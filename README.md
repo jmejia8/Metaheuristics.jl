@@ -14,7 +14,7 @@ Pkg.clone("git@github.com:jmejia8/Metaheuristics.jl.git")
 
 ### ECA
 
-ECA is a new metaheuristic optimization algorithm based on center of mass. ECA minimizes an non-negative objective function.
+ECA is a new metaheuristic optimization algorithm based on center of mass. ECA minimizes a non-negative objective function.
 
 #### Parameters
 - **mfunc:** objective function 
