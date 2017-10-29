@@ -51,7 +51,7 @@ Differential Evolution is a method that optimizes a problem by iteratively tryin
 - **D:** dimension.
 - **F:** DE-stepsize F_weight from interval [0, 2].
 - **N:** Number of population members.
--**CR:** Crossover probability constant from interval [0, 1].
+- **CR:** Crossover probability constant from interval [0, 1].
 - **max_evals:** number evaluations
 - **strategy:** DE strategy
 	- `:rand1` DE/rand/1
