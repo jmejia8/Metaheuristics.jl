@@ -1,5 +1,12 @@
 using Metaheuristics
 using Base.Test
 
-# write your own tests here
-@test 1 == 2
+srand(31415926534)
+
+@testset "Metaheuristics" for tests in [
+            "sphere.jl",
+            "rastrigin.jl",
+            "discus.jl"
+]
+    include(tests)
+end
