@@ -1,9 +1,12 @@
 module Metaheuristics
 
 # ECA algorithm
-export eca
+export eca, diffEvolution
 
-# ECA algotihm
+# ECA algorithm
 include("eca.jl")
+
+# Differential algorithm
+include("diffEvolution.jl")
 
 end # module

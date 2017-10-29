@@ -16,5 +16,9 @@ using Base.Test
     result, fitness = eca(rastrigin, D; showResults=false)
     test_result(result, fitness, D, 1e-5)
 
+    # ED results
+    result, fitness = diffEvolution(rastrigin, D; F = 1, CR = 0.5, showResults=false)
+    test_result(result, fitness, D, 1e-5)
+
 
 end

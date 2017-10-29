@@ -13,7 +13,12 @@ using Base.Test
     # Objective function
     discus(x::Vector{Float64}) = 1e6x[1].^2 + sum(x[2:end] .^2)
 
+    # ECA results
     result, fitness = eca(discus, D; showResults=false)
+    test_result(result, fitness, D, 1e-5)
+
+    # ED results
+    result, fitness = diffEvolution(discus, D; F = 1, CR = 0.5, showResults=false)
     test_result(result, fitness, D, 1e-5)
 
 
