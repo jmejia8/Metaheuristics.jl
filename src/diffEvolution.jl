@@ -1,12 +1,21 @@
 function diffEvolution(func::Function, D::Int;
                         N::Int = 10D,
                         F::Real= 2.0,
-                       CR::Real = 0.9,
+                       CR::Real= 0.9,
                 max_evals::Int = 10000D,
                  strategy::Symbol = :rand1,
               termination::Function = (x ->false),
               showResults::Bool = true,
                    limits  = (-100., 100.))
+
+    if N < 5
+       N = 5
+       println("N increased to minimal value 5")
+    end
+    if CR < 0 || CR > 1
+        CR = 0.5;
+        println("CR should be from interval [0,1]; set to default value 0.5")
+    end
 
     a, b = limits
 
