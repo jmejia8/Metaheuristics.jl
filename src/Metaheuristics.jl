@@ -1,5 +1,9 @@
 module Metaheuristics
 
-# package code goes here
+# ECA algorithm
+export eca
+
+# ECA algotihm
+include("eca.jl")
 
 end # module
