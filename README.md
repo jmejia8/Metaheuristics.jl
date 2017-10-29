@@ -11,7 +11,7 @@ Pkg.clone("git@github.com:jmejia8/Metaheuristics.jl.git")
 ## Algorithms
 
 - ECA algorithm
-- Differential Evolution (ED) algorithm
+- Differential Evolution (DE) algorithm
 
 ### ECA
 
@@ -43,7 +43,7 @@ result, fitness = eca(sphere, D; limits=(-10, 10))
 
 ```
 
-### ED
+### DE
 Differential Evolution is a method that optimizes a problem by iteratively trying to improve a candidate solution with regard to a given measure of quality. [Read more...](https://en.wikipedia.org/wiki/Differential_evolution)
 
 #### Parameters
