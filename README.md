@@ -3,6 +3,7 @@
 A Julia package for metaheuristic optimization algorithms. Evolutionary are considered.
 
 [![Build Status](https://travis-ci.org/jmejia8/Metaheuristics.jl.svg?branch=master)](https://travis-ci.org/jmejia8/Metaheuristics.jl)
+[![Coverage Status](https://coveralls.io/repos/github/jmejia8/Metaheuristics.jl/badge.svg?branch=master)](https://coveralls.io/github/jmejia8/Metaheuristics.jl?branch=master)
 
 ## Installation
 
