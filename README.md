@@ -80,7 +80,7 @@ result, fitness = diffEvolution(sphere, D; limits=(-10, 10))
 
 
 ### PSO
-Particle swarm optimization (PSO) is a population based stochastic optimization technique developed by Dr. Eberhart and Dr. Kennedy  in 1995, inspired by social behavior of bird flocking or fish schooling. (Read more...)[https://en.wikipedia.org/wiki/Particle_swarm_optimization]
+Particle swarm optimization (PSO) is a population based stochastic optimization technique developed by Dr. Eberhart and Dr. Kennedy  in 1995, inspired by social behavior of bird flocking or fish schooling. [Read more...](https://en.wikipedia.org/wiki/Particle_swarm_optimization)
 
 #### Parameters
 - **func:** objective function.
