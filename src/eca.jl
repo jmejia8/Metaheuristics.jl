@@ -108,8 +108,8 @@ function eca(mfunc::Function,
         stop = nevals > max_evals || termination(fitness)
     end
 
-
-    f_best = maximum(fitness)
+    fitness = -1.0 + 1.0 ./ fitness
+    f_best = minimum(fitness)
     if showResults
         println("===========[ ECA results ]=============")
         println("| Generations = $t")
@@ -120,5 +120,5 @@ function eca(mfunc::Function,
         println("=======================================")
     end
 
-    return population[find(x->x == f_best, fitness)[1], :], (1.0 / f_best) - 1
+    return population[find(x->x == f_best, fitness)[1], :], f_best
 end
