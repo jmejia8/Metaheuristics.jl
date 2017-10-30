@@ -21,5 +21,9 @@ using Base.Test
     result, fitness = diffEvolution(discus, D; F = 1, CR = 0.5, showResults=false)
     test_result(result, fitness, D, 1e-5)
 
+    # PSO results
+    result, fitness = pso(discus, 2; showResults=false)
+    test_result(result, fitness, 2, 1e1)
+
 
 end

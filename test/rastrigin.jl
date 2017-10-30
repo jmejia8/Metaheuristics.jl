@@ -20,5 +20,8 @@ using Base.Test
     result, fitness = diffEvolution(rastrigin, D; F = 1, CR = 0.5, showResults=false)
     test_result(result, fitness, D, 1e-5)
 
+    # PSO results
+    result, fitness = pso(rastrigin, 2; showResults=false)
+    test_result(result, fitness, D, 1e-5)
 
 end
