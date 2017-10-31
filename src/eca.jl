@@ -1,4 +1,4 @@
-function center(neigbors, fitness)
+function center(neigbors::Matrix, fitness::Vector)
     n, d = size(neigbors, 1, 2)
     c = zeros(Float64, d)
 
@@ -9,7 +9,7 @@ function center(neigbors, fitness)
     return c / sum(fitness)
 end
 
-function replaceWorst!(population, fitness, A, f_A)
+function replaceWorst!(population::Matrix, fitness::Vector, A, f_A)
     f_wrost = sort(fitness)
 
     l = 1
