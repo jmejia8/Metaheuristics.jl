@@ -44,9 +44,13 @@ function eca(mfunc::Function,
       termination::Function = (x ->false),
       showResults::Bool = true,
        correctSol::Bool = true,
+       searchType::Symbol=:minimize,
            limits  = (-100., 100.))
 
-    func(x) = 1.0 ./ (1 + mfunc(x))
+    func(x) = mfunc(x)
+    if searchType == :minimize
+        func(x) = 1.0 ./ (1 + mfunc(x))
+    end
 
     a, b = limits
 
