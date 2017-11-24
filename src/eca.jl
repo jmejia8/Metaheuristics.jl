@@ -44,6 +44,7 @@ function eca(mfunc::Function,
       termination::Function = (x ->false),
       showResults::Bool = true,
        correctSol::Bool = true,
+         saveGens::Bool = false,
        searchType::Symbol=:minimize,
            limits  = (-100., 100.))
 
@@ -70,6 +71,11 @@ function eca(mfunc::Function,
 
     # current generation
     t = 0
+
+    # best solutions
+    bestPerGen = []
+    tmpBest = maximum(fitness)
+    push!(bestPerGen, population[find(x->x == tmpBest, fitness)[1], :])
 
     # start search
     while !stop
@@ -110,6 +116,15 @@ function eca(mfunc::Function,
         replaceWorst!(population, fitness, A, f_A)
         
         stop = nevals > max_evals || termination(fitness)
+
+        if saveGens
+            tmpBest = maximum(fitness)
+            push!(bestPerGen, population[find(x->x == tmpBest, fitness)[1], :])
+        end
+    end
+
+    if saveGens
+        writecsv("./solutions.csv", bestPerGen)        
     end
 
     fitness = -1.0 + 1.0 ./ fitness
