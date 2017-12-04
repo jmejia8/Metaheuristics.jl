@@ -9,16 +9,27 @@ function center(neigbors::Matrix, fitness::Vector)
     return c / sum(fitness)
 end
 
+function myFind(x, X)
+    for i = 1:length(X)
+        if x == X[i]
+            return i
+        end
+    end
+
+    return -1
+end
+
 function replaceWorst!(population::Matrix, fitness::Vector, A, f_A)
     f_wrost = sort(fitness)
 
     l = 1
     for val in f_wrost[1:length(f_A)]
-        j = find(x -> x == val, fitness)
-        j = j[1]
+        j = myFind(val, fitness)
+
         if fitness[j] > f_A[l]
             continue
         end
+
         population[j,:] = A[l]
         fitness[j] = f_A[l]
         l += 1
@@ -39,7 +50,7 @@ function eca(mfunc::Function,
                 D::Int;
             η_max::Real= 2.0,
                 K::Int = 7,
-                N::Int = K * D,
+                N::Int = 2K * D,
         max_evals::Int = 10000D,
       termination::Function = (x ->false),
       showResults::Bool = true,
@@ -58,7 +69,7 @@ function eca(mfunc::Function,
     population = a + (b - a) * rand(N, D)
 
 
-    fitness = zeros(Real, N)
+    fitness = zeros(Float64, N)
     for i in 1:N            
         fitness[i] = func(population[i, :])
     end
@@ -119,7 +130,7 @@ function eca(mfunc::Function,
 
         if saveGens
             tmpBest = maximum(fitness)
-            push!(bestPerGen, population[find(x->x == tmpBest, fitness)[1], :])
+            push!(bestPerGen, population[myFind(tmpBest, fitness), :])
         end
     end
 
@@ -139,5 +150,5 @@ function eca(mfunc::Function,
         println("=======================================")
     end
 
-    return population[find(x->x == f_best, fitness)[1], :], f_best
+    return population[myFind(f_best, fitness), :], f_best
 end
