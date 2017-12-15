@@ -37,13 +37,15 @@ function replaceWorst!(population::Matrix, fitness::Vector, A, f_A)
 end
 
 function correct(h, limits)
-    a, b = limits
-    return map(x-> begin 
-                while(abs(x) > b)
-                    x /= 2.0
-                end
-                return x
-            end , h)
+    a, b = limits[1,:], limits[2,:]
+
+    for i = 1:length(h)
+        while !( a[i] <= h[i] <= b[i] )
+            h[i] = a[i] + (b[i] - a[i])*rand()
+        end
+    end
+    
+    return h
 end
 
 function eca(mfunc::Function,
@@ -57,16 +59,19 @@ function eca(mfunc::Function,
        correctSol::Bool = true,
          saveGens::Bool = false,
        searchType::Symbol=:minimize,
-           limits  = (-100., 100.))
+       saveConvergence::Bool=false,
+           limits  = [-100., 100.])
 
-    func(x) = mfunc(x)
+    func = mfunc
     if searchType == :minimize
         func(x) = 1.0 ./ (1 + mfunc(x))
     end
 
-    a, b = limits
+    a, b = limits[1,:], limits[2,:]
 
-    population = a + (b - a) * rand(N, D)
+    L = (a + (b - a))'
+
+    population = L .* rand(N, D)
 
 
     fitness = zeros(Float64, N)
@@ -74,7 +79,7 @@ function eca(mfunc::Function,
         fitness[i] = func(population[i, :])
     end
 
-    # current evalutations
+    # current evaluations
     nevals = N
 
     # stop condition
@@ -85,8 +90,16 @@ function eca(mfunc::Function,
 
     # best solutions
     bestPerGen = []
+    convergence = []
     tmpBest = maximum(fitness)
-    push!(bestPerGen, population[find(x->x == tmpBest, fitness)[1], :])
+
+    if saveGens
+        push!(bestPerGen, population[find(x->x == tmpBest, fitness)[1], :])
+    end
+
+    if saveConvergence
+        push!(convergence, tmpBest)
+    end
 
     # start search
     while !stop
@@ -132,10 +145,19 @@ function eca(mfunc::Function,
             tmpBest = maximum(fitness)
             push!(bestPerGen, population[myFind(tmpBest, fitness), :])
         end
+
+        if saveConvergence
+            tmpBest = maximum(fitness)
+            push!(convergence, tmpBest)
+        end
     end
 
     if saveGens
         writecsv("./solutions.csv", bestPerGen)        
+    end
+
+    if saveConvergence
+        writecsv("./convergence.csv", convergence)
     end
 
     fitness = -1.0 + 1.0 ./ fitness
