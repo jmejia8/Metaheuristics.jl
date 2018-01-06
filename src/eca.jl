@@ -1,6 +1,10 @@
-function center(neigbors::Matrix, fitness::Vector)
+function center(neigbors::Matrix, fitness::Vector, negativeVals::Bool)
     n, d = size(neigbors, 1, 2)
     c = zeros(Float64, d)
+
+    if negativeVals
+        fitness = 2abs(minimum(fitness)) + fitness
+    end
 
     for i = 1:n
         c += neigbors[i,:] * fitness[i]
@@ -37,7 +41,7 @@ function replaceWorst!(population::Matrix, fitness::Vector, A, f_A)
 end
 
 function correct(h, limits)
-    a, b = limits[1,:], limits[2,:]
+    a, b = limits
 
     for i = 1:length(h)
         while !( a[i] <= h[i] <= b[i] )
@@ -58,16 +62,21 @@ function eca(mfunc::Function,
       showResults::Bool = true,
        correctSol::Bool = true,
          saveGens::Bool = false,
+     negativeVals::Bool = false,
        searchType::Symbol=:minimize,
        saveConvergence::Bool=false,
            limits  = [-100., 100.])
 
     func = mfunc
-    if searchType == :minimize
+    if searchType == :minimize && ! negativeVals
         func(x) = 1.0 ./ (1 + mfunc(x))
     end
 
     a, b = limits[1,:], limits[2,:]
+    if length(a) < D
+        a = ones(D) * a[1]
+        b = ones(D) * b[1]
+    end
 
     L = (a + (b - a))'
 
@@ -116,13 +125,13 @@ function eca(mfunc::Function,
             U = population[U_ids, :]
 
             η = η_max * rand()
-            c = center(U, fitness[U_ids])
+            c = center(U, fitness[U_ids], negativeVals)
             u = population[rand(U_ids, 1)[1], :]
 
             h = x + η * (c - u)
 
             if correctSol
-                h = correct(h, limits)
+                h = correct(h, (a, b))
             end
 
             f_h = func(h)
@@ -160,8 +169,13 @@ function eca(mfunc::Function,
         writecsv("./convergence.csv", convergence)
     end
 
-    fitness = -1.0 + 1.0 ./ fitness
-    f_best = minimum(fitness)
+    f_best = maximum(fitness)
+    if searchType == :minimize 
+        if ! negativeVals
+            fitness = -1.0 + 1.0 ./ fitness
+        end
+        f_best = minimum(fitness)
+    end
     if showResults
         println("===========[ ECA results ]=============")
         println("| Generations = $t")
