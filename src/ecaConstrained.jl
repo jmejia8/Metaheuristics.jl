@@ -122,6 +122,17 @@ function getBest(Population::Array{Individual, 1})
     return Population[j]
 end
 
+function correct(y, a, b)
+
+    for i = 1:length(y)
+        while !( a[i] <= y[i] <= b[i] )
+            y[i] = a[i] + (b[i] - a[i])*rand()
+        end
+    end
+    
+    return y
+end
+
 function ecaConstrained(
             mfunc::Function,
                 D::Int,
@@ -134,14 +145,12 @@ function ecaConstrained(
       termination::Function = (x ->false),
       showResults::Bool = true,
        correctSol::Bool = true,
-         saveGens::Bool = false,
-     negativeVals::Bool = false,
        searchType::Symbol=:minimize,
-       saveConvergence::Bool=false,
+         saveLast::String = "",
+       saveConvergence::String="",
            limits  = [-100., 100.])
 
     func = mfunc
-
     a, b = limits[1,:], limits[2,:]
     if length(a) < D
         a = ones(D) * a[1]
@@ -169,16 +178,11 @@ function ecaConstrained(
     t = 0
 
     # best solutions
-    # bestPerGen = []
-    # convergence = []
-    # tmpBest = maximum(f)
+    convergence = []
 
-    if saveGens
-        push!(bestPerGen, Population[find(x->x == tmpBest, f)[1], :])
-    end
-
-    if saveConvergence
-        push!(convergence, tmpBest)
+    if saveConvergence != ""
+        tmpBest = getBest(Population)
+        push!(convergence, tmpBest.f)
     end
 
     # start search
@@ -201,7 +205,7 @@ function ecaConstrained(
             y = x + η * (c - u)
 
             if correctSol
-                y = correct(y, limits)
+                y = correct(y, a, b)
             end
 
             f, g, h = func(y)
@@ -220,24 +224,25 @@ function ecaConstrained(
         
         stop = nevals > max_evals || termination(Population)
 
-        # if saveGens
-        #     tmpBest = maximum(f)
-        #     push!(bestPerGen, Population[myFind(tmpBest, f), :])
-        # end
 
-        # if saveConvergence
-        #     tmpBest = maximum(f)
-        #     push!(convergence, tmpBest)
-        # end
+        if saveConvergence != ""
+            tmpBest = getBest(Population)
+            push!(convergence, [tmpBest.f, tmpBest.νVal])
+        end
+
     end
 
-    # if saveGens
-    #     writecsv("./solutions.csv", bestPerGen)        
-    # end
+    if saveLast != ""
+        o = []
+        for i = 1:N
+            push!(o, Population[i].x)
+        end
+        writecsv(saveLast, o)        
+    end
 
-    # if saveConvergence
-    #     writecsv("./convergence.csv", convergence)
-    # end
+    if saveConvergence != ""
+        writecsv(saveConvergence, convergence)
+    end
 
     best = getBest(Population)
 
