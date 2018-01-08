@@ -182,7 +182,8 @@ function ecaConstrained(
 
     if saveConvergence != ""
         tmpBest = getBest(Population)
-        push!(convergence, tmpBest.f)
+        c = sum(G(tmpBest.g) .> 0.0) + sum(H(tmpBest.h) .> 0.0)
+        push!(convergence, [tmpBest.f, tmpBest.νVal, c])
     end
 
     # start search
@@ -227,7 +228,8 @@ function ecaConstrained(
 
         if saveConvergence != ""
             tmpBest = getBest(Population)
-            push!(convergence, [tmpBest.f, tmpBest.νVal])
+            c = sum(G(tmpBest.g) .> 0.0) + sum(H(tmpBest.h) .> 0.0)
+            push!(convergence, [tmpBest.f, tmpBest.νVal, c])
         end
 
     end
