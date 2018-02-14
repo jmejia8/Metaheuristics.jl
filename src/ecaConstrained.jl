@@ -217,13 +217,18 @@ function ecaConstrained(
             if Selection(Population[i], sol)
                 push!(A, sol)
             end
+            
+            stop = nevals >= max_evals
+            if stop
+                break
+            end
         end
 
         t += 1
 
         replaceWorst!(Population, A)
         
-        stop = nevals > max_evals || termination(Population)
+        stop = stop || termination(Population)
 
 
         if saveConvergence != ""
@@ -252,8 +257,8 @@ function ecaConstrained(
         println("===========[ ECA results ]=============")
         println("| Generations = $t")
         println("| Evals       = ", nevals)
-        println("| best f.   = ", best.f)
-        println("| best ν.   = ", best.νVal)
+        @printf("| best f.   = %e\n", best.f)
+        @printf("| best ν.   = %e\n", best.νVal)
         println("=======================================")
     end
 
