@@ -192,11 +192,17 @@ function ecaConstrained(
         # empty archive
         A   = Array{Individual, 1}([])
         
+        I = randperm(N)
         # For each elements in Population
         for i in 1:N            
             x = Population[i].x
 
-            U_ids = randperm(N)[1:K]
+            if i <= N-K
+                U_ids = I[i+1:K+i]
+            else
+                U_ids = I[1:K]
+            end
+
             U = Population[U_ids]
 
             η = η_max * rand()
