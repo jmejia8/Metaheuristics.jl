@@ -112,7 +112,7 @@ function getBest(Population::Array{Individual, 1})
             ν_min = Population[i].νVal
             f_min = Population[i].f
             j = i
-        elseif ν_min == Population[i].νVal && f_min < Population[i].f
+        elseif ν_min == Population[i].νVal && f_min > Population[i].f
             ν_min = Population[i].νVal
             f_min = Population[i].f
             j = i
