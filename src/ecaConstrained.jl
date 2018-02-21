@@ -141,6 +141,7 @@ function ecaConstrained(
             η_max::Real= 2.0,
                 K::Int = 7,
                 N::Int = 2K * D,
+        p_exploit::Real= 0.9,
         max_evals::Int = 10000D,
       termination::Function = (x ->false),
       showResults::Bool = true,
@@ -193,23 +194,42 @@ function ecaConstrained(
         A   = Array{Individual, 1}([])
         
         I = randperm(N)
+
+        p = nevals / max_evals
+
+        # Best solution
+        tmpBest = getBest(Population)
+        x_best  = tmpBest.x
+
         # For each elements in Population
         for i in 1:N            
             x = Population[i].x
 
+            # generate U masses
             if i <= N-K
-                U_ids = I[i+1:K+i]
+                U_ids = I[i:K+i]
             else
                 U_ids = I[1:K]
             end
 
             U = Population[U_ids]
-
-            η = η_max * rand()
+            
+            # generate center of mass
             c = center(U, searchType)
-            u = Population[rand(U_ids, 1)[1]].x
 
-            y = x + η * (c - u)
+            # stepsize
+            η = η_max * rand()
+
+            # Ask if exploit process should be performed
+            if p < p_exploit
+                u = Population[rand(U_ids, 1)[1]].x
+
+                # offspring using strategy 1
+                y = x + η * (c - u)
+            else
+                # offspring using strategy 2
+                y = x + 2η * (x_best - c)
+            end
 
             if correctSol
                 y = correct(y, a, b)
