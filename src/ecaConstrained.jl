@@ -138,10 +138,11 @@ function ecaConstrained(
                 D::Int,
                 D_g::Int,
                 D_h::Int;
-            η_max::Real= 2.0,
-                K::Int = 7,
-                N::Int = 2K * D,
-        p_exploit::Real= 0.9,
+            η_max::Real= 4.0,
+                K::Int = 3,
+                N::Int = K * D,
+        p_exploit::Real= 0.90,
+            p_bin::Real= 0.4,
         max_evals::Int = 10000D,
       termination::Function = (x ->false),
       showResults::Bool = true,
@@ -224,11 +225,19 @@ function ecaConstrained(
             if p < p_exploit
                 u = Population[rand(U_ids, 1)[1]].x
 
-                # offspring using strategy 1
+                # u-random-to-center/bin
                 y = x + η * (c - u)
+
             else
-                # offspring using strategy 2
-                y = x + 2η * (x_best - c)
+                # center-to-best/bin
+                y = x + η * (x_best - c)
+            end
+
+            for j = 1:D
+                if rand() < p_bin
+                    y[j] = x[j]
+                     
+                end
             end
 
             if correctSol
