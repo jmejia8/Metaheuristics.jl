@@ -35,15 +35,16 @@ function diffEvolution(func::Function, D::Int;
     # current generation
     t = 0
     
-    fBest = maximum(fitness)
-    xBest = population[find(x->x == fBest, fitness)[1], :]        
+    i_min = indmin(fitness)
+    xBest = population[i_min,:]
+    fBest = fitness[i_min]
 
     # start search
     while !stop
         x = copy(population)
         # For each elements in population
         for i in 1:N
-            k = rand(1:N, 5)
+            k = randperm(N)
 
             if strategy == :rand1
                 # DE/rand/1
@@ -68,10 +69,11 @@ function diffEvolution(func::Function, D::Int;
             # binomial crossover
             v = x[i,:]
             r = rand(1:D,1)[1]
-            for j = 1:D
-                if rand() < CR || j == r
-                    v[j] = u[j] end
-            end
+
+            I = rand(D) .< CR
+            v[I] = u[I]
+            v[r] = u[r]
+
 
             fv = func(v)
             nevals += 1
@@ -80,15 +82,20 @@ function diffEvolution(func::Function, D::Int;
                 fitness[i] = fv
             end
 
+            stop = nevals >= max_evals
+            if stop
+                break
+            end
         end
 
         t += 1
 
-        fBest = minimum(fitness)
-        xBest = population[find(a->a == fBest, fitness)[1], :]        
+        i_min = indmin(fitness)
+        xBest = population[i_min,:]
+        fBest = fitness[i_min]
     
         # stop condition
-        stop = nevals > max_evals || termination(fitness)
+        stop = stop || termination(fitness)
     end
 
 
