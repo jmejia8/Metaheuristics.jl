@@ -14,13 +14,16 @@ include("diffEvolution.jl")
 # PSO algorithm
 include("pso.jl")
 
-# WOA
+# The whale optimization algorithm
+# S Mirjalili, A Lewis - Advances in Engineering Software, 2016
 include("WOA.jl")
 
-# GOA
+# Grasshopper optimisation algorithm: Theory and application
+# S Saremi, S Mirjalili, A Lewis - Advances in Engineering Software, 2017
 include("GOA.jl")
 
-# GSA
+# GSA: a gravitational search algorithm
+# E Rashedi, H Nezamabadi-Pour, S Saryazdi - Information sciences, 2009
 include("GSA.jl")
 
 
