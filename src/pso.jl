@@ -29,8 +29,9 @@ function pso(func::Function, D::Int;
     # current generation
     t = 0
     
-    fBest = minimum(fitness)
-    xGBest= xPBests[find(x->x == fBest, fitness)[1], :]        
+    i_min = indmin(fitness)
+    xGBest= population[i_min]         
+    fBest = fitness[i_min]
 
     velocity(x, v, pbest, gbest) = ω*v + C1*rand()*(pbest-x) + C2*rand()*(gbest-x)
 
