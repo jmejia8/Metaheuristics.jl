@@ -2,7 +2,7 @@ __precompile__()
 module Metaheuristics
 
 # ECA algorithm
-export eca, diffEvolution, pso, ecaConstrained, WOA, GOA
+export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA
 
 # ECA algorithm
 include("eca.jl")
@@ -19,6 +19,9 @@ include("WOA.jl")
 
 # GOA
 include("GOA.jl")
+
+# GSA
+include("GSA.jl")
 
 
 end # module
