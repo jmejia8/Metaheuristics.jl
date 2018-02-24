@@ -74,6 +74,9 @@ function diffEvolution(func::Function, D::Int;
             v[I] = u[I]
             v[r] = u[r]
 
+            # Correct sol.
+            I = .!(a .< v .< b)
+            v[ I ] = a + (b-a) * rand(sum(I))
 
             fv = func(v)
             nevals += 1
