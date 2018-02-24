@@ -15,46 +15,53 @@
 #_________________________________________________________________________#
 
 # This function initialize the first population of search agents
-function initialization(SearchAgents_no,dim,ub,lb)
+function initializationWOA(N, D,ub,lb)
     Boundary_no= size(ub,2) # numnber of boundaries
 
     # If the boundaries of all variables are equal and user enter a signle
     # number for both ub and lb
     if Boundary_no==1
-        Positions=rand(SearchAgents_no,dim).*(ub-lb)+lb
+        Positions=rand(N, D).*(ub-lb)+lb
     end
 
     # If each variable has a different lb and ub
     if Boundary_no > 1
-        for i=1:dim
+        for i=1:D
             ub_i = ub[i]
             lb_i = lb[i]
-            Positions(:,i)=rand(SearchAgents_no,1).*(ub_i-lb_i)+lb_i
+            Positions(:,i)=rand(N, 1).*(ub_i-lb_i)+lb_i
         end
     end
     return Positions 
 end
 
 # The Whale Optimization Algorithm
-function WOA(SearchAgents_no, Max_evals, lb, ub, dim, fobj)
+function WOA(fobj::Function,
+                D::Int;
+                N::Int = 30,
+        max_evals::Int = 10000D, 
+         saveLast::String = "",
+  saveConvergence::String = "",
+             limits = [-100.0, 100.0])
 
-    Max_iter = div(Max_evals, SearchAgents_no)
+    Max_iter = div(max_evals, N) + 1
+    ub,lb = limits
 
     # initialize position vector and score for the leader
-    Leader_pos  = zeros(1,dim)
+    Leader_pos  = zeros(1,D)
     Leader_score= Inf #change this to -inf for maximization problems
 
 
     #Initialize the positions of search agents
-    Positions = initialization(SearchAgents_no,dim,ub,lb)
+    Positions = initializationWOA(N, D,ub,lb)
 
-    Convergence_curve = zeros(1,Max_iter)
+    Convergence_curve = zeros(Max_iter)
 
     t=0# Loop counter
 
     # Main loop
     while t < Max_iter
-        for i=1:size(Positions,1)
+        for i=1:N
             
             # Return back the search agents that go beyond the boundaries of the search space
             # Flag4ub = Positions[i,:] .> ub
@@ -78,7 +85,7 @@ function WOA(SearchAgents_no, Max_evals, lb, ub, dim, fobj)
         a2=-1+t*((-1)/Max_iter)
         
         # Update the Position of search agents 
-        for i=1:size(Positions,1)
+        for i=1:N
             r1 = rand() # r1 is a random number in [0,1]
             r2 = rand() # r2 is a random number in [0,1]
             
@@ -91,11 +98,11 @@ function WOA(SearchAgents_no, Max_evals, lb, ub, dim, fobj)
             
             p = rand()        # p in Eq. (2.6)
             
-            for j = 1:size(Positions,2)
+            for j = 1:D
                 
                 if p < 0.5   
                     if abs(A) >= 1
-                        rand_leader_index = floor(Integer, SearchAgents_no*rand()+1)
+                        rand_leader_index = floor(Integer, N* rand()+1)
                         X_rand  = Positions[rand_leader_index, :]
                         D_X_rand= abs(C*X_rand[j]-Positions[i,j]) # Eq. (2.7)
                         Positions[i,j]=X_rand[j]-A*D_X_rand       # Eq. (2.8)
@@ -119,8 +126,16 @@ function WOA(SearchAgents_no, Max_evals, lb, ub, dim, fobj)
         Convergence_curve[t]=Leader_score
 
     end
+
+    if saveConvergence != ""
+       writecsv(saveConvergence, Convergence_curve)
+    end
+
+    if saveLast != ""
+       writecsv(saveLast, Positions)
+    end
     
-    return Leader_score,Leader_pos,Convergence_curve
+    return Leader_pos, Leader_score
 
 
 end
