@@ -28,6 +28,9 @@ include("GOA.jl")
 # E Rashedi, H Nezamabadi-Pour, S Saryazdi - Information sciences, 2009
 include("GSA.jl")
 
+# SA: Simulated Annealing
+# Kirkpatrick, S., Gelatt, C.D., & Vecchi, M.P. (1983). Optimization by
+# Simulated Annealing. _Science, 220_, 671-680.
 include("SA.jl")
 
 
