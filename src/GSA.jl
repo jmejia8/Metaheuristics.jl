@@ -1,34 +1,9 @@
-# GSA code v1.1.
-# Coded by Jesús Mejúa, 2010. 
+# GSA code v0.1.
+# Coded by Jesús Mejía. 
 # Based on MATLAB code of Esmat Rashedi, 2010. 
 # " E. Rashedi, H. Nezamabadi-pour and S. Saryazdi,
 # “GSA: A Gravitational Search Algorithm”, Information sciences, vol. 179,
 # no. 13, pp. 2232-2248, 2009."
-
-function initializationGSA(D,N,up,down)
-	if size(up,2) == 1
-		X = rand(N,D).*(up-down)+down
-	end
-	if size(up,2)>1
-		for i = 1:D
-			high = up[i]
-			low  = down[i]
-			X[:,i] = rand(N,1).*(high-low)+low
-		end
-	end
-
-	return X
-end
-
-function evaluateF(X, fobj, N)
-
-	f = zeros(N)
-	for i = 1:N
-		f[i] = fobj(X[i,:])
-	end
-
-	return f
-end
 
 function massCalculation(fit,searchType)
 	####here, make your own function of 'mass calculation'
@@ -115,18 +90,6 @@ function move(X,a,V)
 	return X, V
 end
 
-function getBestGSA(fitness, searchType)
-	if searchType == :minimize
-		best_X = indmin(fitness) # minimization.
-		best = fitness[best_X] 
-	else
-		best_X = indmax(fitness) # maximization.
-		best = fitness[best_X] 
-	end
-
-	return best_X, best
-end
-
 # Gravitational Search Algorithm.
 function GSA(fobj::Function,
 	            D::Int;
@@ -150,18 +113,22 @@ function GSA(fobj::Function,
 
 	low, up = limits
 
+	# bounds vectors
+	low = low * ones(D)
+	up  =  up * ones(D)
+
 	max_it = div(max_evals, N) + 1
 
 	#random initialization for agents.
-	X = initializationGSA(D,N,up,low)
+	X = initializePop(N, D, low, up)
 
 	#Evaluation of agents. 
-	fitness = evaluateF(X, fobj, N)
+	fitness = evaluatePop(X, fobj, N)
 
 	V = zeros(N,D)
 
 	# Current best
-	best_X, best = getBestGSA(fitness, searchType)
+	best_X, best = getBest(fitness, searchType)
 
 	Fbest = best
 	Lbest = X[best_X,:]
@@ -182,11 +149,11 @@ function GSA(fobj::Function,
 		X, V = move(X,a,V)
 
 		# Checking allowable range. 
-		# X = space_bound(X,up,low)
+		X = correctPop(X, low, up)
 		
 		#Evaluation of agents. 
-		fitness = evaluateF(X, fobj, N)
-		best_X, best = getBestGSA(fitness, searchType)
+		fitness = evaluatePop(X, fobj, N)
+		best_X, best = getBest(fitness, searchType)
 
 
 		if searchType == :minimize

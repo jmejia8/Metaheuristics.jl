@@ -14,27 +14,6 @@
 #                                                                         #
 #_________________________________________________________________________#
 
-# This function initialize the first population of search agents
-function initializationWOA(N, D,ub,lb)
-    Boundary_no= size(ub,2) # numnber of boundaries
-
-    # If the boundaries of all variables are equal and user enter a signle
-    # number for both ub and lb
-    if Boundary_no==1
-        Positions=rand(N, D).*(ub-lb)+lb
-    end
-
-    # If each variable has a different lb and ub
-    if Boundary_no > 1
-        for i=1:D
-            ub_i = ub[i]
-            lb_i = lb[i]
-            Positions(:,i)=rand(N, 1).*(ub_i-lb_i)+lb_i
-        end
-    end
-    return Positions 
-end
-
 # The Whale Optimization Algorithm
 function WOA(fobj::Function,
                 D::Int;
@@ -45,7 +24,11 @@ function WOA(fobj::Function,
              limits = [-100.0, 100.0])
 
     Max_iter = div(max_evals, N) + 1
-    ub,lb = limits
+    lb, ub = limits
+
+    # bounds vectors
+    lb = lb * ones(D)
+    ub = ub * ones(D)
 
     # initialize position vector and score for the leader
     Leader_pos  = zeros(1,D)
@@ -53,7 +36,7 @@ function WOA(fobj::Function,
 
 
     #Initialize the positions of search agents
-    Positions = initializationWOA(N, D,ub,lb)
+    Positions = initializePop(N, D, lb, ub)
 
     Convergence_curve = zeros(Max_iter)
 
@@ -61,13 +44,12 @@ function WOA(fobj::Function,
 
     # Main loop
     while t < Max_iter
+        # Return back the search agents that go beyond the boundaries of the search space
+        Positions = correctPop(Positions, lb, ub)
+
         for i=1:N
             
-            # Return back the search agents that go beyond the boundaries of the search space
-            # Flag4ub = Positions[i,:] .> ub
-            # Flag4lb = Positions[i,:] .< lb
-            # Positions[i,:]=( Positions[i,:] .* (!(Flag4ub + Flag4lb)) ) + ub .* Flag4ub + lb .* Flag4lb
-            
+
             # Calculate objective function for each search agent
             fitness=fobj(Positions[i,:])
             
