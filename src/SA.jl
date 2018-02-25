@@ -12,19 +12,25 @@ end
 
 
 function SA( fobj::Function,
-               x0::Vector;
+                D::Int;
+               x0::Vector = [],
                 N::Int = 500,
-        max_evals::Int = 10000length(x0),
+        max_evals::Int = 10000D,
            TolFun::Real= 1e-4,
       showResults::Bool= true,
                limits  = [-100., 100.])
+
+	l, u = limits
+
+	if length(x0) != D
+	    x0 = l + (u - l) .* rand(D)
+	end
 
 	# the current point and fx=f(x)
 	x = x0
 	fx= fobj(x)
 	f0= fx
 
-	l, u = limits
 
 	nevals = 1
 	stop = false
