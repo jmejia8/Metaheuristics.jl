@@ -2,7 +2,9 @@ __precompile__()
 module Metaheuristics
 
 # ECA algorithm
-export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA
+export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA, SA
+
+include("tools.jl")
 
 # ECA algorithm
 include("eca.jl")
@@ -25,6 +27,8 @@ include("GOA.jl")
 # GSA: a gravitational search algorithm
 # E Rashedi, H Nezamabadi-Pour, S Saryazdi - Information sciences, 2009
 include("GSA.jl")
+
+include("SA.jl")
 
 
 end # module
