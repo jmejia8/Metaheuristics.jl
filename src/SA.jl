@@ -84,3 +84,6 @@ function SA( fobj::Function,
 	
 	return x0, f0
 end
+
+# Based on MATLAB code of Héctor Corte
+# B.Sc. in physics 2010
