@@ -54,7 +54,7 @@ function center(U::Array{Particle, 1}, searchType::Symbol)
         c += U[i].x * fitness[i]
     end
 
-    return c / sum(fitness)
+    return c / sum(fitness), indmin(fitness)
 end
 
 function getBest(Population::Array{Particle, 1}, searchType::Symbol)
@@ -149,16 +149,16 @@ function eca(mfunc::Function,
             U = Population[U_ids]
             
             # generate center of mass
-            c = center(U, searchType)
+            c, u_worst = center(U, searchType)
 
             # stepsize
             η = η_max * rand()
 
             # Ask if exploit process should be performed
             if p < p_exploit
-                u = Population[rand(U_ids, 1)[1]].x
-
-                # u-random-to-center/bin
+                # u: worst element in U
+                u = U[u_worst].x
+                # worst-to-center/bin
                 y = x + η * (c - u)
 
             else
