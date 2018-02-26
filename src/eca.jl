@@ -62,16 +62,33 @@ function getBest(Population::Array{Particle, 1}, searchType::Symbol)
     j = 1
 
     for i = 2:length(Population)
-        if searchType == :minimize && f_best < Population[i].f
+        if searchType == :minimize && f_best > Population[i].f
             f_best = Population[i].f
             j = i
-        elseif searchType != :minimize && f_best > Population[i].f
+        elseif searchType != :minimize && f_best < Population[i].f
             f_best = Population[i].f
             j = i
         end
     end
 
     return Population[j]
+end
+
+function getWorstInd(Population::Array{Particle, 1}, searchType::Symbol)
+    f_worst = Population[1].f
+    j = 1
+
+    for i = 2:length(Population)
+        if searchType == :minimize && f_worst < Population[i].f
+            f_worst = Population[i].f
+            j = i
+        elseif searchType != :minimize && f_worst > Population[i].f
+            f_worst = Population[i].f
+            j = i
+        end
+    end
+
+    return j
 end
 
 
@@ -183,9 +200,8 @@ function eca(mfunc::Function,
             nevals += 1
 
             if Selection(Population[i], sol, searchType)
-                push!(A, sol)
+                Population[getWorstInd(Population, searchType)] = sol
 
-                # is it bestter?
                 if Selection(best, sol, searchType)
                     best = sol
                 end
@@ -199,8 +215,6 @@ function eca(mfunc::Function,
 
         t += 1
 
-        replaceWorst!(Population, A, searchType)
-        
         stop = stop || termination(Population)
 
 
