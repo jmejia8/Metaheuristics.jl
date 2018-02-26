@@ -144,10 +144,6 @@ function eca(mfunc::Function,
 
     # start search
     while !stop
-
-        # empty archive
-        A   = Array{Particle, 1}([])
-        
         I = randperm(N)
 
         p = nevals / max_evals
