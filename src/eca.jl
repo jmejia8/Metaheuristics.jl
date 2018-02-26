@@ -168,7 +168,7 @@ function eca(mfunc::Function,
 
             for j = 1:D
                 if rand() < p_bin
-                    y[j] = x[j]
+                    y[j] = c[j]
                      
                 end
             end
