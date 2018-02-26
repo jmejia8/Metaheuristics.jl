@@ -13,7 +13,7 @@ using Base.Test
     # Objective function
     rastrigin(x::Vector{Float64}, D=length(x)) = 10D+ sum(x.*x - 10cos.(2π*x))
 
-    result, fitness = eca(rastrigin, D; showResults=false)
+    result, fitness = eca(rastrigin, D; showResults=false, N = 15D)
     test_result(result, fitness, D, 1e-5)
 
     # ED results
