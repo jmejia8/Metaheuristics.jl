@@ -19,6 +19,7 @@ function WOA(fobj::Function,
                 D::Int;
                 N::Int = 30,
         max_evals::Int = 10000D, 
+      showResults::Bool = true,
          saveLast::String = "",
   saveConvergence::String = "",
              limits = [-100.0, 100.0])
@@ -117,6 +118,14 @@ function WOA(fobj::Function,
        writecsv(saveLast, Positions)
     end
     
+    if showResults
+        println("===========[ ECA results ]=============")
+        println("| Generations = $t")
+        println("| Evals       = ", t*N)
+        @printf("| best f.     = %e\n", Leader_score)
+        println("=======================================")
+    end
+
     return Leader_pos, Leader_score
 
 

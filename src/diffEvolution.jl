@@ -6,6 +6,8 @@ function diffEvolution(func::Function, D::Int;
                  strategy::Symbol = :rand1,
               termination::Function = (x ->false),
               showResults::Bool = true,
+                 saveLast::String = "",
+          saveConvergence::String="",
                    limits  = (-100., 100.))
 
     if N < 5
@@ -38,6 +40,12 @@ function diffEvolution(func::Function, D::Int;
     i_min = indmin(fitness)
     xBest = population[i_min,:]
     fBest = fitness[i_min]
+
+    convergence = []
+
+    if saveConvergence != ""
+        push!(convergence, fBest)
+    end
 
     # start search
     while !stop
@@ -96,11 +104,22 @@ function diffEvolution(func::Function, D::Int;
         i_min = indmin(fitness)
         xBest = population[i_min,:]
         fBest = fitness[i_min]
+
+        if saveConvergence != ""
+            push!(convergence, fBest)
+        end
     
         # stop condition
         stop = stop || termination(fitness)
     end
 
+    if saveLast != ""
+        writecsv(saveLast, population)        
+    end
+
+    if saveConvergence != ""
+        writecsv(saveConvergence, convergence)
+    end
 
     if showResults
         println("============[ ED results ]=============")

@@ -92,13 +92,16 @@ end
 
 # Gravitational Search Algorithm.
 function GSA(fobj::Function,
-	            D::Int;
-		        N::Int    = 30,
-	 ElitistCheck::Int    = 1,
-	   searchType::Symbol = :minimize,
-		max_evals::Int    = 10000D,
-		   Rpower::Int    = 1,
-		           limits = [-100.0, 100.0])
+                D::Int;
+                N::Int    = 30,
+     ElitistCheck::Int    = 1,
+       searchType::Symbol = :minimize,
+        max_evals::Int    = 10000D,
+           Rpower::Int    = 1,
+         saveLast::String = "",
+      showResults::Bool = true,
+      saveConvergence::String="",
+              limits = [-100.0, 100.0])
 	#V:   Velocity.
 	#a:   Acceleration.
 	#M:   Mass.  Ma = Mp = Mi = M
@@ -132,6 +135,11 @@ function GSA(fobj::Function,
 
 	Fbest = best
 	Lbest = X[best_X,:]
+
+    convergence = []
+	if saveConvergence != ""
+		push!(convergence, Fbest)
+	end
 
 	for iteration = 1:max_it
 		# iteration
@@ -168,7 +176,27 @@ function GSA(fobj::Function,
 			end
 		end
 
+		if saveConvergence != ""
+			push!(convergence, Fbest)
+		end
+
 	end #iteration
+
+	if saveLast != ""
+		writecsv(saveLast, X)        
+	end
+
+	if saveConvergence != ""
+		writecsv(saveConvergence, convergence)
+	end
+
+	if showResults
+		println("===========[ GSA results ]=============")
+		println("| Generations = $max_it")
+		println("| Evals       = ", max_it*N)
+		@printf("| best f.     = %e\n", Fbest)
+		println("=======================================")
+	end
 
 	return Lbest, Fbest
 
