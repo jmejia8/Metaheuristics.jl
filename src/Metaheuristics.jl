@@ -2,7 +2,7 @@ __precompile__()
 module Metaheuristics
 
 # ECA algorithm
-export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA, CGSA, SA
+export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
 
 include("tools.jl")
 
@@ -41,7 +41,7 @@ include("SA.jl")
 # Li, Zhenhua, and Qingfu Zhang. 
 # "An efficient rank-1 update for Cholesky CMA-ES using auxiliary evolution path." 
 # Evolutionary Computation (CEC), 2017 IEEE Congress on. IEEE, 2017.
-include("CMAES_EAP.jl")
+include("CMAES_AEP.jl")
 
 
 end # module
