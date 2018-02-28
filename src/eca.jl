@@ -139,7 +139,7 @@ function eca(mfunc::Function,
     convergence = []
 
     if saveConvergence != ""
-        push!(convergence, best.f)
+        push!(convergence, [nevals best.f])
     end
 
     # start search
@@ -215,7 +215,7 @@ function eca(mfunc::Function,
 
 
         if saveConvergence != ""
-            push!(convergence, best.f)
+            push!(convergence, [nevals best.f])
         end
 
     end

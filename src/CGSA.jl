@@ -164,7 +164,7 @@ function CGSA(fobj::Function,
 
     convergence = []
 	if saveConvergence != ""
-		push!(convergence, Fbest)
+		push!(convergence, [N Fbest])
 	end
 
 	# chaos
@@ -211,7 +211,7 @@ function CGSA(fobj::Function,
 		end
 
 		if saveConvergence != ""
-			push!(convergence, Fbest)
+			push!(convergence, [(iteration+1)*N Fbest])
 		end
 
 	end #iteration

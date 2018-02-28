@@ -44,7 +44,7 @@ function diffEvolution(func::Function, D::Int;
     convergence = []
 
     if saveConvergence != ""
-        push!(convergence, fBest)
+        push!(convergence, [nevals fBest])
     end
 
     # start search
@@ -106,7 +106,7 @@ function diffEvolution(func::Function, D::Int;
         fBest = fitness[i_min]
 
         if saveConvergence != ""
-            push!(convergence, fBest)
+            push!(convergence, [nevals fBest])
         end
     
         # stop condition

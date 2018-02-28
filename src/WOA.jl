@@ -39,9 +39,10 @@ function WOA(fobj::Function,
     #Initialize the positions of search agents
     Positions = initializePop(N, D, lb, ub)
 
-    Convergence_curve = zeros(Max_iter)
+    convergence = []
 
     t=0# Loop counter
+    nevals = 0
 
     # Main loop
     while t < Max_iter
@@ -53,6 +54,7 @@ function WOA(fobj::Function,
 
             # Calculate objective function for each search agent
             fitness=fobj(Positions[i,:])
+            nevals += 1
             
             # Update the leader
             if fitness < Leader_score # Change this to > for maximization problem
@@ -106,12 +108,13 @@ function WOA(fobj::Function,
             end
         end
         t=t+1
-        Convergence_curve[t]=Leader_score
+
+        push!(convergence, [nevals Leader_score])
 
     end
 
     if saveConvergence != ""
-       writecsv(saveConvergence, Convergence_curve)
+       writecsv(saveConvergence, convergence)
     end
 
     if saveLast != ""

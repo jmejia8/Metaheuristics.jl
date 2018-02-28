@@ -33,13 +33,14 @@ function SA( fobj::Function,
 	fx= fobj(x)
 	f0= fx
 
-	convergence = []
-	if saveConvergence != ""
-		push!(convergence, f0)
-	end
 
 	nevals = 1
 	stop = false
+
+	convergence = []
+	if saveConvergence != ""
+		push!(convergence, [nevals f0])
+	end
 
 	t = 1
 	# Main loop simulates de annealing from a high temperature to zero in max_evals.
@@ -89,7 +90,7 @@ function SA( fobj::Function,
 		end
 
 		if saveConvergence != ""
-			push!(convergence, f0)
+			push!(convergence, [nevals f0])
 		end
 
 		t += 1

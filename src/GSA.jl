@@ -138,7 +138,7 @@ function GSA(fobj::Function,
 
     convergence = []
 	if saveConvergence != ""
-		push!(convergence, Fbest)
+		push!(convergence, [N Fbest])
 	end
 
 	for iteration = 1:max_it
@@ -177,7 +177,7 @@ function GSA(fobj::Function,
 		end
 
 		if saveConvergence != ""
-			push!(convergence, Fbest)
+			push!(convergence, [(iteration+1)*N Fbest])
 		end
 
 	end #iteration
