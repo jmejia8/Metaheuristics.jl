@@ -44,9 +44,10 @@ function CMAES_AEP(fobj::Function,
 
 	# Limits
 	VarMin, VarMax = limits
+	VarMin *= ones(D)
+	VarMax *= ones(D)
 
-
-	σ = (VarMax - VarMin)/3
+	σ = (VarMax[1] - VarMin[1])/3
 
 	# Auxiliary Evolution Path
 	P = zeros(D)
@@ -54,7 +55,7 @@ function CMAES_AEP(fobj::Function,
 	V = zeros(D)
 
 	# initialize M
-	x = VarMin + (VarMax - VarMin) * rand(D)
+	x = VarMin + (VarMax - VarMin) .* rand(D)
 	f = fobj(x)
 	M = IndCMA(zeros(D), zeros(D), x, f)
 	A = eye(D)
@@ -84,6 +85,7 @@ function CMAES_AEP(fobj::Function,
 			z = mvnorm(D)
 			y = A*z
 			x = M.x + σ * y
+			x = correctSol(x, VarMin, VarMax)
 			f = fobj(x)
 
 			nevals += 1
