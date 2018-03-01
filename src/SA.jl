@@ -17,7 +17,9 @@ function SA( fobj::Function,
                 N::Int = 500,
         max_evals::Int = 10000D,
            TolFun::Real= 1e-4,
-      showResults::Bool= true,
+      showResults::Bool = true,
+         saveLast::String = "",
+       saveConvergence::String="",
                limits  = [-100., 100.])
 
 	l, u = limits
@@ -35,6 +37,12 @@ function SA( fobj::Function,
 	nevals = 1
 	stop = false
 
+	convergence = []
+	if saveConvergence != ""
+		push!(convergence, [nevals f0])
+	end
+
+	t = 1
 	# Main loop simulates de annealing from a high temperature to zero in max_evals.
 	while !stop
 
@@ -80,8 +88,30 @@ function SA( fobj::Function,
 			    break
 			end
 		end
+
+		if saveConvergence != ""
+			push!(convergence, [nevals f0])
+		end
+
+		t += 1
 	end
-	
+
+	if saveLast != ""
+		writecsv(saveLast, x0)        
+	end
+
+	if saveConvergence != ""
+		writecsv(saveConvergence, convergence)
+	end
+
+	if showResults
+		println("===========[  SA results ]=============")
+		println("| Generations = $t")
+		println("| Evals       = ", nevals)
+		@printf("| best f.     = %e\n", f0)
+		println("=======================================")
+	end
+
 	return x0, f0
 end
 

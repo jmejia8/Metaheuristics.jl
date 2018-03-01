@@ -1,91 +1,127 @@
-function center(neigbors::Matrix, fitness::Vector, negativeVals::Bool)
-    n, d = size(neigbors, 1, 2)
-    c = zeros(Float64, d)
-
-    if negativeVals
-        fitness = 2abs(minimum(fitness)) + fitness
-    end
-
-    for i = 1:n
-        c += neigbors[i,:] * fitness[i]
-    end
-
-    return c / sum(fitness)
+struct Particle
+    x::Vector
+    f::Real
 end
 
-function myFind(x, X)
-    for i = 1:length(X)
-        if x == X[i]
-            return i
-        end
-    end
-
-    return -1
-end
-
-function replaceWorst!(population::Matrix, fitness::Vector, A, f_A)
-    f_wrost = sort(fitness)
-
-    l = 1
-    for val in f_wrost[1:length(f_A)]
-        j = myFind(val, fitness)
-
-        if fitness[j] > f_A[l]
-            continue
-        end
-
-        population[j,:] = A[l]
-        fitness[j] = f_A[l]
-        l += 1
-    end 
-end
-
-function correct(h, limits)
-    a, b = limits
-
-    for i = 1:length(h)
-        while !( a[i] <= h[i] <= b[i] )
-            h[i] = a[i] + (b[i] - a[i])*rand()
-        end
+function Selection(fOld::Particle, fNew::Particle, searchType::Symbol)
+    if searchType == :minimize
+        return fNew.f < fOld.f
     end
     
-    return h
+    return fNew.f > fOld.f
 end
+
+function replaceWorst!(Population::Array{Particle, 1}, A::Array{Particle, 1}, searchType::Symbol)
+    n = length(A)
+    if n == 0
+        return
+    end
+
+    j = 1
+    for i = randperm(length(Population))
+        if Selection(Population[i], A[j], searchType)
+            Population[i] = A[j]
+            j += 1
+        end
+        if j>n
+            return
+        end
+    end
+
+end
+
+function center(U::Array{Particle, 1}, searchType::Symbol)
+    n, d = length(U), length(U[1].x)
+
+    fitness = zeros(Float64, n)
+    
+    for i = 1:n
+        fitness[i] = U[i].f
+    end
+
+    m = minimum(fitness)
+    
+    if m < 0
+        fitness = 2abs(m) + fitness
+    end
+
+    if searchType == :minimize
+        fitness = 2maximum(fitness) - fitness
+    end
+
+    c = zeros(Float64, d)
+    for i = 1:n
+        c += U[i].x * fitness[i]
+    end
+
+    return c / sum(fitness), indmin(fitness)
+end
+
+function getBest(Population::Array{Particle, 1}, searchType::Symbol)
+    f_best = Population[1].f
+    j = 1
+
+    for i = 2:length(Population)
+        if searchType == :minimize && f_best > Population[i].f
+            f_best = Population[i].f
+            j = i
+        elseif searchType != :minimize && f_best < Population[i].f
+            f_best = Population[i].f
+            j = i
+        end
+    end
+
+    return Population[j]
+end
+
+function getWorstInd(Population::Array{Particle, 1}, searchType::Symbol)
+    f_worst = Population[1].f
+    j = 1
+
+    for i = 2:length(Population)
+        if searchType == :minimize && f_worst < Population[i].f
+            f_worst = Population[i].f
+            j = i
+        elseif searchType != :minimize && f_worst > Population[i].f
+            f_worst = Population[i].f
+            j = i
+        end
+    end
+
+    return j
+end
+
 
 function eca(mfunc::Function,
                 D::Int;
-            η_max::Real= 2.0,
-                K::Int = 7,
-                N::Int = 2K * D,
+            η_max::Real= 4.0,
+                K::Int = 3,
+                N::Int = K * D,
+        p_exploit::Real= 0.95,
+            p_bin::Real= 0.3,
         max_evals::Int = 10000D,
       termination::Function = (x ->false),
       showResults::Bool = true,
        correctSol::Bool = true,
-         saveGens::Bool = false,
-     negativeVals::Bool = false,
        searchType::Symbol=:minimize,
-       saveConvergence::Bool=false,
+         saveLast::String = "",
+       saveConvergence::String="",
            limits  = [-100., 100.])
 
     func = mfunc
-    if searchType == :minimize && ! negativeVals
-        func(x) = 1.0 ./ (1 + mfunc(x))
-    end
-
     a, b = limits[1,:], limits[2,:]
     if length(a) < D
         a = ones(D) * a[1]
         b = ones(D) * b[1]
     end
 
-    L = (a + (b - a))'
 
-    population = L .* rand(N, D)
+    Population = Array{Particle, 1}([])
 
-
-    fitness = zeros(Float64, N)
-    for i in 1:N            
-        fitness[i] = func(population[i, :])
+    for i in 1:N
+        x = a + (b-a) .* rand(D)
+        f = func(x)
+        push!(Population, Particle(x, f))
     end
 
     # current evaluations
@@ -97,94 +133,113 @@ function eca(mfunc::Function,
     # current generation
     t = 0
 
-    # best solutions
-    bestPerGen = []
+    # best solution
+    best = getBest(Population)
+    
     convergence = []
-    tmpBest = maximum(fitness)
 
-    if saveGens
-        push!(bestPerGen, population[find(x->x == tmpBest, fitness)[1], :])
-    end
-
-    if saveConvergence
-        push!(convergence, tmpBest)
+    if saveConvergence != ""
+        push!(convergence, [nevals best.f])
     end
 
     # start search
     while !stop
+        I = randperm(N)
 
-        # empty archive
-        A   = []
-        f_A = Float64.([])
-        
-        # For each elements in population
+        p = nevals / max_evals
+
+        # For each elements in Population
         for i in 1:N            
-            x = population[i, :]
+            x = Population[i].x
 
-            U_ids = rand(1:N, K)
-            U = population[U_ids, :]
-
-            η = η_max * rand()
-            c = center(U, fitness[U_ids], negativeVals)
-            u = population[rand(U_ids, 1)[1], :]
-
-            h = x + η * (c - u)
-
-            if correctSol
-                h = correct(h, (a, b))
+            # generate U masses
+            if i <= N-K
+                U_ids = I[i:K+i]
+            else
+                U_ids = I[1:K]
             end
 
-            f_h = func(h)
+            U = Population[U_ids]
+            
+            # generate center of mass
+            c, u_worst = center(U, searchType)
+
+            # stepsize
+            η = η_max * rand()
+
+            # Ask if exploit process should be performed
+            if p < p_exploit
+                # u: worst element in U
+                u = U[u_worst].x
+                # worst-to-center/bin
+                y = x + η * (c - u)
+
+            else
+                # center-to-best/bin
+                y = x + η * (best.x - c)
+            end
+
+            for j = 1:D
+                if rand() < p_bin
+                    y[j] = c[j]
+                     
+                end
+            end
+
+            if correctSol
+                y = correct(y, a, b)
+            end
+
+            f = func(y)
+            sol = Particle(y, f)
 
             nevals += 1
 
-            if f_h > fitness[i]
-                push!(A,   h)
-                push!(f_A, f_h)
+            if Selection(Population[i], sol, searchType)
+                Population[getWorstInd(Population, searchType)] = sol
+
+                if Selection(best, sol, searchType)
+                    best = sol
+                end
+            end
+            
+            stop = nevals >= max_evals
+            if stop
+                break
             end
         end
 
         t += 1
 
-        replaceWorst!(population, fitness, A, f_A)
-        
-        stop = nevals > max_evals || termination(fitness)
+        stop = stop || termination(Population)
 
-        if saveGens
-            tmpBest = maximum(fitness)
-            push!(bestPerGen, population[myFind(tmpBest, fitness), :])
+
+        if saveConvergence != ""
+            push!(convergence, [nevals best.f])
         end
 
-        if saveConvergence
-            tmpBest = maximum(fitness)
-            push!(convergence, tmpBest)
+    end
+
+    if saveLast != ""
+        o = []
+        for i = 1:N
+            push!(o, Population[i].x)
         end
+        writecsv(saveLast, o)        
     end
 
-    if saveGens
-        writecsv("./solutions.csv", bestPerGen)        
+    if saveConvergence != ""
+        writecsv(saveConvergence, convergence)
     end
 
-    if saveConvergence
-        writecsv("./convergence.csv", convergence)
-    end
 
-    f_best = maximum(fitness)
-    if searchType == :minimize 
-        if ! negativeVals
-            fitness = -1.0 + 1.0 ./ fitness
-        end
-        f_best = minimum(fitness)
-    end
     if showResults
         println("===========[ ECA results ]=============")
         println("| Generations = $t")
         println("| Evals       = ", nevals)
-        println("| best sol.   = ", f_best)
-        println("| mean sol    = ", mean(fitness))
-        println("| std. sol    = ", std(fitness))
+        @printf("| best f.   = %e\n", best.f)
         println("=======================================")
     end
 
-    return population[myFind(f_best, fitness), :], f_best
+    return best.x, best.f
 end

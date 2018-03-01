@@ -1,50 +1,3 @@
-# struct Individual
-#     x::Vector
-#     f::Real
-#     g::Vector
-#     h::Vector
-#     νVal::Real
-# end
-
-# function reducePop(Population, N, N_new)
-#     fitness = zeros(N)
-#     for i = 1:N
-#         fitness[i] = Population[i].f
-#     end
-
-#     fitness_order = sort(fitness)
-
-#     P = Array{Individual, 1}([])
-
-#     for i = 1:N_new
-#         item = findfirst(x -> x == fitness_order[i], fitness)
-#         push!(P, Population[item])
-#     end
-
-#     return P
-
-# end
-
-# function getWorst(Population::Array{Individual, 1})
-#     ν_max = Population[1].νVal
-#     f_max = Population[1].f
-#     j = 1
-
-#     for i = 2:length(Population)
-#         if ν_max > Population[i].νVal 
-#             ν_max = Population[i].νVal
-#             f_max = Population[i].f
-#             j = i
-#         elseif ν_max == Population[i].νVal && f_max < Population[i].f
-#             ν_max = Population[i].νVal
-#             f_max = Population[i].f
-#             j = i
-#         end
-#     end
-
-#     return Population[j]
-# end
-
 ###################################################
 #      Solutions and population functions
 #          for Matrix representation
@@ -59,6 +12,10 @@ function correctSol(y::Vector, a::Vector, b::Vector)
     end
     
     return y
+end
+
+function correct(y::Vector, a::Vector, b::Vector)
+    return correctSol(y, a, b)
 end
 
 function correctPop(P, a, b)
@@ -77,12 +34,12 @@ function correctPop(P, a, b)
     return P
 end
 
-function initializePop(N, D, a, b)
+function initializePop(N::Int, D::Int, a::Vector, b::Vector)
     # a, b should be D × 1
     return a' .* ones(N, D) + (b - a)' .* rand(N, D)
 end
 
-function initializeSol(D, a, b)
+function initializeSol(D::Int, a::Vector, b::Vector)
     # a, b should be D × 1
     return a + (b - a) .* rand(D)
 end
