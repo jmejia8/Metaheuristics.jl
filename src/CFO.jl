@@ -1,14 +1,22 @@
 include("tools.jl")
 function IPD(N, D, XiMin, XiMax, γ)
-	Population = zeros(N, D)
-		
-	# place probes probe line-by-probe line (i is dimension number)
-	for i = 1:D 
-		ΔXi = γ * (XiMax[i] - XiMin[i]) / (N - 1)
-		Population[:, i] = XiMin[i] + ΔXi*linspace(0, N-1,N)
+	if D > 1
+		NumProbesPerDimension = div(N, D); # even #
+	else
+		NumProbesPerDimension = N;
 	end
 
-	return Population
+	R = repmat(XiMin' + γ .* (XiMax' - XiMin'), N);
+
+	for i = 1: D # place probes probe line-by-probe line (i is dimension number)
+		DeltaXi = (XiMax[i] - XiMin[i]) / (NumProbesPerDimension - 1);
+		for k = 1:NumProbesPerDimension
+			p = k + NumProbesPerDimension * (i - 1); # probe #
+			R[p, i] = XiMin[i] + (k - 1) * DeltaXi;
+		end
+	end
+
+	return R
 
 end
 
@@ -33,13 +41,14 @@ end
 
 function CFO(fobj::Function,
                 D::Int;
-                N::Int  = 8D,
+                # N::Int  = 8D,
         max_evals::Int  = 10000D, 
-                γ::Real = 1,
-                α::Real = 2,
+                γ::Real = 0.5,
+                G::Real = 1,
+                α::Real = 1,
                 β::Real = 2,
          FrepInit::Real = 0.5,
-            ΔFrep::Real = 0.005,
+            ΔFrep::Real = 0.1,
           minFrep::Real = 0.05,
                 limits = [-100.0, 100.0])
 
@@ -47,12 +56,22 @@ function CFO(fobj::Function,
 	XiMin *= ones(D)
 	XiMax *= ones(D)
 
+	if D == 30
+		ρ = 2
+	elseif D <= 30
+		ρ = 12
+	else
+		ρ = 8
+	end
+
+	N = ρ*D
+
 	max_iters = div(max_evals, N) + 1
 
 	LastStep = max_iters
 
 	# STEP (A1) -------- Compute Initial Probe Distribution (Step 0)-----------
-	Population = initializePop(N, D, XiMin, XiMax)#IPD(N, D, XiMin, XiMax, γ)
+	Population = IPD(N, D, XiMin, XiMax, γ)
 	# return Population
 
 	# STEP (A2) ---------- Compute Initial Fitness Matrix (Step 0) ------------
@@ -77,22 +96,22 @@ function CFO(fobj::Function,
 		# Compute Accelerations Based on Current Probe Distribution & Fitnesses
 		# ---------------------------------------------------------------------
 		for p = 1:N
-			for i = 1:D
-				for k = 1:N
-					if k == p
-						continue
-					end
+			for k = 1:N
+				if k == p
+					continue
+				end
 
-					sum_kp = sum((Population[k, :] - Population[p, :]) .^ 2)
+				sum_kp = sum((Population[k, :] - Population[p, :]) .^ 2)
 
-					# to avoid zero denominator
-					if sum_kp != 0 
-						denom     = sqrt(sum_kp)
-						Numerator = UnitStep(fitness[k] - fitness[p]) * (fitness[k] - fitness[p])
-						accel[p, i] += (Population[k, i] - Population[p, i]) * (Numerator ^ α) / (denom ^ β)
-					end
+				# to avoid zero denominator
+				if sum_kp != 0 
+					denom     = sqrt(sum_kp)
+					Numerator = UnitStep(fitness[k] - fitness[p]) * (fitness[k] - fitness[p])^α
+					accel[p,:] += (Population[k,:] - Population[p, :]) * (Numerator) / (denom ^ β)
 				end
 			end
+
+			accel[p,:] *= G
 		end
 		
 		# Get Best Fitness & Corresponding Probe # and Time Step -------
@@ -110,11 +129,11 @@ function CFO(fobj::Function,
 		end
 		
 		# STEP (B) ---- Compute Probe Position Vectors for this Time Step -----
-		Population += accel
+		Population += 0.5accel
 		
 		# Starting at Step #20 Shrink Decision Space Around Best Probe Every
 		# 20th Step
-		if mod(j, 20) == 0 && j >= 21
+		if mod(j, 20) == 0
 			# shrink DS by 0.5
 			XiMin = XiMin + (best - XiMin) ./ 2
 			XiMax = XiMax - (XiMax - best) ./ 2			
