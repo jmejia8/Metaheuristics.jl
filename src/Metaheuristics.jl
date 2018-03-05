@@ -3,6 +3,7 @@ module Metaheuristics
 
 # ECA algorithm
 export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
+export CFO
 
 include("tools.jl")
 
@@ -42,6 +43,11 @@ include("SA.jl")
 # "An efficient rank-1 update for Cholesky CMA-ES using auxiliary evolution path." 
 # Evolutionary Computation (CEC), 2017 IEEE Congress on. IEEE, 2017.
 include("CMAES_AEP.jl")
+
+# R.A. Formato Central force optimization:
+# a new metaheuristic with applications in applied electromagnetics
+# Progress in Electromagnetics Research, PIER 77 (2007), pp. 425-491, 10.2528/PIER07082403
+include("CFO.jl")
 
 
 end # module

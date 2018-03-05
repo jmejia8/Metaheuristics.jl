@@ -1,4 +1,3 @@
-include("tools.jl")
 function IPD(N, D, XiMin, XiMax, γ)
 	if D > 1
 		NumProbesPerDimension = div(N, D); # even #
@@ -39,9 +38,8 @@ function UnitStep(vars)
 
 end
 
-function CFO(fobj::Function,
+function CFO(fobj_::Function,
                 D::Int;
-                # N::Int  = 8D,
         max_evals::Int  = 10000D, 
                 γ::Real = 0.5,
                 G::Real = 1,
@@ -50,7 +48,14 @@ function CFO(fobj::Function,
          FrepInit::Real = 0.5,
             ΔFrep::Real = 0.1,
           minFrep::Real = 0.05,
+       searchType::Symbol=:minimize,
                 limits = [-100.0, 100.0])
+
+	if searchType == :minimize
+		fobj(x) = -fobj_(x)
+	else
+		fobj = fobj_
+	end
 
 	XiMin, XiMax = limits
 	XiMin *= ones(D)
@@ -150,5 +155,8 @@ function CFO(fobj::Function,
 		
 	end
 
+	if searchType == :minimize
+		bestFitness *= -1
+	end
 	return best, bestFitness
 end
