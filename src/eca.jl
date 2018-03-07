@@ -54,7 +54,7 @@ function center(U::Array{Particle, 1}, searchType::Symbol)
         c += U[i].x * fitness[i]
     end
 
-    return c / sum(fitness), indmin(fitness)
+    return c / sum(fitness), indmin(fitness), indmax(fitness)
 end
 
 function getBest(Population::Array{Particle, 1}, searchType::Symbol)
@@ -94,11 +94,11 @@ end
 
 function eca(mfunc::Function,
                 D::Int;
-            η_max::Real= 4.0,
-                K::Int = 3,
-                N::Int = K * D,
+            η_max::Real= 2,
+                K::Int = 7,
+                N::Int = K*D,
         p_exploit::Real= 0.95,
-            p_bin::Real= 0.3,
+            p_bin::Real= 0.02,
         max_evals::Int = 10000D,
       termination::Function = (x ->false),
       showResults::Bool = true,
@@ -156,13 +156,14 @@ function eca(mfunc::Function,
             if i <= N-K
                 U_ids = I[i:K+i]
             else
-                U_ids = I[1:K]
+                j = (i:K+i) .% N
+                U_ids = I[j + 1]
             end
 
             U = Population[U_ids]
             
             # generate center of mass
-            c, u_worst = center(U, searchType)
+            c, u_worst, u_best = center(U, searchType)
 
             # stepsize
             η = η_max * rand()
@@ -181,7 +182,7 @@ function eca(mfunc::Function,
 
             for j = 1:D
                 if rand() < p_bin
-                    y[j] = c[j]
+                    y[j] = U[u_best].x[j]
                      
                 end
             end
