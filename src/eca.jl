@@ -1,6 +1,6 @@
 struct Particle
-    x::Vector
-    f::Real
+    x::Vector{Float64}
+    f::Float64
 end
 
 function Selection(fOld::Particle, fNew::Particle, searchType::Symbol)
@@ -104,6 +104,7 @@ function eca(mfunc::Function,
       showResults::Bool = true,
        correctSol::Bool = true,
        searchType::Symbol=:minimize,
+       showIter::Bool = false,
          saveLast::String = "",
        saveConvergence::String="",
            limits  = [-100., 100.])
@@ -134,7 +135,7 @@ function eca(mfunc::Function,
     t = 0
 
     # best solution
-    best = getBest(Population)
+    best = getBest(Population, searchType)
     
     convergence = []
 
@@ -208,6 +209,11 @@ function eca(mfunc::Function,
             if stop
                 break
             end
+        end
+
+        if showIter
+            @printf("| iter = %d \t nevals = %d \t f = %e\n", t, nevals, best.f)
+            println("| ", best.x)
         end
 
         t += 1
