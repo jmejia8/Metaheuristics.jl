@@ -119,8 +119,15 @@ function eca(mfunc::Function,
 
     Population = Array{Particle, 1}([])
 
+    puntos(x, a, b) = 0.5*(a + b) + 0.5*(b-a)*cos.( x )
+    X = rand(N, D)
+    for j in 1:D
+        X[:, j] = puntos(2π*rand(N), a[j], b[j])
+    end
+
     for i in 1:N
-        x = a + (b-a) .* rand(D)
+        # x = a + (b-a) .* rand(D)
+        x = X[i,:]
         f = func(x)
         push!(Population, Particle(x, f))
     end
