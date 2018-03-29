@@ -1,3 +1,10 @@
+struct Individual
+    x::Vector{Float64}
+    f::Float64
+    g::Vector{Float64}
+    h::Vector{Float64}
+end
+
 ###################################################
 #      Solutions and population functions
 #          for Matrix representation
@@ -14,8 +21,12 @@ function correctSol(y::Vector, a::Vector, b::Vector)
     return y
 end
 
-function correct(y::Vector, a::Vector, b::Vector)
-    return correctSol(y, a, b)
+function correct(y::Vector, a::Vector, b::Vector, crrect::Bool=false)
+    if crrect
+        return correctSol(y, a, b)
+    end
+
+    return y
 end
 
 function correctPop(P, a, b)
@@ -34,9 +45,20 @@ function correctPop(P, a, b)
     return P
 end
 
-function initializePop(N::Int, D::Int, a::Vector, b::Vector)
+function initializePop(N::Int, D::Int, a::Vector, b::Vector, initType::Symbol=:uniform)
     # a, b should be D × 1
-    return a' .* ones(N, D) + (b - a)' .* rand(N, D)
+
+    if initType == :cheb
+        chebPts(x, a, b) = 0.5*(a + b) + 0.5*(b-a)*cos.( x )
+        X = zeros(N, D)
+        for j in 1:D
+            X[:, j] = chebPts(2π*rand(N), a[j], b[j])
+        end
+
+        return X
+    end
+
+    return a'  .+ (b - a)' .* rand(N, D)
 end
 
 function initializeSol(D::Int, a::Vector, b::Vector)
@@ -68,4 +90,22 @@ function getBest(fitness::Vector, searchType::Symbol = :minimize)
     end
 
     return best_X, best
+end
+
+function Selection(fOld::Individual, fNew::Individual, searchType::Symbol)
+    gOld = fOld.g .> 0
+    hOld = fOld.h .!= 0
+
+    gNew = fNew.g .> 0
+    hNew = fNew.h .!= 0
+
+    if sum(gNew) + sum(hNew) < sum(gOld) + sum(hOld)
+        return true
+    end
+
+    if searchType == :minimize
+        return fNew.f < fOld.f
+    end
+    
+    return fNew.f > fOld.f
 end
