@@ -153,16 +153,16 @@ end
 
 function eca(mfunc::Function,
                 D::Int;
-            η_max::Real= 2,
-                K::Int = 10,
-                N::Int = 7*D,
-        max_evals::Int = 10000D,
-      termination::Function = (x ->false),
-      showResults::Bool = true,
-       correctSol::Bool = true,
+            η_max::Real  = 2,
+                K::Int   = 10,
+                N::Int   = 7*D,
+        max_evals::Int   = 10000D,
+      showResults::Bool  = true,
+       correctSol::Bool  = true,
        searchType::Symbol=:minimize,
-       showIter::Bool = false,
-         saveLast::String = "",
+         showIter::Bool  = false,
+         saveLast::String= "",
+      termination::Function   = (x ->false),
        saveConvergence::String="",
            limits  = [-100., 100.])
 
@@ -209,12 +209,10 @@ function eca(mfunc::Function,
     while !stop
         I = randperm(N)
 
-        p = nevals / max_evals
-
         Mcr_fail = zeros(D)
         
         # For each elements in Population
-        for i in 1:N            
+        for i in 1:N
 
             # current
             x = Population[i].x
@@ -281,11 +279,13 @@ function eca(mfunc::Function,
             push!(convergence, [nevals best.f])
         end
 
+        p = nevals / max_evals
+        
         # new size
-        N = K + round(Int, (1-p)*(N_init - K))
+        N = 2K + round(Int, (1- p ) * (N_init - 2K))
 
-        if N < K
-            N = K
+        if N < 2K
+            N = 2K
         end
 
         Population = resizePop!(Population, N, K)
