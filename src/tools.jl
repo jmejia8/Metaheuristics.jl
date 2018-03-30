@@ -1,4 +1,4 @@
-struct Individual
+struct Individual_
     x::Vector{Float64}
     f::Float64
     g::Vector{Float64}
@@ -92,7 +92,7 @@ function getBest(fitness::Vector, searchType::Symbol = :minimize)
     return best_X, best
 end
 
-function Selection(fOld::Individual, fNew::Individual, searchType::Symbol)
+function Selection(fOld::Individual_, fNew::Individual_, searchType::Symbol)
     gOld = fOld.g .> 0
     hOld = fOld.h .!= 0
 
