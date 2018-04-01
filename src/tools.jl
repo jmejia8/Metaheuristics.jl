@@ -2,7 +2,7 @@
 #      Solutions and population functions
 #          for Matrix representation
 ###################################################
-function correctSol(y::Vector, a::Vector, b::Vector)
+function correctSol(y::Vector{Float64}, a::Vector{Float64}, b::Vector{Float64})
     # Correct solution
 
     for i = 1:length(y)
@@ -14,7 +14,7 @@ function correctSol(y::Vector, a::Vector, b::Vector)
     return y
 end
 
-function correct(y::Vector, a::Vector, b::Vector)
+function correct(y::Vector{Float64}, a::Vector{Float64}, b::Vector{Float64})
     return correctSol(y, a, b)
 end
 
@@ -34,12 +34,12 @@ function correctPop(P, a, b)
     return P
 end
 
-function initializePop(N::Int, D::Int, a::Vector, b::Vector)
+function initializePop(N::Int, D::Int, a::Vector{Float64}, b::Vector{Float64})
     # a, b should be D × 1
     return a' .* ones(N, D) + (b - a)' .* rand(N, D)
 end
 
-function initializeSol(D::Int, a::Vector, b::Vector)
+function initializeSol(D::Int, a::Vector{Float64}, b::Vector{Float64})
     # a, b should be D × 1
     return a + (b - a) .* rand(D)
 end
@@ -58,7 +58,7 @@ function evaluatePop(X::Matrix, fobj::Function, N::Int)
     return f
 end
 
-function getBest(fitness::Vector, searchType::Symbol = :minimize)
+function getBest(fitness::Vector{Float64}, searchType::Symbol = :minimize)
     if searchType == :minimize
         best_X = indmin(fitness) # minimization.
         best = fitness[best_X] 
