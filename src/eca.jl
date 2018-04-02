@@ -160,8 +160,10 @@ function eca(mfunc::Function,
       showResults::Bool  = true,
        correctSol::Bool  = true,
        searchType::Symbol=:minimize,
+      initPopRand::Symbol=:cheb,
          showIter::Bool  = false,
          saveLast::String= "",
+     canResizePop::Bool  = true,
       termination::Function   = (x ->false),
        saveConvergence::String="",
            limits  = [-100., 100.])
@@ -176,7 +178,7 @@ function eca(mfunc::Function,
 
     Population = Array{Particle, 1}([])
 
-    X = initializePop(N, D, a, b, :cheb)
+    X = initializePop(N, D, a, b, initPopRand)
     for i in 1:N
         x = X[i,:]
         f = func(x)
@@ -202,6 +204,7 @@ function eca(mfunc::Function,
     end
 
     N_init = N
+    p = nevals / max_evals
 
     p_cr = rand(D)
     
@@ -230,7 +233,7 @@ function eca(mfunc::Function,
             u = U[u_worst].x
 
             # current-to-center/bin
-            y = x + η * (c - u)
+            y = x + (1-p^5)* η * (c - u) + (p^5) * η * (best.x - c)
 
             # binary crossover
             y, M_current = crossover(U[u_best].x, y, p_cr)
@@ -281,14 +284,16 @@ function eca(mfunc::Function,
 
         p = nevals / max_evals
         
-        # new size
-        N = 2K + round(Int, (1- p ) * (N_init - 2K))
+        if canResizePop
+            # new size
+            N = 2K + round(Int, (1- p ) * (N_init - 2K))
 
-        if N < 2K
-            N = 2K
+            if N < 2K
+                N = 2K
+            end
+
+            Population = resizePop!(Population, N, K)
         end
-
-        Population = resizePop!(Population, N, K)
 
     end
 
@@ -310,6 +315,7 @@ function eca(mfunc::Function,
         println("| Generations = $t")
         println("| Evals       = ", nevals)
         @printf("| best f.     = %e\n", best.f)
+        println("| p_cr: ",p_cr)
         println("=======================================")
     end
 
