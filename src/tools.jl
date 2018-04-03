@@ -59,7 +59,6 @@ function initializePop(N::Int, D::Int, a::Vector{Float64}, b::Vector{Float64}, i
 
         return X
     end
-
     return a'  .+ (b - a)' .* rand(N, D)
 end
 

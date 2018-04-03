@@ -1,10 +1,13 @@
 function diffEvolution(func::Function, D::Int;
                         N::Int = 10D,
-                        F::Real= 2.0,
+                        F::Real= 1.0,
                        CR::Real= 0.9,
+                   CR_min::Real= CR,
+                   CR_max::Real= CR,
                 max_evals::Int = 10000D,
                  strategy::Symbol = :rand1,
               termination::Function = (x ->false),
+               individual::DataType = xf_indiv,
               showResults::Bool = true,
                  saveLast::String = "",
           saveConvergence::String="",
@@ -19,13 +22,19 @@ function diffEvolution(func::Function, D::Int;
         println("CR should be from interval [0,1]; set to default value 0.5")
     end
 
-    a, b = limits
+    # bounds
+    la, lb = limits
+    la *= ones(D)
+    lb *= ones(D)
 
-    population = a + (b - a) * rand(N, D)
+    # population array
+    population = Array{individual, 1}([])
 
-    fitness = zeros(Real, N)
-    for i in 1:N            
-        fitness[i] = func(population[i, :])
+    # uniform initilization
+    X = initializePop(N, D, la, lb)
+    for i in 1:N
+        x = X[i,:]
+        push!(population, generateChild(individual, x, func(x)))
     end
 
     # current evalutations
@@ -37,9 +46,10 @@ function diffEvolution(func::Function, D::Int;
     # current generation
     t = 0
     
-    i_min = indmin(fitness)
-    xBest = population[i_min,:]
-    fBest = fitness[i_min]
+    # best element ever
+    best_ind = getBestInd(population)
+    xBest = population[best_ind].x
+    fBest = population[best_ind].f
 
     convergence = []
 
@@ -49,48 +59,101 @@ function diffEvolution(func::Function, D::Int;
 
     # start search
     while !stop
-        x = copy(population)
+        currentPop = copy(population)
         # For each elements in population
         for i in 1:N
-            k = randperm(N)
 
+            # select participats
+            r1 = rand(1:N, 1)[1]
+            while r1 == i
+                r1 = rand(1:N, 1)[1]
+            end
+
+            r2 = rand(1:N, 1)[1]
+            while r2 == i || r1 == r2
+                r2 = rand(1:N, 1)[1]
+            end
+
+            r3 = rand(1:N, 1)[1]
+            while r3 == i || r3 == r1 || r3 == r2
+                r3 = rand(1:N, 1)[1]
+            end
+
+            x = currentPop[i].x
+            a = currentPop[r1].x
+            b = currentPop[r2].x
+            c = currentPop[r3].x
+
+            # strategy is selected here
             if strategy == :rand1
                 # DE/rand/1
-                u = x[k[3],:] + F*(x[k[1],:] - x[k[2],:])
+                u = a + F*(b - c)
             elseif strategy == :best1
                 # DE/best/1
-                u = xBest + F*(x[k[1],:] - x[k[2],:])
+                u = xBest + F*(b - c)
             elseif strategy == :rand2
                 # DE/rand/2
-                u = x[k[5],:] + F*(x[k[1],:] - x[k[2],:] + x[k[3],:] - x[k[4],:])
+
+                r4 = rand(1:N, 1)[1]
+                while r4 == i || r4 == r1 || r4 == r2 || r4 == r3
+                    r4 = rand(1:N, 1)[1]
+                end
+
+                r5 = rand(1:N, 1)[1]
+                while r5 == i || r5 == r1 || r5 == r2 || r5 == r3 || r5 == r4
+                    r5 = rand(1:N, 1)[1]
+                end
+
+                d = currentPop[r4].x
+                ee = currentPop[r5].x
+                
+                u = ee + F*(a - b + c - d)
             elseif strategy == :randToBest1
                 # DE/rand-to-best/1
-                u = x[i,:] + F*(xBest - x[i,:] + x[k[1],:] - x[k[2],:])
+                u = x + F*(xBest - x + a - b)
             elseif strategy == :best2
                 # DE/best/2
-                u = xBest + F*(x[k[1],:] - x[k[2],:] + x[k[3],:] - x[k[4],:])                
+                r4 = rand(1:N, 1)[1]
+                while r4 == i || r4 == r1 || r4 == r2 || r4 == r3 || r4 == best_ind
+                    r4 = rand(1:N, 1)[1]
+                end
+                d = currentPop[r4].x
+                u = xBest + F*(a - b + c - d)                
             else
                 error("Unknown strategy $(strategy)")
             end
 
-            
             # binomial crossover
-            v = x[i,:]
+            v = zeros(D)
             r = rand(1:D,1)[1]
 
-            I = rand(D) .< CR
-            v[I] = u[I]
-            v[r] = u[r]
+            # binomial crossover
+            for j = 1:D
+                if rand() < CR || j == r
+                    v[j] = u[j]
 
-            # Correct sol.
-            I = .!(a .< v .< b)
-            v[ I ] = a + (b-a) * rand(sum(I))
+                    if v[j] < la[j]
+                        v[j] = 2la[j] - v[j]
+                    end
+                    if v[j] > lb[j]
+                        v[j] = 2lb[j] - v[j]
+                    end
+                else
+                    v[j] = x[j]
+                end
+            end
 
-            fv = func(v)
+            # instance child
+            h = generateChild(individual, v, func(v))
             nevals += 1
-            if fv < fitness[i]
-                population[i,:] = v
-                fitness[i] = fv
+
+            # select survivals
+            if Selection(currentPop[i], h)
+                population[i] = h
+
+                if Selection(currentPop[best_ind], h)
+                    best_ind = i
+                end
             end
 
             stop = nevals >= max_evals
@@ -101,16 +164,15 @@ function diffEvolution(func::Function, D::Int;
 
         t += 1
 
-        i_min = indmin(fitness)
-        xBest = population[i_min,:]
-        fBest = fitness[i_min]
+        xBest = population[best_ind].x
+        fBest = population[best_ind].f
 
         if saveConvergence != ""
             push!(convergence, [nevals fBest])
         end
     
         # stop condition
-        stop = stop || termination(fitness)
+        stop = stop || termination(population)
     end
 
     if saveLast != ""
@@ -126,8 +188,6 @@ function diffEvolution(func::Function, D::Int;
         println("| Generations = $t")
         println("| Evals       = ", nevals)
         println("| best sol.   = ", fBest)
-        println("| mean sol    = ", mean(fitness))
-        println("| std. sol    = ", std(fitness))
         println("=======================================")
     end
 
