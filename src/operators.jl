@@ -44,23 +44,6 @@ function Selection(Old::xfg_indiv, New::xfg_indiv, searchType=:minimize)
     return New.f > Old.f
 end
 
-function countViolations(g::Vector, h::Vector)
-    sum_g = 0
-    sum_h = 0
-
-    for i = 1:length(g)
-        if g[i] > 0
-            sum_g += g[i]  end
-    end
-
-    for i = 1:length(h)
-        if h[i] != 0.0
-            sum_h += abs(h[i])  end
-    end
-
-    return sum_g + sum_h
-end
-
 function getBest(Population, searchType::Symbol = :minimize)
     best = Population[1]
 
