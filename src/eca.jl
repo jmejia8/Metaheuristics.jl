@@ -1,17 +1,4 @@
-struct Particle
-    x::Vector{Float64}
-    f::Float64
-end
-
-function Selection(fOld::Particle, fNew::Particle, searchType::Symbol)
-    if searchType == :minimize
-        return fNew.f < fOld.f
-    end
-    
-    return fNew.f > fOld.f
-end
-
-function replaceWorst!(Population::Array{Particle, 1}, A::Array{Particle, 1}, searchType::Symbol)
+function replaceWorst!(Population::Array, A::Array, searchType::Symbol)
     n = length(A)
     if n == 0
         return
@@ -30,15 +17,7 @@ function replaceWorst!(Population::Array{Particle, 1}, A::Array{Particle, 1}, se
 
 end
 
-function center(U::Array{Particle, 1}, searchType::Symbol)
-    n, d = length(U), length(U[1].x)
-
-    fitness = zeros(Float64, n)
-    
-    for i = 1:n
-        fitness[i] = U[i].f
-    end
-
+function fitnessToMass(fitness::Vector{Float64}, searchType::Symbol)
     m = minimum(fitness)
     
     if m < 0
@@ -49,32 +28,71 @@ function center(U::Array{Particle, 1}, searchType::Symbol)
         fitness = 2maximum(fitness) - fitness
     end
 
-    c = zeros(Float64, d)
+    return fitness
+end
+
+function getMass(U::Array{xf_indiv, 1}, searchType::Symbol)
+    n, d = length(U), length(U[1].x)
+
+    fitness = zeros(Float64, n)
+    
     for i = 1:n
-        c += U[i].x * fitness[i]
+        fitness[i] = U[i].f
     end
 
-    return c / sum(fitness), indmin(fitness), indmax(fitness)
+    return fitnessToMass(fitness, searchType)
 end
 
-function getBest(Population::Array{Particle, 1}, searchType::Symbol)
-    f_best = Population[1].f
-    j = 1
+function getMass(U::Array{xfg_indiv, 1}, searchType::Symbol)
+    n, d = length(U), length(U[1].x)
 
-    for i = 2:length(Population)
-        if searchType == :minimize && f_best > Population[i].f
-            f_best = Population[i].f
-            j = i
-        elseif searchType != :minimize && f_best < Population[i].f
-            f_best = Population[i].f
-            j = i
-        end
+    fitness = zeros(Float64, n)
+    svios = zeros(n)
+
+    for i = 1:n
+        fitness[i] = U[i].f
+        svios[i] = countViolations(U[i].g, [])
     end
 
-    return Population[j]
+    return fitnessToMass(fitness, searchType) .+ svios
+    
 end
 
-function getWorstInd(Population::Array{Particle, 1}, searchType::Symbol)
+function getMass(U::Array{xfgh_indiv, 1}, searchType::Symbol)
+    n, d = length(U), length(U[1].x)
+
+    fitness = zeros(Float64, n)
+    svios = zeros(n)
+
+    for i = 1:n
+        fitness[i] = U[i].f
+        svios[i] = countViolations(U[i].g, U[i].h)
+    end
+
+    return fitnessToMass(fitness, searchType) .+ svios
+end
+
+function center(U::Array, mass::Vector{Float64})
+    d = length(U[1].x)
+
+    c = zeros(Float64, d)
+    
+    for i = 1:length(mass)
+        c += mass[i] * U[i].x
+    end
+
+    return c / sum(mass)
+end
+
+function center(U::Array, searchType::Symbol)
+    n, d = length(U), length(U[1].x)
+
+    mass = getMass(U, searchType)
+
+    return center(U, mass), indmin(mass), indmax(mass)
+end
+
+function getWorstInd(Population::Array, searchType::Symbol)
     f_worst = Population[1].f
     j = 1
 
@@ -91,7 +109,7 @@ function getWorstInd(Population::Array{Particle, 1}, searchType::Symbol)
     return j
 end
 
-function getU(P::Array{Particle, 1}, K::Int, I::Vector{Int}, i::Int, N::Int)
+function getU(P::Array, K::Int, I::Vector{Int}, i::Int, N::Int)
     if i <= N-K
         U_ids = I[i:K+i]
     else
@@ -135,7 +153,7 @@ function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
     return p_cr
 end
 
-function resizePop!(P::Array{Particle, 1}, N_new::Int, K::Int)
+function resizePop!(P::Array, N_new::Int, K::Int)
     N = length(P)
 
     if N == N_new
@@ -151,11 +169,11 @@ function resizePop!(P::Array{Particle, 1}, N_new::Int, K::Int)
     return P[ids]
 end
 
-function eca(mfunc::Function,
+function eca(fobj::Function,
                 D::Int;
             η_max::Real  = 2,
-                K::Int   = 10,
-                N::Int   = 7*D,
+                K::Int   = 7,
+                N::Int   = K*D,
         max_evals::Int   = 10000D,
       showResults::Bool  = true,
        correctSol::Bool  = true,
@@ -166,9 +184,10 @@ function eca(mfunc::Function,
      canResizePop::Bool  = true,
       termination::Function   = (x ->false),
        saveConvergence::String="",
+            individual::DataType= xf_indiv,
            limits  = [-100., 100.])
 
-    func = mfunc
+    func = fobj
     a, b = limits[1,:], limits[2,:]
     if length(a) < D
         a = ones(D) * a[1]
@@ -176,13 +195,12 @@ function eca(mfunc::Function,
     end
 
 
-    Population = Array{Particle, 1}([])
+    Population = Array{individual, 1}([])
 
     X = initializePop(N, D, a, b, initPopRand)
     for i in 1:N
         x = X[i,:]
-        f = func(x)
-        push!(Population, Particle(x, f))
+        push!(Population, generateChild(individual, x, func(x)))
     end
 
     # current evaluations
@@ -240,8 +258,7 @@ function eca(mfunc::Function,
 
             y = correct(y, a, b, correctSol)
 
-            f = func(y)
-            sol = Particle(y, f)
+            sol = generateChild(individual, y, func(y))
 
             nevals += 1
 
@@ -315,7 +332,7 @@ function eca(mfunc::Function,
         println("| Generations = $t")
         println("| Evals       = ", nevals)
         @printf("| best f.     = %e\n", best.f)
-        println("| p_cr: ",p_cr)
+        println("| p_cr: ", p_cr)
         println("=======================================")
     end
 

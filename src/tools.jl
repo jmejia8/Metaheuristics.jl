@@ -110,3 +110,21 @@ function Selection(fOld::Individual_, fNew::Individual_, searchType::Symbol)
     
     return fNew.f > fOld.f
 end
+
+# COP functions
+function countViolations(g::Vector, h::Vector)
+    sum_g = 0
+    sum_h = 0
+
+    for i = 1:length(g)
+        if g[i] > 0
+            sum_g += g[i]  end
+    end
+
+    for i = 1:length(h)
+        if h[i] != 0.0
+            sum_h += abs(h[i])  end
+    end
+
+    return sum_g + sum_h
+end
