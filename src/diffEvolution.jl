@@ -4,6 +4,8 @@ function diffEvolution(func::Function, D::Int;
                        CR::Real= 0.9,
                    CR_min::Real= CR,
                    CR_max::Real= CR,
+                    F_min::Real=F,
+                    F_max::Real=F,
                 max_evals::Int = 10000D,
                  strategy::Symbol = :rand1,
               termination::Function = (x ->false),
@@ -11,7 +13,7 @@ function diffEvolution(func::Function, D::Int;
               showResults::Bool = true,
                  saveLast::String = "",
           saveConvergence::String="",
-                   limits  = (-100., 100.))
+                   limits  = [-100., 100.])
 
     if N < 5
        N = 5
@@ -22,10 +24,13 @@ function diffEvolution(func::Function, D::Int;
         println("CR should be from interval [0,1]; set to default value 0.5")
     end
 
+
     # bounds
-    la, lb = limits
-    la *= ones(D)
-    lb *= ones(D)
+    la, lb = limits[1,:], limits[2,:]
+    if length(la) < D
+        la = ones(D) * la[1]
+        lb = ones(D) * lb[1]
+    end
 
     # population array
     population = Array{individual, 1}([])
@@ -61,6 +66,16 @@ function diffEvolution(func::Function, D::Int;
     while !stop
         currentPop = copy(population)
         # For each elements in population
+
+        # stepsize
+        if F_min < F_max
+            F = F_min + (F_max - F_min ) * rand()
+        end
+
+        if CR_min < CR_max
+           CR = CR_min + (CR_max - CR_min) * rand()
+        end
+
         for i in 1:N
 
             # select participats
@@ -125,11 +140,11 @@ function diffEvolution(func::Function, D::Int;
 
             # binomial crossover
             v = zeros(D)
-            r = rand(1:D,1)[1]
+            j_rand = rand(1:D,1)[1]
 
             # binomial crossover
             for j = 1:D
-                if rand() < CR || j == r
+                if rand() < CR || j == j_rand
                     v[j] = u[j]
 
                     if v[j] < la[j]
