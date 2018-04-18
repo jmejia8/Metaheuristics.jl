@@ -174,14 +174,17 @@ function eca(fobj::Function,
             η_max::Real  = 2,
                 K::Int   = 7,
                 N::Int   = K*D,
+        p_exploit::Real  = 0.95,
+            p_bin::Real  = 0.02,
         max_evals::Int   = 10000D,
       showResults::Bool  = true,
        correctSol::Bool  = true,
        searchType::Symbol=:minimize,
-      initPopRand::Symbol=:cheb,
+      initPopRand::Symbol=:uniform,
          showIter::Bool  = false,
          saveLast::String= "",
-     canResizePop::Bool  = true,
+         adaptive::Bool  = true,
+     canResizePop::Bool  = false,
       termination::Function   = (x ->false),
        saveConvergence::String="",
             individual::DataType= xf_indiv,
@@ -224,13 +227,17 @@ function eca(fobj::Function,
     N_init = N
     p = nevals / max_evals
 
-    p_cr = rand(D)
+    if adaptive
+        p_cr = rand(D)
+    else
+        p_cr = p_bin*ones(D)
+    end
     
     # start search
     while !stop
         I = randperm(N)
 
-        Mcr_fail = zeros(D)
+        adaptive && (Mcr_fail = zeros(D))
         
         # For each elements in Population
         for i in 1:N
@@ -251,7 +258,18 @@ function eca(fobj::Function,
             u = U[u_worst].x
 
             # current-to-center/bin
-            y = x + (1-p^5)* η * (c - u) + (p^5) * η * (best.x - c)
+            if p < p_exploit
+                # u: worst element in U
+                u = U[u_worst].x
+                
+                # current-to-center/bin
+                y = x + η * (c - u)
+            elseif p_exploit < 0
+                y = x + (1-p^5)* η * (c - u) + (p^5) * η * (best.x - c)
+            else
+                # current-to-best/bin
+                y = x + η * (best.x - c)
+            end
 
             # binary crossover
             y, M_current = crossover(U[u_best].x, y, p_cr)
@@ -269,7 +287,7 @@ function eca(fobj::Function,
                 if Selection(best, sol, searchType)
                     best = sol
                 end
-            else
+            elseif adaptive
                 Mcr_fail += M_current
             end
             
@@ -292,7 +310,7 @@ function eca(fobj::Function,
             break
         end
 
-        p_cr = adaptCrossover(p_cr, Mcr_fail/N)
+        adaptive && ( p_cr = adaptCrossover(p_cr, Mcr_fail/N) )
 
 
         if saveConvergence != ""
