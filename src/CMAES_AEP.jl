@@ -22,12 +22,12 @@ function mvnorm(D)
 end
 
 function CMAES_AEP(fobj::Function,
-                D::Int;
-        max_evals::Int = 10000D, 
-      showResults::Bool = true,
-         saveLast::String = "",
-  saveConvergence::String = "",
-             limits = [-100.0, 100.0])
+                      D::Int;
+              max_evals::Int = 10000D, 
+            showResults::Bool = true,
+               saveLast::String = "",
+        saveConvergence::String = "",
+                   limits = [-100.0, 100.0])
 
 	# algorithm parameters
 	λ = 4 + floor(Int, 3log(D))
@@ -43,9 +43,11 @@ function CMAES_AEP(fobj::Function,
 	ENN= √(D)*(1-1/(4*D)+1/(21*D^2))
 
 	# Limits
-	VarMin, VarMax = limits
-	VarMin *= ones(D)
-	VarMax *= ones(D)
+	VarMin, VarMax = limits[1,:], limits[2,:]
+	if length(VarMin) < D
+		VarMin = ones(D) * VarMin[1]
+		VarMax = ones(D) * VarMax[1]
+	end
 
 	σ = (VarMax[1] - VarMin[1])/3
 
