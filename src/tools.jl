@@ -62,6 +62,28 @@ function initializePop(N::Int, D::Int, a::Vector{Float64}, b::Vector{Float64}, i
     return a'  .+ (b - a)' .* rand(N, D)
 end
 
+function initializePop(func::Function, N::Int, D::Int, a::Vector{Float64}, b::Vector{Float64}, initType::Symbol=:uniform)
+    X = initializePop(N, D, a, b, initType)
+    
+    # infers datatype
+    x = X[1,:]
+    child = generateChild(x, func(x))
+    individual = typeof(child)
+
+    # population array
+    population = Array{individual, 1}([])
+
+    # first individual
+    push!(population, child)
+
+    for i in 2:N
+        x = X[i,:]
+        child = generateChild(x, func(x))
+        push!(population, child)
+    end
+
+    return population
+end
 function initializeSol(D::Int, a::Vector{Float64}, b::Vector{Float64})
     # a, b should be D × 1
     return a + (b - a) .* rand(D)
