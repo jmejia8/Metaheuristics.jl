@@ -1,4 +1,4 @@
-function diffEvolution(func::Function, D::Int;
+function DE(func::Function, D::Int;
                         N::Int = 10D,
                         F::Real= 1.0,
                        CR::Real= 0.9,
@@ -9,11 +9,11 @@ function diffEvolution(func::Function, D::Int;
                 max_evals::Int = 10000D,
                  strategy::Symbol = :rand1,
               termination::Function = (x ->false),
-               individual::DataType = xf_indiv,
               showResults::Bool = true,
                  saveLast::String = "",
           saveConvergence::String="",
                    limits  = [-100., 100.])
+
 
     if N < 5
        N = 5
@@ -200,4 +200,38 @@ function diffEvolution(func::Function, D::Int;
     end
 
     return xBest, fBest
+end
+
+function diffEvolution(func::Function, D::Int;
+                        N::Int = 10D,
+                        F::Real= 1.0,
+                       CR::Real= 0.9,
+                   CR_min::Real= CR,
+                   CR_max::Real= CR,
+                    F_min::Real=F,
+                    F_max::Real=F,
+                max_evals::Int = 10000D,
+                 strategy::Symbol = :rand1,
+              termination::Function = (x ->false),
+              showResults::Bool = true,
+                 saveLast::String = "",
+          saveConvergence::String="",
+                   limits  = [-100., 100.])
+    warn("This function is deprecated. Use DE function")
+    return DE(func, D;
+                    N  = N,
+                    F  = F,
+                    CR = CR,
+                    CR_min = CR_min,
+                    CR_max = CR_max,
+                    F_min = F_min,
+                    F_max = F_max,
+                    max_evals  = max_evals,
+                    strategy  = strategy,
+                    termination  = termination,
+                    showResults  = showResults,
+                    saveLast  = saveLast,
+                    saveConvergence = saveConvergence,
+                    limits  = limits)
+
 end
