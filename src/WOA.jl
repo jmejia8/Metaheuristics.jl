@@ -28,8 +28,12 @@ function WOA(fobj::Function,
     lb, ub = limits
 
     # bounds vectors
-    lb = lb * ones(D)
-    ub = ub * ones(D)
+    lb, ub = limits[1,:], limits[2,:]
+    if length(lb) < D
+        lb = ones(D) * lb[1]
+        ub = ones(D) * ub[1]
+    end
+
 
     # initialize position vector and score for the leader
     Leader_pos  = zeros(1,D)
