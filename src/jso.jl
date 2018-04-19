@@ -75,14 +75,17 @@ function jso(fobj::Function, D::Int;
 
     max_nfes = max_evals
 
-    a, b = limits
-
-    P = a + (b - a) .* rand(N, D)
-    f = zeros(N)
-
-    for i = 1:N
-        f[i] = fobj(P[i,:])
+    a, b = limits[1,:], limits[2,:]
+    if length(a) < D
+        a = ones(D) * a[1]
+        b = ones(D) * b[1]
     end
+
+
+
+    P = initializePop(N, D, a, b, :uniform)
+    f = evaluatePop(P, fobj, N)
+
     nfes = N
 
     MF  = 0.5ones(H)
