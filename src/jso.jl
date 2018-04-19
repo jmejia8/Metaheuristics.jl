@@ -14,28 +14,28 @@ function getPbests(P::Matrix{Float64}, f::Vector{Float64}, p::Float64)
     i = sortperm(f)
     N = length(f)
 
-    n = p*N
-    if n <= 1
+    n = round(Int, p*N)
+    if n < 2
         n = 2
     end
 
-    ids = i[1:round(Int, n) ]
+    ids = i[1:n]
 
     return ids
 end
 
-function getXr(P::Matrix{Float64}, A, i::Int)
+function getXr(P::Matrix{Float64}, A, i::Int, i_pbest)
     N  = size(P, 1)
     NA = length(A)
 
     r1 = rand(1:N,1)[1]
     r2 = rand(1:N+NA,1)[1]
 
-    while r1 == i
+    while r1 == i || r1 == i_pbest
         r1 = rand(1:N,1)[1]
     end
 
-    while r2 == i || r1 == r2
+    while r2 == i || r2 == r1 || r2 == i_pbest
         r2 = rand(1:N+NA,1)[1]
     end
 
@@ -60,7 +60,9 @@ function meanWL(S::Vector{Float64}, w::Vector{Float64})
     return dot(w, S.^2) / dot(w, S)
 end
 
-function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
+function jso(fobj::Function, D::Int;
+                        max_evals = 10000D,
+                        limits = [-100.0, 100.0])
     # conf
     p_max = 0.25
     p_min = 0.25/2
@@ -71,7 +73,7 @@ function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
     H = 5
 
 
-    max_nfes = 10000D
+    max_nfes = max_evals
 
     a, b = limits
 
@@ -97,15 +99,15 @@ function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
         SF    = Array{Float64}([])
         Sdiff = Array{Float64}([])
 
-        Pnext = copy(P)
-        fnext = copy(f)
 
         N_old = N
 
-        # println(N, " ", a, " ", b)
-
         pbests = getPbests(P, f, p)
 
+        Us = []
+        fus = Array{Float64}([])
+        CRs = Array{Float64}([])
+        Fs = Array{Float64}([])
         for i = 1:N
             r = rand(1:H, 1)[1]
 
@@ -132,6 +134,9 @@ function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
                 F = 0.7
             end
 
+            push!(CRs, CR)
+            push!(Fs, F)
+
             x = P[i,:]
             fx = f[i]
 
@@ -142,9 +147,10 @@ function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
             while nfes < 0.50*max_nfes && pbst == i
                 pbst = rand(pbests,1)[1]
             end
-
+            ##############
+            ##############
             x_pbest  = P[ pbst ,:]
-            xr1, xr2 = getXr(P, A, i)
+            xr1, xr2 = getXr(P, A, i, pbst)
             
             v = x + Fw *(x_pbest - x) + F * (xr1 - xr2)
             u = x
@@ -160,17 +166,9 @@ function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
             fu = fobj(u)
             nfes += 1
 
-            if fu <= fx
-                Pnext[i,:] = u
-                fnext[i] = fu
-            end
+            push!(Us, u)
+            push!(fus, fu)
 
-            if fu < fx
-                push!(A, x)
-                push!(SCR, CR)
-                push!(SF, F)
-                push!(Sdiff, abs(fx - fu))
-            end
 
             stop = nfes >= max_nfes
             if stop
@@ -178,6 +176,27 @@ function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
             end
 
         end
+
+        for i =1:length(fus)
+            fu = fus[i]
+            fx = f[i]
+
+            u = Us[i]
+            x = P[i,:]
+
+            if fu <= fx
+                P[i,:] = u
+                f[i]   = fu
+            end
+
+            if fu < fx
+                push!(A, x)
+                push!(SCR, CRs[i])
+                push!(SF, Fs[i])
+                push!(Sdiff, abs(fx - fu))
+            end
+        end
+
         
 
         if length(SF) > 0       
@@ -197,11 +216,15 @@ function jso(fobj::Function, D::Int; limits = [-100.0, 100.0])
 
         # update population size
         N = round(Int, N_init + ( N_min - N_init ) * nfes / max_nfes )
-        if N_old != N
-            Ids = sortperm(fnext)[1:N]
-            P = Pnext[Ids,:]
-            f = fnext[Ids]
-    
+
+        if N < N_min
+            N = N_min
+        end
+
+        if  N < N_old
+            Ids = sortperm(f)[1:N]
+            P = P[Ids,:]
+            f = f[Ids]
             if length(A) > N
                 K = randperm(length(A))[1:N]
                 A = A[K]
