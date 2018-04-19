@@ -158,12 +158,21 @@ function jso(fobj::Function, D::Int;
             v = x + Fw *(x_pbest - x) + F * (xr1 - xr2)
             u = x
 
+
             j_r = rand(1:D,1)[1]
             for j = 1:D
                 if rand() <= CR || j == j_r
                     u[j] = v[j]
+
+                    if u[j] < a[j]
+                        u[j] = (a[j] + x[j]) / 2.0
+                    elseif u[j] > b[j]
+                        u[j] = (b[j] + x[j]) / 2.0
+                    end
                 end
             end
+
+            u = correct(u, a, b, true)
 
 
             fu = fobj(u)
