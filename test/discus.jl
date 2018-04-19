@@ -18,7 +18,7 @@ using Base.Test
     test_result(result, fitness, D, 1e-5)
 
     # ED results
-    result, fitness = diffEvolution(discus, D; F = 1, CR = 0.5, showResults=false)
+    result, fitness = DE(discus, D; F = 1, CR = 0.5, showResults=false)
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
