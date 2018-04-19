@@ -68,16 +68,28 @@ function getBestInd(Population, searchType::Symbol = :minimize)
     return j
 end
 
-function generateChild(individual::Type{xf_indiv}, x::Vector{Float64}, fResult::Float64)
-    return individual(x, fResult)
+function generateChild(x::Vector{Float64}, fResult::Float64)
+    return xf_indiv(x, fResult)
 end
 
-function generateChild(individual::Type{xfg_indiv}, x::Vector{Float64}, fResult)
+function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1}})
     f, g = fResult
-    return individual(x, f, g)
+    return xfg_indiv(x, f, g)
 end
 
-function generateChild(individual::Type{xfgh_indiv}, x::Vector{Float64}, fResult)
+function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}})
     f, g, h = fResult
-    return individual(x, f, g, h)
+    return xfgh_indiv(x, f, g, h)
+end
+
+function inferType(fVal::Tuple{Float64})
+    return xf_indiv
+end
+
+function inferType(fVal::Tuple{Float64,Array{Float64,1}})
+    return xfg_indiv
+end
+
+function inferType(fVal::Tuple{Float64,Array{Float64,1},Array{Float64,1}})
+    return xfgh_indiv
 end
