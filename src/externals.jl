@@ -1,5 +1,5 @@
 if Pkg.installed("Distributions") == nothing
-    Pkg.install("Distributions")
+    Pkg.add("Distributions")
 end
 
 using Distributions
