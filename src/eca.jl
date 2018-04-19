@@ -187,7 +187,6 @@ function eca(fobj::Function,
      canResizePop::Bool  = false,
       termination::Function   = (x ->false),
        saveConvergence::String="",
-            individual::DataType= xf_indiv,
            limits  = [-100., 100.])
 
     func = fobj
@@ -198,13 +197,8 @@ function eca(fobj::Function,
     end
 
 
-    Population = Array{individual, 1}([])
-
-    X = initializePop(N, D, a, b, initPopRand)
-    for i in 1:N
-        x = X[i,:]
-        push!(Population, generateChild(individual, x, func(x)))
-    end
+    # population array
+    Population = initializePop(func, N, D, a, b, initPopRand)
 
     # current evaluations
     nevals = N
@@ -276,7 +270,7 @@ function eca(fobj::Function,
 
             y = correct(y, a, b, correctSol)
 
-            sol = generateChild(individual, y, func(y))
+            sol = generateChild(y, func(y))
 
             nevals += 1
 

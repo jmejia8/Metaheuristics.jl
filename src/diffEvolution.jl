@@ -32,15 +32,8 @@ function diffEvolution(func::Function, D::Int;
         lb = ones(D) * lb[1]
     end
 
-    # population array
-    population = Array{individual, 1}([])
-
     # uniform initilization
-    X = initializePop(N, D, la, lb)
-    for i in 1:N
-        x = X[i,:]
-        push!(population, generateChild(individual, x, func(x)))
-    end
+    population = initializePop(func, N, D, la, lb)
 
     # current evalutations
     nevals = N
@@ -159,7 +152,7 @@ function diffEvolution(func::Function, D::Int;
             end
 
             # instance child
-            h = generateChild(individual, v, func(v))
+            h = generateChild(v, func(v))
             nevals += 1
 
             # select survivals
