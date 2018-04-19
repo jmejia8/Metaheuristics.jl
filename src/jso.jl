@@ -1,5 +1,3 @@
-using Distributions
-
 function getFw(F::Float64, nfes::Int, max_nfes::Int)
     if nfes < 0.2 * max_nfes
         return 0.7F

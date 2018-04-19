@@ -3,8 +3,6 @@
 # "An efficient rank-1 update for Cholesky CMA-ES using auxiliary evolution path." 
 # Evolutionary Computation (CEC), 2017 IEEE Congress on. IEEE, 2017.
 
-using Distributions
-
 struct IndCMA
 	# step
 	z::Vector
