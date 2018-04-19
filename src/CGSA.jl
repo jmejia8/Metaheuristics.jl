@@ -143,8 +143,11 @@ function CGSA(fobj::Function,
 	low, up = limits
 
 	# bounds vectors
-	low = low * ones(D)
-	up  =  up * ones(D)
+    low, up = limits[1,:], limits[2,:]
+    if length(low) < D
+        low = ones(D) * low[1]
+        up = ones(D) * up[1]
+    end
 
 	max_it = div(max_evals, N) + 1
 	
