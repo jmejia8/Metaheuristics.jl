@@ -3,8 +3,9 @@ module Metaheuristics
 
 # ECA algorithm
 export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
-export CFO, jso
+export CFO, jso, DE
 
+include("externals.jl")
 include("structures.jl")
 include("operators.jl")
 include("tools.jl")
