@@ -3,18 +3,6 @@
 # "An efficient rank-1 update for Cholesky CMA-ES using auxiliary evolution path." 
 # Evolutionary Computation (CEC), 2017 IEEE Congress on. IEEE, 2017.
 
-struct IndCMA
-	# step
-	z::Vector
-	y::Vector
-
-	# position
-	x::Vector
-
-	# cost
-	f::Real
-end
-
 function mvnorm(D)
 	return rand(MvNormal(zeros(D), eye(D)))
 end
@@ -57,7 +45,8 @@ function CMAES_AEP(fobj::Function,
 	# initialize M
 	x = VarMin + (VarMax - VarMin) .* rand(D)
 	f = fobj(x)
-	M = IndCMA(zeros(D), zeros(D), x, f)
+	M = generateChild(x, f)
+	sample = typeof(M)
 	A = eye(D)
 
 	# current number of evaluations
@@ -79,24 +68,28 @@ function CMAES_AEP(fobj::Function,
 	while !stop
 
 		# Generate Samples
-		Population = Array{IndCMA}([])
+		Population = Array{sample}([])
 		fVals = zeros(λ)
+		ys = []
+		zs = []
 		for i=1:λ
 			z = mvnorm(D)
 			y = A*z
 			x = M.x + σ * y
 			x = correctSol(x, VarMin, VarMax)
-			f = fobj(x)
 
 			nevals += 1
 
-			sol = IndCMA(z, y, x, f)
-			fVals[i] = f
+			sol = generateChild(x, fobj(x))
+			fVals[i] = sol.f
+
+			push!(ys, y)
+			push!(zs, z)
 			
 			push!(Population, sol)
 
 			# Update best solution
-			if sol.f < bestSol.f
+			if Selection(bestSol, sol)
 				bestSol = sol
 			end
 		end
@@ -111,19 +104,20 @@ function CMAES_AEP(fobj::Function,
 			break
 		end
 
-		Population = Population[sortperm(fVals)]
+		# Population = Population[sortperm(fVals)]
 
 		x   = zeros(D)
 		y_w = zeros(D)
 		z_w = zeros(D)
 
+		Indx = sortperm(fVals)
 		for i = 1:μ
-			x += w[i] * Population[i].x
-			y_w += w[i] * Population[i].y
-			z_w += w[i] * Population[i].z
+			x += w[i] * Population[Indx[i]].x
+			y_w += w[i] * ys[Indx[i]]
+			z_w += w[i] * zs[Indx[i]]
 		end
 
-		M = IndCMA(zeros(D), zeros(D), x, 0)
+		M = generateChild(x, 0.0)
 
 		# update paths
 		P = (1- cc)*P + √(cc*( 2 - cc )*μw) * y_w
