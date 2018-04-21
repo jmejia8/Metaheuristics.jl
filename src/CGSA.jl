@@ -11,9 +11,6 @@
 # "Chaotic gravitational constants for the gravitational search algorithm." 
 # Applied Soft Computing 53 (2017): 407-419.
 # ------------------------------------------
-# Common functions
-# include("tools.jl")
-# include("CGSA.jl")
 
 function chaos(index,curr_iter,max_iter,Value)
 	x = zeros(max_iter + 1)
@@ -140,8 +137,6 @@ function CGSA(fobj::Function,
 	#Rpower: Power of R in eq.7.
 	Rnorm = 2
 
-	low, up = limits
-
 	# bounds vectors
     low, up = limits[1,:], limits[2,:]
     if length(low) < D
@@ -155,7 +150,8 @@ function CGSA(fobj::Function,
 	X = initializePop(N, D, low, up)
 
 	#Evaluation of agents. 
-	fitness = evaluatePop(X, fobj, N)
+	fvals = evaluatePop(X, fobj, N)
+	fitness = getfValues(fvals)
 
 	V = zeros(N,D)
 
@@ -197,21 +193,16 @@ function CGSA(fobj::Function,
 		X = correctPop(X, low, up)
 		
 		#Evaluation of agents. 
-		fitness = evaluatePop(X, fobj, N)
+		fvals = evaluatePop(X, fobj, N)
+		fitness = getfValues(fvals)
 		best_X, best = getBest(fitness, searchType)
 
-
-		if searchType == :minimize
-			if best < Fbest  # minimization.
+		# fix this
+		if Selection(generateChild(zeros(2), fvals[best_X]), generateChild(zeros(2), Fbest), searchType)
 				Fbest = best
 				Lbest = X[best_X,:]
-			end
-		else 
-			if best > Fbest  # maximization
-				Fbest = best
-				Lbest = X[best_X,:]
-			end
 		end
+
 
 		if saveConvergence != ""
 			push!(convergence, [(iteration+1)*N Fbest])

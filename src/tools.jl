@@ -94,12 +94,37 @@ end
 #          for vector representation
 ###################################################
 function evaluatePop(X::Matrix, fobj::Function, N::Int)
+    v = fobj(X[1,:])
+    soltype = typeof(v)
 
-    f = zeros(N)
-    for i = 1:N
-        f[i] = fobj(X[i,:])
+    f = Array{soltype}([])
+    push!(f, v)
+    for i = 2:N
+        push!(f, fobj(X[i,:]))
     end
 
+    return f
+end
+
+function getfValues(f::Vector{Float64})
+    return f
+end
+
+function getfValues(fv::Array{Tuple{Float64,Array{Float64,1}}})
+    f = zeros(length(fv))
+
+    for i = 1:length(fv)
+        f[i] = fv[i][1]
+    end
+    return f
+end
+
+function getfValues(fv::Array{ Tuple{Float64,Array{Float64,1},Array{Float64,1}} })
+    f = zeros(length(fv))
+
+    for i = 1:length(fv)
+        f[i] = fv[i][1]
+    end
     return f
 end
 
