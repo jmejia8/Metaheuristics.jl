@@ -106,26 +106,24 @@ function evaluatePop(X::Matrix, fobj::Function, N::Int)
     return f
 end
 
-function getfValues(f::Vector{Float64})
+function getfValues(P::Array)
+    f = zeros(length(P))
+
+    for i = 1:length(P)
+        f[i] = P[i].f
+    end
+
     return f
 end
 
-function getfValues(fv::Array{Tuple{Float64,Array{Float64,1}}})
-    f = zeros(length(fv))
+function getPositions(P::Array, N::Int, D::Int)
+    X = zeros(N, D)
 
-    for i = 1:length(fv)
-        f[i] = fv[i][1]
+    for i = 1:N
+        X[i,:] = P[i].x
     end
-    return f
-end
 
-function getfValues(fv::Array{ Tuple{Float64,Array{Float64,1},Array{Float64,1}} })
-    f = zeros(length(fv))
-
-    for i = 1:length(fv)
-        f[i] = fv[i][1]
-    end
-    return f
+    return X
 end
 
 function getBest(fitness::Vector{Float64}, searchType::Symbol = :minimize)

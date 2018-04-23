@@ -146,30 +146,28 @@ function CGSA(fobj::Function,
 
 	max_it = div(max_evals, N) + 1
 	
-	#random initialization for agents.
-	X = initializePop(N, D, low, up)
+	# random initialization for agents.
+	P = initializePop(fobj, N, D, low, up)
+	fitness = getfValues(P)
+	X = getPositions(P, N, D)
 
-	#Evaluation of agents. 
-	fvals = evaluatePop(X, fobj, N)
-	fitness = getfValues(fvals)
-
+	# Velocity
 	V = zeros(N,D)
 
 	# Current best
-	best_X, best = getBest(fitness, searchType)
+	theBest = getBest(P, searchType)
 
-	Fbest = best
-	Lbest = X[best_X,:]
 
     convergence = []
 	if saveConvergence != ""
-		push!(convergence, [N Fbest])
+		push!(convergence, [N theBest.f])
 	end
 
 	# chaos
 	wMax = chValueInitial
 	wMin = 1e-10
 	for iteration = 1:max_it
+
 		# iteration
 		chValue = wMax-iteration*((wMax-wMin)/max_it)
 	  
@@ -191,21 +189,23 @@ function CGSA(fobj::Function,
 
 		# Checking allowable range. 
 		X = correctPop(X, low, up)
+		for i = 1:N
+			x = X[i,:]
+			P[i] = generateChild(x, fobj(x))
+			fitness[i] = P[i].f
+		end
 		
 		#Evaluation of agents. 
-		fvals = evaluatePop(X, fobj, N)
-		fitness = getfValues(fvals)
-		best_X, best = getBest(fitness, searchType)
+		currentBest = getBest(P, searchType)
 
 		# fix this
-		if Selection(generateChild(zeros(2), fvals[best_X]), generateChild(zeros(2), Fbest), searchType)
-				Fbest = best
-				Lbest = X[best_X,:]
+		if Selection(theBest, currentBest, searchType)
+			theBest = currentBest
 		end
 
 
 		if saveConvergence != ""
-			push!(convergence, [(iteration+1)*N Fbest])
+			push!(convergence, [(iteration+1)*N theBest.f])
 		end
 
 	end #iteration
@@ -222,10 +222,10 @@ function CGSA(fobj::Function,
 		println("===========[CGSA results ]=============")
 		println("| Generations = $max_it")
 		println("| Evals       = ", max_it*N)
-		@printf("| best f.     = %e\n", Fbest)
+		@printf("| best f.     = %e\n", theBest.f)
 		println("=======================================")
 	end
 
-	return Lbest, Fbest
+	return theBest.x, theBest.f
 
 end
