@@ -157,7 +157,7 @@ function Selection(fOld::Individual_, fNew::Individual_, searchType::Symbol)
 end
 
 # COP functions
-function countViolations(g::Vector, h::Vector)
+function violationsSum(g::Vector, h::Vector)
     sum_g = 0
     sum_h = 0
 
@@ -169,6 +169,24 @@ function countViolations(g::Vector, h::Vector)
     for i = 1:length(h)
         if h[i] != 0.0
             sum_h += abs(h[i])  end
+    end
+
+    return sum_g + sum_h
+end
+
+# for Deb rules
+function countViolations(g::Vector, h::Vector)
+    sum_g = 0
+    sum_h = 0
+
+    for i = 1:length(g)
+        if g[i] > 0
+            sum_g += 1  end
+    end
+
+    for i = 1:length(h)
+        if h[i] != 0.0
+            sum_h += 1  end
     end
 
     return sum_g + sum_h
