@@ -79,10 +79,9 @@ function jso(fobj::Function, D::Int;
         b = ones(D) * b[1]
     end
 
-
-
-    P = initializePop(N, D, a, b, :uniform)
-    f = evaluatePop(P, fobj, N)
+    population = initializePop(fobj, N, D, a, b)
+    f = getfValues(population)
+    P = getPositions(population, N, D)
 
     nfes = N
 
@@ -109,6 +108,9 @@ function jso(fobj::Function, D::Int;
         fus = Array{Float64}([])
         CRs = Array{Float64}([])
         Fs = Array{Float64}([])
+
+        # 
+        Children = copy(population)
         for i = 1:N
             r = rand(1:H, 1)[1]
 
@@ -172,8 +174,8 @@ function jso(fobj::Function, D::Int;
 
             u = correct(u, a, b, true)
 
-
-            fu = fobj(u)
+            Children[i] = generateChild(u, fobj(u))
+            fu = Children[i].f
             nfes += 1
 
             push!(Us, u)
@@ -194,12 +196,13 @@ function jso(fobj::Function, D::Int;
             u = Us[i]
             x = P[i,:]
 
-            if fu <= fx
+            if Selection(population[i], Children[i]; leq=true)
                 P[i,:] = u
                 f[i]   = fu
+                population[i] = Children[i]
             end
 
-            if fu < fx
+            if Selection(population[i], Children[i])
                 push!(A, x)
                 push!(SCR, CRs[i])
                 push!(SF, Fs[i])
@@ -245,8 +248,8 @@ function jso(fobj::Function, D::Int;
         g += 1
     end
 
-    best = indmin(f)
-    return P[best, :], f[indmin(f)]
+    best = getBest(population)
+    return best.x, best.f
 
 
 end
