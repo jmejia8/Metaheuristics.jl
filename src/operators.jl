@@ -1,13 +1,21 @@
-function Selection(Old::xf_indiv, New::xf_indiv, searchType=:minimize)
+function Selection(Old::xf_indiv, New::xf_indiv, searchType::Symbol=:minimize; leq::Bool=false)
     if searchType == :minimize
+        if leq
+            return New.f <= Old.f
+        end
+
         return New.f < Old.f
+    end
+    
+    if leq
+        return New.f >= Old.f
     end
     
     return New.f > Old.f
 end
 
 # Deb rules (selection)
-function Selection(Old::xfgh_indiv, New::xfgh_indiv, searchType=:minimize)
+function Selection(Old::xfgh_indiv, New::xfgh_indiv, searchType::Symbol=:minimize; leq::Bool=false)
 
     old_vio = countViolations(Old.g, Old.h)
     new_vio = countViolations(New.g, New.h)
@@ -19,15 +27,21 @@ function Selection(Old::xfgh_indiv, New::xfgh_indiv, searchType=:minimize)
     end
 
     if searchType == :minimize
-         return New.f < Old.f
+        if leq
+            return New.f <= Old.f
+        end
+        return New.f < Old.f
+    end
+    
+    if leq
+        return New.f >= Old.f
     end
     
     return New.f > Old.f
 end
 
 # Deb rules (selection)
-function Selection(Old::xfg_indiv, New::xfg_indiv, searchType=:minimize)
-
+function Selection(Old::xfg_indiv, New::xfg_indiv, searchType::Symbol=:minimize; leq::Bool=false)
     old_vio = countViolations(Old.g, [])
     new_vio = countViolations(New.g, [])
 
@@ -38,7 +52,13 @@ function Selection(Old::xfg_indiv, New::xfg_indiv, searchType=:minimize)
     end
 
     if searchType == :minimize
-         return New.f < Old.f
+        if leq
+            return New.f <= Old.f
+        end
+        return New.f < Old.f
+    end
+    if leq
+        return New.f >= Old.f
     end
     
     return New.f > Old.f
