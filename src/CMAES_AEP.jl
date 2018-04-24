@@ -110,7 +110,7 @@ function CMAES_AEP(fobj::Function,
 		y_w = zeros(D)
 		z_w = zeros(D)
 
-		Indx = sortperm(fVals)
+		Indx = sortperm(Population, lt=Selection)
 		for i = 1:μ
 			x += w[i] * Population[Indx[i]].x
 			y_w += w[i] * ys[Indx[i]]
@@ -145,9 +145,7 @@ function CMAES_AEP(fobj::Function,
 
 	if showResults
 		println("===========[CMAES results]=============")
-		println("| Generations = $t")
-		println("| Evals       = ", nevals)
-		@printf("| best f.     = %e\n", bestSol.f)
+		printResults(bestSol, [], t, nevals)
 		println("=======================================")
 	end
 
