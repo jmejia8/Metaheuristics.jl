@@ -191,3 +191,27 @@ function countViolations(g::Vector, h::Vector)
 
     return sum_g + sum_h
 end
+
+function printResults(best::xf_indiv, P, t, nevals)
+    println("| Generations = $t")
+    println("| Evals       = ", nevals)
+    @printf("| best f.     = %e\n", best.f)
+    
+end
+
+function printResults(best::xfg_indiv, P, t, nevals)
+    println("| Generations = $t")
+    println("| Evals       = ", nevals)
+    @printf("| best f.     = %e\n", best.f)
+    @printf("| No. vio. g. = %i\n", countViolations(best.g,[]))
+    
+end
+
+
+function printResults(best::xfgh_indiv, P, t, nevals)
+    println("| Generations = $t")
+    println("| Evals       = ", nevals)
+    @printf("| best f.     = %e\n", best.f)
+    @printf("| No. vios.   = %i\n", countViolations(best.g, best.h))
+    
+end
