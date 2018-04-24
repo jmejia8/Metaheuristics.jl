@@ -220,9 +220,7 @@ function CGSA(fobj::Function,
 
 	if showResults
 		println("===========[CGSA results ]=============")
-		println("| Generations = $max_it")
-		println("| Evals       = ", max_it*N)
-		@printf("| best f.     = %e\n", theBest.f)
+		printResults(theBest, P, max_it, max_it*N)
 		println("=======================================")
 	end
 
