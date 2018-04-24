@@ -17,8 +17,8 @@ end
 # Deb rules (selection)
 function Selection(Old::xfgh_indiv, New::xfgh_indiv, searchType::Symbol=:minimize; leq::Bool=false)
 
-    old_vio = countViolations(Old.g, Old.h)
-    new_vio = countViolations(New.g, New.h)
+    old_vio = violationsSum(Old.g, Old.h)
+    new_vio = violationsSum(New.g, New.h)
 
     if new_vio < old_vio 
         return true
@@ -42,8 +42,8 @@ end
 
 # Deb rules (selection)
 function Selection(Old::xfg_indiv, New::xfg_indiv, searchType::Symbol=:minimize; leq::Bool=false)
-    old_vio = countViolations(Old.g, [])
-    new_vio = countViolations(New.g, [])
+    old_vio = violationsSum(Old.g, [])
+    new_vio = violationsSum(New.g, [])
 
     if new_vio < old_vio 
         return true
