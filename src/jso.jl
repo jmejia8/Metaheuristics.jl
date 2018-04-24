@@ -8,9 +8,9 @@ function getFw(F::Float64, nfes::Int, max_nfes::Int)
     return 1.2F
 end
 
-function getPbests(P::Matrix{Float64}, f::Vector{Float64}, p::Float64)
-    i = sortperm(f)
-    N = length(f)
+function getPbests(P::Array, p::Float64)
+    i = sortperm(P, lt=Selection)
+    N = length(P)
 
     n = round(Int, p*N)
     if n < 2
@@ -22,7 +22,7 @@ function getPbests(P::Matrix{Float64}, f::Vector{Float64}, p::Float64)
     return ids
 end
 
-function getXr(P::Matrix{Float64}, A, i::Int, i_pbest)
+function getXr(P::Matrix{Float64}, A, i::Int, i_pbest::Int)
     N  = size(P, 1)
     NA = length(A)
 
@@ -60,6 +60,7 @@ end
 
 function jso(fobj::Function, D::Int;
                         max_evals = 10000D,
+                        showResults::Bool  = true,
                         limits = [-100.0, 100.0])
     # conf
     p_max = 0.25
@@ -102,7 +103,7 @@ function jso(fobj::Function, D::Int;
 
         N_old = N
 
-        pbests = getPbests(P, f, p)
+        pbests = getPbests(population, p)
 
         Us = []
         fus = Array{Float64}([])
@@ -235,7 +236,9 @@ function jso(fobj::Function, D::Int;
         end
 
         if  N < N_old
-            Ids = sortperm(f)[1:N]
+            Ids = sortperm(population, lt=Selection)[1:N]
+
+            population = population[Ids]
             P = P[Ids,:]
             f = f[Ids]
             if length(A) > N
@@ -249,6 +252,13 @@ function jso(fobj::Function, D::Int;
     end
 
     best = getBest(population)
+    if showResults
+        println("===========[ jSO results ]=============")
+        printResults(best, population, g, nfes)
+        println("=======================================")
+
+    end
+
     return best.x, best.f
 
 
