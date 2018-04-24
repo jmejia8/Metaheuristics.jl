@@ -215,3 +215,15 @@ function printResults(best::xfgh_indiv, P, t, nevals)
     @printf("| No. vios.   = %i\n", countViolations(best.g, best.h))
     
 end
+
+function isfeasible(element::xf_indiv)
+    return true
+end
+
+function isfeasible(element::xfg_indiv)
+    return countViolations(element.g, []) == 0
+end
+
+function isfeasible(element::xfgh_indiv)
+    return countViolations(element.g, element.h) == 0
+end

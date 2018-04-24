@@ -61,6 +61,7 @@ end
 function jso(fobj::Function, D::Int;
                         max_evals = 10000D,
                         showResults::Bool  = true,
+                        saveConvergence::String="",
                         limits = [-100.0, 100.0])
     # conf
     p_max = 0.25
@@ -71,6 +72,7 @@ function jso(fobj::Function, D::Int;
     N_min = 4
     H = 5
 
+    convergence = []
 
     max_nfes = max_evals
 
@@ -85,6 +87,14 @@ function jso(fobj::Function, D::Int;
     P = getPositions(population, N, D)
 
     nfes = N
+    
+    # the best
+    best = getBest(population)
+
+    if saveConvergence != "" && isfeasible(best)
+        push!(convergence, [nfes best.f])
+    end
+
 
     MF  = 0.5ones(H)
     MCR = 0.8ones(H)
@@ -209,11 +219,18 @@ function jso(fobj::Function, D::Int;
                 push!(SF, Fs[i])
                 push!(Sdiff, abs(fx - fu))
             end
+
+            if Selection(best, Children[i])
+                best = Children[i]
+            end
         end
 
+        if saveConvergence != "" && isfeasible(best)
+            push!(convergence, [nfes best.f])
+        end
         
 
-        if length(SF) > 0       
+        if length(SF) > 0
             w = Sdiff / sum(Sdiff)
 
             MCR[intex_M] = meanWL(SCR, w)
@@ -251,7 +268,10 @@ function jso(fobj::Function, D::Int;
         g += 1
     end
 
-    best = getBest(population)
+    if saveConvergence != ""
+        writecsv(saveConvergence, convergence)
+    end
+
     if showResults
         println("===========[ jSO results ]=============")
         printResults(best, population, g, nfes)

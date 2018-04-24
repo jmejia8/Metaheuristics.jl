@@ -57,7 +57,7 @@ function CMAES_AEP(fobj::Function,
 
 	# convergence values
 	convergence = []
-	if saveConvergence != ""
+	if saveConvergence != "" && isfeasible(bestSol)
 		push!(convergence, [nevals bestSol.f])
 	end
 
@@ -94,7 +94,7 @@ function CMAES_AEP(fobj::Function,
 			end
 		end
 
-		if saveConvergence != ""
+		if saveConvergence != "" && isfeasible(bestSol)
 			push!(convergence, [nevals bestSol.f])
 		end
 

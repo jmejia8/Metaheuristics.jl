@@ -159,7 +159,7 @@ function CGSA(fobj::Function,
 
 
     convergence = []
-	if saveConvergence != ""
+	if saveConvergence != "" && isfeasible(theBest)
 		push!(convergence, [N theBest.f])
 	end
 
@@ -204,7 +204,7 @@ function CGSA(fobj::Function,
 		end
 
 
-		if saveConvergence != ""
+		if saveConvergence != "" && isfeasible(theBest)
 			push!(convergence, [(iteration+1)*N theBest.f])
 		end
 
