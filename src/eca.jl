@@ -341,10 +341,7 @@ function eca(fobj::Function,
 
     if showResults
         println("===========[ ECA results ]=============")
-        println("| Generations = $t")
-        println("| Evals       = ", nevals)
-        @printf("| best f.     = %e\n", best.f)
-        println("| p_cr: ", p_cr)
+        printResults(best, Population, t, nevals)
         println("=======================================")
     end
 
