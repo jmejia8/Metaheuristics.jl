@@ -110,7 +110,7 @@ function CMAES_AEP(fobj::Function,
 		y_w = zeros(D)
 		z_w = zeros(D)
 
-		Indx = sortperm(Population, lt=Selection)
+		Indx = sortperm(Population, lt=Selection, rev=true)
 		for i = 1:μ
 			x += w[i] * Population[Indx[i]].x
 			y_w += w[i] * ys[Indx[i]]

@@ -9,7 +9,7 @@ function getFw(F::Float64, nfes::Int, max_nfes::Int)
 end
 
 function getPbests(P::Array, p::Float64)
-    i = sortperm(P, lt=Selection)
+    i = sortperm(P, lt=Selection, rev=true)
     N = length(P)
 
     n = round(Int, p*N)
@@ -253,7 +253,7 @@ function jso(fobj::Function, D::Int;
         end
 
         if  N < N_old
-            Ids = sortperm(population, lt=Selection)[1:N]
+            Ids = sortperm(population, lt=Selection, rev=true)[1:N]
 
             population = population[Ids]
             P = P[Ids,:]
