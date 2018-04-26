@@ -44,32 +44,12 @@ function getMass(U::Array{xf_indiv, 1}, searchType::Symbol)
 end
 
 function getMass(U::Array{xfg_indiv, 1}, searchType::Symbol)
-    n, d = length(U), length(U[1].x)
-
-    fitness = zeros(Float64, n)
-    svios = zeros(n)
-
-    for i = 1:n
-        fitness[i] = U[i].f
-        svios[i] = countViolations(U[i].g, [])
-    end
-
-    return fitnessToMass(fitness, searchType) .+ svios
+    return getMass(U, searchType)
     
 end
 
 function getMass(U::Array{xfgh_indiv, 1}, searchType::Symbol)
-    n, d = length(U), length(U[1].x)
-
-    fitness = zeros(Float64, n)
-    svios = zeros(n)
-
-    for i = 1:n
-        fitness[i] = U[i].f
-        svios[i] = countViolations(U[i].g, U[i].h)
-    end
-
-    return fitnessToMass(fitness, searchType) .+ svios
+    return getMass(U, searchType)
 end
 
 function center(U::Array, mass::Vector{Float64})
@@ -85,28 +65,11 @@ function center(U::Array, mass::Vector{Float64})
 end
 
 function center(U::Array, searchType::Symbol)
-    n, d = length(U), length(U[1].x)
+    n = length(U)
 
     mass = getMass(U, searchType)
 
-    return center(U, mass), indmin(mass), indmax(mass)
-end
-
-function getWorstInd(Population::Array, searchType::Symbol)
-    f_worst = Population[1].f
-    j = 1
-
-    for i = 2:length(Population)
-        if searchType == :minimize && f_worst < Population[i].f
-            f_worst = Population[i].f
-            j = i
-        elseif searchType != :minimize && f_worst > Population[i].f
-            f_worst = Population[i].f
-            j = i
-        end
-    end
-
-    return j
+    return center(U, mass), getWorstInd(U, searchType), getBestInd(U, searchType)
 end
 
 function getU(P::Array, K::Int, I::Vector{Int}, i::Int, N::Int)
@@ -165,7 +128,7 @@ function resizePop!(P::Array, N_new::Int, K::Int)
         f[i] = P[i].f
     end
 
-    ids = sortperm(f)[1:N_new]
+    ids = sortperm(P, lt=is_better)[1:N_new]
     return P[ids]
 end
 
