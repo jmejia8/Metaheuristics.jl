@@ -2,7 +2,7 @@ __precompile__()
 module Metaheuristics
 
 # ECA algorithm
-export eca, diffEvolution, pso, ecaConstrained, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
+export eca, diffEvolution, pso, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
 export CFO, jso, DE
 
 include("externals.jl")
@@ -12,7 +12,6 @@ include("tools.jl")
 
 # ECA algorithm
 include("eca.jl")
-include("ecaConstrained.jl")
 
 # Differential algorithm
 include("diffEvolution.jl")
