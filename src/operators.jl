@@ -76,6 +76,35 @@ function getBest(Population, searchType::Symbol = :minimize)
     return best
 end
 
+function getWorst(Population, searchType::Symbol = :minimize)
+    worst = Population[1]
+
+    for i = 2:length(Population)
+        if Selection(Population[i], worst)
+            worst = Population[i]
+        end
+    end
+
+    return worst
+end
+
+function getWorstInd(Population, searchType::Symbol = :minimize)
+    worst = 1
+
+    for i = 2:length(Population)
+        if Selection(Population[i], Population[worst])
+            worst = i
+        end
+    end
+
+    return worst
+end
+
+function is_better(x, y)
+    # x better than y
+    return Selection(y, x)
+end
+
 function getBestInd(Population, searchType::Symbol = :minimize)
     j = 1
 
