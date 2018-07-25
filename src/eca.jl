@@ -150,6 +150,7 @@ function eca(fobj::Function,
      canResizePop::Bool  = false,
       termination::Function   = (x ->false),
        saveConvergence::String="",
+    returnDetails::Bool = false,
            limits  = [-100., 100.])
 
     func = fobj
@@ -306,6 +307,10 @@ function eca(fobj::Function,
         println("===========[ ECA results ]=============")
         printResults(best, Population, t, nevals)
         println("=======================================")
+    end
+
+    if returnDetails
+        return best, Population, t, nevals
     end
 
     return best.x, best.f
