@@ -25,7 +25,7 @@ function massCalculation(fit,searchType)
 			worst= Fmin #eq.19-20.
 		end
 		
-		M = (fit - worst) ./ (best - worst) #eq.15,
+		M = (fit .- worst) ./ (best .- worst) #eq.15,
 
 	end
 

@@ -18,7 +18,7 @@ function CMAES_AEP(fobj::Function,
 	# algorithm parameters
 	λ = 4 + floor(Int, 3log(D))
 	μ = div(λ, 2)
-	w = (log(μ+1) - log.(1:μ)) ./ (μ*log(μ+1) - sum( log.(1:μ) ))
+	w = (log(μ+1) .- log.(1:μ)) ./ (μ*log(μ+1) - sum( log.(1:μ) ))
 	μw = 1 / sum( w .^ 2 )
 	cσ = √(μw) / ( √(D) + √(μw))
 	dσ = 1 + 2max(0, √((μw - 1) / (D+1)) - 1) + cσ

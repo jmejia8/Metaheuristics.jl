@@ -10,7 +10,7 @@ function pso(func::Function, D::Int;
 
     a, b = limits
 
-    population = a + (b - a) * rand(N, D)
+    population = a .+ (b .- a) * rand(N, D)
     vPop = randn(N, D)
    
     fitness = zeros(Real, N)
@@ -30,10 +30,10 @@ function pso(func::Function, D::Int;
     t = 0
     
     i_min = indmin(fitness)
-    xGBest= population[i_min]         
+    xGBest= population[i_min,:]         
     fBest = fitness[i_min]
 
-    velocity(x, v, pbest, gbest) = ω*v + C1*rand()*(pbest-x) + C2*rand()*(gbest-x)
+    velocity(x, v, pbest, gbest) = ω*v .+ C1*rand()*(pbest - x) .+ C2*rand()*(gbest-x)
 
     # start search
     while !stop
@@ -44,7 +44,7 @@ function pso(func::Function, D::Int;
             xPBest = xPBests[i,:]
 
             v = velocity(x, vPop[i,:], xPBest, xGBest)
-            x += v
+            x = x .+ v
 
             population[i,:] = x
             vPop[i,:] = v

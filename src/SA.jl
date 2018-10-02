@@ -7,7 +7,7 @@ SA:  Minimizes a function with the method of Simulated Annealing
 function newSol(y, μ)
 	# This function is used to generate new point according to lower and upper
 	# and a random factor proportional to current point.
-	return(((1+ μ).^abs.(y)-1)/ μ).*sign.(y)
+	return(((1.0 .+ μ) .^ abs.(y) .- 1) / μ) .* sign.(y)
 end
 
 
@@ -25,7 +25,7 @@ function SA( fobj::Function,
 	l, u = limits
 
 	if length(x0) != D
-	    x0 = l + (u - l) .* rand(D)
+	    x0 = l .+ (u .- l) .* rand(D)
 	end
 
 	# the current point and fx=f(x)
@@ -54,7 +54,7 @@ function SA( fobj::Function,
 		# equilibrium.
 		for i = 1:N        
 			# We generate new test point using newSol function      
-			dx = newSol(2rand(size(x)) - 1, μ) .* (u-l)
+			dx = newSol(2rand(length(x)) .- 1.0 , μ) .* (u-l)
 
 			# the test point and fx1=f(x1)
 			x1 = x + dx

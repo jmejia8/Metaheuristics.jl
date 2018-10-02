@@ -21,11 +21,11 @@ function fitnessToMass(fitness::Vector{Float64}, searchType::Symbol)
     m = minimum(fitness)
     
     if m < 0
-        fitness = 2abs(m) + fitness
+        fitness = 2abs(m) .+ fitness
     end
 
     if searchType == :minimize
-        fitness = 2maximum(fitness) - fitness
+        fitness = 2maximum(fitness) .- fitness
     end
 
     return fitness
@@ -58,7 +58,7 @@ function center(U::Array, mass::Vector{Float64})
     c = zeros(Float64, d)
     
     for i = 1:length(mass)
-        c += mass[i] * U[i].x
+        c += mass[i] .* U[i].x
     end
 
     return c / sum(mass)
@@ -77,7 +77,7 @@ function getU(P::Array, K::Int, I::Vector{Int}, i::Int, N::Int)
         U_ids = I[i:K+i]
     else
         j = (i:K+i) .% N
-        U_ids = I[j + 1]
+        U_ids = I[j .+ 1]
     end
 
     return P[U_ids]
@@ -101,7 +101,7 @@ function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
 
     for i = 1:length(p_cr)
         if M[i] > 0.3
-            pn = abs(p_best + 0.3randn())
+            pn = abs(p_best .+ 0.3randn())
             if pn > 1.0
                 pn = 1.0
             end
@@ -187,7 +187,7 @@ function eca(fobj::Function,
     if adaptive
         p_cr = rand(D)
     else
-        p_cr = p_bin*ones(D)
+        p_cr = p_bin .* ones(D)
     end
     
     # start search
@@ -220,12 +220,12 @@ function eca(fobj::Function,
                 u = U[u_worst].x
                 
                 # current-to-center/bin
-                y = x + η * (c - u)
+                y = x .+ η .* (c .- u)
             elseif p_exploit < 0
-                y = x + (1-p^5)* η * (c - u) + (p^5) * η * (best.x - c)
+                y = x .+ (1-p^5)* η * (c .- u) .+ (p^5) * η * (best.x .- c)
             else
                 # current-to-best/bin
-                y = x + η * (best.x - c)
+                y = x .+ η .* (best.x .- c)
             end
 
             # binary crossover
@@ -278,7 +278,7 @@ function eca(fobj::Function,
         
         if canResizePop
             # new size
-            N = 2K + round(Int, (1- p ) * (N_init - 2K))
+            N = 2K .+ round(Int, (1 - p ) * (N_init .- 2K))
 
             if N < 2K
                 N = 2K
