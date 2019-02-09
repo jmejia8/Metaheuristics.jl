@@ -1,5 +1,10 @@
 using Metaheuristics
-using Base.Test
+if VERSION < v"0.7.0"
+    using Base.Test
+    srand(31415926534)
+else
+    using Test
+end
 
 # write your own tests here
 @testset "Sphere" begin
@@ -11,7 +16,7 @@ using Base.Test
     D = 10
 
     # Objective function
-    sphere{T <: Vector}(x::T) = sum(x.*x)
+    sphere(x) = sum(x.*x)
 
     # ECA results
     result, fitness = eca(sphere, D; showResults=false)
