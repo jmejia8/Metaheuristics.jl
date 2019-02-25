@@ -51,7 +51,7 @@ function initializePop(N::Int, D::Int, a::Vector{Float64}, b::Vector{Float64}, i
     # a, b should be D × 1
 
     if initType == :cheb
-        chebPts(x, a, b) = 0.5*(a + b) + 0.5*(b-a)*cos.( x )
+        chebPts(x, a, b) = 0.5*(a + b) .+ 0.5*(b-a)*cos.( x )
         X = zeros(N, D)
         for j in 1:D
             X[:, j] = chebPts(2π*rand(N), a[j], b[j])
