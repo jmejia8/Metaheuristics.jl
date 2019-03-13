@@ -8,6 +8,7 @@ elseif VERSION < v"0.7.0" && Pkg.installed("Distributions") == nothing
 end
 
 using Distributions
+import DelimitedFiles.writedlm
 
 if VERSION >= v"0.7.0"
 	import Random: randperm
@@ -20,4 +21,5 @@ if VERSION >= v"0.7.0"
 	eye(n) = Diagonal(ones(n))
 
 	repmat(X, n) = repeat(X, n)
+	writecsv(f, A) = writedlm(f, A, ',')
 end
