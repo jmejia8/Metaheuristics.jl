@@ -46,8 +46,9 @@ function DE(func::Function, D::Int;
     
     # best element ever
     best_ind = getBestInd(population)
-    xBest = population[best_ind].x
-    fBest = population[best_ind].f
+    best  = population[best_ind]
+    xBest = best.x
+    fBest = best.f
 
     convergence = []
 
@@ -159,7 +160,8 @@ function DE(func::Function, D::Int;
             if Selection(currentPop[i], h)
                 population[i] = h
 
-                if Selection(currentPop[best_ind], h)
+                if Selection(best, h)
+                    best = h
                     best_ind = i
                 end
             end
@@ -172,8 +174,8 @@ function DE(func::Function, D::Int;
 
         t += 1
 
-        xBest = population[best_ind].x
-        fBest = population[best_ind].f
+        xBest = best.x
+        fBest = best.f
 
         if saveConvergence != ""
             push!(convergence, [nevals fBest])
@@ -184,7 +186,10 @@ function DE(func::Function, D::Int;
     end
 
     if saveLast != ""
-        writecsv(saveLast, population)        
+        data = zeros(N, D+1)
+        data[:,1:D] = getPositions(population, N, D)
+        data[:,D+1] = getfValues(population)
+        writecsv(saveLast, data)        
     end
 
     if saveConvergence != ""

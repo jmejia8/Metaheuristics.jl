@@ -8,9 +8,9 @@ elseif VERSION < v"0.7.0" && Pkg.installed("Distributions") == nothing
 end
 
 using Distributions
-import DelimitedFiles.writedlm
 
 if VERSION >= v"0.7.0"
+	import DelimitedFiles.writedlm
 	import Random: randperm
 	import Printf.@printf
 	import LinearAlgebra: norm, Diagonal, dot
