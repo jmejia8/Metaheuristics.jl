@@ -5,70 +5,68 @@ include("tools.jl")
 
 mutable struct Bee
     sol
-    fitness :: AbstractFloat
-    t :: Integer
+    fit::Float64
+    t::Int
 end
 
-Bee(data) = Bee(data, 0.0, 0)
+Bee(solution) = Bee(solution, 0.0, 0)
 
 
 function Base.copy(s::Bee)
-    return Bee(copy(s.sol.x), s.fitness, s.t)
+    return Bee(copy(s.sol.x), s.fit, s.t)
 end
 
 
-@inline function update_fitness!(bee::Bee, f)
-    bee.fitness = fitness(f(bee.sol.x))
+@inline function update_fit!(bee::Bee)
+    bee.fit = fit(bee.sol.f)
 end
 
-@inline function update_fitness!(Bees::Array, f)
+@inline function update_fit!(Bees::Array)
     for bee in Bees
-        update_fitness!(bee, f)
+        update_fit!(bee)
     end
 end
 
-function fitness(val)
-    if val >= 0.0
-        return 1.0/(1.0+val)
+function fit(fx)
+    if fx >= 0.0
+        return 1.0/(1.0+fx)
     end
     
-    return 1.0+abs(val)
+    1.0 + abs(fx)
 end
 
-function update_bee!(bee, beem::Bee, f)
+function updateBee!(bee, beem::Bee, f)
     D = length(bee.sol.x)
     ϕ = -1.0 + 2.0rand()
-    j = rand(1:D)
 
-    x_new = ϕ*(bee.sol.x[j] - beem.sol.x[j])
+    v = ϕ*(bee.sol.x - beem.sol.x)
 
-    bee.sol.x[j] += x_new
-    fit_new = fitness(f(bee.sol.x))
+    x_new = bee.sol.x + v
+    fx = f(x_new)
 
-    if fit_new > bee.fitness
-        bee.fitness = fit_new
+    if fx < bee.sol.f
+        bee.sol.x = x_new
+        bee.sol.f = fx
+        bee.fit = fit(fx)
         bee.t = 0
     else
-        bee.sol.x[j] -= x_new
         bee.t += 1
     end
 end
 
-function update_employed!(Bees, f)
+function employedPhase!(Bees, f)
     N = length(Bees)
     for bee in Bees
-        update_fitness!(bee, f)
-        update_bee!(bee, Bees[rand(1:N)], f)
+        updateBee!(bee, Bees[rand(1:N)], f)
     end
 end
 
-function roulette_select(Bees)
-    sf = sum(map(x->x.fitness, Bees))
+function roulettSelect(Bees, sum_f)
     r = rand()
     rs = 0.0
 
     for bee in Bees
-        rs += bee.fitness / sf
+        rs += bee.fit / sum_f
         if r <= rs
             return bee
         end
@@ -77,25 +75,17 @@ function roulette_select(Bees)
     return Bees[end]
 end
 
-function update_outlook!(Bees, f, No::Integer)
+function outlookerPhase!(Bees, f, No::Integer)
     N = length(Bees)
+    sum_f = sum(map(x->x.fit, Bees))
+
     for i=1:No
-        bee = roulette_select(Bees)
-        update_fitness!(bee, f)
-        update_bee!(bee, Bees[rand(1:N)], f)
+        bee = roulettSelect(Bees, sum_f)
+        updateBee!(bee, Bees[rand(1:N)], f)
     end
 end
 
-function update_scout!(Bees, f, genBee::Function, limit::Integer)
-    bees_scout = filter(x->x.t >= limit, Bees)
-    for bee in bees_scout
-        bee.sol.x = genBee()
-        bee.t = 0
-    end
-    update_fitness!(bees_scout, f)
-end
-
-function update_scout!(Bees, f, genBee::Function, limit::Integer)
+function scoutPhase!(Bees, f, genBee::Function, limit::Integer)
     bees_scout = filter(x->x.t >= limit, Bees)
     for bee in bees_scout
         bee.sol.x = genBee()
@@ -103,26 +93,25 @@ function update_scout!(Bees, f, genBee::Function, limit::Integer)
     end
 end
 
-function getBest(Bees)
+function getBest(Bees::Array{Bee})
     best = Bees[1]
     for bee in Bees
-        if bee.fitness > best.fitness
+        if bee.sol.f < best.sol.f
             best = bee
         end
     end
+ 
     return best
 end
 
-function updateBest!(Bees, bee_best::Bee)
-    bee_cand = getBest(Bees)
-    if bee_best.fitness < bee_cand.fitness
-        bee_best = deepcopy(bee_cand)
+function chooseBest(Bees, best::Bee)
+    bee_cand = getBest(Bees) 
+    if bee_cand.sol.f < best.sol.f
+        return deepcopy(bee_cand)
     end
-end
 
-# function updateBest!(Bees, bee_best::Bee)
-#     bee_best = deepcopy(bee_cand)
-# end
+    return best
+end
 
 function initialBees(f, N, bounds)
      P = initializePop(f, N, length(bounds[1,:]), bounds[1,:], bounds[2,:])
@@ -136,7 +125,8 @@ function ABC(
         N = 100,
         limit=10,
         iters = 1000,
-        No =10
+        Ne = div(N+1, 2),
+        No = div(N+1, 2),
     )
 
     D = size(bounds, 2)
@@ -144,16 +134,17 @@ function ABC(
 
     Bees = initialBees(fobj, N, bounds)
 
-    best = getBest(Bees)
+    best = deepcopy(getBest(Bees))
+    
     for i=1:iters
-        update_employed!(Bees, fobj)
-        update_outlook!(Bees, fobj, No)
-        updateBest!(Bees, best)
-        update_scout!(Bees, fobj, genBee, limit)
+        employedPhase!(Bees, fobj)
+        outlookerPhase!(Bees, fobj, No)
+        best = chooseBest(Bees, best)
+        scoutPhase!(Bees, fobj, genBee, limit)
     end
     return best.sol.x, best.sol.f
 end
 
 f(x) = sum(x.^2)
 
-ABC(f, [-10.0 -10 -10; 10 10 10])
+@time ABC(f, [-10.0 -10 -10; 10 10 10])
