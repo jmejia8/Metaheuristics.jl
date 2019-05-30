@@ -1,8 +1,3 @@
-using Printf
-include("structures.jl")
-include("operators.jl")
-include("tools.jl")
-
 mutable struct Bee
     sol
     fit::Float64
@@ -90,6 +85,8 @@ function scoutPhase!(bees, f, genPos::Function, limit::Int)
         bees_scout[i].sol.f = f(bees_scout[i].sol.x)
         bees_scout[i].t = 0
     end
+
+    return length(bees_scout)
 end
 
 function getBest(bees::Bees)
@@ -123,7 +120,8 @@ function ABC(
         bounds;
         N = 50,
         limit=10,
-        iters = 1000,
+        iters = Inf,
+        max_evals = 10000*size(bounds, 2),
         Ne = div(N+1, 2),
         No = div(N+1, 2),
     )
@@ -132,19 +130,25 @@ function ABC(
     @inline genPos(D=D, a=bounds[1,:], b = bounds[2,:]) = initializeSol(D, a, b)
 
     bees = initialbees(fobj, N, bounds)
+    nevals = length(bees)
 
     best = deepcopy(getBest(bees))
-    
-    for i=1:iters
-        employedPhase!(bees, fobj, Ne)
+    t = 0
+
+    while nevals < max_evals && t < iters#i=1:iters
+        t += 1
+
+        employedPhase!(bees, fobj, Ne)        
         outlookerPhase!(bees, fobj, No)
+
         best = chooseBest(bees, best)
-        scoutPhase!(bees, fobj, genPos, limit)
+
+        nevals += Ne + No + scoutPhase!(bees, fobj, genPos, limit)
+
     end
+
+    println(bees)
 
     return best.sol.x, best.sol.f
 end
 
-f(x) = sum(x.^2)
-
-@time ABC(f, [-10.0ones(10) 10.0ones(10)]')

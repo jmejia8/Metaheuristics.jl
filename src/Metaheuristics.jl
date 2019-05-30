@@ -3,7 +3,7 @@ module Metaheuristics
 
 # ECA algorithm
 export eca, diffEvolution, pso, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
-export CFO, jso, DE
+export CFO, jso, DE, ABC
 
 include("externals.jl")
 include("structures.jl")
@@ -55,6 +55,9 @@ include("CFO.jl")
 # Single objective real-parameter optimization: Algorithm jSO.
 # In Evolutionary Computation (CEC), 2017 IEEE Congress on (pp. 1311-1318). IEEE.
 include("jso.jl")
+
+
+include("ABC.jl")
 
 
 end # module
