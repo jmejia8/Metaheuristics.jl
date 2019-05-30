@@ -9,8 +9,8 @@ end
 
 @testset "Metaheuristics" for tests in [
             "sphere.jl",
-            "rastrigin.jl",
-            "discus.jl"
+            "discus.jl",
+            "rastrigin.jl"
 ]
     include(tests)
 end

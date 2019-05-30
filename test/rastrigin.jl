@@ -30,4 +30,8 @@ end
     result, fitness = pso(rastrigin, 2; showResults=false)
     test_result(result, fitness, D, 1e-5)
 
+    # ABC results
+    result, fitness = ABC(rastrigin, [-1.0ones(D) 1.0ones(D)]', limit=20)
+    test_result(result, fitness, D, 1e-5)
+
 end

@@ -29,4 +29,9 @@ end
     # PSO results
     result, fitness = pso(sphere, D; limits=(-10, 10), showResults=false)
     test_result(result, fitness, D, 1e-5)
+
+    # ABC results
+    result, fitness = ABC(sphere, [-10.0ones(5) 10.0ones(5)]')
+    test_result(result, fitness, D, 1e-5)
 end
+

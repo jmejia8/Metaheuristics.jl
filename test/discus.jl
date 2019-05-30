@@ -31,5 +31,8 @@ end
     result, fitness = pso(discus, 2; showResults=false)
     test_result(result, fitness, 2, 1e1)
 
+    # ABC results
+    result, fitness = ABC(discus, [-10.0ones(5) 10.0ones(5)]', limit=20)
+    test_result(result, fitness, D, 1e-5)
 
 end
