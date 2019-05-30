@@ -9,21 +9,18 @@ mutable struct Bee
     t::Int
 end
 
-Bee(solution) = Bee(solution, 0.0, 0)
+Bees = Array{Bee, 1}
+
+Bee(solution) = Bee(solution, fit(solution.f), 0)
 
 
-function Base.copy(s::Bee)
-    return Bee(copy(s.sol.x), s.fit, s.t)
-end
-
-
-@inline function update_fit!(bee::Bee)
+@inline function updateFit!(bee::Bee)
     bee.fit = fit(bee.sol.f)
 end
 
-@inline function update_fit!(Bees::Array)
-    for bee in Bees
-        update_fit!(bee)
+@inline function updateFit!(bees::Bees)
+    for bee in bees
+        updateFit!(bee)
     end
 end
 
@@ -35,11 +32,11 @@ function fit(fx)
     1.0 + abs(fx)
 end
 
-function updateBee!(bee, beem::Bee, f)
+function updateBee!(bee, bee2, f)
     D = length(bee.sol.x)
     ϕ = -1.0 + 2.0rand()
 
-    v = ϕ*(bee.sol.x - beem.sol.x)
+    v = ϕ*(bee.sol.x - bee2.sol.x)
 
     x_new = bee.sol.x + v
     fx = f(x_new)
@@ -54,48 +51,50 @@ function updateBee!(bee, beem::Bee, f)
     end
 end
 
-function employedPhase!(Bees, f)
-    N = length(Bees)
-    for bee in Bees
-        updateBee!(bee, Bees[rand(1:N)], f)
+function employedPhase!(bees, f, Ne)
+    N = length(bees)
+    S = view(bees, rand(1:N, Ne))
+    for bee in S
+        updateBee!(bee, bees[rand(1:N)], f)
     end
 end
 
-function roulettSelect(Bees, sum_f)
+function roulettSelect(bees, sum_f)
     r = rand()
     rs = 0.0
 
-    for bee in Bees
+    for bee in bees
         rs += bee.fit / sum_f
         if r <= rs
             return bee
         end
     end
 
-    return Bees[end]
+    return bees[end]
 end
 
-function outlookerPhase!(Bees, f, No::Integer)
-    N = length(Bees)
-    sum_f = sum(map(x->x.fit, Bees))
+function outlookerPhase!(bees, f, No::Int)
+    N = length(bees)
+    sum_f = sum(map(x->x.fit, bees))
 
     for i=1:No
-        bee = roulettSelect(Bees, sum_f)
-        updateBee!(bee, Bees[rand(1:N)], f)
+        bee = roulettSelect(bees, sum_f)
+        updateBee!(bee, bees[rand(1:N)], f)
     end
 end
 
-function scoutPhase!(Bees, f, genBee::Function, limit::Integer)
-    bees_scout = filter(x->x.t >= limit, Bees)
-    for bee in bees_scout
-        bee.sol.x = genBee()
-        bee.t = 0
+function scoutPhase!(bees, f, genPos::Function, limit::Int)
+    bees_scout = filter(x->x.t >= limit, bees)
+    for i in 1:length(bees_scout)
+        bees_scout[i].sol.x = genPos()
+        bees_scout[i].sol.f = f(bees_scout[i].sol.x)
+        bees_scout[i].t = 0
     end
 end
 
-function getBest(Bees::Array{Bee})
-    best = Bees[1]
-    for bee in Bees
+function getBest(bees::Bees)
+    best = bees[1]
+    for bee in bees
         if bee.sol.f < best.sol.f
             best = bee
         end
@@ -104,8 +103,8 @@ function getBest(Bees::Array{Bee})
     return best
 end
 
-function chooseBest(Bees, best::Bee)
-    bee_cand = getBest(Bees) 
+function chooseBest(bees, best::Bee)
+    bee_cand = getBest(bees) 
     if bee_cand.sol.f < best.sol.f
         return deepcopy(bee_cand)
     end
@@ -113,7 +112,7 @@ function chooseBest(Bees, best::Bee)
     return best
 end
 
-function initialBees(f, N, bounds)
+function initialbees(f, N, bounds)
      P = initializePop(f, N, length(bounds[1,:]), bounds[1,:], bounds[2,:])
 
      return [ Bee(sol) for sol in P ]
@@ -122,7 +121,7 @@ end
 function ABC(
         fobj::Function,
         bounds;
-        N = 100,
+        N = 50,
         limit=10,
         iters = 1000,
         Ne = div(N+1, 2),
@@ -130,21 +129,22 @@ function ABC(
     )
 
     D = size(bounds, 2)
-    @inline genBee(D=D, a=bounds[1,:], b = bounds[2,:]) = initializeSol(D, a, b)
+    @inline genPos(D=D, a=bounds[1,:], b = bounds[2,:]) = initializeSol(D, a, b)
 
-    Bees = initialBees(fobj, N, bounds)
+    bees = initialbees(fobj, N, bounds)
 
-    best = deepcopy(getBest(Bees))
+    best = deepcopy(getBest(bees))
     
     for i=1:iters
-        employedPhase!(Bees, fobj)
-        outlookerPhase!(Bees, fobj, No)
-        best = chooseBest(Bees, best)
-        scoutPhase!(Bees, fobj, genBee, limit)
+        employedPhase!(bees, fobj, Ne)
+        outlookerPhase!(bees, fobj, No)
+        best = chooseBest(bees, best)
+        scoutPhase!(bees, fobj, genPos, limit)
     end
+
     return best.sol.x, best.sol.f
 end
 
 f(x) = sum(x.^2)
 
-@time ABC(f, [-10.0 -10 -10; 10 10 10])
+@time ABC(f, [-10.0ones(10) 10.0ones(10)]')
