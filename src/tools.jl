@@ -21,6 +21,17 @@ function correctSol(y::Vector{Float64}, a::Vector{Float64}, b::Vector{Float64})
     return y
 end
 
+function correct(y::Vector{Float64}, c, a::Vector{Float64}, b::Vector{Float64})
+    # Correct solution
+
+    for i = 1:length(y)
+        if !( a[i] <= y[i] <= b[i] )
+            y[i] = c[i]
+        end
+    end
+    
+    return y
+end
 
 function correct(y::Vector{Float64}, a::Vector{Float64}, b::Vector{Float64}, crrect::Bool=false)
     if crrect

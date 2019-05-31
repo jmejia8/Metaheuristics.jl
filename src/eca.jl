@@ -232,7 +232,7 @@ function eca(fobj::Function,
             # binary crossover
             y, M_current = crossover(U[u_best].x, y, p_cr)
 
-            y = correct(y, a, b, correctSol)
+            y = correct(y, c, a, b)
 
             sol = generateChild(y, func(y))
 

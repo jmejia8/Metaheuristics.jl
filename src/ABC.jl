@@ -147,8 +147,6 @@ function ABC(
 
     end
 
-    println(bees)
-
     return best.sol.x, best.sol.f
 end
 

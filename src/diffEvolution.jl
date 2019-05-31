@@ -142,10 +142,9 @@ function DE(func::Function, D::Int;
                     v[j] = u[j]
 
                     if v[j] < la[j]
-                        v[j] = 2la[j] - v[j]
-                    end
-                    if v[j] > lb[j]
-                        v[j] = 2lb[j] - v[j]
+                        v[j] = la[j]
+                    elseif v[j] > lb[j]
+                        v[j] = lb[j]
                     end
                 else
                     v[j] = x[j]
