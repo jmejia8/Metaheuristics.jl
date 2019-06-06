@@ -46,26 +46,29 @@ function updateBee!(bee, bee2, f)
     end
 end
 
+function getK(i, N)
+    return rand(union(1:i-1, i+1:N))
+end
+
 function employedPhase!(bees, f, Ne)
     N = length(bees)
-    S = view(bees, rand(1:N, Ne))
-    for bee in S
-        updateBee!(bee, bees[rand(1:N)], f)
+    for i in randperm(N)[1:Ne]
+        updateBee!(bees[i], bees[getK(i, N)], f)
     end
 end
+
 
 function roulettSelect(bees, sum_f)
     r = rand()
     rs = 0.0
-
-    for bee in bees
-        rs += bee.fit / sum_f
+    for i in 1:length(bees)
+        rs += bees[i].fit / sum_f
         if r <= rs
-            return bee
+            return i
         end
     end
 
-    return bees[end]
+    return length(bees)
 end
 
 function outlookerPhase!(bees, f, No::Int)
@@ -73,8 +76,8 @@ function outlookerPhase!(bees, f, No::Int)
     sum_f = sum(map(x->x.fit, bees))
 
     for i=1:No
-        bee = roulettSelect(bees, sum_f)
-        updateBee!(bee, bees[rand(1:N)], f)
+        j = roulettSelect(bees, sum_f)
+        updateBee!(bees[j], bees[getK(j, N)], f)
     end
 end
 
