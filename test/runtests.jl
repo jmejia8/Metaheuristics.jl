@@ -5,6 +5,8 @@ if VERSION < v"0.7.0"
     srand(31415926534)
 else
     using Test
+    import Random: seed!
+    seed!(31415926534)
 end
 
 @testset "Metaheuristics" for tests in [
