@@ -93,19 +93,19 @@ function scoutPhase!(bees, f, genPos::Function, limit::Int)
 end
 
 function getBest(bees::Bees)
-    best = bees[1]
+    best = bees[1].sol
     for bee in bees
-        if bee.sol.f < best.sol.f
-            best = bee
+        if bee.sol.f < best.f
+            best = bee.sol
         end
     end
  
     return best
 end
 
-function chooseBest(bees, best::Bee)
+function chooseBest(bees, best)
     bee_cand = getBest(bees) 
-    if bee_cand.sol.f < best.sol.f
+    if bee_cand.f < best.f
         return deepcopy(bee_cand)
     end
 
@@ -118,6 +118,7 @@ function initialbees(f, N, bounds)
      return [ Bee(sol) for sol in P ]
 end 
 
+
 function ABC(
         fobj::Function,
         bounds;
@@ -125,6 +126,7 @@ function ABC(
         limit=10,
         iters = Inf,
         max_evals = 10000*size(bounds, 2),
+        termination =  x -> false,
         Ne = div(N+1, 2),
         No = div(N+1, 2),
     )
@@ -138,7 +140,9 @@ function ABC(
     best = deepcopy(getBest(bees))
     t = 0
 
-    while nevals < max_evals && t < iters#i=1:iters
+    stop = nevals >= max_evals || t >= iters || termination(bees)
+
+    while !stop
         t += 1
 
         employedPhase!(bees, fobj, Ne)        
@@ -147,9 +151,11 @@ function ABC(
         best = chooseBest(bees, best)
 
         nevals += Ne + No + scoutPhase!(bees, fobj, genPos, limit)
+    
+        stop = nevals >= max_evals || t >= iters || termination(bees)
 
     end
 
-    return best.sol.x, best.sol.f
+    return best.x, best.f
 end
 

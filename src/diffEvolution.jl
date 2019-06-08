@@ -39,7 +39,7 @@ function DE(func::Function, D::Int;
     nevals = N
 
     # stop condition
-    stop = false
+    stop = termination(population)
 
     # current generation
     t = 0

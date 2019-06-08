@@ -168,7 +168,7 @@ function eca(fobj::Function,
     nevals = N
 
     # stop condition
-    stop = false
+    stop = termination(Population)
 
     # current generation
     t = 0

@@ -1,3 +1,9 @@
+function getBestPSO(fs::Array{Float64})
+    fx = minimum(fs)
+
+    return generateChild(zeros(2), fx)
+end
+
 function pso(func::Function, D::Int;
                         N::Int = 10D,
                        C1::Real= 2.0,
@@ -24,7 +30,7 @@ function pso(func::Function, D::Int;
     nevals = N
 
     # stop condition
-    stop = false
+    stop = termination(fitness)
 
     # current generation
     t = 0
