@@ -176,9 +176,15 @@ function eca(fobj::Function,
     # best solution
     best = getBest(Population, searchType)
 
+    status = State(best, Population)
+
     convergence = []
 
     if saveConvergence != ""
+        status_tmp = deepcopy(status)
+        empty!(status_tmp.convergence)
+
+        push!(status.convergence, status_tmp)
         push!(convergence, [nevals best.f])
     end
 
