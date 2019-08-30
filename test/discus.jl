@@ -19,8 +19,12 @@ end
     # Objective function
     discus(x::Vector{Float64}) = 1e6x[1].^2 + sum(x[2:end] .^2)
 
+    bounds = Array([-100.0ones(D) 100.0ones(D)]')
+
     # ECA results
-    result, fitness = eca(discus, D; showResults=false)
+    status = optimize(discus, bounds, ECA(options = Options(f_calls_limit=10000D)))
+    result = status.best_sol.x
+    fitness = status.best_sol.f
     test_result(result, fitness, D, 1e-5)
 
     # ED results

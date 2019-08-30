@@ -19,7 +19,13 @@ end
     # Objective function
     rastrigin(x::Vector{Float64}, D=length(x)) = 10D+ sum(x.*x - 10cos.(2π*x))
 
-    result, fitness = eca(rastrigin, D; showResults=false, N = 15D)
+    bounds = Array([-100.0ones(D) 100.0ones(D)]')
+
+
+    status = optimize(rastrigin, bounds, ECA(options = Options( f_calls_limit=10000D)))
+    result = status.best_sol.x
+    fitness = status.best_sol.f
+
     test_result(result, fitness, D, 1e-5)
 
     # ED results
