@@ -1,4 +1,5 @@
 abstract type AbstractSolution end
+abstract type AbstractAlgorithm end
 
 mutable struct xf_indiv <: AbstractSolution # Single Objective
 	x::Vector{Float64}
@@ -25,9 +26,9 @@ mutable struct xFgh_indiv # Single Objective Constraied
 	h::Vector{Float64}
 end
 
-mutable struct State{T<:AbstractSolution}
-    best_sol::T
-    population::Array{T,1}
+mutable struct State
+    best_sol
+    population::Array
 
     f_calls::Int
     g_calls::Int
@@ -54,7 +55,7 @@ function State(
         convergence = State[],
     )
 
-    State{xf_indiv}(#
+    State(#
         best_sol,
         Array(population),
         
@@ -157,7 +158,7 @@ function Information(;#
 end
 
 
-mutable struct Algorithm
+mutable struct Algorithm <: AbstractAlgorithm
     parameters
     status::State
     information::Information
@@ -194,17 +195,17 @@ end
 
 struct Problem
     f::Function
-    bounds::Matrix{Float64}
-    g::Function
-    h::Function
+    bounds::Array{Float64, 2}
+    g::Array{Function}
+    h::Array{Function}
     type::Symbol
 end
 
-function Problem(F::Function,
+function Problem(
                 f::Function,
                 bounds::Array,
-                g::Function = Function[],
-                h::Function = Function[])
+                g = Function[],
+                h = Function[])
 
     type::Symbol = :constrained
 
@@ -218,3 +219,39 @@ function Problem(F::Function,
 end
 
 
+mutable struct ECA <: AbstractAlgorithm
+            η_max::Float64
+                K::Int
+                N::Int
+        p_exploit::Float64
+            p_bin::Float64
+             p_cr::Array{Float64}
+         adaptive::Bool
+     resize_population::Bool
+end
+
+function ECA(;η_max::Float64 = 2.0,
+                 K::Int = 7,
+                 N::Int = 100,
+         p_exploit::Float64 = 0.95,
+             p_bin::Float64 = 0.02,
+             p_cr::Array{Float64} = Float64[],
+          adaptive::Bool = false,
+     resize_population::Bool = false,
+     information = Information(),
+     options = Options()
+     )
+
+    parameters = ECA(η_max, K, N, p_exploit, p_bin, p_cr, adaptive, resize_population)
+    Algorithm(
+        parameters,
+        initialize! = initialize_eca!,
+        update_state! = update_state_eca!,
+        is_better = is_better ,
+        stop_criteria = stop_check ,
+        final_stage! = final_stage_eca!,
+        information = information,
+        options = options
+        )
+
+end
