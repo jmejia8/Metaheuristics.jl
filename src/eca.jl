@@ -114,12 +114,16 @@ function resizePop!(P::Array, N_new::Int, K::Int)
     return P[ids]
 end
 
-function update_state!(problem, engine, parameters, status, information, options, iteration)
+function update_state_eca!(problem, engine, parameters, status, information, options, iteration)
+    println(status)
     Population = status.population
-
+    K = parameters.K
     I = randperm(N)
 
-    adaptive && (Mcr_fail = zeros(D))
+    parameters.adaptive && (Mcr_fail = zeros(D))
+
+    stop = false
+
     # For each elements in Population
     for i in 1:parameters.N
 
@@ -130,7 +134,7 @@ function update_state!(problem, engine, parameters, status, information, options
         U = getU(Population, parameters.K, I, i, parameters.N)
         
         # generate center of mass
-        c, u_worst, u_best = center(U, searchType)
+        c, u_worst, u_best = center(U, :minimize)
 
         # stepsize
         η = parameters.η_max * rand()
@@ -159,11 +163,11 @@ function update_state!(problem, engine, parameters, status, information, options
 
         sol = generateChild(y, problem.f(y))
 
-        nevals += 1
+        status.f_calls += 1
 
         # replace worst element
         if engine.is_better(Population[i], sol)
-            Population[getWorstInd(Population, searchType)] = sol
+            Population[getWorstInd(Population, :minimize)] = sol
 
             if engine.is_better(status.best_sol, sol)
                 status.best_sol = sol
@@ -172,102 +176,97 @@ function update_state!(problem, engine, parameters, status, information, options
             Mcr_fail += M_current
         end
         
-        stop_criteria(status, information, options) && break
+        stop = stop_criteria(status, information, options) 
+        stop && break
     end
 
     if showIter
-            @printf("| iter = %d \t nevals = %d \t f = %e\n", t, nevals, best.f)
-            println("| ", best.x)
-        end
-
-        t += 1
-
-        stop = stop || termination(Population)
-
-        if stop
-            break
-        end
-
-        adaptive && ( p_cr = adaptCrossover(p_cr, Mcr_fail/N) )
-
-
-        if saveConvergence != ""
-            push!(convergence, [nevals best.f])
-        end
-
-        p = nevals / max_evals
-        
-        if canResizePop
-            # new size
-            N = 2K .+ round(Int, (1 - p ) * (N_init .- 2K))
-
-            if N < 2K
-                N = 2K
-            end
-
-            Population = resizePop!(Population, N, K)
-        end
-end
-
-function initialize!(problem,engine,parameters,status,information,options)
-    func = fobj
-    a, b = limits[1,:], limits[2,:]
-    if length(a) < D
-        a = ones(D) * a[1]
-        b = ones(D) * b[1]
+        @printf("| iter = %d \t status.f_calls = %d \t f = %e\n", t, status.f_calls, best.f)
+        println("| ", best.x)
     end
 
+    t += 1
+
+    stop = stop || stop_criteria(status, information, options) 
+
+    if stop
+        return
+    end
+
+    if parameters.adaptive
+        parameters.p_cr = adaptCrossover(parameters.p_cr, Mcr_fail/N)
+    end
+
+    # if saveConvergence != ""
+    #     push!(convergence, [status.f_calls best.f])
+    # end
+
+    p = status.f_calls / options.f_calls_limit
+    
+    if parameters.resize_population
+        # new size
+        parameters.N = 2K .+ round(Int, (1 - p ) * (N_init .- 2K))
+
+        if parameters.N < 2K
+            parameters.N = 2K
+        end
+
+        Population = resizePop!(Population, N, K)
+    end
+end
+
+function initialize_eca!(problem,engine,parameters,status,information,options)
+    a, b = problem.bounds[1,:], problem.bounds[2,:]
+    D = length(a)
 
     # population array
-    Population = initializePop(func, N, D, a, b, initPopRand)
+    Population = initializePop(problem.f, parameters.N, D, a, b)
 
     # current evaluations
-    nevals = N
+    status.f_calls = parameters.N
 
     # stop condition
-    stop = termination(Population)
+    stop = engine.stop_criteria(status, information, options)
 
     # current generation
     t = 0
 
     # best solution
-    best = getBest(Population, searchType)
-
+    best = getBest(Population, :minimize)
     status = State(best, Population)
 
     convergence = []
 
-    if saveConvergence != ""
+    if options.store_convergence
         status_tmp = deepcopy(status)
         empty!(status_tmp.convergence)
 
         push!(status.convergence, status_tmp)
-        push!(convergence, [nevals best.f])
     end
 
-    N_init = N
-    p = nevals / max_evals
+    N_init = parameters.N
+    p = status.f_calls / options.f_calls_limit
 
-    if adaptive
-        p_cr = rand(D)
+    if parameters.adaptive
+        parameters.p_cr = rand(D)
     else
-        p_cr = p_bin .* ones(D)
+        parameters.p_cr = parameters.p_bin .* ones(D)
     end
     
 end
 
-function final_stage!(status, information, options)
-    if saveLast != ""
-        o = []
-        for i = 1:N
-            push!(o, Population[i].x)
-        end
-        writecsv(saveLast, o)        
-    end
+function final_stage_eca!(status, information, options)
+    # if saveLast != ""
+    #     o = []
+    #     for i = 1:N
+    #         push!(o, Population[i].x)
+    #     end
+    #     writecsv(saveLast, o)        
+    # end
 
-    if saveConvergence != ""
-        writecsv(saveConvergence, convergence)
-    end
+    # if saveConvergence != ""
+    #     writecsv(saveConvergence, convergence)
+    # end
 end
 
 
@@ -292,29 +291,21 @@ function eca(fobj::Function,
     returnDetails::Bool = false,
            limits  = [-100., 100.])
 
+    @warn "This function is deprecated."
 
-    initialize!(problem,engine,parameters,status,information,options)
-    # start search
-    while !stop
-       
-        update_state!(problem, engine, parameters, status, information, options, iteration)
+    f = fobj
+    
+    a, b = limits[1,:], limits[2,:]
 
-        
-
+    if length(a) < D
+        a = ones(D) * a[1]
+        b = ones(D) * b[1]
     end
 
-    final_stage!(status, information, options)
+    bounds = Array([a b]')
 
+    method = ECA()
 
-    if showResults
-        println("===========[ ECA results ]=============")
-        printResults(best, Population, t, nevals)
-        println("=======================================")
-    end
-
-    if returnDetails
-        return best, Population, t, nevals
-    end
-
-    return best.x, best.f
+    status = optimize(f, bounds, method)
+    return status.best_sol.x, status.best_sol.f
 end
