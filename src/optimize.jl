@@ -1,12 +1,12 @@
 function optimize(f::Function, # objective function
                   bounds::Array,
-                  method::Algorithm
+                  method::AbstractAlgorithm
                   )
 
       problem = Problem(f, bounds)
       engine = method.engine
 
-      method.options.debug && println("Initializing population...")
+      method.options.debug && @info("Initializing population...")
       engine.initialize!(problem, engine, method.parameters, method.status, method.information, method.options)
 
       #####################################
@@ -28,7 +28,7 @@ function optimize(f::Function, # objective function
             push!(status.convergence, st)
       end
       
-      method.options.debug && println("Starting main loop...")
+      method.options.debug && @info("Starting main loop...")
 
       status.iteration = 0
       while !engine.stop_criteria(status, information, options)
