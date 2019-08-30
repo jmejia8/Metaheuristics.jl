@@ -5,6 +5,9 @@ module Metaheuristics
 export eca, diffEvolution, pso, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
 export CFO, jso, DE, ABC
 
+# v2 items
+export optimize, ECA, Options, State, Information, Engine, Problem
+
 include("externals.jl")
 include("stop.jl")
 include("structures.jl")
