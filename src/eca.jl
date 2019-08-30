@@ -115,23 +115,24 @@ function resizePop!(P::Array, N_new::Int, K::Int)
 end
 
 function update_state_eca!(problem, engine, parameters, status, information, options, iteration)
-    println(status)
-    Population = status.population
     K = parameters.K
-    I = randperm(N)
+    I = randperm(parameters.N)
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
     stop = false
+    a = problem.bounds[1,:]
+    b = problem.bounds[2,:]
 
     # For each elements in Population
     for i in 1:parameters.N
+        p = status.f_calls / options.f_calls_limit
 
         # current
-        x = Population[i].x
+        x = status.population[i].x
 
         # generate U masses
-        U = getU(Population, parameters.K, I, i, parameters.N)
+        U = getU(status.population, parameters.K, I, i, parameters.N)
         
         # generate center of mass
         c, u_worst, u_best = center(U, :minimize)
@@ -166,28 +167,20 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
         status.f_calls += 1
 
         # replace worst element
-        if engine.is_better(Population[i], sol)
-            Population[getWorstInd(Population, :minimize)] = sol
-
-            if engine.is_better(status.best_sol, sol)
+        if engine.is_better(sol, status.population[i])
+            status.population[getWorstInd(status.population, :minimize)] = sol
+            if engine.is_better(sol, status.best_sol)
                 status.best_sol = sol
             end
         elseif parameters.adaptive
             Mcr_fail += M_current
         end
         
-        stop = stop_criteria(status, information, options) 
+        stop = engine.stop_criteria(status, information, options) 
         stop && break
     end
 
-    if showIter
-        @printf("| iter = %d \t status.f_calls = %d \t f = %e\n", t, status.f_calls, best.f)
-        println("| ", best.x)
-    end
-
-    t += 1
-
-    stop = stop || stop_criteria(status, information, options) 
+    stop = stop || engine.stop_criteria(status, information, options) 
 
     if stop
         return
@@ -211,7 +204,7 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
             parameters.N = 2K
         end
 
-        Population = resizePop!(Population, N, K)
+        status.population = resizePop!(status.population, parameters.N, K)
     end
 end
 
@@ -219,23 +212,26 @@ function initialize_eca!(problem,engine,parameters,status,information,options)
     a, b = problem.bounds[1,:], problem.bounds[2,:]
     D = length(a)
 
+    # if options.f_calls_limit == 0
+    #     options.f_calls_limit = 10000D
+    #     @warn "f_calls_limit increased to $(options.f_calls_limit)"
+    # end
+
     # population array
     Population = initializePop(problem.f, parameters.N, D, a, b)
-
+    status.population = Population
     # current evaluations
     status.f_calls = parameters.N
 
     # stop condition
-    stop = engine.stop_criteria(status, information, options)
 
     # current generation
-    t = 0
+    status.iteration = 0
 
     # best solution
-    best = getBest(Population, :minimize)
-    status = State(best, Population)
+    status.best_sol = getBest(Population, :minimize)
 
-    convergence = []
+    stop = engine.stop_criteria(status, information, options)
 
     if options.store_convergence
         status_tmp = deepcopy(status)
@@ -245,7 +241,7 @@ function initialize_eca!(problem,engine,parameters,status,information,options)
     end
 
     N_init = parameters.N
-    p = status.f_calls / options.f_calls_limit
+    
 
     if parameters.adaptive
         parameters.p_cr = rand(D)
@@ -291,7 +287,7 @@ function eca(fobj::Function,
     returnDetails::Bool = false,
            limits  = [-100., 100.])
 
-    @warn "This function is deprecated."
+    @warn "eca(f, D;...) function is deprecated. Please use: `optimize(f, bounds, ECA())`"
 
     f = fobj
     
@@ -304,8 +300,16 @@ function eca(fobj::Function,
 
     bounds = Array([a b]')
 
+    options = Options(f_calls_limit = max_evals, debug=showIter, store_convergence = (saveConvergence != ""))
     method = ECA()
 
+    method.options.f_calls_limit = max_evals
+
     status = optimize(f, bounds, method)
+
+    if showResults
+        display(status)
+    end
+
     return status.best_sol.x, status.best_sol.f
 end
