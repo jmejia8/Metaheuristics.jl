@@ -6,9 +6,13 @@ export eca, diffEvolution, pso, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
 export CFO, jso, DE, ABC
 
 include("externals.jl")
+include("stop.jl")
 include("structures.jl")
 include("operators.jl")
+include("display.jl")
 include("tools.jl")
+
+include("optimize.jl")
 
 # ECA algorithm
 include("eca.jl")
