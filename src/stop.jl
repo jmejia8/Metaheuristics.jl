@@ -33,6 +33,6 @@ end
 function stop_check(status, information, options)
     call_limit_stop_check(status, information, options) ||
     iteration_stop_check(status, information, options)    ||
-    var_stop_check(status, information, options)    ||
-    accuracy_stop_check(status, information, options)
+    accuracy_stop_check(status, information, options) ||
+    var_stop_check(status, information, options)
 end
