@@ -19,6 +19,6 @@ function display(status::State)
     
 
     @printf("| f calls: %.0f\n", status.f_calls)
-    @printf("| Total time: %.4f\n", status.final_time - status.start_time)
+    @printf("| Total time: %.4f s\n", status.final_time - status.start_time)
     println("+============================+")
 end
