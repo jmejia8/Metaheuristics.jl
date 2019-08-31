@@ -176,13 +176,11 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
             Mcr_fail += M_current
         end
         
-        stop = engine.stop_criteria(status, information, options) 
-        stop && break
+        status.stop = engine.stop_criteria(status, information, options) 
+        status.stop && break
     end
 
-    stop = stop || engine.stop_criteria(status, information, options) 
-
-    if stop
+    if status.stop
         return
     end
 
@@ -212,10 +210,18 @@ function initialize_eca!(problem,engine,parameters,status,information,options)
     a, b = problem.bounds[1,:], problem.bounds[2,:]
     D = length(a)
 
-    # if options.f_calls_limit == 0
-    #     options.f_calls_limit = 10000D
-    #     @warn "f_calls_limit increased to $(options.f_calls_limit)"
-    # end
+    if options.f_calls_limit == 0
+        options.f_calls_limit = 10000D
+        options.debug &&  @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+    end
+
+    if parameters.N == 0
+        parameters.N = parameters.K*D
+    end
+
+    if options.iterations == 0
+        options.iterations = div(options.f_calls_limit, parameters.N) + 1
+    end
 
     # population array
     Population = initializePop(problem.f, parameters.N, D, a, b)
@@ -223,7 +229,6 @@ function initialize_eca!(problem,engine,parameters,status,information,options)
     # current evaluations
     status.f_calls = parameters.N
 
-    # stop condition
 
     # current generation
     status.iteration = 0
@@ -232,13 +237,6 @@ function initialize_eca!(problem,engine,parameters,status,information,options)
     status.best_sol = getBest(Population, :minimize)
 
     stop = engine.stop_criteria(status, information, options)
-
-    if options.store_convergence
-        status_tmp = deepcopy(status)
-        empty!(status_tmp.convergence)
-
-        push!(status.convergence, status_tmp)
-    end
 
     N_init = parameters.N
     
@@ -252,6 +250,7 @@ function initialize_eca!(problem,engine,parameters,status,information,options)
 end
 
 function final_stage_eca!(status, information, options)
+    status.final_time = time()
     # if saveLast != ""
     #     o = []
     #     for i = 1:N
