@@ -1,7 +1,8 @@
+import Base.Multimedia.display
+
 function display(solution::xf_indiv)
     @printf("| f(x) = %g\n| ", solution.f)
     @show(solution.x)
-    println("")
 
 
 end
@@ -18,5 +19,6 @@ function display(status::State)
     
 
     @printf("| f calls: %.0f\n", status.f_calls)
+    @printf("| Total time: %.4f\n", status.final_time - status.start_time)
     println("+============================+")
 end
