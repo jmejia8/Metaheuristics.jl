@@ -11,7 +11,7 @@ A Julia package for metaheuristic optimization algorithms. Evolutionary are cons
 
 Open the Julia REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 ```
-pkg> add https://github.com/jmejia8/Bilevel.jl.git
+pkg> add https://github.com/jmejia8/Metaheuristics.jl.git
 ```
 
 ## Algorithms
