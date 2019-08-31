@@ -3,3 +3,4 @@
 *.jl.mem
 *.sublime-project
 *.sublime-workspace
+Manifest.toml
