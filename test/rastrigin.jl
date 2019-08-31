@@ -22,7 +22,7 @@ end
     bounds = Array([-100.0ones(D) 100.0ones(D)]')
 
 
-    status = optimize(rastrigin, bounds, ECA(options = Options( f_calls_limit=10000D)))
+    status = optimize(rastrigin, bounds, ECA())
     result = status.best_sol.x
     fitness = status.best_sol.f
 
