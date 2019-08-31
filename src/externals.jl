@@ -7,13 +7,13 @@ elseif VERSION < v"0.7.0" && Pkg.installed("Distributions") == nothing
     Pkg.add("Distributions")
 end
 
-using Distributions
 
 if VERSION >= v"0.7.0"
-	import DelimitedFiles.writedlm
+	# import DelimitedFiles.writedlm
 	import Random: randperm
 	import Printf.@printf
 	import LinearAlgebra: norm, Diagonal, dot
+    import Statistics: var, mean, std
 
 	indmin = argmin
 	indmax = argmax
@@ -21,5 +21,5 @@ if VERSION >= v"0.7.0"
 	eye(n) = Diagonal(ones(n))
 
 	repmat(X, n) = repeat(X, n)
-	writecsv(f, A) = writedlm(f, A, ',')
+	# writecsv(f, A) = writedlm(f, A, ',')
 end

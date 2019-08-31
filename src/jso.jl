@@ -133,7 +133,7 @@ function jso(fobj::Function, D::Int;
             if MCR[r] < 0
                 CR = 0
             else
-                CR = rand(Normal(MCR[r], 0.1))
+                CR = MCR[r] + 0.01randn()
             end
 
             if g < 0.25max_nfes
@@ -142,7 +142,7 @@ function jso(fobj::Function, D::Int;
                 CR = max(CR, 0.6)
             end
 
-            F = rand(Cauchy(MF[r], 0.1))
+            F = MF[r] + 0.1(randn()/randn())
 
             if g < 0.6max_nfes && F > 0.7
                 F = 0.7

@@ -79,3 +79,54 @@ function diffEvolution(func::Function, D::Int;
                     limits  = limits)
 
 end
+
+function DE(f::Function, D::Int;
+                        N::Int = 10D,
+                        F::Real= 1.0,
+                       CR::Real= 0.9,
+                   CR_min::Real= CR,
+                   CR_max::Real= CR,
+                    F_min::Real=F,
+                    F_max::Real=F,
+                max_evals::Int = 10000D,
+                 strategy::Symbol = :rand1,
+              termination::Function = (x ->false),
+              showResults::Bool = true,
+                 saveLast::String = "",
+          saveConvergence::String="",
+                   limits  = [-100., 100.])
+
+
+    @warn "DE(f, D;...) function is deprecated. Please use: `optimize(f, bounds, DE())`"
+
+    a, b = limits[1,:], limits[2,:]
+
+    if length(a) < D
+        a = ones(D) * a[1]
+        b = ones(D) * b[1]
+    end
+
+    bounds = Array([a b]')
+
+    options = Options(f_calls_limit = max_evals, store_convergence = (saveConvergence != ""))
+    method = DE(;N = N,
+                F = Float64(F),
+               CR = Float64(CR),
+           CR_min = CR_min,
+            CR_max= CR_max,
+            F_min =F_min,
+            F_max =F_max,
+        strategy  = strategy)
+
+    method.options.f_calls_limit = max_evals
+
+    status = optimize(f, bounds, method)
+
+    if true
+        display(status)
+    end
+
+
+    return status.best_sol.x, status.best_sol.f
+end
+

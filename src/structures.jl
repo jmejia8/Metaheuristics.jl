@@ -280,24 +280,16 @@ mutable struct DE
 end
 
 function DE(;N::Int = 0,
-            F::Float64= 1.0,
-           CR::Float64= 0.9,
-       CR_min::Float64= CR,
-       CR_max::Float64= CR,
-        F_min::Float64=F,
-        F_max::Float64=F,
+            F = 1.0,
+           CR = 0.9,
+       CR_min = CR,
+       CR_max = CR,
+        F_min =F,
+        F_max =F,
      strategy::Symbol = :rand1,
      information = Information(),
      options = Options())
-
-    if N < 5
-       N = 5
-       println("N increased to minimal value 5")
-    end
-    if CR < 0 || CR > 1
-        CR = 0.5;
-        println("CR should be from interval [0,1]; set to default value 0.5")
-    end    
+ 
 
      parameters = DE(N,promote(F,CR,CR_min,CR_max,F_min,F_max)...,strategy)
 
