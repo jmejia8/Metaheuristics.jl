@@ -38,6 +38,10 @@ mutable struct State
     success_rate::Float64
     convergence::Array{State}
 
+    start_time::Float64
+    final_time::Float64
+    stop::Bool
+
 end
 
 function State(
@@ -53,6 +57,9 @@ function State(
 
         success_rate= 0,
         convergence = State[],
+        start_time = 0.0,
+        final_time = 0.0,
+        stop = false
     )
 
     State(#
@@ -66,7 +73,7 @@ function State(
             h_calls,
             iteration)...,
             Real(success_rate),
-            State[])
+            State[], start_time, final_time, stop)
     
 end
 
@@ -121,7 +128,7 @@ function Options(;
     g_calls_limit::Real = 0,
     h_calls_limit::Real = 0,
     
-    iterations::Int = 1000,
+    iterations::Int = 0,
     store_convergence::Bool = false,
     show_results::Bool = true,
     debug::Bool = false,
@@ -232,7 +239,7 @@ end
 
 function ECA(;η_max::Float64 = 2.0,
                  K::Int = 7,
-                 N::Int = 100,
+                 N::Int = 0,
          p_exploit::Float64 = 0.95,
              p_bin::Float64 = 0.02,
              p_cr::Array{Float64} = Float64[],
