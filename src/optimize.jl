@@ -5,8 +5,10 @@ function optimize(f::Function, # objective function
 
       problem = Problem(f, bounds)
       engine = method.engine
-
+      convergence = State[]
       method.options.debug && @info("Initializing population...")
+
+      method.status.start_time = time()
       engine.initialize!(problem, engine, method.parameters, method.status, method.information, method.options)
 
       #####################################
@@ -23,31 +25,31 @@ function optimize(f::Function, # objective function
       # store convergence
       ###################################
       if options.store_convergence
-            st = deepcopy(status)
-            empty!(st.convergence)
-            push!(status.convergence, st)
+            update_convergence!(convergence, status)
       end
       
       method.options.debug && @info("Starting main loop...")
 
       status.iteration = 0
-      while !engine.stop_criteria(status, information, options)
+      while !status.stop
             status.iteration += 1
 
             update_state!(problem,engine,method.parameters,method.status,method.information,method.options,status.iteration)
             
-            options.debug && display(status)
-
+            if options.debug
+                  status.final_time = time()
+                  display(status)
+            end
 
             if options.store_convergence
-                  st = deepcopy(status)
-                  empty!(st.convergence)
-                  push!(status.convergence, st)
+                  update_convergence!(convergence, status)
             end
             
       end
 
       final_stage!(status, information, options)
+
+      status.convergence = convergence
 
       return status
 
