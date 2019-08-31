@@ -76,7 +76,7 @@ using Metaheuristics
 # Objective function
 sphere(x) = sum(x.^2)
 
-# bounds = [-10 -10 -10 -10;
+bounds = [-10 -10 -10 -10;
              10  10  10  10
 ]
 
