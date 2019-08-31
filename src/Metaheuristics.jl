@@ -13,6 +13,7 @@ include("stop.jl")
 include("structures.jl")
 include("operators.jl")
 include("display.jl")
+include("algorithm.jl")
 include("tools.jl")
 
 include("optimize.jl")

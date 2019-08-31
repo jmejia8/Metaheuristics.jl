@@ -206,37 +206,25 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
     end
 end
 
+
 function initialize_eca!(problem,engine,parameters,status,information,options)
-    a, b = problem.bounds[1,:], problem.bounds[2,:]
-    D = length(a)
+    D = size(problem.bounds, 2)
+
+
+    if parameters.N <= parameters.K
+        parameters.N = parameters.K*D
+    end
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
         options.debug &&  @warn( "f_calls_limit increased to $(options.f_calls_limit)")
     end
 
-    if parameters.N == 0
-        parameters.N = parameters.K*D
-    end
-
     if options.iterations == 0
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    # population array
-    Population = initializePop(problem.f, parameters.N, D, a, b)
-    status.population = Population
-    # current evaluations
-    status.f_calls = parameters.N
-
-
-    # current generation
-    status.iteration = 0
-
-    # best solution
-    status.best_sol = getBest(Population, :minimize)
-
-    stop = engine.stop_criteria(status, information, options)
+    initialize!(problem,engine,parameters,status,information,options)
 
     N_init = parameters.N
     
@@ -265,50 +253,3 @@ function final_stage_eca!(status, information, options)
 end
 
 
-function eca(fobj::Function,
-                D::Int;
-            η_max::Real  = 2,
-                K::Int   = 7,
-                N::Int   = K*D,
-        p_exploit::Real  = 0.95,
-            p_bin::Real  = 0.02,
-        max_evals::Int   = 10000D,
-      showResults::Bool  = true,
-       correctSol::Bool  = true,
-       searchType::Symbol=:minimize,
-      initPopRand::Symbol=:uniform,
-         showIter::Bool  = false,
-         saveLast::String= "",
-         adaptive::Bool  = false,
-     canResizePop::Bool  = false,
-      termination::Function   = (x ->false),
-       saveConvergence::String="",
-    returnDetails::Bool = false,
-           limits  = [-100., 100.])
-
-    @warn "eca(f, D;...) function is deprecated. Please use: `optimize(f, bounds, ECA())`"
-
-    f = fobj
-    
-    a, b = limits[1,:], limits[2,:]
-
-    if length(a) < D
-        a = ones(D) * a[1]
-        b = ones(D) * b[1]
-    end
-
-    bounds = Array([a b]')
-
-    options = Options(f_calls_limit = max_evals, debug=showIter, store_convergence = (saveConvergence != ""))
-    method = ECA()
-
-    method.options.f_calls_limit = max_evals
-
-    status = optimize(f, bounds, method)
-
-    if showResults
-        display(status)
-    end
-
-    return status.best_sol.x, status.best_sol.f
-end

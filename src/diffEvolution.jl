@@ -1,212 +1,164 @@
-function DE(func::Function, D::Int;
-                        N::Int = 10D,
-                        F::Real= 1.0,
-                       CR::Real= 0.9,
-                   CR_min::Real= CR,
-                   CR_max::Real= CR,
-                    F_min::Real=F,
-                    F_max::Real=F,
-                max_evals::Int = 10000D,
-                 strategy::Symbol = :rand1,
-              termination::Function = (x ->false),
-              showResults::Bool = true,
-                 saveLast::String = "",
-          saveConvergence::String="",
-                   limits  = [-100., 100.])
+function update_state_de!(problem, engine, parameters, status, information, options, iteration)
+    population = status.population
+    currentPop = copy(population)
 
+    F = parameters.F
+    CR = parameters.CR
 
-    if N < 5
-       N = 5
-       println("N increased to minimal value 5")
-    end
-    if CR < 0 || CR > 1
-        CR = 0.5;
-        println("CR should be from interval [0,1]; set to default value 0.5")
+    D = size(problem.bounds, 2)
+
+    # stepsize
+    if parameters.F_min < parameters.F_max
+        F = parameters.F_min + (F_max - parameters.F_min ) * rand()
     end
 
-
-    # bounds
-    la, lb = limits[1,:], limits[2,:]
-    if length(la) < D
-        la = ones(D) * la[1]
-        lb = ones(D) * lb[1]
+    if parameters.CR_min < parameters.CR_max
+       CR = parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand()
     end
 
-    # uniform initilization
-    population = initializePop(func, N, D, la, lb)
+    N = parameters.N
+    strategy = parameters.strategy
 
-    # current evalutations
-    nevals = N
+    la = problem.bounds[1,:]
+    lb = problem.bounds[2,:]
 
-    # stop condition
-    stop = termination(population)
+    D = length(la)
 
-    # current generation
-    t = 0
-    
-    # best element ever
-    best_ind = getBestInd(population)
-    best  = population[best_ind]
-    xBest = best.x
-    fBest = best.f
+    xBest = status.best_sol.x
 
-    convergence = []
+    for i in 1:N
 
-    if saveConvergence != ""
-        push!(convergence, [nevals fBest])
-    end
-
-    # start search
-    while !stop
-        currentPop = copy(population)
-        # For each elements in population
-
-        # stepsize
-        if F_min < F_max
-            F = F_min + (F_max - F_min ) * rand()
+        # select participats
+        r1 = rand(1:N)
+        while r1 == i
+            r1 = rand(1:N)
         end
 
-        if CR_min < CR_max
-           CR = CR_min + (CR_max - CR_min) * rand()
+        r2 = rand(1:N)
+        while r2 == i || r1 == r2
+            r2 = rand(1:N)
         end
 
-        for i in 1:N
+        r3 = rand(1:N)
+        while r3 == i || r3 == r1 || r3 == r2
+            r3 = rand(1:N)
+        end
 
-            # select participats
-            r1 = rand(1:N, 1)[1]
-            while r1 == i
-                r1 = rand(1:N, 1)[1]
+        x = currentPop[i].x
+        a = currentPop[r1].x
+        b = currentPop[r2].x
+        c = currentPop[r3].x
+
+        # strategy is selected here
+        if strategy == :rand1
+            # DE/rand/1
+            u = a + F*(b - c)
+        elseif strategy == :best1
+            # DE/best/1
+            u = xBest + F*(b - c)
+        elseif strategy == :rand2
+            # DE/rand/2
+
+            r4 = rand(1:N)
+            while r4 == i || r4 == r1 || r4 == r2 || r4 == r3
+                r4 = rand(1:N)
             end
 
-            r2 = rand(1:N, 1)[1]
-            while r2 == i || r1 == r2
-                r2 = rand(1:N, 1)[1]
+            r5 = rand(1:N)
+            while r5 == i || r5 == r1 || r5 == r2 || r5 == r3 || r5 == r4
+                r5 = rand(1:N)
             end
 
-            r3 = rand(1:N, 1)[1]
-            while r3 == i || r3 == r1 || r3 == r2
-                r3 = rand(1:N, 1)[1]
+            d = currentPop[r4].x
+            ee = currentPop[r5].x
+            
+            u = ee + F*(a - b + c - d)
+        elseif strategy == :randToBest1
+            # DE/rand-to-best/1
+            u = x + F*(xBest - x + a - b)
+        elseif strategy == :best2
+            # DE/best/2
+            r4 = rand(1:N)
+            while r4 == i || r4 == r1 || r4 == r2 || r4 == r3 || r4 == best_ind
+                r4 = rand(1:N)
             end
+            d = currentPop[r4].x
+            u = xBest + F*(a - b + c - d)                
+        else
+            @error("Unknown strategy $(strategy)")
+        end
 
-            x = currentPop[i].x
-            a = currentPop[r1].x
-            b = currentPop[r2].x
-            c = currentPop[r3].x
+        # binomial crossover
+        v = zeros(D)
+        j_rand = rand(1:D)
 
-            # strategy is selected here
-            if strategy == :rand1
-                # DE/rand/1
-                u = a + F*(b - c)
-            elseif strategy == :best1
-                # DE/best/1
-                u = xBest + F*(b - c)
-            elseif strategy == :rand2
-                # DE/rand/2
+        # binomial crossover
+        for j = 1:D
+            if rand() < CR || j == j_rand
+                v[j] = u[j]
 
-                r4 = rand(1:N, 1)[1]
-                while r4 == i || r4 == r1 || r4 == r2 || r4 == r3
-                    r4 = rand(1:N, 1)[1]
+                if v[j] < la[j]
+                    v[j] = la[j]
+                elseif v[j] > lb[j]
+                    v[j] = lb[j]
                 end
-
-                r5 = rand(1:N, 1)[1]
-                while r5 == i || r5 == r1 || r5 == r2 || r5 == r3 || r5 == r4
-                    r5 = rand(1:N, 1)[1]
-                end
-
-                d = currentPop[r4].x
-                ee = currentPop[r5].x
-                
-                u = ee + F*(a - b + c - d)
-            elseif strategy == :randToBest1
-                # DE/rand-to-best/1
-                u = x + F*(xBest - x + a - b)
-            elseif strategy == :best2
-                # DE/best/2
-                r4 = rand(1:N, 1)[1]
-                while r4 == i || r4 == r1 || r4 == r2 || r4 == r3 || r4 == best_ind
-                    r4 = rand(1:N, 1)[1]
-                end
-                d = currentPop[r4].x
-                u = xBest + F*(a - b + c - d)                
             else
-                error("Unknown strategy $(strategy)")
-            end
-
-            # binomial crossover
-            v = zeros(D)
-            j_rand = rand(1:D,1)[1]
-
-            # binomial crossover
-            for j = 1:D
-                if rand() < CR || j == j_rand
-                    v[j] = u[j]
-
-                    if v[j] < la[j]
-                        v[j] = la[j]
-                    elseif v[j] > lb[j]
-                        v[j] = lb[j]
-                    end
-                else
-                    v[j] = x[j]
-                end
-            end
-
-            # instance child
-            h = generateChild(v, func(v))
-            nevals += 1
-
-            # select survivals
-            if Selection(currentPop[i], h)
-                population[i] = h
-
-                if Selection(best, h)
-                    best = h
-                    best_ind = i
-                end
-            end
-
-            stop = nevals >= max_evals
-            if stop
-                break
+                v[j] = x[j]
             end
         end
 
-        t += 1
+        # instance child
+        h = generateChild(v, problem.f(v))
+        status.f_calls += 1
 
-        xBest = best.x
-        fBest = best.f
+        # select survivals
+        if engine.is_better(h, currentPop[i])
+            population[i] = h
 
-        if saveConvergence != ""
-            push!(convergence, [nevals fBest])
+            if engine.is_better(h, status.best_sol)
+                status.best_sol = h
+                best_ind = i
+            end
         end
-    
-        # stop condition
-        stop = stop || termination(population)
+
+        status.stop = engine.stop_criteria(status, information, options)
+        if status.stop
+            break
+        end
     end
 
-    if saveLast != ""
-        data = zeros(N, D+1)
-        data[:,1:D] = getPositions(population, N, D)
-        data[:,D+1] = getfValues(population)
-        writecsv(saveLast, data)        
-    end
 
-    if saveConvergence != ""
-        writecsv(saveConvergence, convergence)
-    end
 
-    if showResults
-        println("============[ ED results ]=============")
-        println("| Generations = $t")
-        println("| Evals       = ", nevals)
-        println("| best sol.   = ", fBest)
-        println("=======================================")
-    end
 
-    return xBest, fBest
 end
 
-function diffEvolution(func::Function, D::Int;
+function initialize_de!(problem,engine,parameters,status,information,options)
+    D = size(problem.bounds, 2)
+
+
+    if parameters.N <= 5
+        parameters.N = 10*D
+    end
+
+    if options.f_calls_limit == 0
+        options.f_calls_limit = 10000D
+        options.debug &&  @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+    end
+
+    if options.iterations == 0
+        options.iterations = div(options.f_calls_limit, parameters.N) + 1
+    end
+
+    initialize!(problem,engine,parameters,status,information,options)
+
+end
+
+function final_stage_de!(status, information, options)
+    status.final_time = time()
+end
+
+
+function DE(f::Function, D::Int;
                         N::Int = 10D,
                         F::Real= 1.0,
                        CR::Real= 0.9,
@@ -221,21 +173,30 @@ function diffEvolution(func::Function, D::Int;
                  saveLast::String = "",
           saveConvergence::String="",
                    limits  = [-100., 100.])
-    warn("This function is deprecated. Use DE function")
-    return DE(func, D;
-                    N  = N,
-                    F  = F,
-                    CR = CR,
-                    CR_min = CR_min,
-                    CR_max = CR_max,
-                    F_min = F_min,
-                    F_max = F_max,
-                    max_evals  = max_evals,
-                    strategy  = strategy,
-                    termination  = termination,
-                    showResults  = showResults,
-                    saveLast  = saveLast,
-                    saveConvergence = saveConvergence,
-                    limits  = limits)
 
+
+    @warn "DE(f, D;...) function is deprecated. Please use: `optimize(f, bounds, DE())`"
+
+    a, b = limits[1,:], limits[2,:]
+
+    if length(a) < D
+        a = ones(D) * a[1]
+        b = ones(D) * b[1]
+    end
+
+    bounds = Array([a b]')
+
+    options = Options(f_calls_limit = max_evals, store_convergence = (saveConvergence != ""))
+    method = DE()
+    method.options.f_calls_limit = max_evals
+
+    status = optimize(f, bounds, method)
+
+    if true
+        display(status)
+    end
+
+
+    return status.best_sol.x, status.best_sol.f
 end
+

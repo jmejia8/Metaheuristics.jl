@@ -249,6 +249,10 @@ function ECA(;η_max::Float64 = 2.0,
      options = Options()
      )
 
+
+
+
+
     parameters = ECA(η_max, K, N, p_exploit, p_bin, p_cr, adaptive, resize_population)
     Algorithm(
         parameters,
@@ -257,6 +261,53 @@ function ECA(;η_max::Float64 = 2.0,
         is_better = is_better ,
         stop_criteria = stop_check ,
         final_stage! = final_stage_eca!,
+        information = information,
+        options = options
+        )
+
+end
+
+
+mutable struct DE
+    N::Int 
+    F::Float64
+    CR::Float64
+    CR_min::Float64
+    CR_max::Float64
+    F_min::Float64
+    F_max::Float64
+    strategy::Symbol 
+end
+
+function DE(;N::Int = 0,
+            F::Float64= 1.0,
+           CR::Float64= 0.9,
+       CR_min::Float64= CR,
+       CR_max::Float64= CR,
+        F_min::Float64=F,
+        F_max::Float64=F,
+     strategy::Symbol = :rand1,
+     information = Information(),
+     options = Options())
+
+    if N < 5
+       N = 5
+       println("N increased to minimal value 5")
+    end
+    if CR < 0 || CR > 1
+        CR = 0.5;
+        println("CR should be from interval [0,1]; set to default value 0.5")
+    end    
+
+     parameters = DE(N,promote(F,CR,CR_min,CR_max,F_min,F_max)...,strategy)
+
+    Algorithm(
+        parameters,
+        initialize! = initialize_de!,
+        update_state! = update_state_de!,
+        is_better = is_better ,
+        stop_criteria = stop_check ,
+        final_stage! = final_stage_de!,
         information = information,
         options = options
         )
