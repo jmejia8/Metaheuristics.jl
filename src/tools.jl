@@ -238,3 +238,8 @@ end
 function isfeasible(element::xfgh_indiv)
     return countViolations(element.g, element.h) == 0
 end
+
+function update_convergence!(convergence, status)
+    st = deepcopy(status)
+    push!(convergence, st)
+end
