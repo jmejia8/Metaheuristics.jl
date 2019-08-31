@@ -29,7 +29,9 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # ED results
-    result, fitness = DE(rastrigin, D; F = 1, CR = 0.5, showResults=false)
+    status = optimize(rastrigin, bounds, DE(CR=0.5))
+    result = status.best_sol.x
+    fitness = status.best_sol.f
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
