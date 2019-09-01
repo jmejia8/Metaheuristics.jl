@@ -67,5 +67,7 @@ include("jso.jl")
 
 include("ABC.jl")
 
+include("deprecated.jl")
+
 
 end # module
