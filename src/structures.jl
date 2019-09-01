@@ -230,6 +230,7 @@ mutable struct ECA <: AbstractAlgorithm
             η_max::Float64
                 K::Int
                 N::Int
+                N_init::Int
         p_exploit::Float64
             p_bin::Float64
              p_cr::Array{Float64}
@@ -240,6 +241,7 @@ end
 function ECA(;η_max::Float64 = 2.0,
                  K::Int = 7,
                  N::Int = 0,
+                 N_init::Int = N,
          p_exploit::Float64 = 0.95,
              p_bin::Float64 = 0.02,
              p_cr::Array{Float64} = Float64[],
@@ -250,10 +252,10 @@ function ECA(;η_max::Float64 = 2.0,
      )
 
 
+    N_init = N
 
 
-
-    parameters = ECA(η_max, K, N, p_exploit, p_bin, p_cr, adaptive, resize_population)
+    parameters = ECA(η_max, K, N, N_init, p_exploit, p_bin, p_cr, adaptive, resize_population)
     Algorithm(
         parameters,
         initialize! = initialize_eca!,

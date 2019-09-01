@@ -117,6 +117,7 @@ end
 function update_state_eca!(problem, engine, parameters, status, information, options, iteration)
     K = parameters.K
     I = randperm(parameters.N)
+    D = size(problem.bounds, 2)
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
@@ -185,7 +186,7 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
     end
 
     if parameters.adaptive
-        parameters.p_cr = adaptCrossover(parameters.p_cr, Mcr_fail/N)
+        parameters.p_cr = adaptCrossover(parameters.p_cr, Mcr_fail/parameters.N)
     end
 
     # if saveConvergence != ""
@@ -195,8 +196,10 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
     p = status.f_calls / options.f_calls_limit
     
     if parameters.resize_population
+        K = parameters.K
+
         # new size
-        parameters.N = 2K .+ round(Int, (1 - p ) * (N_init .- 2K))
+        parameters.N = 2K .+ round(Int, (1 - p ) * (parameters.N_init .- 2K))
 
         if parameters.N < 2K
             parameters.N = 2K
