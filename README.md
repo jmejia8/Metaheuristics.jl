@@ -30,7 +30,7 @@ pkg> add https://github.com/jmejia8/Metaheuristics.jl.git
 
 ### ECA
 
-ECA() is a new metaheuristic optimization algorithm based on center of mass. ECA minimizes an objective function.
+ECA() is a new metaheuristic optimization algorithm based on center of mass. ECA minimizes an objective function [read more.](https://www.dropbox.com/s/kqc22ki2edjtt0y/ECA-optimization.pdf).
 
 #### Parameters
 - `η_max:` stepsize.
