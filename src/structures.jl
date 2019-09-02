@@ -313,18 +313,31 @@ mutable struct PSO
     N::Int
     C1::Float64
     C2::Float64
-     ω::Float64
-     v::Array{Float64} # velocity
-    pbest::Array{Float64}
+    ω::Float64
+    v::Array{Float64} # velocity
+    flock::Array{xf_indiv}
 end
 
-function PSO(N::Int = 0,
+function PSO(;N::Int = 0,
             C1 = 2.0,
             C2 = 2.0,
-             ω = 0.8,
-             v = Float64[],
-             pbest = Float64[]
+            ω = 0.8,
+            v = Float64[],
+            flock = xf_indiv[],
+            information = Information(),
+            options = Options()
              )
 
-    PSO(N, promote(Float64(C1), C2, ω)..., v, pbest)
+    parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
+
+    Algorithm(
+        parameters,
+        initialize! = initialize_pso!,
+        update_state! = update_state_pso!,
+        is_better = is_better ,
+        stop_criteria = stop_check ,
+        final_stage! = final_stage_pso!,
+        information = information,
+        options = options
+        )
 end

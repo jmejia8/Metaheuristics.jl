@@ -4,17 +4,12 @@ function getBestPSO(fs::Array{Float64})
     return generateChild(zeros(2), fx)
 end
 
-
-function velocity(x, v, pbest, gbest, parameters)
-    parameters.ω*v .+ parameters.C1*rand()*(pbest - x) + parameters.C2*rand()*(gbest-x)
-end
-
-function update_state_pso!(problem, engine, parameters, status, information, options, iteration)
+function initialize_pso!(problem,engine,parameters,status,information,options)
     D = size(problem.bounds, 2)
 
 
-    if parameters.N <= parameters.K
-        parameters.N = parameters.K*D
+    if parameters.N == 0
+        parameters.N = 10*D
     end
 
     if options.f_calls_limit == 0
@@ -26,6 +21,24 @@ function update_state_pso!(problem, engine, parameters, status, information, opt
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
+
+
+    initialize!(problem,engine,parameters,status,information,options)
+
+    parameters.v = zeros(parameters.N, D)
+
+
+
+    parameters.flock = status.population
+
+
+end
+
+
+@inline function velocity(x, v, pbest, gbest, parameters)
+    r1 = parameters.C1*rand()
+    r2 = parameters.C2*rand()
+    parameters.ω*v + r2*(pbest - x) + r2*(gbest-x)
 end
 
 function update_state_pso!(problem, engine, parameters, status, information, options, iteration)
@@ -33,24 +46,24 @@ function update_state_pso!(problem, engine, parameters, status, information, opt
     # For each elements in population
     for i in 1:parameters.N
 
-        x = status.population[i]
-        xPBest = parameters.pbest[i,:]
+        x = parameters.flock[i].x
+        xPBest = status.population[i].x
 
-        parameters.v[i] = velocity(x, vPop[i,:], xPBest, xGBest, parameters)
-        x = x + v
+        parameters.v[i,:] = velocity(x, parameters.v[i,:], xPBest, xGBest, parameters)
+        x += parameters.v[i,:]
 
         sol = generateChild(x, problem.f(x))
         status.f_calls += 1
 
         if engine.is_better(sol, status.population[i])
-            parameters.pbest[i,:] = x
+            status.population[i] = sol
 
             if engine.is_better(sol, status.best_sol)
                 status.best_sol = sol
             end
         end
 
-        status.population[i] = sol
+        parameters.flock[i] = sol
         
         # stop condition
         status.stop = engine.stop_criteria(status, information, options) 
@@ -59,7 +72,12 @@ function update_state_pso!(problem, engine, parameters, status, information, opt
 
 end
 
-function pso(func::Function, D::Int;
+function final_stage_pso!(status, information, options)
+    status.final_time = time()
+    
+end
+
+function pso(f::Function, D::Int;
                         N::Int = 10D,
                        C1::Real= 2.0,
                        C2::Real= 2.0,
@@ -69,44 +87,30 @@ function pso(func::Function, D::Int;
               showResults::Bool = true,
                    limits  = (-100., 100.))
 
+    @warn "pso(f, D;...) function is deprecated. Please use: `optimize(f, bounds, PSO())`"
+
     a, b = limits
 
-    population = a .+ (b .- a) * rand(N, D)
-    vPop = randn(N, D)
-   
-    fitness = zeros(Real, N)
-    for i in 1:N            
-        fitness[i] = func(population[i, :])
+    if typeof(a) <: Real
+        a = ones(D) * a
+        b = ones(D) * b
+    elseif length(a) < D
+        a = ones(D) * a[1]
+        b = ones(D) * b[1]
     end
 
-    xPBests = copy(population)
-
-    # current evaluationsVu
-    nevals = N
-
-    # stop condition
-    stop = termination(fitness)
-
-    # current generation
-    t = 0
-    
-    i_min = indmin(fitness)
-    xGBest= population[i_min,:]         
-    fBest = fitness[i_min]
-
-    velocity(x, v, pbest, gbest) = ω*v .+ C1*rand()*(pbest - x) .+ C2*rand()*(gbest-x)
-
-    # start search
-    while !stop
-
-    end
+    bounds = Array([a b]')
 
 
-    if showResults
+    options = Options(f_calls_limit = max_evals)
+    method = PSO(;N = N, C1 = C1, C2=C2, ω = ω)
+
+    status = optimize(f, bounds, method)
+
+
+    if true
         display(status)
     end
 
-    return xGBest, fBest
+    return status.best_sol.x, status.best_sol.f
 end
-
-# pso(x->sum(x.*x), 2;limits  = (-1., 1.))
