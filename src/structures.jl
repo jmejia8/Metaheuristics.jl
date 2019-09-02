@@ -307,3 +307,24 @@ function DE(;N::Int = 0,
         )
 
 end
+
+
+mutable struct PSO
+    N::Int
+    C1::Float64
+    C2::Float64
+     ω::Float64
+     v::Array{Float64} # velocity
+    pbest::Array{Float64}
+end
+
+function PSO(N::Int = 0,
+            C1 = 2.0,
+            C2 = 2.0,
+             ω = 0.8,
+             v = Float64[],
+             pbest = Float64[]
+             )
+
+    PSO(N, promote(Float64(C1), C2, ω)..., v, pbest)
+end

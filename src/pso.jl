@@ -4,6 +4,61 @@ function getBestPSO(fs::Array{Float64})
     return generateChild(zeros(2), fx)
 end
 
+
+function velocity(x, v, pbest, gbest, parameters)
+    parameters.ω*v .+ parameters.C1*rand()*(pbest - x) + parameters.C2*rand()*(gbest-x)
+end
+
+function update_state_pso!(problem, engine, parameters, status, information, options, iteration)
+    D = size(problem.bounds, 2)
+
+
+    if parameters.N <= parameters.K
+        parameters.N = parameters.K*D
+    end
+
+    if options.f_calls_limit == 0
+        options.f_calls_limit = 10000D
+        options.debug &&  @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+    end
+
+    if options.iterations == 0
+        options.iterations = div(options.f_calls_limit, parameters.N) + 1
+    end
+
+end
+
+function update_state_pso!(problem, engine, parameters, status, information, options, iteration)
+    xGBest = status.best_sol.x
+    # For each elements in population
+    for i in 1:parameters.N
+
+        x = status.population[i]
+        xPBest = parameters.pbest[i,:]
+
+        parameters.v[i] = velocity(x, vPop[i,:], xPBest, xGBest, parameters)
+        x = x + v
+
+        sol = generateChild(x, problem.f(x))
+        status.f_calls += 1
+
+        if engine.is_better(sol, status.population[i])
+            parameters.pbest[i,:] = x
+
+            if engine.is_better(sol, status.best_sol)
+                status.best_sol = sol
+            end
+        end
+
+        status.population[i] = sol
+        
+        # stop condition
+        status.stop = engine.stop_criteria(status, information, options) 
+        status.stop && break
+    end
+
+end
+
 function pso(func::Function, D::Int;
                         N::Int = 10D,
                        C1::Real= 2.0,
@@ -43,48 +98,12 @@ function pso(func::Function, D::Int;
 
     # start search
     while !stop
-        # For each elements in population
-        for i in 1:N
 
-            x = population[i,:]
-            xPBest = xPBests[i,:]
-
-            v = velocity(x, vPop[i,:], xPBest, xGBest)
-            x = x .+ v
-
-            population[i,:] = x
-            vPop[i,:] = v
-
-            fx = func(x)
-            nevals += 1
-
-            if fx < fitness[i]
-                xPBests[i,:]= x
-                fitness[i]  = fx
-
-                if fx < fBest
-                    xGBest= x
-                    fBest = fx
-                end
-            end
-
-        end
-
-        t += 1
-
-        # stop condition
-        stop = nevals > max_evals || termination(fitness)
     end
 
 
     if showResults
-        println("============[ PSO results ]============")
-        println("| Generations = $t")
-        println("| Evals.      = ", nevals)
-        println("| best sol.   = ", fBest)
-        println("| mean sol    = ", mean(fitness))
-        println("| std. sol    = ", std(fitness))
-        println("=======================================")
+        display(status)
     end
 
     return xGBest, fBest
