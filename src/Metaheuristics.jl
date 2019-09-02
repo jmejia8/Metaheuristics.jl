@@ -3,7 +3,7 @@ module Metaheuristics
 
 # ECA algorithm
 export eca, diffEvolution, pso, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
-export CFO, jso, DE, ABC
+export CFO, jso, DE, ABC, PSO
 
 # v2 items
 export optimize, ECA, Options, State, Information, Engine, Problem

@@ -131,3 +131,41 @@ function DE(f::Function, D::Int;
 end
 
 
+function pso(f::Function, D::Int;
+                        N::Int = 10D,
+                       C1::Real= 2.0,
+                       C2::Real= 2.0,
+                        ω::Real= 0.8,
+                max_evals::Int = 10000D,
+              termination::Function = (x ->false),
+              showResults::Bool = true,
+                   limits  = (-100., 100.))
+
+    @warn "pso(f, D;...) function is deprecated. Please use: `optimize(f, bounds, PSO())`"
+
+    a, b = limits
+
+    if typeof(a) <: Real
+        a = ones(D) * a
+        b = ones(D) * b
+    elseif length(a) < D
+        a = ones(D) * a[1]
+        b = ones(D) * b[1]
+    end
+
+    bounds = Array([a b]')
+
+
+    options = Options(f_calls_limit = max_evals)
+    method = PSO(;N = N, C1 = C1, C2=C2, ω = ω)
+
+    status = optimize(f, bounds, method)
+
+
+    if showResults
+        display(status)
+    end
+
+    return status.best_sol.x, status.best_sol.f
+end
+
