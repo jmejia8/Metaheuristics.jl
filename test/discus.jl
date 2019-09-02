@@ -34,8 +34,10 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    result, fitness = pso(discus, 2; showResults=false)
-    test_result(result, fitness, 2, 1e1)
+    status = optimize(discus, 0.1bounds, PSO())
+    result = status.best_sol.x
+    fitness = status.best_sol.f
+    test_result(result, fitness, D, 1e1)
 
     # ABC results
     result, fitness = ABC(discus, [-10.0ones(5) 10.0ones(5)]', limit=20)

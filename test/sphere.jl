@@ -33,7 +33,9 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    result, fitness = pso(sphere, D; limits=(-10, 10), showResults=false)
+    status = optimize(sphere, bounds, PSO())
+    result = status.best_sol.x
+    fitness = status.best_sol.f
     test_result(result, fitness, D, 1e-5)
 
     # ABC results

@@ -35,7 +35,9 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    result, fitness = pso(rastrigin, 2; showResults=false)
+    status = optimize(rastrigin, 0.1bounds, PSO(N=200))
+    result = status.best_sol.x
+    fitness = status.best_sol.f
     test_result(result, fitness, D, 1e-5)
 
     # ABC results
