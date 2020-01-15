@@ -168,7 +168,7 @@ function Selection(fOld::Individual_, fNew::Individual_, searchType::Symbol)
 end
 
 # COP functions
-function violationsSum(g::Vector, h::Vector)
+function violationsSum(g::Vector, h::Vector; ε =0.0)
     sum_g = 0
     sum_h = 0
 
@@ -178,11 +178,11 @@ function violationsSum(g::Vector, h::Vector)
     end
 
     for i = 1:length(h)
-        if h[i] != 0.0
+        if ≈(h[i], 0.0, atol=ε)
             sum_h += abs(h[i])  end
     end
 
-    return sum_g + sum_h
+    return (sum_g/length(g)) + (sum_h / length(h)) 
 end
 
 # for Deb rules

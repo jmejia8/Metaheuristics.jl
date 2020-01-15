@@ -233,6 +233,7 @@ mutable struct ECA <: AbstractAlgorithm
                 N_init::Int
         p_exploit::Float64
             p_bin::Float64
+                ε::Float64
              p_cr::Array{Float64}
          adaptive::Bool
      resize_population::Bool
@@ -244,6 +245,7 @@ function ECA(;η_max::Float64 = 2.0,
                  N_init::Int = N,
          p_exploit::Float64 = 0.95,
              p_bin::Float64 = 0.02,
+                ε::Float64 = 0.0,
              p_cr::Array{Float64} = Float64[],
           adaptive::Bool = false,
      resize_population::Bool = false,
@@ -255,12 +257,12 @@ function ECA(;η_max::Float64 = 2.0,
     N_init = N
 
 
-    parameters = ECA(η_max, K, N, N_init, p_exploit, p_bin, p_cr, adaptive, resize_population)
+    parameters = ECA(η_max, K, N, N_init, p_exploit, p_bin, ε, p_cr, adaptive, resize_population)
     Algorithm(
         parameters,
         initialize! = initialize_eca!,
         update_state! = update_state_eca!,
-        is_better = is_better ,
+        is_better = is_better_eca ,
         stop_criteria = stop_check ,
         final_stage! = final_stage_eca!,
         information = information,

@@ -7,11 +7,22 @@ function display(solution::xf_indiv)
 
 end
 
+function display(solution::xfgh_indiv)
+    @printf("| f(x) = %g\n", solution.f)
+    @printf("| g(x) = ")
+    println(solution.g)
+    @printf("| h(x) = ")
+    println(solution.h)
+    @show(solution.x)
+
+
+end
+
 function display(status::State)
 
-    if typeof(status.best_sol) != xf_indiv
-        return println(status)
-    end
+    # if typeof(status.best_sol) != xf_indiv
+    #     return println(status)
+    # end
 
     println("+=========== STATE ==========+")
     @printf("| Iter.: %.0f\n", status.iteration)

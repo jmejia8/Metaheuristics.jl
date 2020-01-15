@@ -13,7 +13,7 @@ function fitnessToMass(fitness::Vector{Float64}, searchType::Symbol)
     return fitness
 end
 
-function getMass(U::Array{xf_indiv, 1}, searchType::Symbol)
+function getMass(U::Array{xf_indiv, 1}, searchType::Symbol; kargs...)
     n, d = length(U), length(U[1].x)
 
     fitness = zeros(Float64, n)
@@ -25,13 +25,27 @@ function getMass(U::Array{xf_indiv, 1}, searchType::Symbol)
     return fitnessToMass(fitness, searchType)
 end
 
-function getMass(U::Array{xfg_indiv, 1}, searchType)
+function getMass(U::Array{xfg_indiv, 1}, searchType; kargs...)
     return getMass(U, searchType)
     
 end
 
-function getMass(U::Array{xfgh_indiv, 1}, searchType)
-    return getMass(U, searchType)
+function getMass(U::Array{xfgh_indiv, 1}, searchType; ε=0.0)
+    n, d = length(U), length(U[1].x)
+
+    fitness = zeros(Float64, n)
+    
+    for i = 1:n
+        v = violationsSum(U[i].g, U[i].h; ε = ε)
+        if v > 0.0
+            fitness[i] = v
+        else
+            fitness[i] = U[i].f
+        end
+    end
+
+    return fitnessToMass(fitness, searchType)
+
 end
 
 function center(U, mass)
@@ -46,10 +60,10 @@ function center(U, mass)
     return c / sum(mass)
 end
 
-function center(U::Array, searchType::Symbol)
+function center(U::Array, searchType::Symbol; ε = 0.0)
     n = length(U)
 
-    mass = getMass(U, searchType)
+    mass = getMass(U, searchType; ε=ε)
 
     return center(U, mass), getWorstInd(U, searchType), getBestInd(U, searchType)
 end
@@ -129,6 +143,13 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
     for i in 1:parameters.N
         p = status.f_calls / options.f_calls_limit
 
+        if parameters.ε > 0
+            ε = parameters.ε * (p - 1)^4
+
+        else
+            ε = 0.0
+        end
+
         # current
         x = status.population[i].x
 
@@ -136,7 +157,7 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
         U = getU(status.population, parameters.K, I, i, parameters.N)
         
         # generate center of mass
-        c, u_worst, u_best = center(U, :minimize)
+        c, u_worst, u_best = center(U, :minimize, ε = ε)
 
         # stepsize
         η = parameters.η_max * rand()
@@ -168,9 +189,9 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
         status.f_calls += 1
 
         # replace worst element
-        if engine.is_better(sol, status.population[i])
+        if engine.is_better(sol, status.population[i], ε = ε)
             status.population[getWorstInd(status.population, :minimize)] = sol
-            if engine.is_better(sol, status.best_sol)
+            if engine.is_better(sol, status.best_sol, ε = ε)
                 status.best_sol = sol
             end
         elseif parameters.adaptive
@@ -255,4 +276,32 @@ function final_stage_eca!(status, information, options)
     # end
 end
 
+
+is_better_eca(New::xf_indiv, Old::xf_indiv; searchType =:minimize, leq =false, kargs...) = New.f < Old.f
+
+
+function is_better_eca(New::xfgh_indiv, Old::xfgh_indiv; searchType =:minimize, leq =false, ε = 0.0)
+
+    old_vio = violationsSum(Old.g, Old.h, ε = ε)
+    new_vio = violationsSum(New.g, New.h, ε = ε)
+
+    if new_vio < old_vio 
+        return true
+    elseif new_vio > old_vio 
+        return false
+    end
+
+    if searchType == :minimize
+        if leq
+            return New.f <= Old.f
+        end
+        return New.f < Old.f
+    end
+    
+    if leq
+        return New.f >= Old.f
+    end
+    
+    return New.f > Old.f
+end
 
