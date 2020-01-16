@@ -112,7 +112,7 @@ function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
     return p_cr
 end
 
-function resizePop!(P::Array, N_new::Int, K::Int)
+function resizePop!(P::Array, N_new::Int, K::Int; is_better=is_better)
     N = length(P)
 
     if N == N_new
@@ -190,7 +190,8 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
 
         # replace worst element
         if engine.is_better(sol, status.population[i], ε = ε)
-            status.population[getWorstInd(status.population, :minimize)] = sol
+            wi = getWorstInd(status.population, :minimize, engine.is_better)
+            status.population[wi] = sol
             if engine.is_better(sol, status.best_sol, ε = ε)
                 status.best_sol = sol
             end
@@ -226,7 +227,10 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
             parameters.N = 2K
         end
 
-        status.population = resizePop!(status.population, parameters.N, K)
+        status.population = resizePop!(status.population,
+                                            parameters.N,
+                                                        K,
+                                            (a, b) -> engine.is_better(a,b,ε=ε))
     end
 end
 
