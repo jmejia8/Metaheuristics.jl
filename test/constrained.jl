@@ -18,20 +18,20 @@ end
 
     # Objective function
     f(x) = (sum((x .- 1).^2), [sum((x .- 1).^2) - 4, sum(sin.(x .- 1)) - 1], [(x[1] - x[2])^2])
+    f2(x) = (sum((x .- 1).^2), [sum((x .- 1).^2) - 4, sum(sin.(x .- 1)) - 1, (x[1] - x[2])^2 - 6])
 
     bounds = Array([-10.0ones(D) 10.0ones(D)]')
 
     # ECA results
     status = optimize(f, bounds, ECA(ε = 1.0, options=Options(debug=false)))
 
-    display(status.best_sol)
-    println("--------------------------")
-    for ind = status.population
-        @show ind.x
-    end
+    result = status.best_sol.x
+    fitness = status.best_sol.f
+    test_result(result, fitness, D, 1e-5)
 
-    println("==========")
-    @show f(ones(D))
+    # ECA results 2
+    status = optimize(f2, bounds, ECA(ε = 1.0, options=Options(debug=false)))
+
     result = status.best_sol.x
     fitness = status.best_sol.f
     test_result(result, fitness, D, 1e-5)
