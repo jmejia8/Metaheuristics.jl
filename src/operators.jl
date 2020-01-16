@@ -76,7 +76,7 @@ function getBest(Population, searchType::Symbol = :minimize)
     return best
 end
 
-function getWorst(Population, searchType::Symbol = :minimize)
+function getWorst(Population, searchType::Symbol = :minimize, is_better=is_better)
     worst = Population[1]
 
     for i = 2:length(Population)
@@ -88,11 +88,11 @@ function getWorst(Population, searchType::Symbol = :minimize)
     return worst
 end
 
-function getWorstInd(Population, searchType::Symbol = :minimize)
+function getWorstInd(Population, searchType::Symbol = :minimize, is_better=is_better)
     worst = 1
 
     for i = 2:length(Population)
-        if Selection(Population[i], Population[worst])
+        if is_better(Population[worst], Population[i])
             worst = i
         end
     end
@@ -123,7 +123,7 @@ end
 
 function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1}})
     f, g = fResult
-    return xfg_indiv(x, f, g)
+    return xfgh_indiv(x, f, g, [0.0])
 end
 
 function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}})
