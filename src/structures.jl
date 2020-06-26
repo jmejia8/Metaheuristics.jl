@@ -2,32 +2,32 @@ abstract type AbstractSolution end
 abstract type AbstractAlgorithm end
 
 mutable struct xf_indiv <: AbstractSolution # Single Objective
-	x::Vector{Float64}
-	f::Float64
+    x::Vector{Float64}
+    f::Float64
 end
 
 mutable struct xfg_indiv # Single Objective Constraied
-	x::Vector{Float64}
-	f::Float64
-	g::Vector{Float64}
+    x::Vector{Float64}
+    f::Float64
+    g::Vector{Float64}
 end
 
 mutable struct xfgh_indiv # Single Objective Constraied
-	x::Vector{Float64}
-	f::Float64
-	g::Vector{Float64}
-	h::Vector{Float64}
+    x::Vector{Float64}
+    f::Float64
+    g::Vector{Float64}
+    h::Vector{Float64}
 end
 
 mutable struct xFgh_indiv # Single Objective Constraied
-	x::Vector{Float64}
-	f::Vector{Float64}
-	g::Vector{Float64}
-	h::Vector{Float64}
+    x::Vector{Float64}
+    f::Vector{Float64}
+    g::Vector{Float64}
+    h::Vector{Float64}
 end
 
 mutable struct State
-    best_sol
+    best_sol::Any
     population::Array
 
     f_calls::Int
@@ -45,36 +45,34 @@ mutable struct State
 end
 
 function State(
-        best_sol,
-        population;
+    best_sol,
+    population;
 
-        # upper level parameters
-        f_calls = 0,
-        g_calls = 0,
-        h_calls = 0,
-        
-        iteration= 0,
-
-        success_rate= 0,
-        convergence = State[],
-        start_time = 0.0,
-        final_time = 0.0,
-        stop = false
-    )
+    # upper level parameters
+    f_calls = 0,
+    g_calls = 0,
+    h_calls = 0,
+    iteration = 0,
+    success_rate = 0,
+    convergence = State[],
+    start_time = 0.0,
+    final_time = 0.0,
+    stop = false,
+)
 
     State(#
         best_sol,
         Array(population),
-        
+
         # upper level parameters
-        promote(
-            f_calls,
-            g_calls,
-            h_calls,
-            iteration)...,
-            Real(success_rate),
-            State[], start_time, final_time, stop)
-    
+        promote(f_calls, g_calls, h_calls, iteration)...,
+        Real(success_rate),
+        State[],
+        start_time,
+        final_time,
+        stop,
+    )
+
 end
 
 mutable struct Engine
@@ -85,13 +83,15 @@ mutable struct Engine
     final_stage!::Function
 end
 
-function Engine(;initialize!::Function = _1(kwargs...) = nothing,
-                   update_state!::Function = _2(kwargs...) = nothing,
-                       is_better::Function = _4(kwargs...) = false, 
-                   stop_criteria::Function = _5(kwargs...) = nothing,
-                    final_stage!::Function = _6(kwargs...) = nothing)
-    
-    Engine(initialize!,update_stat,is_better,stop_criteria,final_stage!)
+function Engine(;
+    initialize!::Function = _1(kwargs...) = nothing,
+    update_state!::Function = _2(kwargs...) = nothing,
+    is_better::Function = _4(kwargs...) = false,
+    stop_criteria::Function = _5(kwargs...) = nothing,
+    final_stage!::Function = _6(kwargs...) = nothing,
+)
+
+    Engine(initialize!, update_stat, is_better, stop_criteria, final_stage!)
 end
 
 
@@ -111,7 +111,7 @@ mutable struct Options
     f_calls_limit::Float64
     g_calls_limit::Float64
     h_calls_limit::Float64
-    
+
     iterations::Int
     store_convergence::Bool
     show_results::Bool
@@ -127,25 +127,24 @@ function Options(;
     f_calls_limit::Real = 0,
     g_calls_limit::Real = 0,
     h_calls_limit::Real = 0,
-    
     iterations::Int = 0,
     store_convergence::Bool = false,
     show_results::Bool = true,
     debug::Bool = false,
-    search_type::Symbol=:minimize)
+    search_type::Symbol = :minimize,
+)
 
-    
+
     Options(
         promote(x_tol, f_tol, g_tol, h_tol)...,
         promote(f_calls_limit, g_calls_limit, h_calls_limit)...,
-        
         promote(iterations)...,
 
         # Results options
-        promote(store_convergence,show_results, debug)...,
-        Symbol(search_type)
+        promote(store_convergence, show_results, debug)...,
+        Symbol(search_type),
     )
-    
+
 end
 
 
@@ -158,7 +157,7 @@ end
 function Information(;#
     f_optimum = NaN,
     x_optimum::Array{Float64} = Float64[],
-    )
+)
 
     Information(Float64(f_optimum), x_optimum)
 
@@ -166,53 +165,49 @@ end
 
 
 mutable struct Algorithm <: AbstractAlgorithm
-    parameters
+    parameters::Any
     status::State
     information::Information
     options::Options
     engine::Engine
 end
 
-function Algorithm(   parameters;
-                   initial_state::State    = State(nothing, []),
-                      initialize!::Function = _1(kwargs...) = nothing,
-                   update_state!::Function = _2(kwargs...) = nothing,
-                       # is_better(a, b)  = true if x is better that y 
-                       is_better::Function = _5(kwargs...) = false,
-                   stop_criteria::Function = stop_check,
-                    final_stage!::Function = _4(kwargs...) = nothing,
-                     information::Information = Information(),
-                         options::Options  = Options())
-    
+function Algorithm(
+    parameters;
+    initial_state::State = State(nothing, []),
+    initialize!::Function = _1(kwargs...) = nothing,
+    update_state!::Function = _2(kwargs...) = nothing,
+    # is_better(a, b)  = true if x is better that y
+    is_better::Function = _5(kwargs...) = false,
+    stop_criteria::Function = stop_check,
+    final_stage!::Function = _4(kwargs...) = nothing,
+    information::Information = Information(),
+    options::Options = Options(),
+)
 
-    engine = Engine(initialize!,
-                update_state!,
-                is_better,
-                stop_criteria,
-                final_stage!)
 
-    Algorithm(  parameters,
-                initial_state,
-                information,
-                options,
-                engine)
+    engine = Engine(
+        initialize!,
+        update_state!,
+        is_better,
+        stop_criteria,
+        final_stage!,
+    )
+
+    Algorithm(parameters, initial_state, information, options, engine)
 
 end
 
 
 struct Problem
     f::Function
-    bounds::Array{Float64, 2}
+    bounds::Array{Float64,2}
     g::Array{Function}
     h::Array{Function}
     type::Symbol
 end
 
-function Problem(
-                f::Function,
-                bounds::Array,
-                g = Function[],
-                h = Function[])
+function Problem(f::Function, bounds::Array, g = Function[], h = Function[])
 
     type::Symbol = :constrained
 
@@ -221,125 +216,6 @@ function Problem(
     else
         type = :constrained
     end
-    
+
     Problem(f, bounds, g, h, type)
-end
-
-
-mutable struct ECA <: AbstractAlgorithm
-            η_max::Float64
-                K::Int
-                N::Int
-                N_init::Int
-        p_exploit::Float64
-            p_bin::Float64
-                ε::Float64
-             p_cr::Array{Float64}
-         adaptive::Bool
-     resize_population::Bool
-end
-
-function ECA(;η_max::Float64 = 2.0,
-                 K::Int = 7,
-                 N::Int = 0,
-                 N_init::Int = N,
-         p_exploit::Float64 = 0.95,
-             p_bin::Float64 = 0.02,
-                ε::Float64 = 0.0,
-             p_cr::Array{Float64} = Float64[],
-          adaptive::Bool = false,
-     resize_population::Bool = false,
-     information = Information(),
-     options = Options()
-     )
-
-
-    N_init = N
-
-
-    parameters = ECA(η_max, K, N, N_init, p_exploit, p_bin, ε, p_cr, adaptive, resize_population)
-    Algorithm(
-        parameters,
-        initialize! = initialize_eca!,
-        update_state! = update_state_eca!,
-        is_better = is_better_eca ,
-        stop_criteria = stop_check ,
-        final_stage! = final_stage_eca!,
-        information = information,
-        options = options
-        )
-
-end
-
-
-mutable struct DE
-    N::Int 
-    F::Float64
-    CR::Float64
-    CR_min::Float64
-    CR_max::Float64
-    F_min::Float64
-    F_max::Float64
-    strategy::Symbol 
-end
-
-function DE(;N::Int = 0,
-            F = 1.0,
-           CR = 0.9,
-       CR_min = CR,
-       CR_max = CR,
-        F_min =F,
-        F_max =F,
-     strategy::Symbol = :rand1,
-     information = Information(),
-     options = Options())
- 
-
-     parameters = DE(N,promote(F,CR,CR_min,CR_max,F_min,F_max)...,strategy)
-
-    Algorithm(
-        parameters,
-        initialize! = initialize_de!,
-        update_state! = update_state_de!,
-        is_better = is_better ,
-        stop_criteria = stop_check ,
-        final_stage! = final_stage_de!,
-        information = information,
-        options = options
-        )
-
-end
-
-
-mutable struct PSO
-    N::Int
-    C1::Float64
-    C2::Float64
-    ω::Float64
-    v::Array{Float64} # velocity
-    flock::Array{xf_indiv}
-end
-
-function PSO(;N::Int = 0,
-            C1 = 2.0,
-            C2 = 2.0,
-            ω = 0.8,
-            v = Float64[],
-            flock = xf_indiv[],
-            information = Information(),
-            options = Options()
-             )
-
-    parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
-
-    Algorithm(
-        parameters,
-        initialize! = initialize_pso!,
-        update_state! = update_state_pso!,
-        is_better = is_better ,
-        stop_criteria = stop_check ,
-        final_stage! = final_stage_pso!,
-        information = information,
-        options = options
-        )
 end
