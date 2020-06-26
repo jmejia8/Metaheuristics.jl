@@ -1,23 +1,80 @@
 
+mutable struct ECA <: AbstractAlgorithm
+    η_max::Float64
+    K::Int
+    N::Int
+    N_init::Int
+    p_exploit::Float64
+    p_bin::Float64
+    ε::Float64
+    p_cr::Array{Float64}
+    adaptive::Bool
+    resize_population::Bool
+end
+
+function ECA(;
+    η_max::Float64 = 2.0,
+    K::Int = 7,
+    N::Int = 0,
+    N_init::Int = N,
+    p_exploit::Float64 = 0.95,
+    p_bin::Float64 = 0.02,
+    ε::Float64 = 0.0,
+    p_cr::Array{Float64} = Float64[],
+    adaptive::Bool = false,
+    resize_population::Bool = false,
+    information = Information(),
+    options = Options(),
+)
+
+
+    N_init = N
+
+
+    parameters = ECA(
+        η_max,
+        K,
+        N,
+        N_init,
+        p_exploit,
+        p_bin,
+        ε,
+        p_cr,
+        adaptive,
+        resize_population,
+    )
+    Algorithm(
+        parameters,
+        initialize! = initialize_eca!,
+        update_state! = update_state_eca!,
+        is_better = is_better_eca,
+        stop_criteria = stop_check,
+        final_stage! = final_stage_eca!,
+        information = information,
+        options = options,
+    )
+
+end
+
 function fitnessToMass(fitness::Vector{Float64}, searchType::Symbol)
     m = minimum(fitness)
-    
+
     if m < 0
-        fitness = 2abs(m) .+ fitness
+        fitness = 2 * abs(m) .+ fitness
     end
 
     if searchType == :minimize
-        fitness = 2maximum(fitness) .- fitness
+        fitness = 2 * maximum(fitness) .- fitness
     end
 
     return fitness
 end
 
-function getMass(U::Array{xf_indiv, 1}, searchType::Symbol; kargs...)
+function getMass(U::Array{xf_indiv,1}, searchType::Symbol; kargs...)
     n, d = length(U), length(U[1].x)
 
     fitness = zeros(Float64, n)
-    
+
     for i = 1:n
         fitness[i] = U[i].f
     end
@@ -25,16 +82,16 @@ function getMass(U::Array{xf_indiv, 1}, searchType::Symbol; kargs...)
     return fitnessToMass(fitness, searchType)
 end
 
-function getMass(U::Array{xfg_indiv, 1}, searchType; kargs...)
+function getMass(U::Array{xfg_indiv,1}, searchType; kargs...)
     return getMass(U, searchType)
-    
+
 end
 
-function getMass(U::Array{xfgh_indiv, 1}, searchType; ε=0.0)
+function getMass(U::Array{xfgh_indiv,1}, searchType; ε = 0.0)
     n, d = length(U), length(U[1].x)
 
     fitness = zeros(Float64, n)
-    
+
     for i = 1:n
         v = violationsSum(U[i].g, U[i].h; ε = ε)
         if v > 0.0
@@ -52,7 +109,7 @@ function center(U, mass)
     d = length(U[1].x)
 
     c = zeros(Float64, d)
-    
+
     for i = 1:length(mass)
         c += mass[i] .* U[i].x
     end
@@ -63,23 +120,29 @@ end
 function center(U::Array, searchType::Symbol; ε = 0.0)
     n = length(U)
 
-    mass = getMass(U, searchType; ε=ε)
+    mass = getMass(U, searchType; ε = ε)
 
-    return center(U, mass), getWorstInd(U, searchType), getBestInd(U, searchType)
+    return center(U, mass),
+    getWorstInd(U, searchType),
+    getBestInd(U, searchType)
 end
 
 function getU(P::Array, K::Int, I::Vector{Int}, i::Int, N::Int)
-    if i <= N-K
+    if i <= N - K
         U_ids = I[i:K+i]
     else
         j = (i:K+i) .% N
-        U_ids = I[j .+ 1]
+        U_ids = I[j.+1]
     end
 
     return P[U_ids]
 end
 
-function crossover(x::Vector{Float64}, y::Vector{Float64}, p_cr::Vector{Float64})
+function crossover(
+    x::Vector{Float64},
+    y::Vector{Float64},
+    p_cr::Vector{Float64},
+)
     D = length(x)
     tmp2 = zeros(D)
     for j = 1:D
@@ -97,7 +160,7 @@ function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
 
     for i = 1:length(p_cr)
         if M[i] > 0.3
-            pn = abs(p_best .+ 0.3randn())
+            pn = abs(p_best .+ 0.3 * randn())
             if pn > 1.0
                 pn = 1.0
             end
@@ -112,7 +175,7 @@ function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
     return p_cr
 end
 
-function resizePop!(P::Array, N_new::Int, K::Int; is_better=is_better)
+function resizePop!(P::Array, N_new::Int, K::Int; is_better = is_better)
     N = length(P)
 
     if N == N_new
@@ -124,11 +187,19 @@ function resizePop!(P::Array, N_new::Int, K::Int; is_better=is_better)
         f[i] = P[i].f
     end
 
-    ids = sortperm(P, lt=is_better)[1:N_new]
+    ids = sortperm(P, lt = is_better)[1:N_new]
     return P[ids]
 end
 
-function update_state_eca!(problem, engine, parameters, status, information, options, iteration)
+function update_state_eca!(
+    problem,
+    engine,
+    parameters,
+    status,
+    information,
+    options,
+    iteration,
+)
     K = parameters.K
     I = randperm(parameters.N)
     D = size(problem.bounds, 2)
@@ -136,11 +207,11 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
     parameters.adaptive && (Mcr_fail = zeros(D))
 
     stop = false
-    a = problem.bounds[1,:]
-    b = problem.bounds[2,:]
+    a = problem.bounds[1, :]
+    b = problem.bounds[2, :]
 
     # For each elements in Population
-    for i in 1:parameters.N
+    for i = 1:parameters.N
         p = status.f_calls / options.f_calls_limit
 
         if parameters.ε > 0
@@ -155,7 +226,7 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
 
         # generate U masses
         U = getU(status.population, parameters.K, I, i, parameters.N)
-        
+
         # generate center of mass
         c, u_worst, u_best = center(U, :minimize, ε = ε)
 
@@ -169,11 +240,13 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
         if p < parameters.p_exploit
             # u: worst element in U
             u = U[u_worst].x
-            
+
             # current-to-center/bin
             y = x .+ η .* (c .- u)
         elseif parameters.p_exploit < 0
-            y = x .+ (1-p^5)* η * (c .- u) .+ (p^5) * η * (status.best_sol.x .- c)
+            y =
+                x .+ (1 - p^5) * η * (c .- u) .+
+                (p^5) * η * (status.best_sol.x .- c)
         else
             # current-to-best/bin
             y = x .+ η .* (status.best_sol.x .- c)
@@ -198,8 +271,8 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
         elseif parameters.adaptive
             Mcr_fail += M_current
         end
-        
-        status.stop = engine.stop_criteria(status, information, options) 
+
+        status.stop = engine.stop_criteria(status, information, options)
         status.stop && break
     end
 
@@ -208,7 +281,8 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
     end
 
     if parameters.adaptive
-        parameters.p_cr = adaptCrossover(parameters.p_cr, Mcr_fail/parameters.N)
+        parameters.p_cr =
+            adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N)
     end
 
     # if saveConvergence != ""
@@ -216,53 +290,63 @@ function update_state_eca!(problem, engine, parameters, status, information, opt
     # end
 
     p = status.f_calls / options.f_calls_limit
-    
+
     if parameters.resize_population
         K = parameters.K
 
         # new size
-        parameters.N = 2K .+ round(Int, (1 - p ) * (parameters.N_init .- 2K))
+        parameters.N = 2K .+ round(Int, (1 - p) * (parameters.N_init .- 2K))
 
         if parameters.N < 2K
             parameters.N = 2K
         end
 
-        status.population = resizePop!(status.population,
-                                            parameters.N,
-                                                        K,
-                                            (a, b) -> engine.is_better(a,b,ε=ε))
+        status.population = resizePop!(
+            status.population,
+            parameters.N,
+            K,
+            (a, b) -> engine.is_better(a, b, ε = ε),
+        )
     end
 end
 
 
-function initialize_eca!(problem,engine,parameters,status,information,options)
+function initialize_eca!(
+    problem,
+    engine,
+    parameters,
+    status,
+    information,
+    options,
+)
     D = size(problem.bounds, 2)
 
 
     if parameters.N <= parameters.K
-        parameters.N = parameters.K*D
+        parameters.N = parameters.K * D
     end
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
-        options.debug &&  @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        options.debug &&
+            @warn( "f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    initialize!(problem,engine,parameters,status,information,options)
+    initialize!(problem, engine, parameters, status, information, options)
 
     N_init = parameters.N
-    
+
 
     if parameters.adaptive
         parameters.p_cr = rand(D)
     else
         parameters.p_cr = parameters.p_bin .* ones(D)
     end
-    
+
 end
 
 function final_stage_eca!(status, information, options)
@@ -272,7 +356,7 @@ function final_stage_eca!(status, information, options)
     #     for i = 1:N
     #         push!(o, Population[i].x)
     #     end
-    #     writecsv(saveLast, o)        
+    #     writecsv(saveLast, o)
     # end
 
     # if saveConvergence != ""
@@ -281,17 +365,29 @@ function final_stage_eca!(status, information, options)
 end
 
 
-is_better_eca(New::xf_indiv, Old::xf_indiv; searchType =:minimize, leq =false, kargs...) = New.f < Old.f
+is_better_eca(
+    New::xf_indiv,
+    Old::xf_indiv;
+    searchType = :minimize,
+    leq = false,
+    kargs...,
+) = New.f < Old.f
 
 
-function is_better_eca(New::xfgh_indiv, Old::xfgh_indiv; searchType =:minimize, leq =false, ε = 0.0)
+function is_better_eca(
+    New::xfgh_indiv,
+    Old::xfgh_indiv;
+    searchType = :minimize,
+    leq = false,
+    ε = 0.0,
+)
 
     old_vio = violationsSum(Old.g, Old.h, ε = ε)
     new_vio = violationsSum(New.g, New.h, ε = ε)
 
-    if new_vio < old_vio 
+    if new_vio < old_vio
         return true
-    elseif new_vio > old_vio 
+    elseif new_vio > old_vio
         return false
     end
 
@@ -301,11 +397,10 @@ function is_better_eca(New::xfgh_indiv, Old::xfgh_indiv; searchType =:minimize, 
         end
         return New.f < Old.f
     end
-    
+
     if leq
         return New.f >= Old.f
     end
-    
+
     return New.f > Old.f
 end
-

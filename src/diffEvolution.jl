@@ -1,4 +1,54 @@
-function update_state_de!(problem, engine, parameters, status, information, options, iteration)
+mutable struct DE
+    N::Int
+    F::Float64
+    CR::Float64
+    CR_min::Float64
+    CR_max::Float64
+    F_min::Float64
+    F_max::Float64
+    strategy::Symbol
+end
+
+function DE(;
+    N::Int = 0,
+    F = 1.0,
+    CR = 0.9,
+    CR_min = CR,
+    CR_max = CR,
+    F_min = F,
+    F_max = F,
+    strategy::Symbol = :rand1,
+    information = Information(),
+    options = Options(),
+)
+
+
+    parameters =
+        DE(N, promote(F, CR, CR_min, CR_max, F_min, F_max)..., strategy)
+
+    Algorithm(
+        parameters,
+        initialize! = initialize_de!,
+        update_state! = update_state_de!,
+        is_better = is_better,
+        stop_criteria = stop_check,
+        final_stage! = final_stage_de!,
+        information = information,
+        options = options,
+    )
+
+end
+
+
+function update_state_de!(
+    problem,
+    engine,
+    parameters,
+    status,
+    information,
+    options,
+    iteration,
+)
     population = status.population
     currentPop = copy(population)
 
@@ -9,24 +59,25 @@ function update_state_de!(problem, engine, parameters, status, information, opti
 
     # stepsize
     if parameters.F_min < parameters.F_max
-        F = parameters.F_min + (F_max - parameters.F_min ) * rand()
+        F = parameters.F_min + (F_max - parameters.F_min) * rand()
     end
 
     if parameters.CR_min < parameters.CR_max
-       CR = parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand()
+        CR =
+            parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand()
     end
 
     N = parameters.N
     strategy = parameters.strategy
 
-    la = problem.bounds[1,:]
-    lb = problem.bounds[2,:]
+    la = problem.bounds[1, :]
+    lb = problem.bounds[2, :]
 
     D = length(la)
 
     xBest = status.best_sol.x
 
-    for i in 1:N
+    for i = 1:N
 
         # select participats
         r1 = rand(1:N)
@@ -52,10 +103,10 @@ function update_state_de!(problem, engine, parameters, status, information, opti
         # strategy is selected here
         if strategy == :rand1
             # DE/rand/1
-            u = a + F*(b - c)
+            u = a + F * (b - c)
         elseif strategy == :best1
             # DE/best/1
-            u = xBest + F*(b - c)
+            u = xBest + F * (b - c)
         elseif strategy == :rand2
             # DE/rand/2
 
@@ -71,11 +122,11 @@ function update_state_de!(problem, engine, parameters, status, information, opti
 
             d = currentPop[r4].x
             ee = currentPop[r5].x
-            
-            u = ee + F*(a - b + c - d)
+
+            u = ee + F * (a - b + c - d)
         elseif strategy == :randToBest1
             # DE/rand-to-best/1
-            u = x + F*(xBest - x + a - b)
+            u = x + F * (xBest - x + a - b)
         elseif strategy == :best2
             # DE/best/2
             r4 = rand(1:N)
@@ -83,7 +134,7 @@ function update_state_de!(problem, engine, parameters, status, information, opti
                 r4 = rand(1:N)
             end
             d = currentPop[r4].x
-            u = xBest + F*(a - b + c - d)                
+            u = xBest + F * (a - b + c - d)
         else
             @error("Unknown strategy $(strategy)")
         end
@@ -132,30 +183,39 @@ function update_state_de!(problem, engine, parameters, status, information, opti
 
 end
 
-function initialize_de!(problem,engine,parameters,status,information,options)
+function initialize_de!(
+    problem,
+    engine,
+    parameters,
+    status,
+    information,
+    options,
+)
     D = size(problem.bounds, 2)
 
 
 
     if parameters.N <= 5
-        parameters.N = 10*D
+        parameters.N = 10 * D
     end
 
     if parameters.CR < 0 || parameters.CR > 1
-        parameters.CR = 0.5;
-        options.debug && @warn("CR should be from interval [0,1]; set to default value 0.5")
+        parameters.CR = 0.5
+        options.debug &&
+            @warn("CR should be from interval [0,1]; set to default value 0.5")
     end
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
-        options.debug &&  @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        options.debug &&
+            @warn( "f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    initialize!(problem,engine,parameters,status,information,options)
+    initialize!(problem, engine, parameters, status, information, options)
 
 end
 
