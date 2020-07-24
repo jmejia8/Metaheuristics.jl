@@ -37,4 +37,3 @@ end
     test_result(result, fitness, D, 1e-5)
 
 end
-
