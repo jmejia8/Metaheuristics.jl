@@ -17,7 +17,7 @@ function correctSol(y::Vector{Float64}, a::Vector{Float64}, b::Vector{Float64})
             y[i] = a[i] + (b[i] - a[i])*rand()
         end
     end
-    
+
     return y
 end
 
@@ -29,7 +29,7 @@ function correct(y::Vector{Float64}, c, a::Vector{Float64}, b::Vector{Float64})
             y[i] = c[i]
         end
     end
-    
+
     return y
 end
 
@@ -75,7 +75,7 @@ end
 
 function initializePop(func::Function, N::Int, D::Int, a::Vector{Float64}, b::Vector{Float64}, initType::Symbol=:uniform)
     X = initializePop(N, D, a, b, initType)
-    
+
     # infers datatype
     x = X[1,:]
     child = generateChild(x, func(x))
@@ -140,10 +140,10 @@ end
 function getBest(fitness::Vector{Float64}, searchType::Symbol = :minimize)
     if searchType == :minimize
         best_X = indmin(fitness) # minimization.
-        best = fitness[best_X] 
+        best = fitness[best_X]
     else
         best_X = indmax(fitness) # maximization.
-        best = fitness[best_X] 
+        best = fitness[best_X]
     end
 
     return best_X, best
@@ -163,27 +163,23 @@ function Selection(fOld::Individual_, fNew::Individual_, searchType::Symbol)
     if searchType == :minimize
         return fNew.f < fOld.f
     end
-    
+
     return fNew.f > fOld.f
 end
 
 # COP functions
 function violationsSum(g::Vector, h::Vector; ε =0.0)
-    sum_g = 0
-    sum_h = 0
+    sum_g = sum(max.(0.0, g))
+    sum_h = 0.0
 
-    for i = 1:length(g)
-        if g[i] > 0
-            sum_g += g[i]  end
-    end
 
     for i = 1:length(h)
-        if ≈(h[i], 0.0, atol=ε)
+        if !isapprox(h[i], 0.0, atol=ε)
             sum_h += abs(h[i])
         end
     end
 
-    return (sum_g/length(g)) + (sum_h / length(h)) 
+    return (sum_g/length(g)) + (sum_h / length(h))
 end
 
 # for Deb rules
@@ -208,7 +204,7 @@ function printResults(best::xf_indiv, P, t, nevals)
     println("| Generations = $t")
     println("| Evals       = ", nevals)
     @printf("| best f.     = %e\n", best.f)
-    
+
 end
 
 function printResults(best::xfg_indiv, P, t, nevals)
@@ -216,7 +212,7 @@ function printResults(best::xfg_indiv, P, t, nevals)
     println("| Evals       = ", nevals)
     @printf("| best f.     = %e\n", best.f)
     @printf("| No. vio. g. = %i\n", countViolations(best.g,[]))
-    
+
 end
 
 
@@ -225,7 +221,7 @@ function printResults(best::xfgh_indiv, P, t, nevals)
     println("| Evals       = ", nevals)
     @printf("| best f.     = %e\n", best.f)
     @printf("| No. vios.   = %i\n", countViolations(best.g, best.h))
-    
+
 end
 
 function isfeasible(element::xf_indiv)

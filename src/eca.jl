@@ -378,7 +378,6 @@ function is_better_eca(
     New::xfgh_indiv,
     Old::xfgh_indiv;
     searchType = :minimize,
-    leq = false,
     ε = 0.0,
 )
 
@@ -392,15 +391,9 @@ function is_better_eca(
     end
 
     if searchType == :minimize
-        if leq
-            return New.f <= Old.f
-        end
         return New.f < Old.f
     end
 
-    if leq
-        return New.f >= Old.f
-    end
 
     return New.f > Old.f
 end
