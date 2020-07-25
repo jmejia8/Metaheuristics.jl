@@ -221,12 +221,18 @@ function update_state_eca!(
     K = parameters.K
     I = randperm(parameters.N)
     D = size(problem.bounds, 2)
+    is_multiobjective = typeof(status.population[1]) == xFgh_indiv
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
     stop = false
     a = problem.bounds[1, :]
     b = problem.bounds[2, :]
+    ε = 0.0
+
+    if is_multiobjective
+        shuffle!(status.population)
+    end
 
     # For each elements in Population
     for i = 1:parameters.N
@@ -286,8 +292,11 @@ function update_state_eca!(
             if engine.is_better(sol, status.best_sol, ε = ε)
                 status.best_sol = sol
             end
-        elseif parameters.adaptive
-            Mcr_fail += M_current
+        else
+            if is_multiobjective && !engine.is_better(status.population[i], sol, ε = ε)
+                push!(status.population, sol)
+            end
+            parameters.adaptive && (Mcr_fail += M_current)
         end
 
         status.stop = engine.stop_criteria(status, information, options)
@@ -303,9 +312,9 @@ function update_state_eca!(
             adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N)
     end
 
-    # if saveConvergence != ""
-    #     push!(convergence, [status.f_calls best.f])
-    # end
+    if is_multiobjective && length(status.population) > parameters.N
+        status.population = truncate_population!(status.population, parameters.N, (w,z) -> engine.is_better(w, z, ε = ε))
+    end
 
     p = status.f_calls / options.f_calls_limit
 
@@ -434,16 +443,16 @@ function is_better_eca(
     end
 
     if searchType == :minimize
-        for i in length(Old.f)
-            if Old.f[i] < Old.f[i]
+        for i in 1:length(Old.f)
+            if Old.f[i] < New.f[i]
                 return false
             end
         end
         return true
     end
 
-    for i in length(Old.f)
-        if Old.f[i] > Old.f[i]
+    for i in 1:length(Old.f)
+        if Old.f[i] > New.f[i]
             return false
         end
     end

@@ -24,7 +24,11 @@ mutable struct xFgh_indiv # Single Objective Constraied
     f::Vector{Float64}
     g::Vector{Float64}
     h::Vector{Float64}
+    rank::Int
+    crowding::Float64
 end
+
+xFgh_indiv(x::Vector{Float64}, f::Vector{Float64}, g::Vector{Float64}, h::Vector{Float64}; rank = 0, crowding = 0) = xFgh_indiv(x, f, g, h, Int(rank), crowding)
 
 mutable struct State
     best_sol::Any

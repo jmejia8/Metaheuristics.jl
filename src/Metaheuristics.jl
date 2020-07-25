@@ -15,6 +15,7 @@ include("operators.jl")
 include("display.jl")
 include("algorithm.jl")
 include("tools.jl")
+include("multi-objective-functions.jl")
 
 include("optimize.jl")
 
@@ -39,8 +40,8 @@ include("GOA.jl")
 # E Rashedi, H Nezamabadi-Pour, S Saryazdi - Information sciences, 2009
 include("GSA.jl")
 
-# Mirjalili, Seyedali, and Amir H. Gandomi. 
-# "Chaotic gravitational constants for the gravitational search algorithm." 
+# Mirjalili, Seyedali, and Amir H. Gandomi.
+# "Chaotic gravitational constants for the gravitational search algorithm."
 # Applied Soft Computing 53 (2017): 407-419.
 include("CGSA.jl")
 
@@ -49,8 +50,8 @@ include("CGSA.jl")
 # Simulated Annealing. _Science, 220_, 671-680.
 include("SA.jl")
 
-# Li, Zhenhua, and Qingfu Zhang. 
-# "An efficient rank-1 update for Cholesky CMA-ES using auxiliary evolution path." 
+# Li, Zhenhua, and Qingfu Zhang.
+# "An efficient rank-1 update for Cholesky CMA-ES using auxiliary evolution path."
 # Evolutionary Computation (CEC), 2017 IEEE Congress on. IEEE, 2017.
 include("CMAES_AEP.jl")
 
