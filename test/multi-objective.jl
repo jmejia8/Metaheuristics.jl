@@ -36,11 +36,11 @@ end
     result = status.best_sol.x
     fitness = status.best_sol.f
 
-    print("[")
-    for s in status.population
-        print( s.f[1], " ", s.f[2], ";")
-    end
-    println("]")
+    # print("[")
+    # for s in status.population
+    #     print( s.f[1], " ", s.f[2], ";")
+    # end
+    # println("]")
 
     @test true
 
