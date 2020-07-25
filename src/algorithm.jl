@@ -13,8 +13,8 @@ function initialize!(problem,engine,parameters,status,information,options)
     status.iteration = 0
 
     # best solution
-    status.best_sol = getBest(Population, :minimize)
+    status.best_sol = getBest(Population, :minimize, engine.is_better)
 
     status.stop = engine.stop_criteria(status, information, options)
-    
+
 end

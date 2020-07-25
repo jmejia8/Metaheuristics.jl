@@ -13,7 +13,8 @@ end
             "sphere.jl",
             "discus.jl",
             "rastrigin.jl",
-            "constrained.jl"
+            "constrained.jl",
+            "multi-objective.jl"
 ]
     include(tests)
 end

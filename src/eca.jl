@@ -105,6 +105,24 @@ function getMass(U::Array{xfgh_indiv,1}, searchType; ε = 0.0)
 
 end
 
+function getMass(U::Array{xFgh_indiv,1}, searchType; ε = 0.0)
+    n, d = length(U), length(U[1].x)
+
+    fitness = zeros(Float64, n)
+
+    for i = 1:n
+        v = violationsSum(U[i].g, U[i].h; ε = ε)
+        if v > 0.0
+            fitness[i] = v
+        else
+            fitness[i] = sum(U[i].f)
+        end
+    end
+
+    return fitnessToMass(fitness, searchType)
+
+end
+
 function center(U, mass)
     d = length(U[1].x)
 
@@ -123,8 +141,8 @@ function center(U::Array, searchType::Symbol; ε = 0.0)
     mass = getMass(U, searchType; ε = ε)
 
     return center(U, mass),
-    getWorstInd(U, searchType),
-    getBestInd(U, searchType)
+    getWorstInd(U, searchType, is_better_eca),
+    getBestInd(U, searchType, is_better_eca)
 end
 
 function getU(P::Array, K::Int, I::Vector{Int}, i::Int, N::Int)
@@ -263,7 +281,7 @@ function update_state_eca!(
 
         # replace worst element
         if engine.is_better(sol, status.population[i], ε = ε)
-            wi = getWorstInd(status.population, :minimize, engine.is_better)
+            wi = getWorstInd(status.population, :minimize, (w,z) -> engine.is_better(w, z, ε = ε))
             status.population[wi] = sol
             if engine.is_better(sol, status.best_sol, ε = ε)
                 status.best_sol = sol
@@ -396,4 +414,39 @@ function is_better_eca(
 
 
     return New.f > Old.f
+end
+
+
+function is_better_eca(
+    New::xFgh_indiv,
+    Old::xFgh_indiv;
+    searchType = :minimize,
+    ε = 0.0,
+)
+
+    old_vio = violationsSum(Old.g, Old.h, ε = ε)
+    new_vio = violationsSum(New.g, New.h, ε = ε)
+
+    if new_vio < old_vio
+        return true
+    elseif new_vio > old_vio
+        return false
+    end
+
+    if searchType == :minimize
+        for i in length(Old.f)
+            if Old.f[i] < Old.f[i]
+                return false
+            end
+        end
+        return true
+    end
+
+    for i in length(Old.f)
+        if Old.f[i] > Old.f[i]
+            return false
+        end
+    end
+
+    return true
 end
