@@ -17,6 +17,22 @@ mutable struct xfgh_indiv # Single Objective Constraied
     f::Float64
     g::Vector{Float64}
     h::Vector{Float64}
+    sum_violations::Float64 # ∑ max(0,g) + ∑|h|
+
+end
+
+function xfgh_indiv(
+    x::Vector{Float64},
+    f::Float64,
+    g::Vector{Float64},
+    h::Vector{Float64};
+    sum_violations = 0
+)
+    if sum_violations < 0
+        sum_violations = violationsSum(g, h)
+    end
+
+    xfgh_indiv(x, f, g, h, sum_violations)
 end
 
 mutable struct xFgh_indiv # Single Objective Constraied
@@ -26,9 +42,24 @@ mutable struct xFgh_indiv # Single Objective Constraied
     h::Vector{Float64}
     rank::Int
     crowding::Float64
+    sum_violations::Float64 # ∑ max(0,g) + ∑|h|
 end
 
-xFgh_indiv(x::Vector{Float64}, f::Vector{Float64}, g::Vector{Float64}, h::Vector{Float64}; rank = 0, crowding = 0) = xFgh_indiv(x, f, g, h, Int(rank), crowding)
+function xFgh_indiv(
+    x::Vector{Float64},
+    f::Vector{Float64},
+    g::Vector{Float64},
+    h::Vector{Float64};
+    rank = 0,
+    crowding = 0.0,
+    sum_violations = 0.0
+)
+
+    if sum_violations < 0
+        sum_violations = violationsSum(g, h)
+    end
+    xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations)
+end
 
 mutable struct State
     best_sol::Any

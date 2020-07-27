@@ -93,7 +93,7 @@ function getMass(U::Array{xfgh_indiv,1}, searchType; ε = 0.0)
     fitness = zeros(Float64, n)
 
     for i = 1:n
-        v = violationsSum(U[i].g, U[i].h; ε = ε)
+        v = U[i].sum_violations
         if v > 0.0
             fitness[i] = v
         else
@@ -111,7 +111,7 @@ function getMass(U::Array{xFgh_indiv,1}, searchType; ε = 0.0)
     fitness = zeros(Float64, n)
 
     for i = 1:n
-        v = violationsSum(U[i].g, U[i].h; ε = ε)
+        v = U[i].sum_violations
         if v > 0.0
             fitness[i] = v
         else
@@ -252,7 +252,7 @@ function update_state_eca!(
         U = getU(status.population, parameters.K, I, i, parameters.N)
 
         # generate center of mass
-        c, u_worst, u_best = center(U, :minimize, ε = ε)
+        c, u_worst, u_best = center(U, :minimize)
 
         # stepsize
         η = parameters.η_max * rand()
@@ -282,18 +282,21 @@ function update_state_eca!(
         y = correct(y, c, a, b)
 
         sol = generateChild(y, problem.f(y))
+        if ε > 0.0
+            sol.sum_violations = violationsSum(sol.g, sol.h, ε = ε)
+        end
 
         status.f_calls += 1
 
         # replace worst element
-        if engine.is_better(sol, status.population[i], ε = ε)
-            wi = getWorstInd(status.population, :minimize, (w,z) -> engine.is_better(w, z, ε = ε))
+        if engine.is_better(sol, status.population[i])
+            wi = getWorstInd(status.population, :minimize, (w,z) -> engine.is_better(w, z))
             status.population[wi] = sol
-            if engine.is_better(sol, status.best_sol, ε = ε)
+            if engine.is_better(sol, status.best_sol)
                 status.best_sol = sol
             end
         else
-            if is_multiobjective && !engine.is_better(status.population[i], sol, ε = ε)
+            if is_multiobjective && !engine.is_better(status.population[i], sol)
                 push!(status.population, sol)
             end
             parameters.adaptive && (Mcr_fail += M_current)
@@ -313,7 +316,7 @@ function update_state_eca!(
     end
 
     if is_multiobjective && length(status.population) > parameters.N
-        status.population = truncate_population!(status.population, parameters.N, (w,z) -> engine.is_better(w, z, ε = ε))
+        status.population = truncate_population!(status.population, parameters.N, (w,z) -> engine.is_better(w, z))
     end
 
     p = status.f_calls / options.f_calls_limit
@@ -332,7 +335,7 @@ function update_state_eca!(
             status.population,
             parameters.N,
             K,
-            (a, b) -> engine.is_better(a, b, ε = ε),
+            (a, b) -> engine.is_better(a, b),
         )
     end
 end
@@ -399,12 +402,11 @@ is_better_eca(
 function is_better_eca(
     New::xfgh_indiv,
     Old::xfgh_indiv;
-    searchType = :minimize,
-    ε = 0.0,
+    searchType = :minimize
 )
 
-    old_vio = violationsSum(Old.g, Old.h, ε = ε)
-    new_vio = violationsSum(New.g, New.h, ε = ε)
+    old_vio = Old.sum_violations
+    new_vio = New.sum_violations
 
     if new_vio < old_vio
         return true
@@ -428,8 +430,8 @@ function is_better_eca(
     ε = 0.0,
 )
 
-    old_vio = violationsSum(Old.g, Old.h, ε = ε)
-    new_vio = violationsSum(New.g, New.h, ε = ε)
+    old_vio = Old.sum_violations
+    new_vio = New.sum_violations
 
     if new_vio < old_vio
         return true
