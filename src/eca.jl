@@ -378,17 +378,12 @@ end
 
 function final_stage_eca!(status, information, options)
     status.final_time = time()
-    # if saveLast != ""
-    #     o = []
-    #     for i = 1:N
-    #         push!(o, Population[i].x)
-    #     end
-    #     writecsv(saveLast, o)
-    # end
 
-    # if saveConvergence != ""
-    #     writecsv(saveConvergence, convergence)
-    # end
+    # compute Pareto front if it is a multiobjective problem
+    if typeof(status.population[1].f) <: Array
+        options.debug && @info "Computing Pareto front..."
+        status.best_sol = get_pareto_front(status.population, is_better_eca)
+    end
 end
 
 

@@ -117,6 +117,30 @@ function getBestInd(Population, searchType::Symbol = :minimize, is_better = is_b
     return j
 end
 
+function get_pareto_front(Population, is_better = is_better)
+    ids = (Int[])
+    n = length(Population)
+
+    for i in 1:n
+        s = true
+        for j in 1:n
+            i == j && continue
+
+            if is_better(Population[j], Population[i])
+                s = false
+                break
+            end
+        end
+
+        if s
+            push!(ids, i)
+        end
+    end
+
+    return view(Population, ids)
+
+end
+
 function generateChild(x::Vector{Float64}, fResult::Float64)
     return xf_indiv(x, fResult)
 end

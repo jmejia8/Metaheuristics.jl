@@ -33,11 +33,16 @@ end
 
     # ECA results
     status = optimize(ff, bounds, ECA(N = 100, ε = 1.0, options=Options(debug=false)))
-    result = status.best_sol.x
-    fitness = status.best_sol.f
+    result = status.best_sol
 
     # print("[")
     # for s in status.population
+    #     print( s.f[1], " ", s.f[2], ";")
+    # end
+    # println("]")
+
+    # print("[")
+    # for s in status.best_sol
     #     print( s.f[1], " ", s.f[2], ";")
     # end
     # println("]")
