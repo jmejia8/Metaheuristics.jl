@@ -1,7 +1,7 @@
 name = "Metaheuristics"
 uuid = "bcdb8e00-2c21-11e9-3065-2b553b22f898"
 authors = ["Jesus Mejia <jesusmejded@gmail.com>"]
-version = "2.0.2"
+version = "2.0.3"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
