@@ -222,6 +222,7 @@ function update_state_eca!(
     I = randperm(parameters.N)
     D = size(problem.bounds, 2)
     is_multiobjective = typeof(status.population[1]) == xFgh_indiv
+    is_constrained = typeof(status.population[1]) == xfgh_indiv || is_multiobjective
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
@@ -282,7 +283,7 @@ function update_state_eca!(
         y = correct(y, c, a, b)
 
         sol = generateChild(y, problem.f(y))
-        if ε > 0.0
+        if is_constrained #|| is_multiobjective
             sol.sum_violations = violationsSum(sol.g, sol.h, ε = ε)
         end
 
@@ -368,6 +369,12 @@ function initialize_eca!(
 
     initialize!(problem, engine, parameters, status, information, options)
 
+    indiv_type = typeof(status.population[1])
+    if indiv_type <: xfgh_indiv || indiv_type <: xFgh_indiv
+        for sol in status.population
+            sol.sum_violations = violationsSum(sol.g, sol.h, ε = parameters.ε)
+        end
+    end
     N_init = parameters.N
 
 
