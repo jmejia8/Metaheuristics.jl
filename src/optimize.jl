@@ -1,7 +1,23 @@
+"""
+    optimize(f::Function, bounds::Matrix{Float64}, method)
+
+Minimize a n-dimensional function `f` with domain `bounds` (2×n matrix) using `method = ECA()` by default.
+
+Example: Minimize f(x) = Σx² where x ∈ [-10, 10]^3. Solution:
+```
+f(x) = sum(x .^ 2)
+bounds = [  -10.0 -10 -10; # lower bounds
+             10.0  10 10 ] # upper bounds
+result = optimize(f, bounds)
+
+# minimizer
+@show result.best_sol.x
+```
+"""
 function optimize(
       f::Function, # objective function
       bounds::AbstractMatrix,
-      method::AbstractAlgorithm,
+      method::AbstractAlgorithm = ECA(),
 )
 
       problem = Problem(f, Array(bounds))
