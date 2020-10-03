@@ -1,38 +1,46 @@
 mutable struct MOEAD_DE
+    D::Int
+    nobjectives::Int
     N::Int
     F::Float64
     CR::Float64
-    F_max::Float64
-    λ::Matrix{Float64}
-    strategy::Symbol
+    λ::Array{Vector{Float64}}
+    η::Float64
+    p_m::Float64
+    H::Int
+    T::Int
+    δ::Float64
+    n_r::Float64
+    z::Vector{Float64}
+    B::Array{Vector{Int}}
 end
 
-function MOEAD_DE(;
-    N::Int = 300,
+function MOEAD_DE(D, nobjectives;
+    N::Int = 0,
     F = 0.5,
     CR = 1.0,
+    λ = Array{Vector{Float64}}[],
     η = 20,
-    p_m = 1.0 / n,
+    p_m = 1.0 / D,
     H = 299,
     T = 20,
     δ = 0.9,
     n_r = 2,
+    z::Vector{Float64} = fill(Inf, nobjectives),
     B = Array{Int}[],
-    strategy::Symbol = :rand1,
     information = Information(),
     options = Options(),
 )
 
 
-    parameters =
-        MOEAD_DE(N, promote(F, CR)..., strategy)
+    parameters = MOEAD_DE(D, nobjectives, N, promote(F, CR)..., λ, η,p_m, H, T, δ, n_r, z, B)
 
     Algorithm(
         parameters,
         initialize! = initialize_MOEAD_DE!,
         update_state! = update_state_MOEAD_DE!,
-        is_better = is_better,
-        stop_criteria = stop_check,
+        is_better = is_better_MOEAD_DE,
+        stop_criteria = stop_criteria_moead_de,
         final_stage! = final_stage_MOEAD_DE!,
         information = information,
         options = options,
@@ -43,7 +51,7 @@ end
 function initialize_weight_vectors!(parameters, problem)
     values = (0:parameters.H) ./ parameters.H
 
-    parameters.λ =  zeros(values, parameters.N, size(problem.bounds, 2))
+    parameters.λ =  [rand(values, parameters.nobjectives) for i in 1:parameters.N]
 end
 
 function initialize_closest_weight_vectors!(parameters, problem)
@@ -51,13 +59,34 @@ function initialize_closest_weight_vectors!(parameters, problem)
     λ = parameters.λ
     for i in 1:parameters.N
         for j in (i+1):parameters.N
-            distances[i, j] = norm(λ[i], λ[j])
+            distances[i, j] = norm(λ[i] - λ[j])
             distances[j, i] = distances[i, j]
         end
         I = sortperm(distances[i, :])
-        parameters.B[i] = I[2:parameters.T+1]
+        push!(parameters.B, I[2:parameters.T+1])
     end
 end
+
+function update_reference_point!(z::Vector{Float64}, F::Vector{Float64})
+    for i in 1:length(z)
+        if z[i] > F[i]
+            z[i] = F[i]
+        end
+    end
+end
+
+function update_reference_point!(z::Vector{Float64}, sol::xFgh_indiv)
+    update_reference_point!(z, sol.f)
+end
+
+function update_reference_point!(z::Vector{Float64}, population)
+    for sol in population
+        update_reference_point!(z, sol)
+    end
+end
+
+@inline g(fx, λ, z) = maximum(λ .* abs.(fx - z))
+
 function initialize_MOEAD_DE!(
     problem,
     engine,
@@ -71,28 +100,8 @@ function initialize_MOEAD_DE!(
     initialize_closest_weight_vectors!(parameters, problem)
 
 
-
-    if parameters.N <= 5
-        parameters.N = 10 * D
-    end
-
-    if parameters.CR < 0 || parameters.CR > 1
-        parameters.CR = 0.5
-        options.debug &&
-            @warn("CR should be from interval [0,1]; set to default value 0.5")
-    end
-
-    if options.f_calls_limit == 0
-        options.f_calls_limit = 10000D
-        options.debug &&
-            @warn( "f_calls_limit increased to $(options.f_calls_limit)")
-    end
-
-    if options.iterations == 0
-        options.iterations = div(options.f_calls_limit, parameters.N) + 1
-    end
-
     initialize!(problem, engine, parameters, status, information, options)
+    update_reference_point!(parameters.z, status.population)
 
 end
 
@@ -106,8 +115,9 @@ function update_state_MOEAD_DE!(
     options,
     iteration,
 )
-    population = status.population
-    currentPop = copy(population)
+
+
+
 
     F = parameters.F
     CR = parameters.CR
@@ -116,76 +126,41 @@ function update_state_MOEAD_DE!(
 
 
     N = parameters.N
-    strategy = parameters.strategy
 
     la = problem.bounds[1, :]
     lb = problem.bounds[2, :]
 
     D = length(la)
-
-    xBest = status.best_sol.x
+    population = status.population
 
     for i = 1:N
+        if rand() < parameters.δ
+            P_idx = copy(parameters.B[i])
+        else
+            P_idx = collect(1:N)
+        end
 
         # select participats
-        r1 = rand(1:N)
+        r1 = rand(P_idx)
         while r1 == i
-            r1 = rand(1:N)
+            r1 = rand(P_idx)
         end
 
-        r2 = rand(1:N)
+        r2 = rand(P_idx)
         while r2 == i || r1 == r2
-            r2 = rand(1:N)
+            r2 = rand(P_idx)
         end
 
-        r3 = rand(1:N)
+        r3 = rand(P_idx)
         while r3 == i || r3 == r1 || r3 == r2
-            r3 = rand(1:N)
+            r3 = rand(P_idx)
         end
 
-        x = currentPop[i].x
-        a = currentPop[r1].x
-        b = currentPop[r2].x
-        c = currentPop[r3].x
+        x = population[i].x
+        a = population[r1].x
+        b = population[r2].x
+        c = population[r3].x
 
-        # strategy is selected here
-        if strategy == :rand1
-            # DE/rand/1
-            u = a + F * (b - c)
-        elseif strategy == :best1
-            # DE/best/1
-            u = xBest + F * (b - c)
-        elseif strategy == :rand2
-            # DE/rand/2
-
-            r4 = rand(1:N)
-            while r4 == i || r4 == r1 || r4 == r2 || r4 == r3
-                r4 = rand(1:N)
-            end
-
-            r5 = rand(1:N)
-            while r5 == i || r5 == r1 || r5 == r2 || r5 == r3 || r5 == r4
-                r5 = rand(1:N)
-            end
-
-            d = currentPop[r4].x
-            ee = currentPop[r5].x
-
-            u = ee + F * (a - b + c - d)
-        elseif strategy == :randToBest1
-            # DE/rand-to-best/1
-            u = x + F * (xBest - x + a - b)
-        elseif strategy == :best2
-            # DE/best/2
-            r4 = rand(1:N)
-            while r4 == i || r4 == r1 || r4 == r2 || r4 == r3 || r4 == best_ind
-                r4 = rand(1:N)
-            end
-            d = currentPop[r4].x
-            u = xBest + F * (a - b + c - d)
-        else
-            @error("Unknown strategy $(strategy)")
-        end
 
         # binomial crossover
         v = zeros(D)
@@ -193,31 +168,45 @@ function update_state_MOEAD_DE!(
 
         # binomial crossover
         for j = 1:D
-            if rand() < CR || j == j_rand
-                v[j] = u[j]
-
-                if v[j] < la[j]
-                    v[j] = la[j]
-                elseif v[j] > lb[j]
-                    v[j] = lb[j]
-                end
+            # binomial crossover
+            if rand() < CR
+                v[j] = a[j] + F * (b[j] - c[j])
             else
-                v[j] = x[j]
+                v[j] = a[j]
+            end
+            # polynomial mutation
+
+            if rand() < parameters.p_m
+                r = rand()
+                if r < 0.5
+                    σ_k = (2.0 * r)^(1.0 / (parameters.η + 1)) - 1
+                else
+                    σ_k = 1 - (2.0 - 2.0 * r)^(1.0 / (parameters.η + 1))
+                end
+                v[j] = v[j] + σ_k * (lb[j] - la[j])
             end
         end
+
+        v = correctSol(v, la, lb)
 
         # instance child
         h = generateChild(v, problem.f(v))
         status.f_calls += 1
 
-        # select survivals
-        if engine.is_better(h, currentPop[i])
-            population[i] = h
+        update_reference_point!(parameters.z, h)
 
-            if engine.is_better(h, status.best_sol)
-                status.best_sol = h
-                best_ind = i
+
+        c = 0
+
+        z = parameters.z
+        shuffle!(P_idx)
+        while c < parameters.n_r && !isempty(P_idx)
+            j = pop!(P_idx)
+            if g(h.f, parameters.λ[j], z) <= g(population[j].f, parameters.λ[j], z)
+                population[j] = h
+                c += 1
             end
+
         end
 
         status.stop = engine.stop_criteria(status, information, options)
@@ -231,7 +220,13 @@ function update_state_MOEAD_DE!(
 
 end
 
+function is_better_MOEAD_DE(a, b)
+    is_better_eca(a, b)
+end
 
+function stop_criteria_moead_de(status, information, options)
+    return status.iteration > options.iterations
+end
 function final_stage_MOEAD_DE!(status, information, options)
     status.final_time = time()
 end

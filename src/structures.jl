@@ -55,7 +55,7 @@ function xFgh_indiv(
     sum_violations = 0.0
 )
 
-    if sum_violations < 0
+    if sum_violations <= 0
         sum_violations = violationsSum(g, h)
     end
     xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations)

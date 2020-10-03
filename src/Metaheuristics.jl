@@ -7,6 +7,7 @@ export CFO, jso, DE, ABC, PSO
 
 # v2 items
 export optimize, ECA, Options, State, Information, Engine, Problem
+export MOEAD_DE
 
 include("externals.jl")
 include("stop.jl")
@@ -67,6 +68,9 @@ include("jso.jl")
 
 
 include("ABC.jl")
+
+include("moead-de.jl")
+
 
 include("deprecated.jl")
 

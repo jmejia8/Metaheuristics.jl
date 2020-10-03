@@ -32,8 +32,13 @@ end
     bounds = Array([zeros(D) ones(D)]')
 
     # ECA results
-    status = optimize(ff, bounds, ECA(N = 100, ε = 1.0, options=Options(debug=false)))
+    # m = ECA(N = 100, ε = 1.0, options=Options(debug=false))
+    m = MOEAD_DE(D, 2, N = 300, options=Options(debug=true, iterations = 500))
+    status = optimize(ff, bounds, m)
+    status = optimize(ff, bounds, m)
     result = status.best_sol
+    display(status)
+    display(status.population)
 
     # print("[")
     # for s in status.population
