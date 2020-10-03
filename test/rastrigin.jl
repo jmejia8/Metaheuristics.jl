@@ -5,6 +5,8 @@ if VERSION < v"0.7.0"
     srand(31415926534)
 else
     using Test
+    import Random: seed!
+    seed!(31415926534)
 end
 
 # write your own tests here
@@ -35,10 +37,10 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    status = optimize(rastrigin, 0.1bounds, PSO(N=200))
+    status = optimize(rastrigin, bounds, PSO(N=300))
     result = status.best_sol.x
     fitness = status.best_sol.f
-    test_result(result, fitness, D, 1e-5)
+    test_result(result, fitness, D, 1e-3)
 
     # ABC results
     result, fitness = ABC(rastrigin, [-1.0ones(D) 1.0ones(D)]', limit=20)

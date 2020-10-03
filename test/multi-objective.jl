@@ -32,25 +32,11 @@ end
     bounds = Array([zeros(D) ones(D)]')
 
     # ECA results
-    # m = ECA(N = 100, ε = 1.0, options=Options(debug=false))
-    m = MOEAD_DE(D, 2, N = 300, options=Options(debug=true, iterations = 500))
-    status = optimize(ff, bounds, m)
-    status = optimize(ff, bounds, m)
-    result = status.best_sol
-    display(status)
-    display(status.population)
+    eca = ECA(N = 100, ε = 1.0, options=Options(debug=false))
+    moead_de = MOEAD_DE(D, 2, N = 300, options=Options(debug=false, iterations = 500))
+    status_eca = optimize(ff, bounds, eca)
+    status_moead = optimize(ff, bounds, moead_de)
 
-    # print("[")
-    # for s in status.population
-    #     print( s.f[1], " ", s.f[2], ";")
-    # end
-    # println("]")
-
-    # print("[")
-    # for s in status.best_sol
-    #     print( s.f[1], " ", s.f[2], ";")
-    # end
-    # println("]")
 
     @test true
 
