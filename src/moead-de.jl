@@ -17,6 +17,7 @@ function MOEAD_DE(;
     T = 20,
     δ = 0.9,
     n_r = 2,
+    B = Array{Int}[],
     strategy::Symbol = :rand1,
     information = Information(),
     options = Options(),
@@ -39,12 +40,24 @@ function MOEAD_DE(;
 
 end
 
-function initialize_weight_vectors(λ)
-    if isempty(λ)
+function initialize_weight_vectors!(parameters, problem)
+    values = (0:parameters.H) ./ parameters.H
 
-    end
+    parameters.λ =  zeros(values, parameters.N, size(problem.bounds, 2))
 end
 
+function initialize_closest_weight_vectors!(parameters, problem)
+    distances = zeros(parameters.N, parameters.N)
+    λ = parameters.λ
+    for i in 1:parameters.N
+        for j in (i+1):parameters.N
+            distances[i, j] = norm(λ[i], λ[j])
+            distances[j, i] = distances[i, j]
+        end
+        I = sortperm(distances[i, :])
+        parameters.B[i] = I[2:parameters.T+1]
+    end
+end
 function initialize_MOEAD_DE!(
     problem,
     engine,
@@ -54,6 +67,8 @@ function initialize_MOEAD_DE!(
     options,
 )
     D = size(problem.bounds, 2)
+    initialize_weight_vectors!(parameters, problem)
+    initialize_closest_weight_vectors!(parameters, problem)
 
 
 
