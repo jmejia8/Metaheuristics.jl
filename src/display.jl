@@ -55,7 +55,12 @@ function display(status::State)
     end
 
 
+
     @printf("| f calls: %.0f\n", status.f_calls)
+    if typeof(status.population[1]) <: Union{xfgh_indiv, xFgh_indiv}
+        n = sum(map(s -> s.sum_violations ≈ 0, status.population))
+        @printf("| feasibles: %d / %d in final population\n", n, length(status.population))
+    end
     @printf("| Total time: %.4f s\n", status.final_time - status.start_time)
     println("+============================+")
 end

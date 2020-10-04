@@ -33,10 +33,12 @@ end
 
     # ECA results
     eca = ECA(N = 100, ε = 1.0, options=Options(debug=false))
-    moead_de = MOEAD_DE(D, 2, N = 300, options=Options(debug=false, iterations = 500))
     status_eca = optimize(ff, bounds, eca)
-    status_moead = optimize(ff, bounds, moead_de)
+    display(status_eca)
 
+    moead_de = MOEAD_DE(D, 2, N = 300, options=Options(debug=false, iterations = 500))
+    status_moead = optimize(ff, bounds, moead_de)
+    display(status_moead)
 
     @test true
 

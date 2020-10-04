@@ -28,7 +28,7 @@ function xfgh_indiv(
     h::Vector{Float64};
     sum_violations = 0
 )
-    if sum_violations < 0
+    if sum_violations <= 0
         sum_violations = violationsSum(g, h)
     end
 

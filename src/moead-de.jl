@@ -13,6 +13,7 @@ mutable struct MOEAD_DE
     n_r::Float64
     z::Vector{Float64}
     B::Array{Vector{Int}}
+    s1::Float64
 end
 
 function MOEAD_DE(D, nobjectives;
@@ -28,12 +29,13 @@ function MOEAD_DE(D, nobjectives;
     n_r = 2,
     z::Vector{Float64} = fill(Inf, nobjectives),
     B = Array{Int}[],
+    s1 = 0.5,
     information = Information(),
     options = Options(),
 )
 
 
-    parameters = MOEAD_DE(D, nobjectives, N, promote(F, CR)..., λ, η,p_m, H, T, δ, n_r, z, B)
+    parameters = MOEAD_DE(D, nobjectives, N, promote(F, CR)..., λ, η,p_m, H, T, δ, n_r, z, B, s1)
 
     Algorithm(
         parameters,
@@ -202,7 +204,9 @@ function update_state_MOEAD_DE!(
         shuffle!(P_idx)
         while c < parameters.n_r && !isempty(P_idx)
             j = pop!(P_idx)
-            if g(h.f, parameters.λ[j], z) <= g(population[j].f, parameters.λ[j], z)
+            g1 = g(h.f, parameters.λ[j], z)
+            g2 = g(population[j].f, parameters.λ[j], z)
+            if is_better_constrained_MOEAD_DE(g1, g2, h, population[j], parameters)
                 population[j] = h
                 c += 1
             end
@@ -220,6 +224,11 @@ function update_state_MOEAD_DE!(
 
 end
 
+function is_better_constrained_MOEAD_DE(g1, g2, sol1, sol2, parameters)
+    s1 = parameters.s1
+    return g1 + s1*sol1.sum_violations <= g2 + s1*sol2.sum_violations
+end
+
 function is_better_MOEAD_DE(a, b)
     is_better_eca(a, b)
 end
@@ -228,5 +237,7 @@ function stop_criteria_moead_de(status, information, options)
     return status.iteration > options.iterations
 end
 function final_stage_MOEAD_DE!(status, information, options)
+    # status.best_sol = get_pareto_front(status.population, is_better_eca)
+    # @show length(status.best_sol)
     status.final_time = time()
 end
