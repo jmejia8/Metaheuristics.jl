@@ -37,7 +37,9 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    status = optimize(rastrigin, bounds, PSO(N=300))
+    pso = PSO(N=300)
+    pso.options.f_calls_limit = 30000D
+    status = optimize(rastrigin, bounds, pso)
     result = status.best_sol.x
     fitness = status.best_sol.f
     test_result(result, fitness, D, 1e-3)
