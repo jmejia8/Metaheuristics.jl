@@ -12,6 +12,52 @@ mutable struct ECA <: AbstractAlgorithm
     resize_population::Bool
 end
 
+"""
+    ECA(;
+        η_max = 2.0,
+        K = 7,
+        N = 0,
+        N_init = N,
+        p_exploit = 0.95,
+        p_bin = 0.02,
+        ε = 0.0,
+        p_cr = Float64[],
+        adaptive = false,
+        resize_population = false,
+        information = Information(),
+        options = Options()
+    )
+
+Parameters for the metaheuristic ECA: step-size `η_max`,`K` is number of vectors to
+generate the center of mass, `N` is the population size.
+
+# Example
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> optimize(f, [-1 -1 -1; 1 1 1.0], ECA())
+
++=========== RESULT ==========+
+| Iter.: 1021
+| f(x) = 1.68681e-163
+| solution.x = [2.5517634463667404e-82, -2.9182760041942484e-82, -1.3565584801935802e-82]
+| f calls: 21454
+| Total time: 0.0894 s
++============================+
+
+julia> optimize(f, [-1 -1 -1; 1 1 1.0], ECA(N = 10, η_max = 1.0, K = 3))
++=========== RESULT ==========+
+| Iter.: 1506
+| f(x) = 0.000172391
+| solution.x = [-6.340714627875324e-5, -0.004127226953894587, 0.012464071313908906]
+| f calls: 15069
+| Total time: 0.0531 s
++============================+
+```
+
+"""
 function ECA(;
     η_max::Float64 = 2.0,
     K::Int = 7,
