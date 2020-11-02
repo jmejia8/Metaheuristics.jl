@@ -3,9 +3,9 @@ if VERSION >= v"0.7.0"
 	import Random: randperm, shuffle!
 	import Printf.@printf
 	import LinearAlgebra: norm, Diagonal, dot
-    import Statistics: var, mean, std
+	import Statistics: var, mean, std
 	using UnicodePlots
-
+	import Base.minimum
 	indmin = argmin
 	indmax = argmax
 
