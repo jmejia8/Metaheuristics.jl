@@ -257,7 +257,60 @@ end
 #         STRUCTURES FOR THE OPTIONS
 #
 #####################################################
+"""
+    Options Structure
 
+`Options` stores common settings for metaheuristics such as the maximum number of iterations
+debug options, maximum number of function evaluations, etc.
+
+Main properties:
+
+- `x_tol` tolerance to the true minimizer if specified in `Information`.
+- `f_tol` tolerance to the true minimum if specified in `Information`.
+- `f_calls_limit` is the maximum number of function evaluations limit.
+- `iterations` is the maximum number iterationn permited.
+- `store_convergence` if `true`, then push the current `State` in `State.convergence` at each generation/iteration
+- `debug` if `true`, then `optimize` function reports the current `State` (and interest information) for each iterations.
+
+# Example
+
+```jldoctest
+julia> options = Options(f_calls_limit = 1000, debug=true)
+Options(0.0, 0.0, 0.0, 0.0, 1000.0, 0.0, 0.0, 0, false, true, true, :minimize)
+
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia> state = optimize(f, bounds, ECA(options=options))
+[ Info: Initializing population...
+[ Info: Starting main loop...
++=========== RESULT ==========+
+| Iter.: 1
+| f(x) = 17.4821
+| solution.x = [-0.21198067919245656, -4.0408459028606885, -1.0529741414392084]
+| f calls: 42
+| Total time: 0.0003 s
++============================+
+
+...
+
+[ Info: Stopped since call_limit was met.
++=========== RESULT ==========+
+| Iter.: 47
+| f(x) = 1.0924e-06
+| solution.x = [-0.0008050045939313401, 0.000319255968803667, -0.0005851867103384286]
+| f calls: 1000
+| Total time: 0.0258 s
++============================+
+```
+
+"""
 mutable struct Options
     x_tol::Float64
     f_tol::Float64
@@ -303,7 +356,47 @@ function Options(;
 end
 
 
+"""
+    Information Structure
 
+`Information` can be used to store the true optimum in order to stop a metaheuristic early.
+
+Properties:
+
+- `f_optimum` known minimum.
+- `x_optimum` known minimizer.
+
+If `Options` is provided, then `optimize` will stop when `|f(x) - f(x_optimum)| < Options.f_tol`
+or `‖ x - x_optimum ‖ < Options.x_tol` (euclidean distance).
+
+# Example
+
+If you want an approximation to the minimum with accuracy of `1e-3` (|f(x) - f(x*)| < 1e-3),
+then you may use `Information`.
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia> options = Options(f_tol = 1e-3)
+Options(0.0, 0.001, 0.0, 0.0, 1000.0, 0.0, 0.0, 0, false, true, false, :minimize)
+
+julia> state = optimize(f, bounds, ECA(information=information, options=options))
++=========== RESULT ==========+
+| Iter.: 22
+| f(x) = 0.000650243
+| solution.x = [0.022811671589729583, 0.007052331140376011, -0.008951836265056107]
+| f calls: 474
+| Total time: 0.0106 s
++============================+
+```
+"""
 struct Information
     f_optimum::Float64
     x_optimum::Array{Float64}
