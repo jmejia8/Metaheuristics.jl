@@ -167,7 +167,7 @@ Returns the approximation to the minimizer (argmin f(x)) stored in `state`.
 minimizer(s::State) = s.best_sol.x
 
 """
-    minimum(state)
+    minimum(state::Metaheuristics.State)
 Returns the approximation to the minimum (min f(x)) stored in `state`.
 """
 minimum(s::State) = s.best_sol.f
