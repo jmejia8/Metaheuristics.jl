@@ -9,6 +9,9 @@ export CFO, jso, DE, ABC, PSO
 export optimize, ECA, Options, State, Information, Engine, Problem
 export MOEAD_DE
 
+# v3 items
+export convergence, minimizer, minimum, positions, fvals, nfes
+
 include("externals.jl")
 include("stop.jl")
 include("structures.jl")
