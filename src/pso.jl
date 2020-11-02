@@ -7,6 +7,45 @@ mutable struct PSO
     flock::Array{xf_indiv}
 end
 
+
+"""
+    PSO(;
+        N  = 0,
+        C1 = 2.0,
+        C2 = 2.0,
+        ω  = 0.8,
+        information = Information(),
+        options = Options()
+    )
+
+Parameters for Particle Swarm Optimization (PSO) algorithm: learning rates `C1` and `C2`,
+`N` is the population size and `ω` controlls the inertia weight. 
+# Example
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> optimize(f, [-1 -1 -1; 1 1 1.0], PSO())
++=========== RESULT ==========+
+| Iter.: 999
+| f(x) = 3.23944e-48
+| solution.x = [1.0698542573895642e-24, -1.4298101555926563e-24, -2.247029420442994e-25]
+| f calls: 30000
+| Total time: 0.4973 s
++============================+
+
+julia> optimize(f, [-1 -1 -1; 1 1 1.0], PSO(N = 100, C1=1.5, C2=1.5, ω = 0.7))
++=========== RESULT ==========+
+| Iter.: 299
+| f(x) = 1.41505e-38
+| solution.x = [2.161357427851024e-20, -1.1599444038307776e-19, 1.5122345732802047e-20]
+| f calls: 30000
+| Total time: 0.2128 s
++============================+
+```
+
+"""
 function PSO(;
     N::Int = 0,
     C1 = 2.0,
