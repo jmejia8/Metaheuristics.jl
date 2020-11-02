@@ -3,15 +3,29 @@
 
 Minimize a n-dimensional function `f` with domain `bounds` (2×n matrix) using `method = ECA()` by default.
 
-Example: Minimize f(x) = Σx² where x ∈ [-10, 10]^3. Solution:
-```
-f(x) = sum(x .^ 2)
-bounds = [  -10.0 -10 -10; # lower bounds
-             10.0  10 10 ] # upper bounds
-result = optimize(f, bounds)
+# Example
+Minimize f(x) = Σx² where x ∈ [-10, 10]³.
 
-# minimizer
-@show result.best_sol.x
+Solution:
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia> result = optimize(f, bounds)
++=========== RESULT ==========+
+| Iter.: 1008
+| f(x) = 6.48646e-163
+| solution.x = [-4.054471688602619e-82, 4.2565448859996416e-82, 5.505242086898758e-82]
+| f calls: 21187
+| Total time: 0.1231 s
++============================+
 ```
 """
 function optimize(
