@@ -1,15 +1,28 @@
 # Algorithms
 
-Implementation algorithms.
+List of implemented metaheuristics.
 
 ## ECA
 
-Evolutionary Centers Algorithm
+Evolutionary Centers Algorithm.
+
+```@doc
+ECA
+```
 
 ## DE
 
-Differential Evolution
+Differential Evolution.
+
+```@doc
+DE
+```
 
 ## PSO
 
-Particle Swarm Optimization
+Particle Swarm Optimization.
+
+```@doc
+PSO
+```
+

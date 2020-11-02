@@ -1,4 +1,3 @@
-using Documenter
-push!(LOAD_PATH,"../src/")
+using Documenter, Metaheuristics
 
-makedocs(sitename="Documantation on Metaheuristics.jl")
+makedocs(sitename="Metaheuristics.jl")
