@@ -12,6 +12,7 @@ end
         @test ≈(fitness, 0.0, atol=tol)
     end
 
+    
     # Dimension
     D = 10
 
@@ -22,20 +23,21 @@ end
 
     # ECA results
     status = optimize(sphere, bounds)
-    result = status.best_sol.x
-    fitness = status.best_sol.f
+
+    result = minimizer(status)
+    fitness = minimum(status)
     test_result(result, fitness, D, 1e-5)
 
     # ED results
     status = optimize(sphere, bounds, DE(CR=0.5))
-    result = status.best_sol.x
-    fitness = status.best_sol.f
+    result = minimizer(status)
+    fitness = minimum(status)
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
     status = optimize(sphere, bounds, PSO())
-    result = status.best_sol.x
-    fitness = status.best_sol.f
+    result = minimizer(status)
+    fitness = minimum(status)
     test_result(result, fitness, D, 1e-5)
 
     # ABC results
