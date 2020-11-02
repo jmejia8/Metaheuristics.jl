@@ -61,6 +61,46 @@ function xFgh_indiv(
     xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations)
 end
 
+"""
+    State datatype
+State is used to store the current metaheuristic status. In fact, the `optimize`
+function returns a `State`.
+
+- `best_sol` Stores the best solution found so far.
+- `population` is an Array{typeof(best_sol)} for population-based algorithms.
+- `f_calls` is the number of objective functions evaluations.
+- `g_calls`  is the number of inequality constraints evaluations.
+- `h_calls` is the number of equality constraints evaluations.
+- `iteration` is the current iteration.
+- `success_rate` percentage of new generated solutions better that their parents. 
+- `convergence` used save the `State` at each iteration.
+- `start_time` saves the `time()` before the optimization proccess.
+- `final_time` saves the `time()` after the optimization proccess.
+- `stop` if true, then stops the optimization proccess.
+
+# Example
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia> result = optimize(f, bounds)
++=========== RESULT ==========+
+| Iter.: 1008
+| f(x) = 6.48646e-163
+| solution.x = [-4.054471688602619e-82, 4.2565448859996416e-82, 5.505242086898758e-82]
+| f calls: 21187
+| Total time: 0.1231 s
++============================+
+
+```
+"""
 mutable struct State
     best_sol::Any
     population::Array
@@ -75,6 +115,7 @@ mutable struct State
 
     start_time::Float64
     final_time::Float64
+    overall_time::Float64
     stop::Bool
 
 end
@@ -105,9 +146,54 @@ function State(
         State[],
         start_time,
         final_time,
+        final_time - start_time,
         stop,
     )
 
+end
+
+"""
+    minimizer(state)
+Returns the approximation to the minimizer (argmin f(x)) stored in `state`.
+"""
+minimizer(s::State) = s.best_sol.x
+
+"""
+    minimum(state)
+Returns the approximation to the minimum (min f(x)) stored in `state`.
+"""
+minimum(s::State) = s.best_sol.x
+
+"""
+    positions(state)
+If `state` has a population (with `N` solutions), then returns a `N`×d `Matrix`.
+"""
+positions(s::State) = begin
+    isempty(s.population) ? zeros(0,0) : Array(hcat(map(a -> a.x, s.population)...)')
+end
+
+"""
+    fvals(state)
+If `state` has a population (with `N` solutions), then returns a `Vector` with the 
+objective function values from items in `state.population`.
+"""
+fvals(s::State) = begin
+    isempty(s.population) ? zeros(0) : map(a -> a.f, s.population)
+end
+
+"""
+    nfes(state)
+get the number of function evaluations.
+"""
+nfes(s::State) = s.f_calls
+
+"""
+    convergence(state)
+get the data (no. function evaluations and fuction values) to plot the convergence graph. 
+"""
+convergence(s::State) = begin
+    sc = s.convergence
+    isempty(sc) ? (zeros(Int, 0), zeros(0)) : (map(nfes, sc), map(minimum, sc))
 end
 
 mutable struct Engine
