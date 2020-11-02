@@ -9,6 +9,46 @@ mutable struct DE
     strategy::Symbol
 end
 
+"""
+    DE(;
+        N  = 0,
+        F  = 1.0,
+        CR = 0.9,
+        strategy = :rand1,
+        information = Information(),
+        options = Options()
+    )
+
+Parameters for Differential Evolution (DE) algorithm: step-size `F`,`CR` controlls the binomial
+crossover, `N` is the population size. The parameter `trategy` is related to the variation
+operator (`:rand1`, `:rand2`, `:best1`, `:best2`, `:randToBest1`).
+
+# Example
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> optimize(f, [-1 -1 -1; 1 1 1.0], DE())
++=========== RESULT ==========+
+| Iter.: 437
+| f(x) = 0
+| solution.x = [0.0, 0.0, 0.0]
+| f calls: 13134
+| Total time: 0.3102 s
++============================+
+
+julia> optimize(f, [-1 -1 -1; 1 1 1.0], DE(N=50, F=1.5, CR=0.8))
++=========== RESULT ==========+
+| Iter.: 599
+| f(x) = 9.02214e-25
+| solution.x = [-4.1003250484858545e-13, -6.090890160928905e-13, -6.025762626763004e-13]
+| f calls: 30000
+| Total time: 0.0616 s
++============================+
+```
+
+"""
 function DE(;
     N::Int = 0,
     F = 1.0,
