@@ -90,15 +90,23 @@ julia> bounds = [  -10.0 -10 -10; # lower bounds
  -10.0  -10.0  -10.0
   10.0   10.0   10.0
 
-julia> result = optimize(f, bounds)
+julia> state = optimize(f, bounds)
 +=========== RESULT ==========+
-| Iter.: 1008
-| f(x) = 6.48646e-163
-| solution.x = [-4.054471688602619e-82, 4.2565448859996416e-82, 5.505242086898758e-82]
-| f calls: 21187
-| Total time: 0.1231 s
+| Iter.: 1009
+| f(x) = 7.16271e-163
+| solution.x = [-7.691251412064516e-83, 1.0826961235605951e-82, -8.358428300092186e-82]
+| f calls: 21190
+| Total time: 0.2526 s
 +============================+
 
+julia> minimum(state)
+7.162710802659093e-163
+
+julia> minimizer(state)
+3-element Array{Float64,1}:
+ -7.691251412064516e-83
+  1.0826961235605951e-82
+ -8.358428300092186e-82
 ```
 """
 mutable struct State
@@ -162,11 +170,11 @@ minimizer(s::State) = s.best_sol.x
     minimum(state)
 Returns the approximation to the minimum (min f(x)) stored in `state`.
 """
-minimum(s::State) = s.best_sol.x
+minimum(s::State) = s.best_sol.f
 
 """
     positions(state)
-If `state` has a population (with `N` solutions), then returns a `N`×d `Matrix`.
+If `state.population` has `N` solutions, then returns a `N`×d `Matrix`.
 """
 positions(s::State) = begin
     isempty(s.population) ? zeros(0,0) : Array(hcat(map(a -> a.x, s.population)...)')
@@ -174,7 +182,7 @@ end
 
 """
     fvals(state)
-If `state` has a population (with `N` solutions), then returns a `Vector` with the 
+If `state.population` has `N` solutions, then returns a `Vector` with the 
 objective function values from items in `state.population`.
 """
 fvals(s::State) = begin
@@ -189,7 +197,33 @@ nfes(s::State) = s.f_calls
 
 """
     convergence(state)
-get the data (no. function evaluations and fuction values) to plot the convergence graph. 
+get the data (touple with the number of function evaluations and fuction values) to plot
+the convergence graph. 
+
+# Example
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia> state = optimize(f, bounds, ECA(options=Options(store_convergence=true)))
++=========== RESULT ==========+
+| Iter.: 1022
+| f(x) = 7.95324e-163
+| solution.x = [-7.782044850211721e-82, 3.590044165897827e-82, -2.4665318114710003e-82]
+| f calls: 21469
+| Total time: 0.3300 s
++============================+
+
+julia> n_fes, fxs = convergence(state);
+```
+
 """
 convergence(s::State) = begin
     sc = s.convergence
