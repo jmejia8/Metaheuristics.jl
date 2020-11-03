@@ -2,27 +2,21 @@
 
 List of implemented metaheuristics.
 
-## ECA
+## Evolutionary Centers Algorithm
 
-Evolutionary Centers Algorithm.
-
-```@doc
+```@docs
 ECA
 ```
 
-## DE
+## Differential Evolution
 
-Differential Evolution.
-
-```@doc
+```@docs
 DE
 ```
 
-## PSO
+## Particle Swarm Optimization
 
-Particle Swarm Optimization.
-
-```@doc
+```@docs
 PSO
 ```
 
