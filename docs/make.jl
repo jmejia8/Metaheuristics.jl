@@ -10,3 +10,9 @@ makedocs(
             "API References" => "api.md",
             ]
        )
+
+
+
+deploydocs(
+    repo = "github.com/jmejia8/Metaheuristics.jl.git",
+)
