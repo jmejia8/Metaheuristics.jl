@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>API References · Metaheuristics.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Metaheuristics.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><a class="tocitem" href="../tutorial/">Tutorial</a></li><li><a class="tocitem" href="../algorithms/">Algorithms</a></li><li class="is-active"><a class="tocitem" href>API References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>API References</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>API References</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/Metaheuristics.jl/blob/master/docs/src/api.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="API-References"><a class="docs-heading-anchor" href="#API-References">API References</a><a id="API-References-1"></a><a class="docs-heading-anchor-permalink" href="#API-References" title="Permalink"></a></h1><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.optimize" href="#Metaheuristics.optimize"><code>Metaheuristics.optimize</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">optimize(f::Function, bounds::Matrix{Float64}, method)</code></pre><p>Minimize a n-dimensional function <code>f</code> with domain <code>bounds</code> (2×n matrix) using <code>method = ECA()</code> by default.</p><p><strong>Example</strong></p><p>Minimize f(x) = Σx² where x ∈ [-10, 10]³.</p><p>Solution:</p><pre><code class="language-julia-repl">julia&gt; f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia&gt; bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia&gt; result = optimize(f, bounds)
++=========== RESULT ==========+
+| Iter.: 1008
+| f(x) = 6.48646e-163
+| solution.x = [-4.054471688602619e-82, 4.2565448859996416e-82, 5.505242086898758e-82]
+| f calls: 21187
+| Total time: 0.1231 s
++============================+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/optimize.jl#L1-L30">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.State" href="#Metaheuristics.State"><code>Metaheuristics.State</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">State datatype</code></pre><p>State is used to store the current metaheuristic status. In fact, the <code>optimize</code> function returns a <code>State</code>.</p><ul><li><code>best_sol</code> Stores the best solution found so far.</li><li><code>population</code> is an Array{typeof(best_sol)} for population-based algorithms.</li><li><code>f_calls</code> is the number of objective functions evaluations.</li><li><code>g_calls</code>  is the number of inequality constraints evaluations.</li><li><code>h_calls</code> is the number of equality constraints evaluations.</li><li><code>iteration</code> is the current iteration.</li><li><code>success_rate</code> percentage of new generated solutions better that their parents. </li><li><code>convergence</code> used save the <code>State</code> at each iteration.</li><li><code>start_time</code> saves the <code>time()</code> before the optimization proccess.</li><li><code>final_time</code> saves the <code>time()</code> after the optimization proccess.</li><li><code>stop</code> if true, then stops the optimization proccess.</li></ul><p><strong>Example</strong></p><pre><code class="language-julia-repl">julia&gt; f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia&gt; bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia&gt; state = optimize(f, bounds)
++=========== RESULT ==========+
+| Iter.: 1009
+| f(x) = 7.16271e-163
+| solution.x = [-7.691251412064516e-83, 1.0826961235605951e-82, -8.358428300092186e-82]
+| f calls: 21190
+| Total time: 0.2526 s
++============================+
+
+julia&gt; minimum(state)
+7.162710802659093e-163
+
+julia&gt; minimizer(state)
+3-element Array{Float64,1}:
+ -7.691251412064516e-83
+  1.0826961235605951e-82
+ -8.358428300092186e-82</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L64-L111">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.Information" href="#Metaheuristics.Information"><code>Metaheuristics.Information</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">Information Structure</code></pre><p><code>Information</code> can be used to store the true optimum in order to stop a metaheuristic early.</p><p>Properties:</p><ul><li><code>f_optimum</code> known minimum.</li><li><code>x_optimum</code> known minimizer.</li></ul><p>If <code>Options</code> is provided, then <code>optimize</code> will stop when <code>|f(x) - f(x_optimum)| &lt; Options.f_tol</code> or <code>‖ x - x_optimum ‖ &lt; Options.x_tol</code> (euclidean distance).</p><p><strong>Example</strong></p><p>If you want an approximation to the minimum with accuracy of <code>1e-3</code> (|f(x) - f(x*)| &lt; 1e-3), then you may use <code>Information</code>.</p><pre><code class="language-julia-repl">julia&gt; f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia&gt; bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia&gt; options = Options(f_tol = 1e-3)
+Options(0.0, 0.001, 0.0, 0.0, 1000.0, 0.0, 0.0, 0, false, true, false, :minimize)
+
+julia&gt; state = optimize(f, bounds, ECA(information=information, options=options))
++=========== RESULT ==========+
+| Iter.: 22
+| f(x) = 0.000650243
+| solution.x = [0.022811671589729583, 0.007052331140376011, -0.008951836265056107]
+| f calls: 474
+| Total time: 0.0106 s
++============================+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L359-L399">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.Options" href="#Metaheuristics.Options"><code>Metaheuristics.Options</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">Options Structure</code></pre><p><code>Options</code> stores common settings for metaheuristics such as the maximum number of iterations debug options, maximum number of function evaluations, etc.</p><p>Main properties:</p><ul><li><code>x_tol</code> tolerance to the true minimizer if specified in <code>Information</code>.</li><li><code>f_tol</code> tolerance to the true minimum if specified in <code>Information</code>.</li><li><code>f_calls_limit</code> is the maximum number of function evaluations limit.</li><li><code>iterations</code> is the maximum number iterationn permited.</li><li><code>store_convergence</code> if <code>true</code>, then push the current <code>State</code> in <code>State.convergence</code> at each generation/iteration</li><li><code>debug</code> if <code>true</code>, then <code>optimize</code> function reports the current <code>State</code> (and interest information) for each iterations.</li></ul><p><strong>Example</strong></p><pre><code class="language-julia-repl">julia&gt; options = Options(f_calls_limit = 1000, debug=true)
+Options(0.0, 0.0, 0.0, 0.0, 1000.0, 0.0, 0.0, 0, false, true, true, :minimize)
+
+julia&gt; f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia&gt; bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia&gt; state = optimize(f, bounds, ECA(options=options))
+[ Info: Initializing population...
+[ Info: Starting main loop...
++=========== RESULT ==========+
+| Iter.: 1
+| f(x) = 17.4821
+| solution.x = [-0.21198067919245656, -4.0408459028606885, -1.0529741414392084]
+| f calls: 42
+| Total time: 0.0003 s
++============================+
+
+...
+
+[ Info: Stopped since call_limit was met.
++=========== RESULT ==========+
+| Iter.: 47
+| f(x) = 1.0924e-06
+| solution.x = [-0.0008050045939313401, 0.000319255968803667, -0.0005851867103384286]
+| f calls: 1000
+| Total time: 0.0258 s
++============================+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L260-L313">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.convergence" href="#Metaheuristics.convergence"><code>Metaheuristics.convergence</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">convergence(state)</code></pre><p>get the data (touple with the number of function evaluations and fuction values) to plot the convergence graph. </p><p><strong>Example</strong></p><pre><code class="language-julia-repl">julia&gt; f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia&gt; bounds = [  -10.0 -10 -10; # lower bounds
+                    10.0  10 10 ] # upper bounds
+2×3 Array{Float64,2}:
+ -10.0  -10.0  -10.0
+  10.0   10.0   10.0
+
+julia&gt; state = optimize(f, bounds, ECA(options=Options(store_convergence=true)))
++=========== RESULT ==========+
+| Iter.: 1022
+| f(x) = 7.95324e-163
+| solution.x = [-7.782044850211721e-82, 3.590044165897827e-82, -2.4665318114710003e-82]
+| f calls: 21469
+| Total time: 0.3300 s
++============================+
+
+julia&gt; n_fes, fxs = convergence(state);</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L198-L227">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.minimizer" href="#Metaheuristics.minimizer"><code>Metaheuristics.minimizer</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">minimizer(state)</code></pre><p>Returns the approximation to the minimizer (argmin f(x)) stored in <code>state</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L163-L166">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Base.minimum-Tuple{State}" href="#Base.minimum-Tuple{State}"><code>Base.minimum</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">minimum(state::Metaheuristics.State)</code></pre><p>Returns the approximation to the minimum (min f(x)) stored in <code>state</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L169-L172">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.positions" href="#Metaheuristics.positions"><code>Metaheuristics.positions</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">positions(state)</code></pre><p>If <code>state.population</code> has <code>N</code> solutions, then returns a <code>N</code>×d <code>Matrix</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L175-L178">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.fvals" href="#Metaheuristics.fvals"><code>Metaheuristics.fvals</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">fvals(state)</code></pre><p>If <code>state.population</code> has <code>N</code> solutions, then returns a <code>Vector</code> with the  objective function values from items in <code>state.population</code>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L183-L187">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.nfes" href="#Metaheuristics.nfes"><code>Metaheuristics.nfes</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">nfes(state)</code></pre><p>get the number of function evaluations.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/4e66c00f1735151bafb15bff46d65c692e64ddbc/src/structures.jl#L192-L195">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../algorithms/">« Algorithms</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 4 November 2020 18:25">Wednesday 4 November 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
