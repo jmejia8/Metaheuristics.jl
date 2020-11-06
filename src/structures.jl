@@ -186,7 +186,11 @@ If `state.population` has `N` solutions, then returns a `Vector` with the
 objective function values from items in `state.population`.
 """
 fvals(s::State) = begin
-    isempty(s.population) ? zeros(0) : map(a -> a.f, s.population)
+    if !isempty(s.population) && typeof(s.population[1].f) <: Vector
+        return Array(hcat(map(a -> a.f, s.population)...)')
+    end
+
+    return map(a -> a.f, s.population)
 end
 
 """
@@ -257,8 +261,24 @@ end
 #         STRUCTURES FOR THE OPTIONS
 #
 #####################################################
+mutable struct Options
+    x_tol::Float64
+    f_tol::Float64
+    g_tol::Float64
+    h_tol::Float64
+    f_calls_limit::Float64
+    g_calls_limit::Float64
+    h_calls_limit::Float64
+
+    iterations::Int
+    store_convergence::Bool
+    show_results::Bool
+    debug::Bool
+    search_type::Symbol
+end
+
 """
-    Options Structure
+    Options()
 
 `Options` stores common settings for metaheuristics such as the maximum number of iterations
 debug options, maximum number of function evaluations, etc.
@@ -311,22 +331,6 @@ julia> state = optimize(f, bounds, ECA(options=options))
 ```
 
 """
-mutable struct Options
-    x_tol::Float64
-    f_tol::Float64
-    g_tol::Float64
-    h_tol::Float64
-    f_calls_limit::Float64
-    g_calls_limit::Float64
-    h_calls_limit::Float64
-
-    iterations::Int
-    store_convergence::Bool
-    show_results::Bool
-    debug::Bool
-    search_type::Symbol
-end
-
 function Options(;
     x_tol::Real = 0.0,
     f_tol::Real = 0.0,
@@ -355,6 +359,12 @@ function Options(;
 
 end
 
+
+
+struct Information
+    f_optimum::Float64
+    x_optimum::Array{Float64}
+end
 
 """
     Information Structure
@@ -397,11 +407,6 @@ julia> state = optimize(f, bounds, ECA(information=information, options=options)
 +============================+
 ```
 """
-struct Information
-    f_optimum::Float64
-    x_optimum::Array{Float64}
-end
-
 function Information(;#
     f_optimum = NaN,
     x_optimum::Array{Float64} = Float64[],

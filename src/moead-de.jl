@@ -16,6 +16,58 @@ mutable struct MOEAD_DE
     s1::Float64
 end
 
+"""
+    MOEAD_DE(D::Int, nobjectives::Int)
+
+`MOEAD_DE` implements the original version of MOEA/D-DE. It uses the contraint handling method
+based on the sum of violations (for constrained optimizaton):
+`g(x, λ, z) = max(λ .* abs.(fx - z)) + sum(max.(0, gx)) + sum(abs.(hx))`
+
+To use MOEAD_DE, the output from the objective function should be a 3-touple
+`(f::Vector, g::Vector, h::Vector)`, where `f` contains the objective functions,
+`g` and `h` are the equality and inequality constraints respectively.
+
+A feasible solution is such that g_i(x) ≤ 0 and h_j(x) = 0.
+
+# Example
+
+Assume you want to solve the following optimizaton problem:
+
+Minimize:
+
+f(x) = (x_1, x_2)
+
+subject to:
+
+g(x) = x_1^2 + x_2^2 - 1 ≤ 0
+
+x_1, x_2 ∈ [-1, 1]
+
+A solution can be:
+
+```julia
+
+# Dimension
+D = 2
+
+# Objective function
+f(x) = ( x, [sum(x.^2) - 1], [0.0] ) 
+
+# bounds
+bounds = [-1 -1;
+           1  1.0
+        ]
+
+# define the parameters
+moead_de = MOEAD_DE(D, 2, N = 300, options=Options(debug=false, iterations = 500))
+
+# optimize
+status_moead = optimize(f, bounds, moead_de)
+
+# show results
+display(status_moead)
+```
+"""
 function MOEAD_DE(D, nobjectives;
     N::Int = 0,
     F = 0.5,

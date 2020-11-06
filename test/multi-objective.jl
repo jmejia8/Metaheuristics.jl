@@ -12,7 +12,7 @@ end
 
 
     # Dimension
-    D = 30
+    D = 10
 
     # Objective function
     f(x) = begin
@@ -25,7 +25,7 @@ end
         g = 1.0 + (9 / (length(x) - 1)) * sum(x[2:end])
         f1 = x[1]
         f2 = g*(1-sqrt(x[1] / g) - (x[1]/g) * sin(10π*x[1]))
-        return [f1, f2], [g], [0.0]
+        return [f1, f2], [0.0], [0.0]
     end
 
 
