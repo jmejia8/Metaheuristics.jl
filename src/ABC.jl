@@ -147,6 +147,7 @@ is visited.
 ```jldoctest
 julia> f(x) = sum(x.^2)
 f (generic function with 1 method)
+
 julia> optimize(f, [-1 -1 -1; 1 1 1.0], ABC())
 +=========== RESULT ==========+
 | Iter.: 593

@@ -27,7 +27,7 @@ To use MOEAD_DE, the output from the objective function should be a 3-touple
 `(f::Vector, g::Vector, h::Vector)`, where `f` contains the objective functions,
 `g` and `h` are the equality and inequality constraints respectively.
 
-A feasible solution is such that g_i(x) ≤ 0 and h_j(x) = 0.
+A feasible solution is such that `g_i(x) ≤ 0 and h_j(x) = 0`.
 
 # Example
 
@@ -35,13 +35,13 @@ Assume you want to solve the following optimizaton problem:
 
 Minimize:
 
-f(x) = (x_1, x_2)
+`f(x) = (x_1, x_2)`
 
 subject to:
 
-g(x) = x_1^2 + x_2^2 - 1 ≤ 0
+`g(x) = x_1^2 + x_2^2 - 1 ≤ 0`
 
-x_1, x_2 ∈ [-1, 1]
+`x_1, x_2 ∈ [-1, 1]`
 
 A solution can be:
 
