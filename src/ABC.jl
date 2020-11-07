@@ -263,6 +263,9 @@ function ABC(
     method.options.f_calls_limit = max_evals
     method.options.iterations = min( round(Int, max_evals / N), iters )
 
+    method.engine.stop_criteria = (status, information, options) ->
+        stop_check_abc(status, information, options) || termination(status.population)
+
     res = optimize(fobj, bounds, method)
 
     return minimizer(res), minimum(res)
