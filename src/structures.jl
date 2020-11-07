@@ -394,6 +394,9 @@ julia> bounds = [  -10.0 -10 -10; # lower bounds
  -10.0  -10.0  -10.0
   10.0   10.0   10.0
 
+julia> information = Information(f_optimum = 0.0)
+Information(0.0, Float64[])
+
 julia> options = Options(f_tol = 1e-3)
 Options(0.0, 0.001, 0.0, 0.0, 1000.0, 0.0, 0.0, 0, false, true, false, :minimize)
 
