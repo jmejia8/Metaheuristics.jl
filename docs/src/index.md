@@ -1,6 +1,6 @@
 # Introduction
 
-This is documentation for the Metaheuristics Package.
+Documentation for the Metaheuristics Package.
 
 ## Installation
 
