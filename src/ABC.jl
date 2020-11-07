@@ -285,7 +285,7 @@ function stop_check_abc(status, information, options)
     cond2 = call_limit_stop_check(status, information, options) ||
     iteration_stop_check(status, information, options)
 
-    cond = cond2 || !isnan(information.f_optimum) && abs(status.best_sol.sol.f - information.f_optimum) < options.f_tol
+    cond = cond2 || !isnan(information.f_optimum) && abs(status.best_sol.f - information.f_optimum) < options.f_tol
 
     options.debug && cond && @info("Stopped since accuracy was met.")
     cond
