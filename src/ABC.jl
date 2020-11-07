@@ -127,7 +127,14 @@ mutable struct ABC
 end
 
 """
-    ABC(; N = 50, Ne = (N+1) ÷ 2, No = Ne)
+    ABC(;
+        N = 50,
+        Ne = div(N+1, 2),
+        No = div(N+1, 2),
+        limit=10,
+        information = Information(),
+        options = Options()
+    )
 
 ABC implements the original parameters for the Artificial Bee Colony Algorithm.
 `N` is the population size, `Ne` is the number of employees, `No` is the
@@ -156,6 +163,8 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], ABC(N = 80,  No = 20, Ne = 50, limit=5))
 | f calls: 30043
 | Total time: 0.2652 s
 +============================+
+```
+
 """
 function ABC(;
         N = 50,

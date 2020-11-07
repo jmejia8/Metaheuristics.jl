@@ -67,6 +67,7 @@ status_moead = optimize(f, bounds, moead_de)
 # show results
 display(status_moead)
 ```
+
 """
 function MOEAD_DE(D, nobjectives;
     N::Int = 0,
