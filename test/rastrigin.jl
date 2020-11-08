@@ -21,7 +21,7 @@ end
     # Objective function
     rastrigin(x::Vector{Float64}, D=length(x)) = 10D+ sum(x.*x - 10cos.(2π*x))
 
-    bounds = Array([-100.0ones(D) 100.0ones(D)]')
+    bounds = Array([-5.0ones(D) 5.0ones(D)]')
 
 
     status = optimize(rastrigin, bounds, ECA())
@@ -50,9 +50,23 @@ end
     
     # CGSA
     cgsa = CGSA(chaosIndex = 1)
-    cgsa.options.iterations = 1500
+    cgsa.options.iterations = 2000
     status = optimize(rastrigin, bounds, cgsa)
     result = minimizer(status)
     fitness = minimum(status)
     test_result(result, fitness, D, 1e-1)
+
+    # SA results
+    status = optimize(rastrigin, bounds, SA())
+    result = status.best_sol.x
+    fitness = status.best_sol.f
+    test_result(result, fitness, D, 1e-5)
+
+
+    # WOA results
+    status = optimize(rastrigin, bounds, WOA())
+    display(status)
+    result = status.best_sol.x
+    fitness = status.best_sol.f
+    test_result(result, fitness, D, 1e-5)
 end
