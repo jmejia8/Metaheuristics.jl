@@ -2,7 +2,7 @@
 # Coded by Jesús Mejía. 
 # Based on MATLAB code of Esmat Rashedi, 2010. 
 # Adopted from 
-# https://la.mathworks.com/matlabcentral/fileexchange/61116-gsa-+-chaotic-gravitational-constant
+# https://la.mathworks.com/matlcgsaentral/fileexchange/61116-gsa-+-chaotic-gravitational-constant
 # " E. Rashedi, H. Nezamabadi-pour and S. Saryazdi,
 # “GSA: A Gravitational Search Algorithm”, Information sciences, vol. 179,
 # no. 13, pp. 2232-2248, 2009."
@@ -113,25 +113,51 @@ function chaos(index,curr_iter,max_iter,Value)
 end
 
 mutable struct CGSA
-				N::Int    = 30,
-   chValueInitial::Real   = 20,
-       chaosIndex::Real   = 9,
-     ElitistCheck::Int    = 1,
-           Rpower::Int    = 1,
+    N::Int    
+    chValueInitial::Real   
+    chaosIndex::Real   
+    ElitistCheck::Int    
+    Rpower::Int    
+    Rnorm::Int    
+    wMax::Real   
+    wMin::Real   
+    X::Matrix{Float64}
+    V::Matrix{Float64}
+    fitness::Vector{Float64}
 end
 
 function CGSA(;
-                N::Int    = 30,
-   chValueInitial::Real   = 20,
-       chaosIndex::Real   = 9,
-     ElitistCheck::Int    = 1,
-           Rpower::Int    = 1,
-	)
+        N::Int    = 30,
+        chValueInitial::Real   = 20,
+        chaosIndex::Real   = 9,
+        ElitistCheck::Int    = 1,
+        Rpower::Int    = 1,
+        Rnorm::Int    = 2,
+        wMax::Real   = chValueInitial,
+        wMin::Real   = 1e-10,
+        X::Matrix{Float64} = zeros(0,0),
+        V::Matrix{Float64} = zeros(0,0),
+        fitness::Vector{Float64} = zeros(0),
+        information = Information(),
+        options = Options()
+        )
 
-	CGSA(N, chValueInitial, chaosIndex, ElitistCheck, Rpower)
+    parameters = CGSA(N, chValueInitial, chaosIndex, ElitistCheck, Rpower, Rnorm, wMax, wMin, X, V, fitness)
+
+
+    Algorithm(
+        parameters,
+        initialize! = initialize_cgsa!,
+        update_state! = update_state_cgsa!,
+        is_better = is_better_eca,
+        stop_criteria = stop_check,
+        final_stage! = final_stage_cgsa!,
+        information = information,
+        options = options,
+    )
 end
 
-function initialize_abc!(
+function initialize_cgsa!(
     problem,
     engine,
     parameters,
@@ -141,17 +167,16 @@ function initialize_abc!(
    )
 
 
-	Rnorm = 2
+	Rnorm = parameters.Rnorm
 	N = parameters.N
 	D = size(problem.bounds, 2)
 	fobj = problem.f
 
-	@warn "Deprecated function. Use optimize(f, bounds, CGSA())"
 
 	# bounds vectors
     low, up = problem.bounds[1,:], problem.bounds[2,:]
 
-	max_it = div(max_evals, N) + 1
+	max_it = div(10000D, N) + 1
 	options.iterations = options.iterations == 0 ? max_it : options.iterations
 	
 	# random initialization for agents.
@@ -159,12 +184,19 @@ function initialize_abc!(
 	status.population = P
 
 	# Current best
-	theBest = getBest(P, searchType)
-	status.gest_sol = theBest
+	theBest = getBest(P, :minimize)
+	status.best_sol = theBest
+
+	# Velocity
+    parameters.V = isempty(parameters.V) ? zeros(N,D) : parameters.V
+    # Postions
+    parameters.X = isempty(parameters.X) ? positions(status) : parameters.X
+    # function values
+    parameters.fitness = isempty(parameters.fitness) ? fvals(status) : parameters.fitness
 
 end
 
-function update_state_abc!(
+function update_state_cgsa!(
 		problem,
 		engine,
 		parameters,
@@ -174,8 +206,24 @@ function update_state_abc!(
 		iteration,
 	   )
 
-	wMax = chValueInitial
-	wMin = 1e-10
+	wMax = parameters.wMax
+    N = parameters.N
+	wMin = parameters.wMax
+	max_it = options.iterations
+	iteration = status.iteration
+	searchType = :minimize
+	chaosIndex = parameters.chaosIndex	
+    Rnorm = parameters.Rnorm
+    Rpower = parameters.Rpower
+    ElitistCheck = parameters.ElitistCheck
+    low, up = problem.bounds[1,:], problem.bounds[2,:]
+	
+	X = parameters.X
+	V = parameters.V
+	fitness = parameters.fitness
+
+	P = status.population
+	theBest = status.best_sol
 
 	# iteration
 	chValue = wMax-iteration*((wMax-wMin)/max_it)
@@ -200,189 +248,29 @@ function update_state_abc!(
 	X = correctPop(X, low, up)
 	for i = 1:N
 		x = X[i,:]
-		P[i] = generateChild(x, fobj(x))
+		P[i] = generateChild(x, problem.f(x))
 		fitness[i] = P[i].f
 	end
 
+	parameters.X = X
+	parameters.fitness = fitness
+	parameters.V = V
+
 	#Evaluation of agents. 
-	currentBest = getBest(P, searchType)
+	currentBest = status.best_sol
 
 	# fix this
 	if Selection(theBest, currentBest, searchType)
-		theBest = currentBest
+		status.best_sol = currentBest
 	end
 
-
-	if saveConvergence != "" && isfeasible(theBest)
-		push!(convergence, [(iteration+1)*N theBest.f])
-	end
+	status.stop = engine.stop_criteria(status, information, options)
 
 end
 
 
-function final_stage_abc!(status, information, options)
+function final_stage_cgsa!(status, information, options)
     status.final_time = time()
-    # status.best_sol = status.best_sol.sol
 end
 
-function CGSA(fobj::Function,
-                D::Int;
-                N::Int    = 30,
-   chValueInitial::Real   = 20,
-       chaosIndex::Real   = 9,
-     ElitistCheck::Int    = 1,
-       searchType::Symbol = :minimize,
-        max_evals::Int    = 10000D,
-           Rpower::Int    = 1,
-         saveLast::String = "",
-      showResults::Bool   = true,
-      saveConvergence::String="",
-              limits = [-100.0, 100.0])
-	#V:   Velocity.
-	#a:   Acceleration.
-	#M:   Mass.  Ma = Mp = Mi = M
-	#D: Dension of the test function.
-	#N:   Number of agents.
-	#X:   Position of agents. D-by-N matrix.
-	#R:   Distance between agents in search space.
-	#[low-up]: Allowable range for search space.
-	#Rnorm:  Norm in eq.8.
-	#Rpower: Power of R in eq.7.
-	# chaos
 
-	if saveLast != ""
-		writecsv(saveLast, X)        
-	end
-
-	if saveConvergence != ""
-		writecsv(saveConvergence, convergence)
-	end
-
-	if showResults
-		println("===========[CGSA results ]=============")
-		printResults(theBest, P, max_it, max_it*N)
-		println("=======================================")
-	end
-
-	return theBest.x, theBest.f
-
-end
-
-# Gravitational Search Algorithm.
-function CGSA(fobj::Function,
-                D::Int;
-                N::Int    = 30,
-   chValueInitial::Real   = 20,
-       chaosIndex::Real   = 9,
-     ElitistCheck::Int    = 1,
-       searchType::Symbol = :minimize,
-        max_evals::Int    = 10000D,
-           Rpower::Int    = 1,
-         saveLast::String = "",
-      showResults::Bool   = true,
-      saveConvergence::String="",
-              limits = [-100.0, 100.0])
-	#V:   Velocity.
-	#a:   Acceleration.
-	#M:   Mass.  Ma = Mp = Mi = M
-	#D: Dension of the test function.
-	#N:   Number of agents.
-	#X:   Position of agents. D-by-N matrix.
-	#R:   Distance between agents in search space.
-	#[low-up]: Allowable range for search space.
-	#Rnorm:  Norm in eq.8.
-	#Rpower: Power of R in eq.7.
-	Rnorm = 2
-
-	@warn "Deprecated function. Use optimize(f, bounds, CGSA())"
-
-	# bounds vectors
-    low, up = limits[1,:], limits[2,:]
-    if length(low) < D
-        low = ones(D) * low[1]
-        up = ones(D) * up[1]
-    end
-
-	max_it = div(max_evals, N) + 1
-	
-	# random initialization for agents.
-	P = initializePop(fobj, N, D, low, up)
-	fitness = getfValues(P)
-	X = getPositions(P, N, D)
-
-	# Velocity
-	V = zeros(N,D)
-
-	# Current best
-	theBest = getBest(P, searchType)
-
-
-    convergence = []
-	if saveConvergence != "" && isfeasible(theBest)
-		push!(convergence, [N theBest.f])
-	end
-
-	# chaos
-	wMax = chValueInitial
-	wMin = 1e-10
-	for iteration = 1:max_it
-
-		# iteration
-		chValue = wMax-iteration*((wMax-wMin)/max_it)
-	  
-		#Calculation of M. eq.14-20
-		M = massCalculation(fitness,searchType)
-
-		#Calculation of Gravitational constant. eq.13.
-		G = Gconstant(iteration, max_it)
-
-		if 1 <= chaosIndex <= 10
-			G += chaos(chaosIndex,iteration,max_it,chValue)
-		end
-
-		#Calculation of accelaration in gravitational field. eq.7-10,21.
-		a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
-
-		#Agent movement. eq.11-12
-		X, V = move(X,a,V)
-
-		# Checking allowable range. 
-		X = correctPop(X, low, up)
-		for i = 1:N
-			x = X[i,:]
-			P[i] = generateChild(x, fobj(x))
-			fitness[i] = P[i].f
-		end
-		
-		#Evaluation of agents. 
-		currentBest = getBest(P, searchType)
-
-		# fix this
-		if Selection(theBest, currentBest, searchType)
-			theBest = currentBest
-		end
-
-
-		if saveConvergence != "" && isfeasible(theBest)
-			push!(convergence, [(iteration+1)*N theBest.f])
-		end
-
-	end #iteration
-
-	if saveLast != ""
-		writecsv(saveLast, X)        
-	end
-
-	if saveConvergence != ""
-		writecsv(saveConvergence, convergence)
-	end
-
-	if showResults
-		println("===========[CGSA results ]=============")
-		printResults(theBest, P, max_it, max_it*N)
-		println("=======================================")
-	end
-
-	return theBest.x, theBest.f
-
-end
