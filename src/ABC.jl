@@ -257,29 +257,6 @@ end
 
 is_better_abc(bee1, bee2) = is_better(bee1.sol, bee2.sol)
 
-function ABC(
-        fobj::Function,
-        bounds;
-        N = 50,
-        limit=10,
-        iters = Inf,
-        max_evals = 10000*size(bounds, 2),
-        termination =  x -> false,
-        Ne = div(N+1, 2),
-        No = div(N+1, 2),
-    )
-    @warn "ABC(f, bounds) is deprecated. Use optimize(f, bounds, ABC())."
-    method = ABC(N = N, Ne = Ne, No = No, limit = limit)
-    method.options.f_calls_limit = max_evals
-    method.options.iterations = min( round(Int, max_evals / N), iters )
-
-    method.engine.stop_criteria = (status, information, options) ->
-        stop_check_abc(status, information, options) || termination(status.population)
-
-    res = optimize(fobj, bounds, method)
-
-    return minimizer(res), minimum(res)
-end
 
 function stop_check_abc(status, information, options)
     cond2 = call_limit_stop_check(status, information, options) ||
