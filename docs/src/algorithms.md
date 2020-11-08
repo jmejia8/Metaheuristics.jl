@@ -33,3 +33,22 @@ ABC
 MOEAD_DE
 ```
 
+
+## Gravitational Search Algorithm
+
+```@docs
+CGSA
+```
+
+
+## Simulated Annealing
+
+```@docs
+SA
+```
+
+## Whale Optimization Algorithm
+
+```@docs
+WOA
+```
