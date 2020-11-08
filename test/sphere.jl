@@ -21,6 +21,12 @@ end
 
     bounds = Array([-100.0ones(D) 100.0ones(D)]')
 
+    # SA results
+    status = optimize(sphere, bounds, SA())
+    result = minimizer(status)
+    fitness = minimum(status)
+    test_result(result, fitness, D, 1e-5)
+
     # ECA results
     status = optimize(sphere, bounds)
 
@@ -45,9 +51,9 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # CGSA results
-    status = optimize(sphere, bounds, CGSA())
+    status = optimize(sphere, bounds, CGSA(N = 30))
     result = minimizer(status)
     fitness = minimum(status)
-    test_result(result, fitness, D, 1e-5)
+    test_result(result, fitness, D, 1e-1)
 
 end

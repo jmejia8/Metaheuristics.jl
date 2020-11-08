@@ -47,5 +47,12 @@ end
     # ABC results
     result, fitness = ABC(rastrigin, [-1.0ones(D) 1.0ones(D)]', limit=20)
     test_result(result, fitness, D, 1e-5)
-
+    
+    # CGSA
+    cgsa = CGSA(chaosIndex = 1)
+    cgsa.options.iterations = 1500
+    status = optimize(rastrigin, bounds, cgsa)
+    result = minimizer(status)
+    fitness = minimum(status)
+    test_result(result, fitness, D, 1e-1)
 end
