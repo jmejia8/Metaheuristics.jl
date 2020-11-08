@@ -21,8 +21,7 @@ end
     )
 ``` 
 
-Parameters for the method of Simulated Annealing
-(Kirkpatrick et al., 1983)
+Parameters for the method of Simulated Annealing (Kirkpatrick et al., 1983).
 
 Parameters:
 
