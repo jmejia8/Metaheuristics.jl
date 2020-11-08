@@ -43,4 +43,11 @@ end
     # ABC results
     result, fitness = ABC(sphere, [-10.0ones(5) 10.0ones(5)]')
     test_result(result, fitness, D, 1e-5)
+
+    # CGSA results
+    status = optimize(sphere, bounds, CGSA())
+    result = minimizer(status)
+    fitness = minimum(status)
+    test_result(result, fitness, D, 1e-5)
+
 end
