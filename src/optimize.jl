@@ -90,8 +90,10 @@ function optimize(
             if options.store_convergence
                   update_convergence!(convergence, status)
             end
-
+            #status.stop = status.stop||engine.stop_criteria(status,information,options)
       end
+
+      status.overall_time = time() - status.start_time
 
       final_stage!(status, information, options)
 
