@@ -65,7 +65,6 @@ end
 
     # WOA results
     status = optimize(rastrigin, bounds, WOA())
-    display(status)
     result = status.best_sol.x
     fitness = status.best_sol.f
     test_result(result, fitness, D, 1e-5)
