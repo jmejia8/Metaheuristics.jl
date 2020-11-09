@@ -49,8 +49,8 @@ end
     test_result(result, fitness, D, 1e-5)
     
     # CGSA
-    cgsa = CGSA(chaosIndex = 1)
-    cgsa.options.iterations = 2000
+    cgsa = CGSA()
+    cgsa.options.iterations = 500
     status = optimize(rastrigin, bounds, cgsa)
     result = minimizer(status)
     fitness = minimum(status)

@@ -49,7 +49,7 @@ function correctPop(P, a, b)
     for i = 1:N
         for j = 1:D
             if !(a[j] <= P[i, j] <= b[j])
-                P[i, j] = a[j] - (b[j] - a[j])*rand()
+                P[i, j] = a[j] + (b[j] - a[j])*rand()
             end
         end
     end

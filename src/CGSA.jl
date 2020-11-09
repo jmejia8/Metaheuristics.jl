@@ -100,7 +100,7 @@ function CGSA(;
         fitness::Vector{Float64} = zeros(0),
         information = Information(),
         options = Options()
-        )
+    )
 
     parameters = CGSA(N, chValueInitial, chaosIndex, ElitistCheck, Rpower, Rnorm, wMax, wMin, X, V, fitness)
 
@@ -118,38 +118,38 @@ function CGSA(;
 end
 
 function initialize_cgsa!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-   )
+        problem,
+        engine,
+        parameters,
+        status,
+        information,
+        options,
+       )
 
 
-	Rnorm = parameters.Rnorm
-	N = parameters.N
-	D = size(problem.bounds, 2)
-	fobj = problem.f
+    Rnorm = parameters.Rnorm
+    N = parameters.N
+    D = size(problem.bounds, 2)
+    fobj = problem.f
 
 
-	# bounds vectors
+    # bounds vectors
     low, up = problem.bounds[1,:], problem.bounds[2,:]
 
-	max_it = 500
-	options.iterations = options.iterations == 0 ? max_it : options.iterations
+    max_it = 500
+    options.iterations = options.iterations == 0 ? max_it : options.iterations
     options.f_calls_limit = options.f_calls_limit == 0 ? options.iterations * N : options.f_calls_limit
-	
-	# random initialization for agents.
-	P = initializePop(fobj, N, D, low, up)
-	status.population = P
+
+    # random initialization for agents.
+    P = initializePop(fobj, N, D, low, up)
+    status.population = P
     status.f_calls = N
 
-	# Current best
-	theBest = getBest(P, :minimize)
-	status.best_sol = theBest
+    # Current best
+    theBest = getBest(P, :minimize)
+    status.best_sol = theBest
 
-	# Velocity
+    # Velocity
     parameters.V = isempty(parameters.V) ? zeros(N,D) : parameters.V
     # Postions
     parameters.X = isempty(parameters.X) ? positions(status) : parameters.X
@@ -159,76 +159,76 @@ function initialize_cgsa!(
 end
 
 function update_state_cgsa!(
-		problem,
-		engine,
-		parameters,
-		status,
-		information,
-		options,
-		iteration,
-	   )
+        problem,
+        engine,
+        parameters,
+        status,
+        information,
+        options,
+        iteration,
+        )
 
 
-	wMax = parameters.wMax
+    wMax = parameters.wMax
     N = parameters.N
-	wMin = parameters.wMax
-	max_it = options.iterations
-	searchType = :minimize
-	chaosIndex = parameters.chaosIndex	
+    wMin = parameters.wMax
+    max_it = options.iterations
+    searchType = :minimize
+    chaosIndex = parameters.chaosIndex	
     Rnorm = parameters.Rnorm
     Rpower = parameters.Rpower
     ElitistCheck = parameters.ElitistCheck
     low, up = problem.bounds[1,:], problem.bounds[2,:]
-	
-	X = parameters.X
-	V = parameters.V
-	fitness = parameters.fitness
 
-	P = status.population
-	theBest = status.best_sol
+    X = parameters.X
+    V = parameters.V
+    fitness = parameters.fitness
 
-	# iteration
-	chValue = wMax-iteration*((wMax-wMin)/max_it)
+    P = status.population
+    theBest = status.best_sol
 
-	#Calculation of M. eq.14-20
-	M = massCalculation(fitness,searchType)
+    # iteration
+    chValue = wMax-iteration*((wMax-wMin)/max_it)
 
-	#Calculation of Gravitational constant. eq.13.
-	G = Gconstant(iteration, max_it)
+    #Calculation of M. eq.14-20
+    M = massCalculation(fitness,searchType)
 
-	if 1 <= chaosIndex <= 10
-		G += chaos(chaosIndex,iteration,max_it,chValue)
-	end
+    #Calculation of Gravitational constant. eq.13.
+    G = Gconstant(iteration, max_it)
 
-	#Calculation of accelaration in gravitational field. eq.7-10,21.
-	a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
+    if 1 <= chaosIndex <= 10
+        G += chaos(chaosIndex,iteration,max_it,chValue)
+    end
 
-	#Agent movement. eq.11-12
-	X, V = move(X,a,V)
+    #Calculation of accelaration in gravitational field. eq.7-10,21.
+    a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
 
-	# Checking allowable range. 
-	X = correctPop(X, low, up)
-	for i = 1:N
-		x = X[i,:]
-		P[i] = generateChild(x, problem.f(x))
-		fitness[i] = P[i].f
-	end
+    #Agent movement. eq.11-12
+    X, V = move(X,a,V)
+
+    # Checking allowable range. 
+    X = correctPop(X, low, up)
+    for i = 1:N
+        x = X[i,:]
+        P[i] = generateChild(x, problem.f(x))
+        fitness[i] = P[i].f
+    end
     status.f_calls += N
 
-	parameters.X = X
-	parameters.fitness = fitness
-	parameters.V = V
-	status.population = P
+    parameters.X = X
+    parameters.fitness = fitness
+    parameters.V = V
+    status.population = P
 
-	#Evaluation of agents. 
+    #Evaluation of agents. 
     currentBest = getBest(P, :minimize)
 
-	# fix this
-	if engine.is_better(currentBest, theBest)
-		status.best_sol = currentBest
-	end
+    # fix this
+    if engine.is_better(currentBest, theBest)
+        status.best_sol = currentBest
+    end
 
-	status.stop = engine.stop_criteria(status, information, options)
+    status.stop = engine.stop_criteria(status, information, options)
 
 end
 
@@ -242,102 +242,102 @@ end
 
 
 function chaos(index,curr_iter,max_iter,Value)
-	x = zeros(max_iter + 1)
-	x[1]=0.7
+    x = zeros(max_iter + 1)
+    x[1]=0.7
 
-	G = zeros(max_iter)
-	if index == 1
-		# Chebyshev map
-		for i=1:max_iter
-			x[i+1]=cos(i*acos(x[i]))
-			G[i]=((x[i]+1)*Value)/2
-		end
-	elseif index == 2
-		# Circle map
-		a=0.5
-		b=0.2
-		for i=1:max_iter
-			x[i+1]=mod(x[i]+b-(a/(2*pi))*sin(2*pi*x[i]),1)
-			G[i]=x[i]*Value
-		end
-	elseif index == 3
-		# Gauss/mouse map
-		for i=1:max_iter
-			if x[i]==0
-				x[i+1]=0
-			else
-				x[i+1]=mod(1/x[i],1)
-			end
-			G[i]=x[i]*Value
-		end
-	elseif index == 4
-		# Iterative map
-		a=0.7
-		for i=1:max_iter
-			x[i+1]=sin((a*pi)/x[i])
-			G[i]=((x[i]+1)*Value)/2
-		end
-	elseif index == 5
-		# Logistic map
-		a=4
-		for i=1:max_iter
-			x[i+1]=a*x[i]*(1-x[i])
-			G[i]=x[i]*Value
-		end
-	elseif index == 6
-		# Piecewise map
-		P=0.4
-		for i=1:max_iter
-			if x[i]>=0 && x[i]<P
-				x[i+1]=x[i]/P
-			end
-			if x[i]>=P && x[i]<0.5
-				x[i+1]=(x[i]-P)/(0.5-P)
-			end
-			if x[i]>=0.5 && x[i]<1-P
-				x[i+1]=(1-P-x[i])/(0.5-P)
-			end
-			if x[i]>=1-P && x[i]<1
-				x[i+1]=(1-x[i])/P
-			end    
-			G[i]=x[i]*Value
-		end
+    G = zeros(max_iter)
+    if index == 1
+        # Chebyshev map
+        for i=1:max_iter
+            x[i+1]=cos(i*acos(x[i]))
+            G[i]=((x[i]+1)*Value)/2
+        end
+    elseif index == 2
+        # Circle map
+        a=0.5
+        b=0.2
+        for i=1:max_iter
+            x[i+1]=mod(x[i]+b-(a/(2*pi))*sin(2*pi*x[i]),1)
+            G[i]=x[i]*Value
+        end
+    elseif index == 3
+        # Gauss/mouse map
+        for i=1:max_iter
+            if x[i]==0
+                x[i+1]=0
+            else
+                x[i+1]=mod(1/x[i],1)
+            end
+            G[i]=x[i]*Value
+        end
+    elseif index == 4
+        # Iterative map
+        a=0.7
+        for i=1:max_iter
+            x[i+1]=sin((a*pi)/x[i])
+            G[i]=((x[i]+1)*Value)/2
+        end
+    elseif index == 5
+        # Logistic map
+        a=4
+        for i=1:max_iter
+            x[i+1]=a*x[i]*(1-x[i])
+            G[i]=x[i]*Value
+        end
+    elseif index == 6
+        # Piecewise map
+        P=0.4
+        for i=1:max_iter
+            if x[i]>=0 && x[i]<P
+                x[i+1]=x[i]/P
+            end
+            if x[i]>=P && x[i]<0.5
+                x[i+1]=(x[i]-P)/(0.5-P)
+            end
+            if x[i]>=0.5 && x[i]<1-P
+                x[i+1]=(1-P-x[i])/(0.5-P)
+            end
+            if x[i]>=1-P && x[i]<1
+                x[i+1]=(1-x[i])/P
+            end    
+            G[i]=x[i]*Value
+        end
 
-	elseif index == 7
-		# Sine map
-		for i=1:max_iter
-			 x[i+1] = sin(pi*x[i])
-			 G[i]=(x[i])*Value
-		 end
-	elseif index == 8
-		 # Singer map 
-		 u=1.07
-		 for i=1:max_iter
-			 x[i+1] = u*(7.86*x[i]-23.31*(x[i]^2)+28.75*(x[i]^3)-13.302875*(x[i]^4))
-			 G[i]=(x[i])*Value
-		 end
-	elseif index == 9
-		# Sinusoidal map
-		 for i=1:max_iter
-			 x[i+1] = 2.3*x[i]^2*sin(pi*x[i])
-			 G[i]=(x[i])*Value
-		 end
-		 
-	elseif index == 10
-		 # Tent map
-		 x[1]=0.6
-		 for i=1:max_iter
-			 if x[i]<0.7
-				 x[i+1]=x[i]/0.7
-			 end
-			 if x[i]>=0.7
-				 x[i+1]=(10/3)*(1-x[i])
-			 end
-			 G[i]=(x[i])*Value
-		 end
+    elseif index == 7
+        # Sine map
+        for i=1:max_iter
+            x[i+1] = sin(pi*x[i])
+            G[i]=(x[i])*Value
+        end
+    elseif index == 8
+        # Singer map 
+        u=1.07
+        for i=1:max_iter
+            x[i+1] = u*(7.86*x[i]-23.31*(x[i]^2)+28.75*(x[i]^3)-13.302875*(x[i]^4))
+            G[i]=(x[i])*Value
+        end
+    elseif index == 9
+        # Sinusoidal map
+        for i=1:max_iter
+            x[i+1] = 2.3*x[i]^2*sin(pi*x[i])
+            G[i]=(x[i])*Value
+        end
 
-	end
-	return G[curr_iter]
+    elseif index == 10
+        # Tent map
+        x[1]=0.6
+        for i=1:max_iter
+            if x[i]<0.7
+                x[i+1]=x[i]/0.7
+            end
+            if x[i]>=0.7
+                x[i+1]=(10/3)*(1-x[i])
+            end
+            G[i]=(x[i])*Value
+        end
+
+    end
+    return G[curr_iter]
 
 end
 
