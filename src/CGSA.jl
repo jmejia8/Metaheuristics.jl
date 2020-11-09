@@ -207,9 +207,10 @@ function update_state_cgsa!(
     X, V = move(X,a,V)
 
     # Checking allowable range. 
-    X = correctPop(X, low, up)
+    # X = correctPop(X, low, up)
     for i = 1:N
-        x = X[i,:]
+        x = reset_to_violated_bounds!(X[i,:], problem.bounds)
+        X[i,:] = x
         P[i] = generateChild(x, problem.f(x))
         fitness[i] = P[i].f
     end

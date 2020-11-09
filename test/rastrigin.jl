@@ -37,7 +37,7 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    pso = PSO(N=300)
+    pso = PSO(N=200)
     pso.options.f_calls_limit = 30000D
     status = optimize(rastrigin, bounds, pso)
     result = status.best_sol.x
@@ -51,7 +51,9 @@ end
     # CGSA
     cgsa = CGSA()
     cgsa.options.iterations = 500
+    cgsa.options.debug = true
     status = optimize(rastrigin, bounds, cgsa)
+    display(status)
     result = minimizer(status)
     fitness = minimum(status)
     test_result(result, fitness, D, 1e-1)

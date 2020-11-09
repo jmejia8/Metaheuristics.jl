@@ -158,7 +158,7 @@ function update_state_woa!(
 
     end # for j
 
-    x = correctSol(x, problem.bounds[1,:], problem.bounds[2,:])
+    x = reset_to_violated_bounds!(x, problem.bounds)
     status.population[i] = generateChild(x, problem.f(x))
     status.f_calls += 1
 
