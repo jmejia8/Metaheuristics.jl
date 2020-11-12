@@ -10,7 +10,7 @@ export optimize, ECA, Options, State, Information, Engine, Problem
 export MOEAD_DE
 
 # v2.1 items
-export convergence, minimizer, minimum, positions, fvals, nfes
+export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fval
 
 include("externals.jl")
 include("stop.jl")

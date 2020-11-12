@@ -4,6 +4,20 @@ mutable struct Bee
     t::Int
 end
 
+"""
+    get_position(bee)
+
+Get the position vector of a bee when optimize using ABC algorithm.
+"""
+get_position(bee::Bee) = bee.sol.x
+
+"""
+    fval(solution)
+
+Get the fitness of a bee when optimize using ABC algorithm.
+"""
+fval(bee::Bee) = bee.sol.f
+
 Bees = Array{Bee, 1}
 
 Bee(solution) = Bee(solution, fit(solution.f), 0)

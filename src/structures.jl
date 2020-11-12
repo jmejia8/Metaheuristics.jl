@@ -62,6 +62,20 @@ function xFgh_indiv(
 end
 
 """
+    get_position(solution)
+
+Get the position vector.
+"""
+get_position(solution::Union{xf_indiv, xfg_indiv, xFgh_indiv}) = solution.x
+
+"""
+    fval(solution)
+
+Get the objective function value (fitness) of a solution.
+"""
+fval(solution::Union{xf_indiv, xfg_indiv, xfgh_indiv, xFgh_indiv}) = solution.f
+
+"""
     State datatype
 State is used to store the current metaheuristic status. In fact, the `optimize`
 function returns a `State`.
@@ -177,7 +191,7 @@ minimum(s::State) = s.best_sol.f
 If `state.population` has `N` solutions, then returns a `N`×d `Matrix`.
 """
 positions(s::State) = begin
-    isempty(s.population) ? zeros(0,0) : Array(hcat(map(a -> a.x, s.population)...)')
+    isempty(s.population) ? zeros(0,0) : Array(hcat(map(get_position, s.population)...)')
 end
 
 """
@@ -187,10 +201,10 @@ objective function values from items in `state.population`.
 """
 fvals(s::State) = begin
     if !isempty(s.population) && typeof(s.population[1].f) <: Vector
-        return Array(hcat(map(a -> a.f, s.population)...)')
+        return Array(hcat(map(fval, s.population)...)')
     end
 
-    return map(a -> a.f, s.population)
+    return map(fval, s.population)
 end
 
 """
