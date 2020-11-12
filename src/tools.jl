@@ -73,6 +73,20 @@ function evo_boundary_repairer!(x, x_best, bounds)
     end
     x  
 end
+
+
+function is_in_bounds(x, bounds) 
+    for i in 1:size(bounds,2)
+        l = bounds[1, i]
+        u = bounds[2, i]
+        if !( l <= x[i] <= u )
+            return false
+        end
+
+    end
+    return true
+end
+
 ###################################################
 #      Solutions and population functions
 #          for Matrix representation

@@ -27,13 +27,14 @@ function fit(fx)
     1.0 + abs(fx)
 end
 
-function updateBee!(bee, bee2, f)
+function updateBee!(bee, bee2, f, bounds)
     D = length(bee.sol.x)
     ϕ = -1.0 + 2.0rand()
 
     v = ϕ*(bee.sol.x - bee2.sol.x)
 
     x_new = bee.sol.x + v
+
     fx = f(x_new)
 
     if fx < bee.sol.f
@@ -50,10 +51,10 @@ function getK(i, N)
     return rand(union(1:i-1, i+1:N))
 end
 
-function employedPhase!(bees, f, Ne)
+function employedPhase!(bees, f, Ne, bounds)
     N = length(bees)
     for i in randperm(N)[1:Ne]
-        updateBee!(bees[i], bees[getK(i, N)], f)
+        updateBee!(bees[i], bees[getK(i, N)], f, bounds)
     end
 end
 
@@ -71,13 +72,13 @@ function roulettSelect(bees, sum_f)
     return length(bees)
 end
 
-function outlookerPhase!(bees, f, No::Int)
+function outlookerPhase!(bees, f, No::Int, bounds)
     N = length(bees)
     sum_f = sum(map(x->x.fit, bees))
 
     for i=1:No
         j = roulettSelect(bees, sum_f)
-        updateBee!(bees[j], bees[getK(j, N)], f)
+        updateBee!(bees[j], bees[getK(j, N)], f, bounds)
     end
 end
 
@@ -236,8 +237,8 @@ function update_state_abc!(
     a = view(bounds, 1,:)
     b = view(bounds, 2,:)
 
-    employedPhase!(bees, fobj, Ne)        
-    outlookerPhase!(bees, fobj, No)
+    employedPhase!(bees, fobj, Ne, bounds)        
+    outlookerPhase!(bees, fobj, No, bounds)
 
     @inline genPos(D=D, a=Array(a), b = Array(b)) = initializeSol(D, a, b)
     best = chooseBest(bees, status.best_sol)

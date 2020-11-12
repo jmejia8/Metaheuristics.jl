@@ -199,6 +199,7 @@ function update_state_de!(
         end
 
         # instance child
+        v = evo_boundary_repairer!(v, xBest, problem.bounds)
         h = generateChild(v, problem.f(v))
         status.f_calls += 1
 

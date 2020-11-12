@@ -119,7 +119,7 @@ end
 @inline function velocity(x, v, pbest, gbest, parameters)
     r1 = parameters.C1 * rand()
     r2 = parameters.C2 * rand()
-    parameters.ω * v + r2 * (pbest - x) + r2 * (gbest - x)
+    parameters.ω * v + r1 * (pbest - x) + r2 * (gbest - x)
 end
 
 function update_state_pso!(
@@ -139,7 +139,8 @@ function update_state_pso!(
 
         parameters.v[i, :] =
         velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
-        x = replace_with_random_in_bounds!(x + parameters.v[i, :], problem.bounds)
+        x = reset_to_violated_bounds!(x + parameters.v[i, :], problem.bounds)
+        # x += parameters.v[i, :]
 
         sol = generateChild(x, problem.f(x))
         status.f_calls += 1
@@ -149,6 +150,7 @@ function update_state_pso!(
 
             if engine.is_better(sol, status.best_sol)
                 status.best_sol = sol
+                xGBest = status.best_sol.x
             end
         end
 
