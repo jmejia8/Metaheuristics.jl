@@ -57,18 +57,18 @@ function PSO(;
     options = Options(),
 )
 
-    parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
+parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
 
-    Algorithm(
-        parameters,
-        initialize! = initialize_pso!,
-        update_state! = update_state_pso!,
-        is_better = is_better,
-        stop_criteria = stop_check,
-        final_stage! = final_stage_pso!,
-        information = information,
-        options = options,
-    )
+Algorithm(
+    parameters,
+    initialize! = initialize_pso!,
+    update_state! = update_state_pso!,
+    is_better = is_better,
+    stop_criteria = stop_check,
+    final_stage! = final_stage_pso!,
+    information = information,
+    options = options,
+)
 end
 
 function getBestPSO(fs::Array{Float64})
@@ -78,13 +78,13 @@ function getBestPSO(fs::Array{Float64})
 end
 
 function initialize_pso!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-)
+        problem,
+        engine,
+        parameters,
+        status,
+        information,
+        options,
+       )
     D = size(problem.bounds, 2)
 
 
@@ -95,7 +95,7 @@ function initialize_pso!(
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
         options.debug &&
-            @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        @warn( "f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
@@ -123,14 +123,14 @@ end
 end
 
 function update_state_pso!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-    iteration,
-)
+        problem,
+        engine,
+        parameters,
+        status,
+        information,
+        options,
+        iteration,
+       )
     xGBest = status.best_sol.x
     # For each elements in population
     for i = 1:parameters.N
@@ -138,8 +138,8 @@ function update_state_pso!(
         xPBest = status.population[i].x
 
         parameters.v[i, :] =
-            velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
-        x += parameters.v[i, :]
+        velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
+        x = replace_with_random_in_bounds!(x + parameters.v[i, :], problem.bounds)
 
         sol = generateChild(x, problem.f(x))
         status.f_calls += 1
