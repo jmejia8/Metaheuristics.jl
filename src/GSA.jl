@@ -67,7 +67,7 @@ function Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
 			if j != i
 				R = norm(X[i,:]-X[j,:], Rnorm) #Euclidian distanse.
 				for k=1:D 
-					E[i, k] = E[i, k]+rand() * (M[j]) * ((X[j,k]-X[i, k]) / (R^Rpower))
+                    E[i, k]= E[i,k]+rand() * (M[j]) * ((X[j,k]-X[i,k])/(R^Rpower + eps()))
 					#note that Mp(i)/Mi(i)=1
 				end
 			end

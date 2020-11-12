@@ -89,7 +89,7 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], CGSA(N = 80, chaosIndex = 1))
 function CGSA(;
         N::Int    = 30,
         chValueInitial::Real   = 20,
-        chaosIndex::Real   = 9,
+        chaosIndex::Real   = 8,
         ElitistCheck::Int    = 1,
         Rpower::Int    = 1,
         Rnorm::Int    = 2,
@@ -171,14 +171,13 @@ function update_state_cgsa!(
 
     wMax = parameters.wMax
     N = parameters.N
-    wMin = parameters.wMax
+    wMin = parameters.wMin
     max_it = options.iterations
     searchType = :minimize
     chaosIndex = parameters.chaosIndex	
     Rnorm = parameters.Rnorm
     Rpower = parameters.Rpower
     ElitistCheck = parameters.ElitistCheck
-    low, up = problem.bounds[1,:], problem.bounds[2,:]
 
     X = parameters.X
     V = parameters.V
@@ -200,12 +199,15 @@ function update_state_cgsa!(
         G += chaos(chaosIndex,iteration,max_it,chValue)
     end
 
+
     #Calculation of accelaration in gravitational field. eq.7-10,21.
     a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
 
     #Agent movement. eq.11-12
     X, V = move(X,a,V)
 
+
+    #
     # Checking allowable range. 
     # X = correctPop(X, low, up)
     for i = 1:N
