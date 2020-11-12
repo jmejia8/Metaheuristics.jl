@@ -36,23 +36,24 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    pso = PSO(N=200)
+    pso = PSO(ω=0.5)
     pso.options.f_calls_limit = 30000D
     status = optimize(rastrigin, bounds, pso)
     result = status.best_sol.x
     fitness = status.best_sol.f
-    test_result(result, fitness, D, 1e-3)
+    test_result(result, fitness, D, 1e1)
 
     # ABC results
     result, fitness = ABC(rastrigin, [-1.0ones(D) 1.0ones(D)]', limit=20)
     test_result(result, fitness, D, 1e-5)
     
     # CGSA
+    seed!(1)
     cgsa = CGSA(chaosIndex=3, N=100)
     status = optimize(rastrigin, bounds, cgsa)
     result = minimizer(status)
     fitness = minimum(status)
-    test_result(result, fitness, D, 1e-5)
+    test_result(result, fitness, D, 1e1)
 
     # SA results
     status = optimize(rastrigin, bounds, SA())

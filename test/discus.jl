@@ -19,7 +19,7 @@ end
     # Objective function
     discus(x::Vector{Float64}) = 1e6x[1].^2 + sum(x[2:end] .^2)
 
-    bounds = Array([-100.0ones(D) 100.0ones(D)]')
+    bounds = Array([-10.0ones(D) 10.0ones(D)]')
 
     # ECA results
     status = optimize(discus, bounds, ECA())
@@ -34,10 +34,10 @@ end
     test_result(result, fitness, D, 1e-5)
 
     # PSO results
-    status = optimize(discus, 0.1bounds, PSO())
+    status = optimize(discus, [-10.0ones(5) 10.0ones(5)]', PSO(N =20))
     result = status.best_sol.x
     fitness = status.best_sol.f
-    test_result(result, fitness, D, 1e1)
+    test_result(result, fitness, D, 1e-5)
 
     # ABC results
     result, fitness = ABC(discus, [-10.0ones(5) 10.0ones(5)]', limit=20)
