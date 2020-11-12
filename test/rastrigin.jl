@@ -23,7 +23,6 @@ end
 
     bounds = Array([-5.0ones(D) 5.0ones(D)]')
 
-
     status = optimize(rastrigin, bounds, ECA())
     result = status.best_sol.x
     fitness = status.best_sol.f
@@ -49,14 +48,11 @@ end
     test_result(result, fitness, D, 1e-5)
     
     # CGSA
-    cgsa = CGSA()
-    cgsa.options.iterations = 500
-    cgsa.options.debug = true
+    cgsa = CGSA(chaosIndex=3, N=100)
     status = optimize(rastrigin, bounds, cgsa)
-    display(status)
     result = minimizer(status)
     fitness = minimum(status)
-    test_result(result, fitness, D, 1e-1)
+    test_result(result, fitness, D, 1e-5)
 
     # SA results
     status = optimize(rastrigin, bounds, SA())
