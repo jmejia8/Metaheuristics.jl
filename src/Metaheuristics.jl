@@ -74,6 +74,7 @@ include("ABC.jl")
 
 include("moead-de.jl")
 
+include("NSGA2.jl")
 
 include("deprecated.jl")
 
