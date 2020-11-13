@@ -31,7 +31,8 @@ julia> result = optimize(f, bounds)
 function optimize(
       f::Function, # objective function
       bounds::AbstractMatrix,
-      method::AbstractAlgorithm = ECA(),
+      method::AbstractAlgorithm = ECA();
+      logger::Function = (status) -> nothing
 )
 
       problem = Problem(f, Array(bounds))
@@ -90,6 +91,8 @@ function optimize(
             if options.store_convergence
                   update_convergence!(convergence, status)
             end
+
+            logger(status)
             #status.stop = status.stop||engine.stop_criteria(status,information,options)
       end
 
