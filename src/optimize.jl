@@ -70,6 +70,8 @@ function optimize(
       method.options.debug && @info("Starting main loop...")
 
       status.iteration = 0
+      logger(status)
+
       while !status.stop
             status.iteration += 1
 
