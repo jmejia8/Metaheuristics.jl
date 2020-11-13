@@ -187,24 +187,21 @@ function initialize_nsga2!(
         parameters.p_m = 1.0 / D
     end
 
-    if options.iterations == 0
+    if options.iterations <= 0
         options.iterations = 500
- 
+         
         if options.f_calls_limit == 0
-            options.f_calls_limit = options.iterations / parameters.N + 1
+            options.f_calls_limit = options.iterations * parameters.N + 1
         end
     end
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
         if options.iterations == 0
-            options.iterations = options.f_calls_limit * parameters.N
+            options.iterations = options.f_calls_limit ÷ parameters.N
         end
     end
 
-    if options.iterations == 0
-        options.iterations = div(options.f_calls_limit, parameters.N) + 1
-    end
 
     initialize!(problem, engine, parameters, status, information, options)
 

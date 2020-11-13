@@ -40,6 +40,10 @@ end
     status_moead = optimize(ff, bounds, moead_de)
     display(status_moead)
 
+    nsga = NSGA2()
+    st = optimize(ff, bounds, nsga)
+    display(st)
+
     @test true
 
 end
