@@ -47,7 +47,7 @@ function display(status::State)
         catch
             b = nothing
         end
-        if !isnothing(b)
+        if !isnothing(b) && !isempty(b)
             println("\nBest solution(s)")
             display(b)
         end
