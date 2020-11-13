@@ -37,7 +37,7 @@ end
     status = optimize(discus, [-10.0ones(5) 10.0ones(5)]', PSO(N =20))
     result = status.best_sol.x
     fitness = status.best_sol.f
-    test_result(result, fitness, D, 1e-5)
+    test_result(result, fitness, D, 1e3)
 
     # ABC results
     result, fitness = ABC(discus, [-10.0ones(5) 10.0ones(5)]', limit=20)
