@@ -18,7 +18,7 @@ Parameters for the metaheuristic NSGA2.
 """
 function NSGA2(;
     N = 100,
-    η_cr = 15,
+    η_cr = 20,
     p_cr = 0.9,
     η_m = 20,
     p_m = -1,
@@ -41,8 +41,9 @@ function NSGA2(;
 
 end
 
-function tournament_selection(P, is_better)
-    a, b = rand(1:length(P)), rand(1:length(P))
+function tournament_selection(P, i, is_better)
+    a = i
+    b = rand(1:length(P))
     
     is_better(P[a], P[b]) || (!is_better(P[b], P[a]) && P[a].crowding > P[b].crowding ) ? P[a] : P[b]
 end
@@ -91,7 +92,6 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     return cc1, cc2
 end
 
-# https://github.com/msu-coinlab/pymoo/blob/master/pymoo/operators/mutation/polynomial_mutation.py
 function polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
     do_mutation = rand(length(vector)) .< prob
 
@@ -129,12 +129,13 @@ function update_state_nsga2!(
         iteration,
        )
 
-    # fast_non_dominated_sort!(view(status.population, 1:parameters.N), engine.is_better)
 
+    I = randperm(parameters.N)
+    J = randperm(parameters.N)
     for i = 1:parameters.N
 
-        pa = tournament_selection(status.population, engine.is_better)
-        pb = tournament_selection(status.population, engine.is_better)
+        pa = tournament_selection(status.population, I[i], engine.is_better)
+        pb = tournament_selection(status.population, J[i], engine.is_better)
 
         # crossover
         c1, c2 = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
@@ -191,19 +192,14 @@ function initialize_nsga2!(
         options.iterations = 500
          
         if options.f_calls_limit == 0
-            options.f_calls_limit = options.iterations * parameters.N + 1
+            options.f_calls_limit = options.iterations * 2parameters.N + 1
         end
+    elseif options.f_calls_limit == 0
+        options.f_calls_limit = options.iterations * 2parameters.N + 1
     end
-
-    if options.f_calls_limit == 0
-        options.f_calls_limit = 10000D
-        if options.iterations == 0
-            options.iterations = options.f_calls_limit ÷ parameters.N
-        end
-    end
-
 
     initialize!(problem, engine, parameters, status, information, options)
+    fast_non_dominated_sort!(status.population, engine.is_better)
 
     indiv_type = typeof(status.population[1])
     if indiv_type <: xfgh_indiv || indiv_type <: xFgh_indiv
@@ -218,11 +214,8 @@ end
 function final_stage_nsga2!(status, information, options)
     status.final_time = time()
 
-    # compute Pareto front if it is a multiobjective problem
-    if typeof(status.population[1].f) <: Array
-        options.debug && @info "Computing Pareto front..."
-        status.best_sol = get_pareto_front(status.population, is_better_nsga2)
-    end
+    status.best_sol = get_pareto_front(status.population, is_better_nsga2)
+
 end
 
 

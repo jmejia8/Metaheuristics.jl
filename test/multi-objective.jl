@@ -40,7 +40,7 @@ end
     status_moead = optimize(ff, bounds, moead_de)
     display(status_moead)
 
-    nsga = NSGA2()
+    nsga = NSGA2(options=Options(debug=false, iterations = 700))
     st = optimize(ff, bounds, nsga)
     display(st)
 
