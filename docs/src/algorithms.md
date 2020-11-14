@@ -52,3 +52,10 @@ SA
 ```@docs
 WOA
 ```
+
+
+## NSGA-II
+
+```@docs
+NSGA2
+```
