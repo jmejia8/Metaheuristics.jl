@@ -187,12 +187,8 @@ function update_state_nsga2!(
                               parameters.η_cr, parameters.p_cr)
        
         # mutation
-        rand() < parameters.p_m && polynomial_mutation!(c1,
-                                                        problem.bounds,
-                                                        parameters.η_m)
-        rand() < parameters.p_m && polynomial_mutation!(c2,
-                                                        problem.bounds,
-                                                        parameters.η_m)
+        polynomial_mutation!(c1,problem.bounds,parameters.η_m, parameters.p_m)
+        polynomial_mutation!(c2,problem.bounds,parameters.η_m, parameters.p_m)
        
         # rapair solutions if necesary
         replace_with_random_in_bounds!(c1, problem.bounds)
