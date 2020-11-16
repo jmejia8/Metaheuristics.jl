@@ -29,8 +29,6 @@ include("common/stop.jl")
 include("solutions/individual.jl")
 include("solutions/constrained.jl")
 include("solutions/display.jl")
-include("solutions/methods.jl")
-
 
 
 include("algorithms/algorithm.jl")
@@ -85,7 +83,7 @@ include("algorithms/NSGA2/NSGA2.jl")
 #                                                     #
 #######################################################
 include("deprecated/tools.jl")
-
+include("deprecated/methods.jl")
 
 # Grasshopper optimisation algorithm: Theory and application
 # S Saremi, S Mirjalili, A Lewis - Advances in Engineering Software, 2017
