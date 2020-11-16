@@ -13,19 +13,33 @@ export MOEAD_DE
 export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fval, NSGA2
 
 include("externals.jl")
-include("common/stop.jl")
-include("common/structures.jl")
-include("common/operators.jl")
-include("solutions/display.jl")
-include("algorithms/algorithm.jl")
-include("common/tools.jl")
+
+
+include("core/abstracts.jl")
+include("core/information.jl")
+include("core/options.jl")
+include("core/state.jl")
+include("core/structures.jl")
+
+
 include("common/multi-objective-functions.jl")
+include("common/repair.jl")
+include("common/stop.jl")
+
+include("solutions/individual.jl")
+include("solutions/constrained.jl")
+include("solutions/display.jl")
+include("solutions/methods.jl")
+
+
+
+include("algorithms/algorithm.jl")
 
 include("optimize.jl")
 
 #######################################################
 #                                                     #
-#           A L G O R I T H M S                       #        
+#           A L G O R I T H M S                       #
 #                                                     #
 #######################################################
 
@@ -61,6 +75,17 @@ include("algorithms/MOEAD_DE/MOEAD_DE.jl")
 
 # Non-dominate sorting Genetic Algorithm
 include("algorithms/NSGA2/NSGA2.jl")
+
+
+
+
+#######################################################
+#                                                     #
+#           D E P R E C A T E D                       #
+#                                                     #
+#######################################################
+include("deprecated/tools.jl")
+
 
 # Grasshopper optimisation algorithm: Theory and application
 # S Saremi, S Mirjalili, A Lewis - Advances in Engineering Software, 2017

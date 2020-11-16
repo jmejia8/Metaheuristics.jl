@@ -1,3 +1,6 @@
+include("velocity.jl")
+
+
 mutable struct PSO
     N::Int
     C1::Float64
@@ -71,12 +74,6 @@ Algorithm(
 )
 end
 
-function getBestPSO(fs::Array{Float64})
-    fx = minimum(fs)
-
-    return generateChild(zeros(2), fx)
-end
-
 function initialize_pso!(
         problem,
         engine,
@@ -115,12 +112,6 @@ function initialize_pso!(
 
 end
 
-
-@inline function velocity(x, v, pbest, gbest, parameters)
-    r1 = parameters.C1 * rand()
-    r2 = parameters.C2 * rand()
-    parameters.ω * v + r1 * (pbest - x) + r2 * (gbest - x)
-end
 
 function update_state_pso!(
         problem,

@@ -1,6 +1,9 @@
 # Based on MATLAB code of Héctor Corte
 # B.Sc. in physics 2010
 
+
+include("new_solution.jl")
+
 mutable struct SA
     N::Int
     x_initial::Vector{Float64}
@@ -81,13 +84,6 @@ function SA(;
 
     
 end
-
-function newSol(y, μ)
-	# This function is used to generate new point according to lower and upper
-	# and a random factor proportional to current point.
-	return(((1.0 .+ μ) .^ abs.(y) .- 1) / μ) .* sign.(y)
-end
-
 
 function initialize_sa!(
     problem,
