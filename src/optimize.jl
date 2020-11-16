@@ -4,7 +4,6 @@
             bounds::AbstractMatrix,
             method::AbstractAlgorithm = ECA();
             logger::Function = (status) -> nothing,
-            seed = rand(UInt)
       )
 
 Minimize a n-dimensional function `f` with domain `bounds` (2×n matrix) using `method = ECA()` by default.
