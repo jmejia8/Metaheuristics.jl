@@ -108,7 +108,7 @@ end
 
 Get the position vector.
 """
-get_position(solution::Union{xf_indiv, xfg_indiv, xFgh_indiv}) = solution.x
+get_position(solution::Union{xf_indiv, xfg_indiv, xfgh_indiv, xFgh_indiv}) = solution.x
 
 """
     fval(solution)
