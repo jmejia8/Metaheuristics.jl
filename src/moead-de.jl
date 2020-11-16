@@ -154,6 +154,15 @@ function initialize_MOEAD_DE!(
     initialize_weight_vectors!(parameters, problem)
     initialize_closest_weight_vectors!(parameters, problem)
 
+    if options.iterations == 0
+        options.iterations = 500
+    end
+
+    if options.f_calls_limit == 0
+        options.f_calls_limit = options.iterations * parameters.N + 1
+    end
+
+
 
     initialize!(problem, engine, parameters, status, information, options)
     update_reference_point!(parameters.z, status.population)

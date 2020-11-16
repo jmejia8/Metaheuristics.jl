@@ -1,5 +1,11 @@
 """
-    optimize(f::Function, bounds::Matrix{Float64}, method)
+      optimize(
+            f::Function, # objective function
+            bounds::AbstractMatrix,
+            method::AbstractAlgorithm = ECA();
+            logger::Function = (status) -> nothing,
+            seed = rand(UInt)
+      )
 
 Minimize a n-dimensional function `f` with domain `bounds` (2×n matrix) using `method = ECA()` by default.
 
@@ -32,13 +38,15 @@ function optimize(
       f::Function, # objective function
       bounds::AbstractMatrix,
       method::AbstractAlgorithm = ECA();
-      logger::Function = (status) -> nothing
+      logger::Function = (status) -> nothing,
 )
 
       problem = Problem(f, Array(bounds))
       engine = method.engine
       convergence = State[]
+      seed!(method.options.seed)
       method.options.debug && @info("Initializing population...")
+
 
       method.status.start_time = time()
       engine.initialize!(
@@ -93,9 +101,13 @@ function optimize(
             if options.store_convergence
                   update_convergence!(convergence, status)
             end
-
+            
+            status.overall_time = time() - status.start_time
             logger(status)
-            #status.stop = status.stop||engine.stop_criteria(status,information,options)
+            status.stop = status.stop || 
+                        call_limit_stop_check(status, information, options) ||
+                        iteration_stop_check(status, information, options)  ||
+                        time_stop_check(status, information, options)
       end
 
       status.overall_time = time() - status.start_time

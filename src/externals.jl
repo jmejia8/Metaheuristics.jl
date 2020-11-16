@@ -1,6 +1,6 @@
 if VERSION >= v"0.7.0"
 	# import DelimitedFiles.writedlm
-	import Random: randperm, shuffle!
+	import Random: randperm, shuffle!, seed!
 	import Printf.@printf
 	import LinearAlgebra: norm, Diagonal, dot
 	import Statistics: var, mean, std
