@@ -10,11 +10,7 @@ else
 end
 
 @testset "Metaheuristics" for tests in [
-            "sphere.jl",
-            "discus.jl",
-            "rastrigin.jl",
-            "constrained.jl",
-            "multi-objective.jl"
+            "box-constrained.jl",
 ]
     include(tests)
 end

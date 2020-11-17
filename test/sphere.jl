@@ -13,14 +13,6 @@ end
     end
 
     
-    # Dimension
-    D = 10
-
-    # Objective function
-    sphere(x) = sum(x.*x)
-
-    bounds = Array([-100.0ones(D) 100.0ones(D)]')
-
     # SA results
     status = optimize(sphere, bounds, SA())
     result = minimizer(status)

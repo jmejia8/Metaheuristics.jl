@@ -13,14 +13,6 @@ end
         @test ≈(fitness, 0.0, atol=tol)
     end
 
-    # Dimension
-    D = 10
-
-    # Objective function
-    discus(x::Vector{Float64}) = 1e6x[1].^2 + sum(x[2:end] .^2)
-
-    bounds = Array([-10.0ones(D) 10.0ones(D)]')
-
     # ECA results
     status = optimize(discus, bounds, ECA())
     result = status.best_sol.x

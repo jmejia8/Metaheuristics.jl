@@ -31,6 +31,9 @@ include("solutions/constrained.jl")
 include("solutions/display.jl")
 
 
+include("benchmark/benchmark.jl")
+
+
 include("algorithms/algorithm.jl")
 
 include("optimize.jl")
