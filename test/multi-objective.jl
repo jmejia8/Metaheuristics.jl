@@ -10,40 +10,33 @@ end
 # write your own tests here
 @testset "Multi objective" begin
 
+    function run_methods(problem)
 
-    # Dimension
-    D = 10
 
-    # Objective function
-    f(x) = begin
-        g = 1.0 + (9 / (length(x) - 1)) * sum(x[2:end])
-        f1 = x[1]
-        f2 = g*(1-sqrt(x[1] / g))
-        return [f1, f2], [], [0.0]
+        f, bounds = Metaheuristics.Benchmark.get_problem(problem)
+        D = size(bounds, 2)
+
+        options = Options( seed = 1, iterations = 500)
+
+        methods = [
+                ECA(N = 100, options=options),
+                MOEAD_DE(D, 2, N = 300, options=options),
+                NSGA2(options=options)
+              ]
+
+        for method in methods
+            result = ( optimize(f, bounds, method) ) 
+            display(result)
+            @test true
+        end
     end
-    ff(x) = begin
-        g = 1.0 + (9 / (length(x) - 1)) * sum(x[2:end])
-        f1 = x[1]
-        f2 = g*(1-sqrt(x[1] / g) - (x[1]/g) * sin(10π*x[1]))
-        return [f1, f2], [0.0], [0.0]
+
+
+    for problem in [:ZDT6]
+        run_methods(problem) 
     end
 
 
-    bounds = Array([zeros(D) ones(D)]')
 
-    # ECA results
-    eca = ECA(N = 100, ε = 1.0, options=Options(debug=false))
-    status_eca = optimize(ff, bounds, eca)
-    display(status_eca)
-
-    moead_de = MOEAD_DE(D, 2, N = 300, options=Options(debug=false, iterations = 500))
-    status_moead = optimize(ff, bounds, moead_de)
-    display(status_moead)
-
-    nsga = NSGA2(options=Options(debug=false, iterations = 700))
-    st = optimize(ff, bounds, nsga)
-    display(st)
-
-    @test true
 
 end
