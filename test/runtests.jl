@@ -11,6 +11,8 @@ end
 
 @testset "Metaheuristics" for tests in [
             "box-constrained.jl",
+            "constrained.jl",
+            "multi-objective.jl",
 ]
     include(tests)
 end

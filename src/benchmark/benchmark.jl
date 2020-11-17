@@ -6,14 +6,11 @@ include("multiobjective.jl")
 
 
 function get_problem(problem)
-    if problem == :sphere
-        return sphere()
-    elseif problem == :discus
-        return discus()
-    elseif problem == :rastrigin
-        return rastrigin()
+    expr = Meta.parse( string(problem) * "()")
+    try
+        return eval(expr)
+    catch
     end
-
     error("Argument should be: :sphere, :discus, :rastrigin")
 
 end

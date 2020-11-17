@@ -1,39 +1,26 @@
 using Metaheuristics
+using Test
 
-if VERSION < v"0.7.0"
-    using Base.Test
-    srand(31415926534)
-else
-    using Test
-end
+@testset "Box-constrained" begin
 
-# write your own tests here
-@testset "constrained" begin
-    function test_result(result::Vector, fitness::Float64, D::Int, tol::Float64)
+    function test_result(fitness, tol)
         @test ≈(fitness, 0.0, atol=tol)
     end
 
-    # Dimension
-    D = 5
+    desired_accuracy = 1e-4
 
-    # Objective function
-    f(x) = (sum((x .- 1).^2), [sum((x .- 1).^2) - 4, sum(sin.(x .- 1)) - 1], [(x[1] - x[2])^2])
-    f2(x) = (sum((x .- 1).^2), [sum((x .- 1).^2) - 4, sum(sin.(x .- 1)) - 1, (x[1] - x[2])^2 - 6])
+    f, bounds = Metaheuristics.Benchmark.get_problem(:constrained1)
 
-    bounds = Array([-10.0ones(D) 10.0ones(D)]')
+    information = Information(f_optimum = 0.0)
+    options = Options(f_tol = desired_accuracy, seed = 1)
 
-    # ECA results
-    status = optimize(f, bounds, ECA(ε = 1.0, options=Options(debug=false)))
+    methods = [
+               ECA(options = options, information = information),
+               DE(options = options, information = information),
+              ]
 
-    result = status.best_sol.x
-    fitness = status.best_sol.f
-    test_result(result, fitness, D, 1e-5)
-
-    # ECA results 2
-    status = optimize(f2, bounds, ECA(ε = 1.0, options=Options(debug=false)))
-
-    result = status.best_sol.x
-    fitness = status.best_sol.f
-    test_result(result, fitness, D, 1e-5)
-
+    for method in methods
+        fitness = minimum( optimize(f, bounds, method) ) 
+        test_result(fitness, desired_accuracy)
+    end
 end

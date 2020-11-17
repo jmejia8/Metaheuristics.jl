@@ -19,7 +19,7 @@ end
         g = 1.0 + (9 / (length(x) - 1)) * sum(x[2:end])
         f1 = x[1]
         f2 = g*(1-sqrt(x[1] / g))
-        return [f1, f2], [g], [0.0]
+        return [f1, f2], [], [0.0]
     end
     ff(x) = begin
         g = 1.0 + (9 / (length(x) - 1)) * sum(x[2:end])

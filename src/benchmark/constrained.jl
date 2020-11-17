@@ -1,4 +1,4 @@
-function fun1(D = 5)
+function constrained1(D = 5)
     # Objective function
     f(x) = (sum((x .- 1).^2), [sum((x .- 1).^2) - 4, sum(sin.(x .- 1)) - 1], [(x[1] - x[2])^2])
 
@@ -9,7 +9,7 @@ function fun1(D = 5)
 end
 
 
-function fun2(D = 5)
+function constrained2(D = 5)
 
     f(x) = (sum((x .- 1).^2), [sum((x .- 1).^2) - 4, sum(sin.(x .- 1)) - 1, (x[1] - x[2])^2 - 6])
 
