@@ -26,9 +26,7 @@ end
 
         for method in methods
             result = ( optimize(f, bounds, method) ) 
-            @show Metaheuristics.PerformanceIndicators.igd(fvals(result), fvals(pf))
-            display(result)
-            @test true
+            @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
         end
     end
 
