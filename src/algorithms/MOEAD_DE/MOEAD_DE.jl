@@ -31,6 +31,9 @@ To use MOEAD_DE, the output from the objective function should be a 3-touple
 
 A feasible solution is such that `g_i(x) ≤ 0 and h_j(x) = 0`.
 
+Ref. Multiobjective Optimization Problems With Complicated Pareto Sets,
+MOEA/D and NSGA-II; Hui Li and Qingfu Zhang.
+
 # Example
 
 Assume you want to solve the following optimizaton problem:
@@ -78,7 +81,7 @@ function MOEAD_DE(D, nobjectives;
     λ = Array{Vector{Float64}}[],
     η = 20,
     p_m = 1.0 / D,
-    H = 299,
+    H = nobjectives == 2 ? 299 : 33,
     T = 20,
     δ = 0.9,
     n_r = 2,

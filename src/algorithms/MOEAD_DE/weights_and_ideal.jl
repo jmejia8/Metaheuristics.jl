@@ -1,7 +1,9 @@
 function initialize_weight_vectors!(parameters, problem)
-    values = (0:parameters.H) ./ parameters.H
+    values = gen_weights(parameters.nobjectives, parameters.H)
 
-    parameters.λ =  [rand(values, parameters.nobjectives) for i in 1:parameters.N]
+    parameters.N = length(values)
+
+    parameters.λ = values 
 end
 
 function initialize_closest_weight_vectors!(parameters, problem)
@@ -36,4 +38,34 @@ function update_reference_point!(z::Vector{Float64}, population)
 end
 
 @inline g(fx, λ, z) = maximum(λ .* abs.(fx - z))
+
+
+
+"""
+    gen_weights(n_objectives, H)
+
+"""
+function gen_weights(a, b)
+    nobj = a;
+    H    = b;
+    a    = zeros(nobj);
+    d    = H;
+    w    = [];
+    produce_weight!(a, 1, d, H, nobj, w)
+    return w
+end
+
+function  produce_weight!(a, i, d, H, nobj, w)
+    for k=0:d
+        if i<nobj
+            a[i] = k;
+            d2   = d - k;
+            produce_weight!(a, i+1, d2, H, nobj, w);
+        else
+            a[i] = d;
+            push!(w, a/H)
+            break;
+        end
+    end
+end
 
