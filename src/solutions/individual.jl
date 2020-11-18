@@ -60,6 +60,10 @@ end
 
 
 
+Solution = Union{xf_indiv, xfg_indiv, xfgh_indiv, xFgh_indiv}
+Population = Array{Solution, 1}
+
+
 ############################################################
 # Generate solutions depending on the objective function
 # output
@@ -108,11 +112,23 @@ end
 
 Get the position vector.
 """
-get_position(solution::Union{xf_indiv, xfg_indiv, xfgh_indiv, xFgh_indiv}) = solution.x
+get_position(solution::Solution) = solution.x
+
+positions(population::Array) = 
+    isempty(population) ? zeros(0,0) : Array(hcat(map(get_position, population)...)')
 
 """
     fval(solution)
 
 Get the objective function value (fitness) of a solution.
 """
-fval(solution::Union{xf_indiv, xfg_indiv, xfgh_indiv, xFgh_indiv}) = solution.f
+fval(solution::Solution) = solution.f
+
+
+fvals(population::Array) = begin
+    if !isempty(population) && typeof(population[1].f) <: Vector
+        return Array(hcat(map(fval, population)...)')
+    end
+
+    return map(fval, population)
+end

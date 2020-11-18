@@ -9,7 +9,7 @@ using Test
 
     desired_accuracy = 1e-4
 
-    f, bounds = Metaheuristics.Benchmark.get_problem(:constrained1)
+    f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:constrained1)
 
     information = Information(f_optimum = 0.0)
     options = Options(f_tol = desired_accuracy, seed = 1)

@@ -113,22 +113,14 @@ minimum(s::State) = s.best_sol.f
     positions(state)
 If `state.population` has `N` solutions, then returns a `N`×d `Matrix`.
 """
-positions(s::State) = begin
-    isempty(s.population) ? zeros(0,0) : Array(hcat(map(get_position, s.population)...)')
-end
+positions(s::State) = positions(s.population)
 
 """
     fvals(state)
 If `state.population` has `N` solutions, then returns a `Vector` with the 
 objective function values from items in `state.population`.
 """
-fvals(s::State) = begin
-    if !isempty(s.population) && typeof(s.population[1].f) <: Vector
-        return Array(hcat(map(fval, s.population)...)')
-    end
-
-    return map(fval, s.population)
-end
+fvals(s::State) = fvals(s.population)
 
 """
     nfes(state)

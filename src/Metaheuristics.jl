@@ -12,6 +12,8 @@ export MOEAD_DE
 # v2.1 items
 export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fval, NSGA2
 
+export PerformanceIndicators
+
 include("externals.jl")
 
 
@@ -31,7 +33,8 @@ include("solutions/constrained.jl")
 include("solutions/display.jl")
 
 
-include("benchmark/benchmark.jl")
+include("TestProblems/TestProblems.jl")
+include("performance-indicators/PerformanceIndicators.jl")
 
 
 include("algorithms/algorithm.jl")

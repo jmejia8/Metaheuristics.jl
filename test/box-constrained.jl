@@ -10,7 +10,7 @@ using Test
 
         desired_accuracy = 1e-4
 
-        f, bounds = Metaheuristics.Benchmark.get_problem(problem)
+        f, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
 
         information = Information(f_optimum = 0.0)
         options = Options(f_tol = desired_accuracy, seed = 1)

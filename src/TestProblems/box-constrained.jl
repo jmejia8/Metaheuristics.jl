@@ -4,7 +4,8 @@ function sphere(D=10)
 
     bounds = Array([-100.0ones(D) 100.0ones(D)]')
 
-	return f, bounds
+    x = zeros(D)
+    return f, bounds, [generateChild(x, f(x)) ]
 
 end
 
@@ -14,17 +15,19 @@ function discus(D = 10)
 
     bounds = Array([-10.0ones(D) 10.0ones(D)]')
 	
-    return f, bounds
+    x = zeros(D)
+    return f, bounds, [generateChild(x, f(x))] 
 end
 
-function rastrigin(D = 2)
+function rastrigin(D = 10)
     
     # Objective function
     f(x) = 10D+ sum(x.*x - 10cos.(2π*x))
 
     bounds = Array([-5.0ones(D) 5.0ones(D)]')
 
-    return f, bounds
+    x = zeros(D)
+    return f, bounds, [generateChild(x, f(x)) ]
 
 end
 

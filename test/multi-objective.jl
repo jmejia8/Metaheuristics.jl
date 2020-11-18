@@ -13,7 +13,7 @@ end
     function run_methods(problem)
 
 
-        f, bounds = Metaheuristics.Benchmark.get_problem(problem)
+        f, bounds, pf = Metaheuristics.TestProblems.get_problem(problem)
         D = size(bounds, 2)
 
         options = Options( seed = 1, iterations = 500)
@@ -26,13 +26,14 @@ end
 
         for method in methods
             result = ( optimize(f, bounds, method) ) 
+            @show Metaheuristics.PerformanceIndicators.igd(fvals(result), fvals(pf))
             display(result)
             @test true
         end
     end
 
 
-    for problem in [:ZDT6]
+    for problem in [:ZDT3]
         run_methods(problem) 
     end
 

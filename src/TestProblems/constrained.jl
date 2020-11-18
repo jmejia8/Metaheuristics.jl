@@ -5,7 +5,8 @@ function constrained1(D = 5)
 
     bounds = Array([-10.0ones(D) 10.0ones(D)]')
 
-    return f, bounds
+    x = zeros(D)
+    return f, bounds, [generateChild(x, f(x)) ]
 end
 
 
@@ -16,7 +17,8 @@ function constrained2(D = 5)
 
     bounds = Array([-10.0ones(D) 10.0ones(D)]')
 
-    return f, bounds
+    x = zeros(D)
+    return f, bounds, [generateChild(x, f(x)) ]
     
 end
 
