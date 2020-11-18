@@ -75,7 +75,16 @@ Returns the Inverted Generational Distance.
 igd(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, inverted=true, p=p)
 igd(front::State, true_pareto_front::State; p = 1) = igd(fvals(front), fvals(true_pareto_front), p=p)
 
+"""
+	gd_plus(front, true_pareto_front; p = 1)
 
+Returns the Generational Distance Plus.
+
+### Parameters
+
+- `front` is `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
+- `true_pareto_front` is a `M×m` matrix.
+"""
 gd_plus(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, p=p, plus=true)
 gd_plus(front::State, true_pareto_front::State; p = 1) = igd_plus(fvals(front), fvals(true_pareto_front), p=p)
 
