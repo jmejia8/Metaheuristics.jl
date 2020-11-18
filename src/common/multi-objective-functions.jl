@@ -39,7 +39,7 @@ function get_pareto_front(Population, is_better = is_better)
         end
     end
 
-    return view(Population, ids)
+    return Population[ids]
 
 end
 

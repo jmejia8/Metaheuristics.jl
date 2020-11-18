@@ -95,7 +95,7 @@ function MOEAD_DE(D, nobjectives;
 
     parameters = MOEAD_DE(D, nobjectives, N, promote(F, CR)..., λ, η,p_m, H, T, δ, n_r, z, B, s1)
 
-    Algorithm(
+    alg = Algorithm(
         parameters,
         initialize! = initialize_MOEAD_DE!,
         update_state! = update_state_MOEAD_DE!,
@@ -105,6 +105,14 @@ function MOEAD_DE(D, nobjectives;
         information = information,
         options = options,
     )
+
+
+    if isempty(λ)
+        initialize_weight_vectors!(alg.parameters, alg.parameters)
+        initialize_closest_weight_vectors!(alg.parameters, alg.parameters)
+    end
+
+    alg
 
 end
 
@@ -117,8 +125,10 @@ function initialize_MOEAD_DE!(
     options,
 )
     D = size(problem.bounds, 2)
-    initialize_weight_vectors!(parameters, problem)
-    initialize_closest_weight_vectors!(parameters, problem)
+    if isempty(parameters.λ)
+        initialize_weight_vectors!(parameters, problem)
+        initialize_closest_weight_vectors!(parameters, problem)
+    end
 
     if options.iterations == 0
         options.iterations = 500
@@ -160,7 +170,6 @@ function update_state_MOEAD_DE!(
     la = problem.bounds[1, :]
     lb = problem.bounds[2, :]
 
-    D = length(la)
     population = status.population
 
     for i = 1:N
@@ -171,22 +180,17 @@ function update_state_MOEAD_DE!(
         end
 
         # select participats
-        r1 = rand(P_idx)
-        while r1 == i
-            r1 = rand(P_idx)
-        end
-
+        r1 = i
         r2 = rand(P_idx)
-        while r2 == i || r1 == r2
+        while r1 == r2
             r2 = rand(P_idx)
         end
 
         r3 = rand(P_idx)
-        while r3 == i || r3 == r1 || r3 == r2
+        while r3 == r1 || r3 == r2
             r3 = rand(P_idx)
         end
 
-        x = population[i].x
         a = population[r1].x
         b = population[r2].x
         c = population[r3].x
@@ -217,7 +221,7 @@ function update_state_MOEAD_DE!(
             end
         end
 
-        v = correctSol(v, la, lb)
+        v = replace_with_random_in_bounds!(v, problem.bounds)
 
         # instance child
         h = generateChild(v, problem.f(v))
@@ -265,7 +269,7 @@ function stop_criteria_moead_de(status, information, options)
     return status.iteration > options.iterations
 end
 function final_stage_MOEAD_DE!(status, information, options)
-    # status.best_sol = get_pareto_front(status.population, is_better_eca)
-    # @show length(status.best_sol)
     status.final_time = time()
+    status.best_sol = get_pareto_front(status.population, is_better_eca)
+    # @show length(status.best_sol)
 end
