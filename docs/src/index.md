@@ -1,4 +1,10 @@
-# Introduction
+# Metaheuristics - an Intuitive Package for Global Optimization
+
+**Author: Jesus Mejía (@jmejia8)**
+
+High performance algorithms for optimization purely coded in a high performance language.
+
+## Introduction
 
 Optimization is one of the most common task in the scientific and industry field but
 real-world problems require high-performance algorithms to optimize non-differentiable,

@@ -11,6 +11,8 @@ makedocs(
                   "Introduction" => "index.md",
                   "Tutorial" => "tutorial.md",
                   "Algorithms" => "algorithms.md",
+                  "Problems" => "problems.md",
+                  "Performance Idicators" => "indicators.md",
                   "Visualization" => "visualization.md",
                   "API References" => "api.md",
                  ]
