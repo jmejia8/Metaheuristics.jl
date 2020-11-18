@@ -12,7 +12,7 @@ optimization algorithms.
 
 ### Example
 
-```julia
+```jldoctest
 julia> import Metaheuristics: PerformanceIndicators, TestProblems
 
 julia> A = [ collect(1:3) collect(1:3) ]
