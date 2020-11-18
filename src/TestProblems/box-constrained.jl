@@ -1,3 +1,8 @@
+"""
+    sphere(D)
+
+The well-known D-dimensional Sphere function.
+"""
 function sphere(D=10)
     # Objective function
     f(x) = sum(x.*x)
@@ -9,6 +14,11 @@ function sphere(D=10)
 
 end
 
+"""
+    discus(D)
+
+The well-known D-dimensional Discus function.
+"""
 function discus(D = 10)
     # Objective function
     f(x) = 1e6x[1].^2 + sum(x[2:end] .^2)
@@ -19,6 +29,12 @@ function discus(D = 10)
     return f, bounds, [generateChild(x, f(x))] 
 end
 
+
+"""
+    rastrigin(D)
+
+The well-known D-dimensional Rastrigin function.
+"""
 function rastrigin(D = 10)
     
     # Objective function
