@@ -45,4 +45,17 @@ fvals
 nfes
 ```
 
+```@docs
+pareto_front(st::State)
+```
+
+
+```@docs
+pareto_front(st::Array)
+```
+
+```@docs
+Metaheuristics.create_child
+```
+
 

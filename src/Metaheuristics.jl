@@ -12,7 +12,7 @@ export MOEAD_DE
 # v2.1 items
 export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fval, NSGA2
 
-export PerformanceIndicators
+export PerformanceIndicators, pareto_front
 
 include("externals.jl")
 

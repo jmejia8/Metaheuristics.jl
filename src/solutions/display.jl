@@ -2,13 +2,26 @@ import Base.Multimedia.display
 
 function display(solution::xf_indiv)
     @printf("| f(x) = %g\n| ", solution.f)
-    @show(solution.x)
+    println("| x = ", solution.x)
 
 
 end
 
 function display(solution::xfgh_indiv)
     @printf("| f(x) = %g\n", solution.f)
+    @printf("| g(x) = ")
+    println(solution.g)
+    @printf("| h(x) = ")
+    println(solution.h)
+    println("| x = ", solution.x)
+
+
+end
+
+
+function display(solution::xFgh_indiv)
+    @printf("| f(x) = ")
+    println(solution.f)
     @printf("| g(x) = ")
     println(solution.g)
     @printf("| h(x) = ")
