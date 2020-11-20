@@ -14,6 +14,18 @@ Open the Julia (Julia 0.7 or Later) REPL and press `]` to open the Pkg prompt. T
 pkg> add https://github.com/jmejia8/Metaheuristics.jl.git
 ```
 
+## Algorithms
+
+- Evolutionary Centers Algorithm
+- Differential Evolution
+- Particle Swarm Optimization
+- Artificial Bee Colony
+- MOEA/D-DE
+- Gravitational Search Algorithm
+- Simulated Annealing
+- Whale Optimization Algorithm
+- NSGA-II
+
 ## Quick Start
 
 Assume you want to solve the following minimization problem.
@@ -22,10 +34,10 @@ Assume you want to solve the following minimization problem.
 
 Minimize:
 
-$f(x) = 10D + \sum_{i=1}^{D}  x_i^2 - 10\cos(2\pi x_i)$
+![Eq](https://latex.codecogs.com/gif.latex?f(x) = 10D + \sum_{i=1}^{D}  x_i^2 - 10\cos(2\pi x_i))
 
-where $x\in[-5, 5]^{D}$, i.e., $-5 \leq x_i \leq 5$ for $i=1,\ldots,D$. $D$ is the
-dimension number, assume $D=10$.
+where ![Eq](https://latex.codecogs.com/gif.latex?x\in[-5, 5]^{D}), i.e., ![Eq](https://latex.codecogs.com/gif.latex?-5 \leq x_i \leq 5) for ![Eq](https://latex.codecogs.com/gif.latex?i=1,\ldots,D). D is the
+dimension number, assume D=10.
 
 ### Solution
 
