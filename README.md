@@ -8,108 +8,63 @@ A Julia package for metaheuristic optimization algorithms. Evolutionary are cons
 
 ## Installation
 
-### Julia 0.7 or Later
+Open the Julia (Julia 0.7 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
-Open the Julia REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 ```
 pkg> add https://github.com/jmejia8/Metaheuristics.jl.git
 ```
 
-## Algorithms
+## Quick Start
 
-- ECA algorithm
-- Differential Evolution (DE) algorithm
-- Particle swarm optimization (PSO) algorithm
+Assume you want to solve the following minimization problem.
 
-### Optimize
+![Rastrigin Surface](https://raw.githubusercontent.com/jmejia8/Metaheuristics.jl/master/docs/src/figs/rastrigin.png)
 
-`optimize` function is used to optimize a D-dimensional function: `optimize(f::Function, bounds::Array, method::AbstractAlgorithm )`
+Minimize:
 
-- `f` objective function
-- `bounds` a 2 times D matrix that contains the lower and upper bounds by rows.
-- `method` optimization method: `ECA`, `DE`.
+$f(x) = 10D + \sum_{i=1}^{D}  x_i^2 - 10\cos(2\pi x_i)$
 
-### ECA
+where $x\in[-5, 5]^{D}$, i.e., $-5 \leq x_i \leq 5$ for $i=1,\ldots,D$. $D$ is the
+dimension number, assume $D=10$.
 
-ECA() is a new metaheuristic optimization algorithm based on center of mass. ECA minimizes an objective function [read more.](https://www.dropbox.com/s/kqc22ki2edjtt0y/ECA-optimization.pdf).
+### Solution
 
-#### Parameters
-- `η_max:` stepsize.
-- `K:` number of neighbors for generating the center of mass.
-- `N:` population size.
-
-#### Example
-```julia
-using Metaheuristics
-
-# Objective function
-sphere(x) = sum(x.^2)
-
-bounds = [-10 -10 -10 -10;
-             10  10  10  10
-]
-
-eca = ECA()
-
-result = optimize(sphere, bounds, eca)
-
-```
-
-### DE
-Differential Evolution `DE` is a method that optimizes a problem by iteratively trying to improve a candidate solution with regard to a given measure of quality. [Read more...](https://en.wikipedia.org/wiki/Differential_evolution)
-
-#### Parameters
-- `F:` DE-stepsize F_weight from interval [0, 2].
-- `N:` Number of population members.
-- `CR:` Crossover probability constant from interval [0, 1].
-- `strategy:` DE strategy
-	- `:rand1` DE/rand/1
-	- `:rand2` DE/rand/2             
-	- `:best1` DE/best/1             
-	- `:best2` DE/best/2             
-	- `:randToBest1` DE/rand-to-best/1             
-
-#### Example
+Firstly, import the Metaheuristics package:
 
 ```julia
 using Metaheuristics
-
-# Objective function
-sphere(x) = sum(x.^2)
-
-bounds = [-10 -10 -10 -10;
-             10  10  10  10
-]
-
-de = DE()
-
-result = optimize(sphere, bounds, de)
-
 ```
 
+Code the objective function:
+```julia
+f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
+```
 
-### PSO
-Particle swarm optimization is a population based stochastic optimization technique developed by Dr. Eberhart and Dr. Kennedy  in 1995, inspired by social behavior of bird flocking or fish schooling. [Read more...](https://en.wikipedia.org/wiki/Particle_swarm_optimization)
-
-#### Parameters
-- `N:` Number of population members.
-- `C1, C2`  learning factors (C1 = C2 = 2).
-- `ω:` Inertia weight used for balancing the global search.
-
-#### Example
+Instantiate the bounds, note that `bounds` should be a $2\times 10$ `Matrix` where
+the first row corresponds to the lower bounds whilst the second row corresponds to the
+upper bounds.
 
 ```julia
-using Metaheuristics
-
-# Objective function
-sphere(x) = sum(x.^2)
-
-bounds = [-10 -10 -10 -10;
-             10  10  10  10
-]
-
-pso = PSO()
-
-result = optimize(sphere, bounds, pso)
-
+D = 10
+bounds = [-5ones(D) 5ones(D)]'
 ```
+
+Approximate the optimum using the function `optimize`.
+
+```julia
+result = optimize(f, bounds)
+```
+
+Optimize returns a `State` datatype which contains some information about the approximation.
+For instance, you may use mainly two functions to obtain such approximation.
+
+```julia
+@show minimum(result)
+@show minimizer(result)
+```
+
+
+## Contributing
+
+
+Please, be free to send me your PR, issue or any comment about this package for Julia.
