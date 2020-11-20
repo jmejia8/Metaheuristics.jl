@@ -15,6 +15,7 @@ makedocs(
                   "Performance Idicators" => "indicators.md",
                   "Visualization" => "visualization.md",
                   "API References" => "api.md",
+                  "Contributing" => "contributing.md",
                  ]
         )
 
