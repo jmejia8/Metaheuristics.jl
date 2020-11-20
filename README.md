@@ -34,9 +34,9 @@ Assume you want to solve the following minimization problem.
 
 Minimize:
 
-![Eq](https://latex.codecogs.com/gif.latex?f(x) = 10D + \sum_{i=1}^{D}  x_i^2 - 10\cos(2\pi x_i))
+![Eq](https://latex.codecogs.com/gif.latex?f(x)%20=%2010D%20+%20\sum_{i=1}^{D}%20%20x_i^2%20-%2010\cos(2\pi%20x_i))
 
-where ![Eq](https://latex.codecogs.com/gif.latex?x\in[-5, 5]^{D}), i.e., ![Eq](https://latex.codecogs.com/gif.latex?-5 \leq x_i \leq 5) for ![Eq](https://latex.codecogs.com/gif.latex?i=1,\ldots,D). D is the
+where ![Eq](https://latex.codecogs.com/gif.latex?x\in[-5,%205]^{D}), i.e., ![Eq](https://latex.codecogs.com/gif.latex?-5%20\leq%20x_i%20\leq%205) for ![Eq](https://latex.codecogs.com/gif.latex?i=1,\ldots,D). D is the
 dimension number, assume D=10.
 
 ### Solution
