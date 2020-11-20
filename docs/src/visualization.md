@@ -245,3 +245,53 @@ mp4(animation, "anim-convergence.mp4", fps=30)
 
 ![](figs/anim-convergence.mp4)
 
+
+## Pareto Front
+
+
+
+```julia
+import Metaheuristics: optimize, NSGA2, TestProblems, pareto_front, Options
+using Plots; gr()
+
+f, bounds, solutions = TestProblems.ZDT3();
+
+result = optimize(f, bounds, NSGA2(options=Options(seed=0)))
+
+A = pareto_front(result)
+B = pareto_front(solutions)
+
+scatter(A[:, 1], A[:,2], label="NSGA-II")
+plot!(B[:, 1], B[:,2], label="Parento Front", lw=2)
+savefig("pareto.png")
+```
+
+
+![Final Population](figs/pareto.png)
+
+
+## Live Plotting
+
+The [`optimize`](@ref) function has a keyword parameter named `logger` that contains
+a function pointer. Such function will receive the [`State`](@ref) at the end of each
+iteration in the main optimization loop.
+
+```julia
+import Metaheuristics: optimize, NSGA2, TestProblems, pareto_front, Options, fvals
+using Plots; gr()
+
+f, bounds, solutions = TestProblems.ZDT3();
+pf = pareto_front(solutions)
+
+logger(st) = begin
+    A = fvals(st)
+    scatter(A[:, 1], A[:,2], label="NSGA-II", title="Gen: $(st.iteration)")
+    plot!(pf[:, 1], pf[:,2], label="Parento Front", lw=2)
+    gui()
+    sleep(0.1)
+end
+
+result = optimize(f, bounds, NSGA2(options=Options(seed=0)), logger=logger)
+
+```
+

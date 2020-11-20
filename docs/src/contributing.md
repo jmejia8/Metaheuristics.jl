@@ -7,11 +7,9 @@ Please, be free to send me your PR, issue or any comment about this package for 
 When you call the [`optimize`](@ref) function, the following steps are carried out:
 
 1. Initialization: `initialize!(problem, engine, parameters, status, information, options)`
-2. Main optimization loop:
-    - while `status.stop == false` do
+2. Main optimization loop: while `status.stop == false` do
     - update population, parameters via `update_state!(problem, engine, parameters, status, information, options, iteration)`, and 
-    - mainly `status.stop = engine.stop_criteria(status, information, options)`
-   via 
+    - mainly set `status.stop = engine.stop_criteria(status, information, options)`
 3. When the loop in step 2 beaks, then a final function is called `final_stage!` in order
    to update or refine the final state, e.g., delete infeasible solutions in population,
    get non-dominated solutions, etc. 
