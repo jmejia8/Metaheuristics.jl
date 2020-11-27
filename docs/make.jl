@@ -4,7 +4,7 @@ makedocs(
          format = Documenter.HTML(
                                   prettyurls = get(ENV, "CI", nothing) == "true",
                                   assets = ["assets/favicon.ico"],
-                                  analytics = "G-MCJ59XDJNN",
+                                  analytics = "UA-184071594-1",
                                  ),
          sitename="Metaheuristics.jl",
          authors = "Jesús Mejía",
