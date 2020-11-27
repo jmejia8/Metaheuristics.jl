@@ -3,7 +3,8 @@ using Documenter, Metaheuristics
 makedocs(
          format = Documenter.HTML(
                                   prettyurls = get(ENV, "CI", nothing) == "true",
-                                  assets = ["assets/favicon.ico"]
+                                  assets = ["assets/favicon.ico"],
+                                  analytics = "G-MCJ59XDJNN",
                                  ),
          sitename="Metaheuristics.jl",
          authors = "Jesús Mejía",

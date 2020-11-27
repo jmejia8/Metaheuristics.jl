@@ -18,10 +18,16 @@ global optimization.
 
 ## Installation
 
-Open the Julia (Julia 0.7 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia (Julia 1.0 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 ```
-pkg> add https://github.com/jmejia8/Metaheuristics.jl.git
+pkg> add Metaheuristics
+```
+
+Or, equivalently, via the `Pkg` API:
+
+```julia
+julia> import Pkg; Pkg.add("Metaheuristics")
 ```
 
 ## Quick Start
