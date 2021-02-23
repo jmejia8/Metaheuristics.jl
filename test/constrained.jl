@@ -21,6 +21,7 @@ using Test
 
     for method in methods
         res = optimize(f, bounds, method)
+        display(res)
         fitness = minimum( res ) 
         test_result(fitness, desired_accuracy)
     end

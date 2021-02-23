@@ -24,13 +24,14 @@ function xfgh_indiv(
     f::Float64,
     g::Vector{Float64},
     h::Vector{Float64};
-    sum_violations = 0.0
+    sum_violations = 0.0,
+    ε = 0.0
 )
     if sum_violations <= 0.0
-        sum_violations = violationsSum(g, h)
+        sum_violations = violationsSum(g, h; ε)
     end
 
-    xfgh_indiv(x, f, g, h, sum_violations, sum_violations > 0.0)
+    xfgh_indiv(x, f, g, h, sum_violations, sum_violations == 0.0)
 end
 
 mutable struct xFgh_indiv # Single Objective Constraied
@@ -50,11 +51,12 @@ function xFgh_indiv(
     h::Vector{Float64};
     rank = 0,
     crowding = 0.0,
-    sum_violations = 0.0
+    sum_violations = 0.0,
+    ε = 0.0
 )
 
     if sum_violations <= 0
-        sum_violations = violationsSum(g, h)
+        sum_violations = violationsSum(g, h;ε)
     end
     xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations)
 end
@@ -70,34 +72,40 @@ Population = Array{Solution, 1}
 # output
 #############################################################
 
-function generateChild(x::Vector{Float64}, fResult::Float64)
+function generateChild(x::Vector{Float64}, fResult::Float64;ε=0.0)
     return xf_indiv(x, fResult)
 end
 
-function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1}})
+function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1}};ε=0.0)
     f, g = fResult
-    return xfgh_indiv(x, f, g, [0.0])
+    return xfgh_indiv(x, f, g, [0.0];ε)
 end
 
-function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}})
+function generateChild(x::Vector{Float64},
+        fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}};
+        ε=0.0
+    )
     f, g, h = fResult
-    return xfgh_indiv(x, f, g, h)
+    return xfgh_indiv(x, f, g, h; ε)
 end
 
-function generateChild(x::Vector{Float64}, fResult::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}})
+function generateChild(x::Vector{Float64},
+        fResult::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}};
+        ε = 0.0
+    )
     f, g, h = fResult
-    return xFgh_indiv(x, f, g, h)
+    return xFgh_indiv(x, f, g, h;ε)
 end
 
 
-function generate_population(func::Function, N::Int, bounds)
+function generate_population(func::Function, N::Int, bounds;ε=0.0)
     a = view(bounds, 1, :)'
     b = view(bounds, 2, :)'
     D = length(a)
 
     X = a .+ (b - a) .* rand(N, D)
 
-    population = [ generateChild(X[i,:], func(X[i,:])) for i in 1:N]
+    population = [ generateChild(X[i,:], func(X[i,:]); ε) for i in 1:N]
 
     return population
 end

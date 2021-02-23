@@ -3,7 +3,7 @@ function initialize!(problem,engine,parameters,status,information,options)
     D = length(a)
 
     # population array
-    Population = generate_population(problem.f, parameters.N, problem.bounds)
+    Population = generate_population(problem.f, parameters.N, problem.bounds,ε=options.h_tol)
     status.population = Population
     # current evaluations
     status.f_calls = parameters.N

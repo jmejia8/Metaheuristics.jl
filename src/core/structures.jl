@@ -59,20 +59,15 @@ end
 struct Problem <: AbstractProblem
     f::Function
     bounds::Array{Float64,2}
-    g::Array{Function}
-    h::Array{Function}
-    type::Symbol
+    f_calls::Int
 end
 
-function Problem(f::Function, bounds::Array, g = Function[], h = Function[])
+function Problem(f::Function, bounds::Array)
 
-    type::Symbol = :constrained
-
-    if length(g) == 0 && length(h) == 0
-        type = :unconstrained
-    else
-        type = :constrained
+    if size(bounds,1) > 2 && size(bounds,2) == 2
+        bounds = Array(bounds')
     end
 
-    Problem(f, bounds, g, h, type)
+    Problem(f, bounds, 0)
 end
+
