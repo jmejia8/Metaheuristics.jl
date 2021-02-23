@@ -2,7 +2,7 @@ include("mass.jl")
 include("adaptive_parameters.jl")
 include("center_of_mass.jl")
 
-mutable struct ECA <: AbstractAlgorithm
+mutable struct ECA <: AbstractParameters
     η_max::Float64
     K::Int
     N::Int
@@ -90,11 +90,6 @@ function ECA(;
     )
     Algorithm(
         parameters,
-        initialize! = initialize_eca!,
-        update_state! = update_state_eca!,
-        is_better = is_better,
-        stop_criteria = stop_check,
-        final_stage! = final_stage_eca!,
         information = information,
         options = options,
     )
@@ -102,14 +97,14 @@ function ECA(;
 end
 
 
-function update_state_eca!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-    iteration,
+function update_state!(
+    status::State,
+    parameters::ECA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
 )
     K = parameters.K
     I = randperm(parameters.N)
@@ -172,20 +167,20 @@ function update_state_eca!(
         status.f_calls += 1
 
         # replace worst element
-        if engine.is_better(sol, status.population[i])
+        if is_better(sol, status.population[i])
             wi = argworst(status.population)
             status.population[wi] = sol
-            if engine.is_better(sol, status.best_sol)
+            if is_better(sol, status.best_sol)
                 status.best_sol = sol
             end
         else
-            if is_multiobjective && !engine.is_better(status.population[i], sol)
+            if is_multiobjective && !is_better(status.population[i], sol)
                 push!(status.population, sol)
             end
             parameters.adaptive && (Mcr_fail += M_current)
         end
 
-        status.stop = engine.stop_criteria(status, information, options)
+        stop_criteria!(status, parameters, problem, information, options)
         status.stop && break
     end
 
@@ -199,7 +194,7 @@ function update_state_eca!(
     end
 
     if is_multiobjective && length(status.population) > parameters.N
-        status.population = truncate_population!(status.population, parameters.N, (w,z) -> engine.is_better(w, z))
+        status.population = truncate_population!(status.population, parameters.N, (w,z) -> is_better(w, z))
     end
 
     p = status.f_calls / options.f_calls_limit
@@ -218,19 +213,20 @@ function update_state_eca!(
             status.population,
             parameters.N,
             K,
-            (a, b) -> engine.is_better(a, b),
+            (a, b) -> is_better(a, b),
         )
     end
 end
 
 
-function initialize_eca!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
+function initialize!(
+    status::State,
+    parameters::ECA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
 )
     D = size(problem.bounds, 2)
 
@@ -249,7 +245,7 @@ function initialize_eca!(
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    initialize!(problem, engine, parameters, status, information, options)
+    initialize!(problem, nothing, parameters, status, information, options)
 
     N_init = parameters.N
 
@@ -262,7 +258,15 @@ function initialize_eca!(
 
 end
 
-function final_stage_eca!(status, information, options)
+function final_stage!(
+    status::State,
+    parameters::ECA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
     status.final_time = time()
 
     # compute Pareto front if it is a multiobjective problem

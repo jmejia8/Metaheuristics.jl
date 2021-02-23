@@ -1,7 +1,7 @@
 include("operators.jl")
 include("dominated_sort_crowding.jl")
 
-mutable struct NSGA2 <: AbstractAlgorithm
+mutable struct NSGA2 <: AbstractParameters
     N::Int
     η_cr::Float64
     p_cr::Float64
@@ -78,11 +78,6 @@ function NSGA2(;
     parameters = NSGA2(N, promote( Float64(η_cr), p_cr, η_m, p_m, ε )...)
     Algorithm(
         parameters,
-        initialize! = initialize_nsga2!,
-        update_state! = update_state_nsga2!,
-        is_better = is_better_nsga2,
-        stop_criteria = stop_check,
-        final_stage! = final_stage_nsga2!,
         information = information,
         options = options,
     )
@@ -91,23 +86,23 @@ end
 
 
 
-function update_state_nsga2!(
-        problem,
-        engine,
-        parameters,
-        status,
-        information,
-        options,
-        iteration,
-       )
+function update_state!(
+    status::State,
+    parameters::NSGA2,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
 
 
     I = randperm(parameters.N)
     J = randperm(parameters.N)
     for i = 1:2:parameters.N
 
-        pa = tournament_selection(status.population, I[i], engine.is_better)
-        pb = tournament_selection(status.population, J[i], engine.is_better)
+        pa = tournament_selection(status.population, I[i], is_better)
+        pb = tournament_selection(status.population, J[i], is_better)
 
         # crossover
         c1, c2 = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
@@ -136,19 +131,20 @@ function update_state_nsga2!(
     
     # non-dominated sort, crowding distance, elitist removing
     sort!(status.population, by = x -> x.rank, alg = Base.Sort.QuickSort)
-    truncate_population!(status.population, parameters.N, engine.is_better)
+    truncate_population!(status.population, parameters.N, is_better)
 
-    status.stop = engine.stop_criteria(status, information, options)
+    stop_criteria!(status, parameters, problem, information, options)
 end
 
 
-function initialize_nsga2!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
+function initialize!(
+    status::State,
+    parameters::NSGA2,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
 )
     D = size(problem.bounds, 2)
 
@@ -164,8 +160,8 @@ function initialize_nsga2!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-    initialize!(problem, engine, parameters, status, information, options)
-    fast_non_dominated_sort!(status.population, engine.is_better)
+    initialize!(problem, nothing, parameters, status, information, options)
+    fast_non_dominated_sort!(status.population, is_better)
 
     indiv_type = typeof(status.population[1])
     if indiv_type <: xfgh_indiv || indiv_type <: xFgh_indiv
@@ -177,10 +173,18 @@ function initialize_nsga2!(
 
 end
 
-function final_stage_nsga2!(status, information, options)
+function final_stage!(
+    status::State,
+    parameters::NSGA2,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
     status.final_time = time()
 
-    status.best_sol = get_pareto_front(status.population, is_better_nsga2)
+    status.best_sol = get_pareto_front(status.population, is_better)
 
 end
 

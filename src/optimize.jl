@@ -33,6 +33,7 @@ julia> result = optimize(f, bounds)
 +============================+
 ```
 """
+#=
 function optimize(
       f::Function, # objective function
       bounds::AbstractMatrix,
@@ -119,12 +120,12 @@ function optimize(
 
 end
 
+=#
 
-#=
 function optimize(
       f::Function, # objective function
       bounds::AbstractMatrix,
-      method::CECA = ECA();
+      method::AbstractAlgorithm = ECA();
       logger::Function = (status) -> nothing,
 )
 
@@ -136,11 +137,11 @@ function optimize(
 
       method.status.start_time = time()
       initialize!(
-            problem,
-            method.parameters,
             method.status,
+            method.parameters,
+            problem,
             method.information,
-            method.options,
+            method.options
       )
 
       #####################################
@@ -149,8 +150,6 @@ function optimize(
       status = method.status
       information = method.information
       options = method.options
-      update_state! = engine.update_state!
-      final_stage! = engine.final_stage!
       ###################################
 
       ###################################
@@ -169,14 +168,12 @@ function optimize(
             status.iteration += 1
 
             update_state!(
-                  problem,
-                  engine,
-                  method.parameters,
-                  method.status,
-                  method.information,
-                  method.options,
-                  status.iteration,
-            )
+                          method.status,
+                          method.parameters,
+                          problem,
+                          method.information,
+                          method.options
+                         )
 
             if options.debug
                   status.final_time = time()
@@ -197,11 +194,17 @@ function optimize(
 
       status.overall_time = time() - status.start_time
 
-      final_stage!(status, information, options)
+      final_stage!(
+                   method.status,
+                   method.parameters,
+                   problem,
+                   method.information,
+                   method.options
+                  )
 
       status.convergence = convergence
 
       return status
 
 end
-=#
+

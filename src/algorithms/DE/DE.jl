@@ -1,6 +1,6 @@
 include("crossover_mutation.jl")
 
-mutable struct DE
+mutable struct DE <: AbstractParameters
     N::Int
     F::Float64
     CR::Float64
@@ -70,11 +70,6 @@ function DE(;
 
     Algorithm(
         parameters,
-        initialize! = initialize_de!,
-        update_state! = update_state_de!,
-        is_better = is_better,
-        stop_criteria = stop_check,
-        final_stage! = final_stage_de!,
         information = information,
         options = options,
     )
@@ -82,14 +77,14 @@ function DE(;
 end
 
 
-function update_state_de!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-    iteration,
+function update_state!(
+        status::State,
+        parameters::DE,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
 )
     population = status.population
     currentPop = copy(population)
@@ -128,16 +123,16 @@ function update_state_de!(
         status.f_calls += 1
 
         # select survivals
-        if engine.is_better(h, currentPop[i])
+        if is_better(h, currentPop[i])
             population[i] = h
 
-            if engine.is_better(h, status.best_sol)
+            if is_better(h, status.best_sol)
                 status.best_sol = h
                 best_ind = i
             end
         end
 
-        status.stop = engine.stop_criteria(status, information, options)
+        stop_criteria!(status, parameters, problem, information, options)
         if status.stop
             break
         end
@@ -148,13 +143,14 @@ function update_state_de!(
 
 end
 
-function initialize_de!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
+function initialize!(
+        status::State,
+        parameters::DE,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
 )
     D = size(problem.bounds, 2)
 
@@ -180,10 +176,18 @@ function initialize_de!(
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    initialize!(problem, engine, parameters, status, information, options)
+    initialize!(problem, nothing, parameters, status, information, options)
 
 end
 
-function final_stage_de!(status, information, options)
+function final_stage!(
+        status::State,
+        parameters::DE,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
     status.final_time = time()
 end

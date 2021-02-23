@@ -15,7 +15,7 @@
 include("physics.jl")
 include("chaos.jl")
 
-mutable struct CGSA
+mutable struct CGSA <: AbstractParameters
     N::Int    
     chValueInitial::Real   
     chaosIndex::Real   
@@ -108,23 +108,19 @@ function CGSA(;
 
     Algorithm(
         parameters,
-        initialize! = initialize_cgsa!,
-        update_state! = update_state_cgsa!,
-        is_better = is_better_eca,
-        stop_criteria = stop_check,
-        final_stage! = final_stage_cgsa!,
         information = information,
         options = options,
     )
 end
 
-function initialize_cgsa!(
-        problem,
-        engine,
-        parameters,
-        status,
-        information,
-        options,
+function initialize!(
+        status::State,
+        parameters::CGSA,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
        )
 
 
@@ -159,14 +155,14 @@ function initialize_cgsa!(
 
 end
 
-function update_state_cgsa!(
-        problem,
-        engine,
-        parameters,
-        status,
-        information,
-        options,
-        iteration,
+function update_state!(
+        status::State,
+        parameters::CGSA,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
         )
 
 
@@ -174,6 +170,7 @@ function update_state_cgsa!(
     N = parameters.N
     wMin = parameters.wMin
     max_it = options.iterations
+    iteration = status.iteration
     searchType = :minimize
     chaosIndex = parameters.chaosIndex	
     Rnorm = parameters.Rnorm
@@ -232,12 +229,20 @@ function update_state_cgsa!(
         status.best_sol = currentBest
     end
 
-    status.stop = engine.stop_criteria(status, information, options)
+    stop_criteria!(status, parameters, problem, information, options)
 
 end
 
 
-function final_stage_cgsa!(status, information, options)
+function final_stage!(
+        status::State,
+        parameters::CGSA,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
     status.final_time = time()
 end
 

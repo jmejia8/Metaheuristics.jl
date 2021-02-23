@@ -46,7 +46,12 @@ function stop_criteria!(
         options::Options,
         args...;
         kargs...
-)
+    )
+
+        
+    status.stop = call_limit_stop_check(status, information, options) ||
+                  iteration_stop_check(status, information, options)  ||
+                  time_stop_check(status, information, options)
     return
 end
 

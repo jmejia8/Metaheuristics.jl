@@ -164,3 +164,6 @@ convergence(s::State) = begin
 end
 
 
+function update_convergence!(convergence, status)
+    push!(convergence, deepcopy(status))
+end

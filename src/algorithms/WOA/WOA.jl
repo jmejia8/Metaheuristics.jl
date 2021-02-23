@@ -13,7 +13,7 @@
 #                                                                         #
 #_________________________________________________________________________#
 
-mutable struct WOA
+mutable struct WOA <: AbstractParameters
   N::Int 
 end
 
@@ -57,24 +57,20 @@ function WOA(;N = 30, information = Information(), options = Options())
 
   Algorithm(
     parameters,
-    initialize! = initialize_woa!,
-    update_state! = update_state_woa!,
-    is_better = is_better,
-    stop_criteria = stop_check,
-    final_stage! = final_stage_woa!,
     information = information,
     options = options,
   )
 
 end
 
-function initialize_woa!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
+function initialize!(
+    status::State,
+    parameters::WOA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
    )
 
     lb, ub= problem.bounds[1,:], problem.bounds[2,:]
@@ -93,14 +89,14 @@ function initialize_woa!(
 	
 end
 
-function update_state_woa!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-    iteration,
+function update_state!(
+    status::State,
+    parameters::WOA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
    )
 
 
@@ -111,7 +107,7 @@ function update_state_woa!(
   Max_iter = options.iterations
   N = parameters.N
   D = size(problem.bounds, 2)
-  t = iteration
+  t = status.iteration
 
   a=2-t*((2)/Max_iter) # a decreases linearly fron 2 to 0 in Eq. (2.3)
 
@@ -160,16 +156,24 @@ function update_state_woa!(
     status.population[i] = generateChild(x, problem.f(x))
     status.f_calls += 1
 
-    if engine.is_better(status.population[i], status.best_sol)
+    if is_better(status.population[i], status.best_sol)
       status.best_sol = deepcopy(status.population[i])
     end
   end # for i
 
-  status.stop = engine.stop_criteria(status, information, options) 
+  stop_criteria!(status, parameters, problem, information, options)
 
 end
 
-function final_stage_woa!(status, information, options)
+function final_stage!(
+    status::State,
+    parameters::WOA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+  )
     status.final_time = time()
 end
 

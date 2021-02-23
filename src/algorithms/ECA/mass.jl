@@ -38,7 +38,7 @@ function getMass(U::Array{xfgh_indiv,1}, max_fitness, ε)
     fitness = zeros(Float64, n)
 
     for i = 1:n
-        v = violationsSum(U[i].g, U[i].h, ε)
+        v = violationsSum(U[i].g, U[i].h; ε)
         if v > 0.0
             fitness[i] = U[i].f + 2*max_fitness*v
         else

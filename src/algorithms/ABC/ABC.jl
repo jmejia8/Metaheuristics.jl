@@ -1,6 +1,6 @@
 include("bee_dynamics.jl")
 
-mutable struct ABC
+mutable struct ABC <: AbstractAlgorithm
     N::Int
     Ne::Int
     No::Int
@@ -61,11 +61,6 @@ function ABC(;
 
     Algorithm(
         parameters,
-        initialize! = initialize_abc!,
-        update_state! = update_state_abc!,
-        is_better = is_better_abc,
-        stop_criteria = stop_check_abc,
-        final_stage! = final_stage_abc!,
         information = information,
         options = options,
     )
@@ -73,14 +68,15 @@ function ABC(;
     
 end
 
-function initialize_abc!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-   )
+function initialize!(
+        status::State,
+        parameters::ABC,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
     
     D = size(problem.bounds, 2)
 
@@ -98,15 +94,15 @@ function initialize_abc!(
     status.f_calls = nevals
 end
 
-function update_state_abc!(
-        problem,
-        engine,
-        parameters,
-        status,
-        information,
-        options,
-        iteration,
-       )
+function update_state!(
+        status::State,
+        parameters::ABC,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
 
     D = size(problem.bounds, 2)
     fobj = problem.f
@@ -125,12 +121,20 @@ function update_state_abc!(
 
     status.f_calls += Ne + No + scoutPhase!(bees, fobj, genPos, parameters.limit)
     status.best_sol = best
-    status.stop = engine.stop_criteria(status, information, options)
+    stop_criteria!(status, parameters, problem, information, options)
 
 end
 
 
-function final_stage_abc!(status, information, options)
+function final_stage!(
+        status::State,
+        parameters::ABC,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
     status.final_time = time()
     status.population = map(b -> b.sol, status.population)
     # status.best_sol = status.best_sol.sol
@@ -139,7 +143,15 @@ end
 is_better_abc(bee1, bee2) = is_better(bee1.sol, bee2.sol)
 
 
-function stop_check_abc(status, information, options)
+function stop_criteria!(
+        status::State,
+        parameters::ABC,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
     cond2 = call_limit_stop_check(status, information, options) ||
     iteration_stop_check(status, information, options)
 

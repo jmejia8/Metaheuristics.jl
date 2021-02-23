@@ -4,7 +4,7 @@
 
 include("new_solution.jl")
 
-mutable struct SA
+mutable struct SA <: AbstractParameters
     N::Int
     x_initial::Vector{Float64}
     tol_fun::Float64
@@ -73,11 +73,6 @@ function SA(;
 
     Algorithm(
         parameters,
-        initialize! = initialize_sa!,
-        update_state! = update_state_sa!,
-        is_better = is_better_eca,
-        stop_criteria = stop_check_abc,
-        final_stage! = final_stage_sa!,
         information = information,
         options = options,
     )
@@ -85,13 +80,14 @@ function SA(;
     
 end
 
-function initialize_sa!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
+function initialize!(
+    status::State,
+    parameters::SA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
    )
 
 
@@ -121,15 +117,15 @@ function initialize_sa!(
 end
 
 
-function update_state_sa!(
-		problem,
-		engine,
-		parameters,
-		status,
-		information,
-        options,
-        iteration,
-        )
+function update_state!(
+    status::State,
+    parameters::SA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
 
     nevals = status.f_calls
     max_evals = options.f_calls_limit
@@ -175,7 +171,7 @@ function update_state_sa!(
             status.best_sol.f = fx1
         end
 
-        status.stop = engine.stop_criteria(status, information, options)
+        stop_criteria!(status, parameters, problem, information, options)
 
         if status.stop
             break
@@ -186,7 +182,15 @@ function update_state_sa!(
 end
 
 
-function final_stage_sa!(status, information, options)
+function final_stage!(
+    status::State,
+    parameters::SA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
     status.final_time = time()
     status.population = [status.best_sol]
 end

@@ -1,4 +1,4 @@
-mutable struct CECA <: AbstractAlgorithm
+mutable struct CECA <: AbstractParameters
     η_max::Float64
     K::Int
     N::Int
@@ -92,6 +92,8 @@ function update_state!(
 )
     K = parameters.K
     I = randperm(parameters.N)
+    N = parameters.N
+    population = status.population
     D = size(problem.bounds, 2)
 
 
@@ -101,6 +103,7 @@ function update_state!(
     ε = 0.0
     feasible_solutions = findall( s->s.is_feasible, status.population )
 
+    max_val = maximum( abs.(fvals(status)) )
 
     # For each elements in Population
     for i = 1:parameters.N
@@ -115,10 +118,9 @@ function update_state!(
 
         # generate U masses
         U = getU(status.population, parameters.K, I, i, parameters.N, feasible_solutions)
-        mass = getMass(U)
 
         # generate center of mass
-        c, u_worst, u_best = center(U, mass)
+        c, u_worst, u_best = center_ceca(U, max_val, ε)
 
         # stepsize
         η = parameters.η_max * rand()
@@ -168,7 +170,7 @@ function update_state!(
 
     # replacement step
     sort!(status.population, lt = is_better)
-    deleteat!(status.population, N+1:length(population.apopulation) + 1)
+    deleteat!(status.population, N+1:length(status.population))
     
 
 

@@ -1,7 +1,7 @@
 include("velocity.jl")
 
 
-mutable struct PSO
+mutable struct PSO <: AbstractParameters
     N::Int
     C1::Float64
     C2::Float64
@@ -64,23 +64,19 @@ parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
 
 Algorithm(
     parameters,
-    initialize! = initialize_pso!,
-    update_state! = update_state_pso!,
-    is_better = is_better,
-    stop_criteria = stop_check,
-    final_stage! = final_stage_pso!,
     information = information,
     options = options,
 )
 end
 
-function initialize_pso!(
-        problem,
-        engine,
-        parameters,
-        status,
-        information,
-        options,
+function initialize!(
+    status::State,
+    parameters::PSO,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
        )
     D = size(problem.bounds, 2)
 
@@ -101,7 +97,7 @@ function initialize_pso!(
 
 
 
-    initialize!(problem, engine, parameters, status, information, options)
+    initialize!(problem, nothing, parameters, status, information, options)
 
     parameters.v = zeros(parameters.N, D)
 
@@ -113,14 +109,14 @@ function initialize_pso!(
 end
 
 
-function update_state_pso!(
-        problem,
-        engine,
-        parameters,
-        status,
-        information,
-        options,
-        iteration,
+function update_state!(
+    status::State,
+    parameters::PSO,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
        )
     xGBest = status.best_sol.x
     # For each elements in population
@@ -136,10 +132,10 @@ function update_state_pso!(
         sol = generateChild(x, problem.f(x))
         status.f_calls += 1
 
-        if engine.is_better(sol, status.population[i])
+        if is_better(sol, status.population[i])
             status.population[i] = sol
 
-            if engine.is_better(sol, status.best_sol)
+            if is_better(sol, status.best_sol)
                 status.best_sol = sol
                 xGBest = status.best_sol.x
             end
@@ -148,13 +144,21 @@ function update_state_pso!(
         parameters.flock[i] = sol
 
         # stop condition
-        status.stop = engine.stop_criteria(status, information, options)
+        stop_criteria!(status, parameters, problem, information, options)
         status.stop && break
     end
 
 end
 
-function final_stage_pso!(status, information, options)
+function final_stage!(
+    status::State,
+    parameters::PSO,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
     status.final_time = time()
 
 end

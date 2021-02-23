@@ -1,6 +1,6 @@
 include("weights_and_ideal.jl")
 
-mutable struct MOEAD_DE
+mutable struct MOEAD_DE <: AbstractParameters
     D::Int
     nobjectives::Int
     N::Int
@@ -97,11 +97,6 @@ function MOEAD_DE(D, nobjectives;
 
     alg = Algorithm(
         parameters,
-        initialize! = initialize_MOEAD_DE!,
-        update_state! = update_state_MOEAD_DE!,
-        is_better = is_better_MOEAD_DE,
-        stop_criteria = stop_criteria_moead_de,
-        final_stage! = final_stage_MOEAD_DE!,
         information = information,
         options = options,
     )
@@ -116,13 +111,14 @@ function MOEAD_DE(D, nobjectives;
 
 end
 
-function initialize_MOEAD_DE!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
+function initialize!(
+    status::State,
+    parameters::MOEAD_DE,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
 )
     D = size(problem.bounds, 2)
     if isempty(parameters.λ)
@@ -140,20 +136,20 @@ function initialize_MOEAD_DE!(
 
 
 
-    initialize!(problem, engine, parameters, status, information, options)
+    initialize!(problem, nothing, parameters, status, information, options)
     update_reference_point!(parameters.z, status.population)
 
 end
 
 
-function update_state_MOEAD_DE!(
-    problem,
-    engine,
-    parameters,
-    status,
-    information,
-    options,
-    iteration,
+function update_state!(
+    status::State,
+    parameters::MOEAD_DE,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
 )
 
 
@@ -245,7 +241,7 @@ function update_state_MOEAD_DE!(
 
         end
 
-        status.stop = engine.stop_criteria(status, information, options)
+        stop_criteria!(status, parameters, problem, information, options)
         if status.stop
             break
         end
@@ -261,14 +257,27 @@ function is_better_constrained_MOEAD_DE(g1, g2, sol1, sol2, parameters)
     return g1 + s1*sol1.sum_violations <= g2 + s1*sol2.sum_violations
 end
 
-function is_better_MOEAD_DE(a, b)
-    is_better_eca(a, b)
-end
 
-function stop_criteria_moead_de(status, information, options)
+function stop_criteria_moead_de(
+    status::State,
+    parameters::MOEAD_DE,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
     return status.iteration > options.iterations
 end
-function final_stage_MOEAD_DE!(status, information, options)
+function final_stage!(
+    status::State,
+    parameters::MOEAD_DE,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
     status.final_time = time()
     status.best_sol = get_pareto_front(status.population, is_better_eca)
     # @show length(status.best_sol)
