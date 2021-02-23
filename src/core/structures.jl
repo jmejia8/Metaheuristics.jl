@@ -56,7 +56,7 @@ function Algorithm(
 end
 
 
-struct Problem
+struct Problem <: AbstractProblem
     f::Function
     bounds::Array{Float64,2}
     g::Array{Function}

@@ -129,7 +129,7 @@ function chooseBest(bees, best)
 end
 
 function initialbees(f, N, bounds)
-     P = initializePop(f, N, length(bounds[1,:]), bounds[1,:], bounds[2,:])
+     P = generate_population(f, N, bounds)
 
      return [ Bee(sol) for sol in P ]
 end 

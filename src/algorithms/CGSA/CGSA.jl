@@ -142,12 +142,12 @@ function initialize_cgsa!(
     options.f_calls_limit = options.f_calls_limit == 0 ? options.iterations * N : options.f_calls_limit
 
     # random initialization for agents.
-    P = initializePop(fobj, N, D, low, up)
+    P = generate_population(fobj, N, problem.bounds)
     status.population = P
     status.f_calls = N
 
     # Current best
-    theBest = getBest(P, :minimize)
+    theBest = get_best(P)
     status.best_sol = theBest
 
     # Velocity
@@ -225,10 +225,10 @@ function update_state_cgsa!(
     status.population = P
 
     #Evaluation of agents. 
-    currentBest = getBest(P, :minimize)
+    currentBest = get_best(P)
 
     # fix this
-    if engine.is_better(currentBest, theBest)
+    if is_better(currentBest, theBest)
         status.best_sol = currentBest
     end
 

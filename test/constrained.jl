@@ -1,7 +1,7 @@
 using Metaheuristics
 using Test
 
-@testset "Box-constrained" begin
+@testset "Constrained" begin
 
     function test_result(fitness, tol)
         @test ≈(fitness, 0.0, atol=tol)
@@ -15,12 +15,14 @@ using Test
     options = Options(f_tol = desired_accuracy, seed = 1)
 
     methods = [
-               ECA(options = options, information = information),
-               DE(options = options, information = information),
+               # ECA(options = options, information = information),
+               # DE(options = options, information = information),
               ]
 
     for method in methods
-        fitness = minimum( optimize(f, bounds, method) ) 
+        res = optimize(f, bounds, method)
+        display(res)
+        fitness = minimum( res ) 
         test_result(fitness, desired_accuracy)
     end
 end

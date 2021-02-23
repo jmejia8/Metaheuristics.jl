@@ -15,6 +15,7 @@ mutable struct xfgh_indiv # Single Objective Constraied
     g::Vector{Float64}
     h::Vector{Float64}
     sum_violations::Float64 # ∑ max(0,g) + ∑|h|
+    is_feasible::Bool
 
 end
 
@@ -23,13 +24,13 @@ function xfgh_indiv(
     f::Float64,
     g::Vector{Float64},
     h::Vector{Float64};
-    sum_violations = 0
+    sum_violations = 0.0
 )
-    if sum_violations <= 0
+    if sum_violations <= 0.0
         sum_violations = violationsSum(g, h)
     end
 
-    xfgh_indiv(x, f, g, h, sum_violations)
+    xfgh_indiv(x, f, g, h, sum_violations, sum_violations > 0.0)
 end
 
 mutable struct xFgh_indiv # Single Objective Constraied
@@ -86,6 +87,19 @@ end
 function generateChild(x::Vector{Float64}, fResult::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}})
     f, g, h = fResult
     return xFgh_indiv(x, f, g, h)
+end
+
+
+function generate_population(func::Function, N::Int, bounds)
+    a = view(bounds, 1, :)'
+    b = view(bounds, 2, :)'
+    D = length(a)
+
+    X = a .+ (b - a) .* rand(N, D)
+
+    population = [ generateChild(X[i,:], func(X[i,:])) for i in 1:N]
+
+    return population
 end
 
 function inferType(fVal::Tuple{Float64})

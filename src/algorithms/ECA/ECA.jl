@@ -9,7 +9,6 @@ mutable struct ECA <: AbstractAlgorithm
     N_init::Int
     p_exploit::Float64
     p_bin::Float64
-    ε::Float64
     p_cr::Array{Float64}
     adaptive::Bool
     resize_population::Bool
@@ -23,7 +22,6 @@ end
         N_init = N,
         p_exploit = 0.95,
         p_bin = 0.02,
-        ε = 0.0,
         p_cr = Float64[],
         adaptive = false,
         resize_population = false,
@@ -68,7 +66,6 @@ function ECA(;
     N_init::Int = N,
     p_exploit::Float64 = 0.95,
     p_bin::Float64 = 0.02,
-    ε::Float64 = 0.0,
     p_cr::Array{Float64} = Float64[],
     adaptive::Bool = false,
     resize_population::Bool = false,
@@ -87,7 +84,6 @@ function ECA(;
         N_init,
         p_exploit,
         p_bin,
-        ε,
         p_cr,
         adaptive,
         resize_population,
@@ -96,7 +92,7 @@ function ECA(;
         parameters,
         initialize! = initialize_eca!,
         update_state! = update_state_eca!,
-        is_better = is_better_eca,
+        is_better = is_better,
         stop_criteria = stop_check,
         final_stage! = final_stage_eca!,
         information = information,
@@ -119,14 +115,12 @@ function update_state_eca!(
     I = randperm(parameters.N)
     D = size(problem.bounds, 2)
     is_multiobjective = typeof(status.population[1]) == xFgh_indiv
-    is_constrained = typeof(status.population[1]) == xfgh_indiv || is_multiobjective
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
     stop = false
     a = problem.bounds[1, :]
     b = problem.bounds[2, :]
-    ε = 0.0
 
     if is_multiobjective
         shuffle!(status.population)
@@ -136,12 +130,6 @@ function update_state_eca!(
     for i = 1:parameters.N
         p = status.f_calls / options.f_calls_limit
 
-        if parameters.ε > 0
-            ε = parameters.ε * (p - 1)^4
-
-        else
-            ε = 0.0
-        end
 
         # current
         x = status.population[i].x
@@ -150,7 +138,7 @@ function update_state_eca!(
         U = getU(status.population, parameters.K, I, i, parameters.N)
 
         # generate center of mass
-        c, u_worst, u_best = center(U, :minimize)
+        c, u_worst, u_best = center(U)
 
         # stepsize
         η = parameters.η_max * rand()
@@ -177,18 +165,15 @@ function update_state_eca!(
         # binary crossover
         y, M_current = crossover(U[u_best].x, y, parameters.p_cr)
 
-        y = correct(y, c, a, b)
+        evo_boundary_repairer!(y, c, problem.bounds)
 
         sol = generateChild(y, problem.f(y))
-        if is_constrained #|| is_multiobjective
-            sol.sum_violations = violationsSum(sol.g, sol.h, ε = ε)
-        end
 
         status.f_calls += 1
 
         # replace worst element
         if engine.is_better(sol, status.population[i])
-            wi = getWorstInd(status.population, :minimize, (w,z) -> engine.is_better(w, z))
+            wi = argworst(status.population)
             status.population[wi] = sol
             if engine.is_better(sol, status.best_sol)
                 status.best_sol = sol
@@ -266,12 +251,6 @@ function initialize_eca!(
 
     initialize!(problem, engine, parameters, status, information, options)
 
-    indiv_type = typeof(status.population[1])
-    if indiv_type <: xfgh_indiv || indiv_type <: xFgh_indiv
-        for sol in status.population
-            sol.sum_violations = violationsSum(sol.g, sol.h, ε = parameters.ε)
-        end
-    end
     N_init = parameters.N
 
 
@@ -289,41 +268,8 @@ function final_stage_eca!(status, information, options)
     # compute Pareto front if it is a multiobjective problem
     if typeof(status.population[1].f) <: Array
         options.debug && @info "Computing Pareto front..."
-        status.best_sol = get_pareto_front(status.population, is_better_eca)
+        status.best_sol = get_pareto_front(status.population, is_better)
     end
-end
-
-
-is_better_eca(
-    New::xf_indiv,
-    Old::xf_indiv;
-    searchType = :minimize,
-    leq = false,
-    kargs...,
-) = New.f < Old.f
-
-
-function is_better_eca(
-    New::xfgh_indiv,
-    Old::xfgh_indiv;
-    searchType = :minimize
-)
-
-    old_vio = Old.sum_violations
-    new_vio = New.sum_violations
-
-    if new_vio < old_vio
-        return true
-    elseif new_vio > old_vio
-        return false
-    end
-
-    if searchType == :minimize
-        return New.f < Old.f
-    end
-
-
-    return New.f > Old.f
 end
 
 

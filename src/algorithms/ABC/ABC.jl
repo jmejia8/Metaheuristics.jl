@@ -120,7 +120,7 @@ function update_state_abc!(
     employedPhase!(bees, fobj, Ne, bounds)        
     outlookerPhase!(bees, fobj, No, bounds)
 
-    @inline genPos(D=D, a=Array(a), b = Array(b)) = initializeSol(D, a, b)
+    @inline genPos(D=D, a=Array(a), b = Array(b)) = a + (b - a) .* rand(D)
     best = chooseBest(bees, status.best_sol)
 
     status.f_calls += Ne + No + scoutPhase!(bees, fobj, genPos, parameters.limit)

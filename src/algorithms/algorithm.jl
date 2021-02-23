@@ -3,7 +3,7 @@ function initialize!(problem,engine,parameters,status,information,options)
     D = length(a)
 
     # population array
-    Population = initializePop(problem.f, parameters.N, D, a, b)
+    Population = generate_population(problem.f, parameters.N, problem.bounds)
     status.population = Population
     # current evaluations
     status.f_calls = parameters.N
@@ -13,8 +13,8 @@ function initialize!(problem,engine,parameters,status,information,options)
     status.iteration = 0
 
     # best solution
-    status.best_sol = getBest(Population, :minimize, engine.is_better)
+    status.best_sol = get_best(Population)
 
-    status.stop = engine.stop_criteria(status, information, options)
+    # status.stop = engine.stop_criteria(status, information, options)
 
 end

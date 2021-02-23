@@ -59,7 +59,7 @@ function WOA(;N = 30, information = Information(), options = Options())
     parameters,
     initialize! = initialize_woa!,
     update_state! = update_state_woa!,
-    is_better = is_better_eca,
+    is_better = is_better,
     stop_criteria = stop_check,
     final_stage! = final_stage_woa!,
     information = information,
@@ -80,18 +80,16 @@ function initialize_woa!(
     lb, ub= problem.bounds[1,:], problem.bounds[2,:]
 
     #Initialize the positions of search agents
-    Positions = initializePop(parameters.N, length(lb), lb, ub)
-
 	max_it = 500
 	options.iterations = options.iterations == 0 ? max_it : options.iterations
     options.f_calls_limit = options.f_calls_limit == 0 ?
                             options.iterations * parameters.N : options.f_calls_limit
 
 
-    P = initializePop(problem.f, parameters.N, length(ub), lb, ub)
+    P = generate_population(problem.f, parameters.N, problem.bounds)
 	status.population = P
     status.f_calls = parameters.N
-    status.best_sol = deepcopy(getBest(status.population, :minimize))
+    status.best_sol = deepcopy(get_best(status.population))
 	
 end
 

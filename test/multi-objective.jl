@@ -19,7 +19,7 @@ end
         options = Options( seed = 1, iterations = 500)
 
         methods = [
-                ECA(N = 100, options=options),
+                # ECA(N = 100, options=options),
                 MOEAD_DE(D, 2, N = 300, options=options),
                 NSGA2(options=options)
               ]
