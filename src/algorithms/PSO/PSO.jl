@@ -7,7 +7,7 @@ mutable struct PSO <: AbstractParameters
     C2::Float64
     ω::Float64
     v::Array{Float64} # velocity
-    flock::Array{xf_indiv}
+    flock::Array
 end
 
 
@@ -129,7 +129,7 @@ function update_state!(
         x = reset_to_violated_bounds!(x + parameters.v[i, :], problem.bounds)
         # x += parameters.v[i, :]
 
-        sol = generateChild(x, problem.f(x))
+        sol = generateChild(x, problem.f(x), ε = options.h_tol)
         status.f_calls += 1
 
         if is_better(sol, status.population[i])
