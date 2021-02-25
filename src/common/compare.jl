@@ -1,7 +1,7 @@
 """
     is_better(A, B)
     return true if A is better than B in a minimization problem.
-    Feasibility rules and dominated criteria area used in comparison.
+    Feasibility rules and dominated criteria are used in comparison.
 """
 function is_better(A::xf_indiv, B::xf_indiv)
     return A.f < B.f

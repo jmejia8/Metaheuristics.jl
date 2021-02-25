@@ -197,6 +197,7 @@ positions(population::Array) =
 Get the objective function value (fitness) of a solution.
 """
 fval(solution::Solution) = solution.f
+sum_violations(solution::xfgh_indiv) = solution.sum_violations
 
 
 fvals(population::Array) = begin

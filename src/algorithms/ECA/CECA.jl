@@ -49,7 +49,7 @@ function CECA(;
     η_max::Float64 = 2.0,
     K::Int = 7,
     N::Int = 0,
-    ε::Float64 = 0.0,
+    ε::Float64 = 0.5,
     information = Information(),
     options = Options(),
 )
@@ -101,33 +101,43 @@ function update_state!(
     b = problem.bounds[2, :]
 
     ε = 0.0
+
+    p = status.f_calls / options.f_calls_limit
+
+    if parameters.ε > 0
+        ε = parameters.ε * (p - 1)^4
+    end
+
+
     feasible_solutions = findall( s->s.is_feasible, status.population )
 
-    max_val = maximum( abs.(fvals(status)) )
+    fs = fvals(status)
+    fx_max = maximum( abs.(fs) )
+
+    vios = map(sum_violations, population)
+    fs += 2.0*fx_max*vios
+    γ = maximum( abs.(fs) )
+    weights = 2.0γ .- fs
 
     # For each elements in Population
     for i = 1:parameters.N
-        p = status.f_calls / options.f_calls_limit
-
-        if parameters.ε > 0
-            ε = parameters.ε * (p - 1)^4
-        end
 
         # current
         x = status.population[i].x
 
         # generate U masses
-        U = getU(status.population, parameters.K, I, i, parameters.N, feasible_solutions)
+        #U = getU(status.population, parameters.K, I, i, parameters.N, feasible_solutions)
+
+        U_ids = getU_ids(parameters.K, I, i, parameters.N, feasible_solutions)
+        U = population[U_ids]
 
         # generate center of mass
-        c, u_worst, u_best = center_ceca(U, max_val, ε)
+        mass = weights[U_ids]
+        c = center(U, mass)
+        u_worst = argmin(mass)
 
         # stepsize
         η = parameters.η_max * rand()
-
-        # u: worst element in U
-        u = U[u_worst].x
-
 
         # u: worst element in U
         u = U[u_worst].x
@@ -140,24 +150,14 @@ function update_state!(
         sol = generateChild(y, problem.f(y), ε=options.h_tol)
         status.f_calls += 1
 
-        # save new generated solution
-        if is_better(sol, status.population[i])
-            wi = argworst(status.population)
-            status.population[wi] = sol
 
-            if sol.is_feasible
-                push!(feasible_solutions, wi)
-            end
-            
-
-
-            if is_better(sol, status.best_sol)
-                status.best_sol = sol
-            end
-        else
-            # stored but not used until replacement step
-            push!(status.population, sol)
+        if is_better(sol, status.best_sol)
+            status.best_sol = sol
         end
+
+
+        # stored but not used until replacement step
+        push!(status.population, sol)
 
         status.stop = stop_check(status, information, options)
         status.stop && break

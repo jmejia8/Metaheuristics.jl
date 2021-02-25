@@ -13,6 +13,8 @@ function display(solution::xfgh_indiv)
     println(solution.g)
     @printf("| h(x) = ")
     println(solution.h)
+    # @printf("| Σ max(0,g(x)) + Σ |h(x)| = ")
+    # println(solution.sum_violations)
     println("| x = ", solution.x)
 
 
