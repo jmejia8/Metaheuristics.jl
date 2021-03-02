@@ -90,7 +90,7 @@ include("algorithms/MOEAD_DE/MOEAD_DE.jl")
 include("algorithms/NSGA2/NSGA2.jl")
 
 
-
+include("algorithms/ECA/MECA.jl")
 
 #######################################################
 #                                                     #

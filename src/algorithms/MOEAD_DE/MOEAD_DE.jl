@@ -194,7 +194,6 @@ function update_state!(
 
         # binomial crossover
         v = zeros(D)
-        j_rand = rand(1:D)
 
         # binomial crossover
         for j = 1:D

@@ -42,6 +42,7 @@ mutable struct xFgh_indiv # Single Objective Constraied
     rank::Int
     crowding::Float64
     sum_violations::Float64 # ∑ max(0,g) + ∑|h|
+    is_feasible::Bool
 end
 
 function xFgh_indiv(
@@ -58,7 +59,7 @@ function xFgh_indiv(
     if sum_violations <= 0
         sum_violations = violationsSum(g, h;ε)
     end
-    xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations)
+    xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations, sum_violations == 0.0)
 end
 
 
@@ -198,6 +199,7 @@ Get the objective function value (fitness) of a solution.
 """
 fval(solution::Solution) = solution.f
 sum_violations(solution::xfgh_indiv) = solution.sum_violations
+sum_violations(solution::xFgh_indiv) = solution.sum_violations
 
 
 fvals(population::Array) = begin

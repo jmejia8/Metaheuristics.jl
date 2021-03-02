@@ -162,3 +162,26 @@ function ZDT6(D = 10, n_solutions = 100)
     return f, bounds, pareto_set
 end
 
+function DTLZ2(m=3, n_solutions=100)
+    f(x,m=m) = begin
+        g = sum( (x[m:end] .- 0.5).^2 )
+        fx = zeros(m)
+        for i = 1:m
+            fx[i] = (1 + g)
+            if i < m
+                fx[i] *= prod(cos.(x[1:m-i] * (π*0.5) ))
+            end
+            if i > 1
+                fx[i] *= sin( x[1+m - i] * (π*0.5) )
+            end
+        end
+        return fx, [0.0], [0.0]
+    end
+
+    D = 10+m-1
+
+    bounds = Array([zeros(D) ones(D)]')
+
+    return f, bounds, []
+end
+

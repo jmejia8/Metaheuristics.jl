@@ -23,6 +23,7 @@ Here, `problem` can be one of the following symbols:
 - `:ZDT3`
 - `:ZDT4`
 - `:ZDT6`
+- `:DTLZ2`
 
 ## Example
 
