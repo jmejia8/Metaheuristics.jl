@@ -124,6 +124,8 @@ function update_state!(
     used = zeros(Int, length(parameters.λ))
     tmp_counter = 0
 
+    η_mem = Float64[]
+
     # For each elements in Population
     for i = 1:parameters.N
 
@@ -142,33 +144,35 @@ function update_state!(
         u_worst = argmin(mass)
 
         # stepsize
-        η = parameters.η_max * rand()
+        η = (parameters.η_max + 0.5randn())
 
         # u: worst element in U
         u = U[u_worst].x
 
         # current-to-center/bin
         y = x .+ η .* (c .- u)
-
-        evo_boundary_repairer!(y, c, problem.bounds)
+        replace_with_random_in_bounds!(y, problem.bounds)
+        CR = rand(length(y)) .> 0.9
+        y[CR] .= x[CR]
 
         sol = generateChild(y, problem.f(y), ε=options.h_tol)
         update_reference_point!(parameters.z, sol)
         status.f_calls += 1
 
-        # stored but not used until replacement step
+        # stored but not used until replacement step       
         j = i
         if j > nrefs
-            j = rand(1:nrefs)
+            j = argmin(used)
         end
         
         gsv = g(sol.f, parameters.λ[j], parameters.z)
-        gs_old = g(status.population[i].f, parameters.λ[j], parameters.z)
+        gs_old = g(status.population[j].f, parameters.λ[j], parameters.z)
 
         if gsv < gs_old
             used[j] += 1
-            population[i] = sol
+            population[j] = sol
             tmp_counter += 1
+            push!(η_mem, η)
         else
             push!(new_solutions, sol)
         end
@@ -184,10 +188,19 @@ function update_state!(
         
     end
 
+    if !isempty(η_mem)
+        push!(η_mem, parameters.η_max)
+        parameters.η_max = mean(η_mem)
+    end
+    
+    @show parameters.η_max
+
     if isempty(new_solutions)
         @info "wow"
         return
     end
+
+    @show tmp_counter
     
     
     # save best solutions according to g and λ
@@ -200,11 +213,12 @@ function update_state!(
         end
         for i = 1:length(new_solutions)
             
-            gsv = g(new_solutions[i].f, parameters.λ[j], parameters.z)
+            gsv = g(new_solutions[i].f, parameters.λ[j], parameters.z) 
             gs_old = g(status.population[j].f, parameters.λ[j], parameters.z)
+
             if gsv < gs_old
-                gs[j] = gsv
                 population[j] = new_solutions[i]
+                deleteat!(new_solutions, i)
                 used[j] += 1
                 tmp_counter+=1
                 break
@@ -212,8 +226,9 @@ function update_state!(
         end
     end
 
+    @show tmp_counter
     @show sum(used)/parameters.N
-    @show used
+    @show maximum(used)
     
 
     
@@ -271,11 +286,12 @@ function final_stage!(
     kargs...
 )
     status.final_time = time()
+    @info "final_stage"
 
     # compute Pareto front if it is a multiobjective problem
     if typeof(status.population[1].f) <: Array
         options.debug && @info "Computing Pareto front..."
-        status.best_sol = get_pareto_front(status.population, is_better_eca)
+        status.best_sol = get_pareto_front(status.population, is_better)
     end
 end
 
