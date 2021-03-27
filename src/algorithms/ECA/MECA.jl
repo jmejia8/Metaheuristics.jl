@@ -5,7 +5,7 @@ mutable struct MECA <: AbstractParameters
     ε::Float64
     λ::Array{Vector{Float64}}
     z::Vector{Float64}
-    nparitions::Int
+    npartitions::Int
     nobjectives
 end
 
@@ -51,12 +51,12 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], ECA(N = 10, η_max = 1.0, K = 3))
 """
 function MECA(;
     η_max::Float64 = 2.0,
-    K::Int = 7,
-    N::Int = 90,
+    K::Int = 3,
+    N::Int = 0,
     ε::Float64 = 0.5,
     z::Vector{Float64} = zeros(0),
     λ = Array{Vector{Float64}}[],
-    nparitions = 12,
+    npartitions = 12,
     information = Information(),
     options = Options(),
 )
@@ -65,7 +65,7 @@ function MECA(;
         η_max,
         K,
         N,
-        ε, λ, z, nparitions, nparitions
+        ε, λ, z, npartitions, 0
     )
     alg = Algorithm(
         parameters,
@@ -151,9 +151,7 @@ function update_state!(
 
         # current-to-center/bin
         y = x .+ η .* (c .- u)
-        replace_with_random_in_bounds!(y, problem.bounds)
-        CR = rand(length(y)) .> 0.9
-        y[CR] .= x[CR]
+        reset_to_violated_bounds!(y, problem.bounds)
 
         sol = generateChild(y, problem.f(y), ε=options.h_tol)
         update_reference_point!(parameters.z, sol)
@@ -229,6 +227,12 @@ function update_state!(
     @show tmp_counter
     @show sum(used)/parameters.N
     @show maximum(used)
+
+
+    if false && sum(used) == 0
+        status.stop=true
+    end
+    
     
 
     
@@ -255,9 +259,6 @@ function initialize!(
         options.iterations = 500
     end
 
-    if options.f_calls_limit == 0
-        options.f_calls_limit = options.iterations * parameters.N + 1
-    end
 
 
     initialize!(problem, nothing, parameters, status, information, options)
@@ -271,7 +272,17 @@ function initialize!(
 
     if isempty(parameters.λ)
         options.debug && @info "Generating reference points..."
-        parameters.λ = gen_weights(parameters.nobjectives, parameters.nparitions)
+        parameters.λ = gen_weights(parameters.nobjectives, parameters.npartitions)
+    end
+
+
+    if parameters.N <= length(parameters.λ)
+        parameters.N = length(parameters.λ)
+        @warn "Increasing pop size to $(parameters.N)"
+    end
+
+    if options.f_calls_limit == 0
+        options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
 end

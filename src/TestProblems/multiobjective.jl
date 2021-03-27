@@ -178,7 +178,7 @@ function DTLZ2(m=3, n_solutions=100)
         return fx, [0.0], [0.0]
     end
 
-    D = 10+m-1
+    D = 50+m-1
 
     bounds = Array([zeros(D) ones(D)]')
 
