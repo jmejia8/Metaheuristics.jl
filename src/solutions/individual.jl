@@ -28,7 +28,7 @@ function xfgh_indiv(
     ε = 0.0
 )
     if sum_violations <= 0.0
-        sum_violations = violationsSum(g, h; ε)
+        sum_violations = violationsSum(g, h; ε=ε)
     end
 
     xfgh_indiv(x, f, g, h, sum_violations, sum_violations == 0.0)
@@ -57,7 +57,7 @@ function xFgh_indiv(
 )
 
     if sum_violations <= 0
-        sum_violations = violationsSum(g, h;ε)
+        sum_violations = violationsSum(g, h;ε=ε)
     end
     xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations, sum_violations == 0.0)
 end
@@ -79,7 +79,7 @@ end
 
 function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1}};ε=0.0)
     f, g = fResult
-    return xfgh_indiv(x, f, g, [0.0];ε)
+    return xfgh_indiv(x, f, g, [0.0];ε=ε)
 end
 
 function generateChild(x::Vector{Float64},
@@ -87,7 +87,7 @@ function generateChild(x::Vector{Float64},
         ε=0.0
     )
     f, g, h = fResult
-    return xfgh_indiv(x, f, g, h; ε)
+    return xfgh_indiv(x, f, g, h; ε=ε)
 end
 
 function generateChild(x::Vector{Float64},
@@ -95,7 +95,7 @@ function generateChild(x::Vector{Float64},
         ε = 0.0
     )
     f, g, h = fResult
-    return xFgh_indiv(x, f, g, h;ε)
+    return xFgh_indiv(x, f, g, h;ε=ε)
 end
 
 
@@ -106,7 +106,7 @@ function generate_population(func::Function, N::Int, bounds;ε=0.0)
 
     X = a .+ (b - a) .* rand(N, D)
 
-    population = [ generateChild(X[i,:], func(X[i,:]); ε) for i in 1:N]
+    population = [ generateChild(X[i,:], func(X[i,:]); ε=ε) for i in 1:N]
 
     return population
 end

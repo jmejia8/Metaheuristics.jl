@@ -16,7 +16,7 @@ using Test
 
     methods = [
                CECA(options = options, information = information),
-               DE(options = options, information = information),
+               #DE(options = options, information = information),
               ]
 
     for method in methods
