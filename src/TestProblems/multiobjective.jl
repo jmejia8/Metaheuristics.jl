@@ -137,11 +137,11 @@ with `n_solutions`.
 
 ### Parameters
 - `D` number of variables (dimension)
-- `n_solutions` number of pareto solutions.
+- `n_solutions` number of Pareto solutions.
 
 Main properties:
 - nonconvex
-- nonunifromly spaced
+- non-uniformly spaced
 """
 function ZDT6(D = 10, n_solutions = 100)
     f(x) = begin
@@ -167,7 +167,7 @@ function DTLZ2(m=3, n_solutions=100)
         g = sum( (x[m:end] .- 0.5).^2 )
         fx = zeros(m)
         for i = 1:m
-            fx[i] = (1 + g)
+            fx[i] = (1.0 + g)
             if i < m
                 fx[i] *= prod(cos.(x[1:m-i] * (π*0.5) ))
             end
@@ -178,10 +178,10 @@ function DTLZ2(m=3, n_solutions=100)
         return fx, [0.0], [0.0]
     end
 
-    D = 50+m-1
+    D = 10 + m - 1
 
     bounds = Array([zeros(D) ones(D)]')
 
-    return f, bounds, []
+    return f, bounds, zeros(0,0)
 end
 
