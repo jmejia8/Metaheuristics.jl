@@ -80,6 +80,50 @@ function get_best(population::Array)
     return best
 end
 
+
+"""
+    compare(a, b)
+    compares whether two vectors are dominated or not.
+    Output:
+    `1` if argument 1 (a) dominates argument 2 (b).
+    `2` if argument 2 (b) dominates argument 1 (a).
+    `3` if both arguments 1 (a) and 2 (b) are incomparable.
+    `0` if both arguments 1 (a) and 2 (b) are equal.
+"""
+function compare(a, b)
+    k = length(a)
+    @assert k == length(b)
+
+    i = 1
+    while i <= k && a[i] == b[i]
+        i += 1;
+    end
+
+    if i > k
+        return 0 # equals
+    end
+
+    if a[i] < b[i]
+
+        for j = i+1:k# (j = i+1; j <= k; ++j)
+            if b[j] < a[j]
+                return 3 #a and b are incomparable
+            end
+        end
+
+        return 1; #  a dominates b
+    end
+
+    for j = i+1:k #(j = i+1; j < k; ++j) 
+        if (a[j] < b[j])
+            return 3 #; // a and b are incomparable
+        end
+    end
+
+    return 2 # b dominates a
+    
+end
+
 """
     argworst(population)
     return the index of the worst element in population

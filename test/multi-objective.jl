@@ -16,7 +16,7 @@ end
         f, bounds, pf = Metaheuristics.TestProblems.get_problem(problem)
         D = size(bounds, 2)
 
-        options = Options( seed = 1, iterations = 500)
+        options = Options( seed = 1, iterations = 200)
 
         methods = [
                 # ECA(N = 100, options=options),

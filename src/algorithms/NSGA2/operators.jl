@@ -5,6 +5,16 @@ function tournament_selection(P, i, is_better)
     is_better(P[a], P[b]) || (!is_better(P[b], P[a]) && P[a].crowding > P[b].crowding ) ? P[a] : P[b]
 end
 
+
+function gen_β(β, η, D)
+    α = 2.0 .- β .^ (-  η - 1.0 )
+    R = rand(D)
+    mask = R .<= 1.0 ./ α
+    s = 1.0 / (η + 1.0)
+    βq = [ mask[i] ?  (R[i] * α[i])^s : (1.0 / (2 - R[i]*α[i]))^s for i in 1:D]
+    βq
+end
+
 function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     xu = view(bounds, 2,:)
     xl = view(bounds, 1,:)
@@ -18,21 +28,13 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     y2 = max.( vector1, vector2 )
     Δ = max.(eps(), y2 - y1)
 
-    gen_β(β) = begin
-        α = 2.0 .- β .^ (-  η - 1.0 )
-        R = rand(D)
-        mask = R .<= 1 ./ α
-        s = 1 / (η + 1)
-        βq = [ mask[i] ?  (R[i] * α[i])^s : (1.0 / (2 - R[i]*α[i]))^s for i in 1:D]
-        βq
-    end
 
     β = @. 1.0 + (2.0 * (y1 - xl) / Δ)
-    βq = gen_β(β) 
+    βq = gen_β(β, η, D) 
     c1 = @. 0.5*(y1 + y2 -  βq*Δ)
 
     β = @. 1.0 + (2.0 * (y1 - xl) / Δ)
-    βq = gen_β(β) 
+    βq = gen_β(β, η, D) 
     c2 = @. 0.5*(y1 + y2 -  βq*Δ)
 
     # swap

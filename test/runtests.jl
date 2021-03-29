@@ -10,6 +10,7 @@ else
 end
 
 @testset "Metaheuristics" for tests in [
+            "common-methods.jl",
             "box-constrained.jl",
             "constrained.jl",
             "multi-objective.jl",

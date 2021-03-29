@@ -7,10 +7,11 @@ function fast_non_dominated_sort!(pop, is_better)
 
     for i in 1:n
         for j in i+1:n
-            if is_better(pop[i], pop[j])
+            comparison = compare(pop[i].f, pop[j].f)
+            if comparison == 1 #is_better(pop[i], pop[j])
                 push!(dom_list[i], j)
                 dom_count[j] += 1
-            elseif is_better(pop[j], pop[i])
+            elseif comparison == 2 #is_better(pop[j], pop[i])
                 push!(dom_list[j], i)
                 dom_count[i] += 1
             end

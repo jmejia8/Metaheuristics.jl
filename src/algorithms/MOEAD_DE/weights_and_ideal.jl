@@ -44,7 +44,17 @@ function update_reference_point!(z::Vector{Float64}, population)
     end
 end
 
-@inline g(fx, λ, z) = maximum(λ .* abs.(fx - z))
+function g(fx, λ, z) 
+    m = -Inf
+    for i in eachindex(z)
+        @inbounds v = λ[i] * abs(fx[i] - z[i])
+        if m < v
+            m = v
+        end
+    end
+    
+    return m
+end
 
 
 
