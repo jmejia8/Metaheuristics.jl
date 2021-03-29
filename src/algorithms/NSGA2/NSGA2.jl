@@ -138,7 +138,6 @@ end
 
 
 function initialize!(
-    status::State,
     parameters::NSGA2,
     problem::AbstractProblem,
     information::Information,
@@ -160,7 +159,7 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-    initialize!(problem, nothing, parameters, status, information, options)
+    status = gen_initial_state(problem,parameters,information,options)
     fast_non_dominated_sort!(status.population, is_better)
 
     indiv_type = typeof(status.population[1])
@@ -170,6 +169,7 @@ function initialize!(
         end
     end
 
+    status
 
 end
 
@@ -184,7 +184,7 @@ function final_stage!(
     )
     status.final_time = time()
 
-    status.best_sol = get_pareto_front(status.population, is_better)
+    #status.best_sol = get_pareto_front(status.population, is_better)
 
 end
 

@@ -41,28 +41,45 @@ function optimize(
       logger::Function = (status) -> nothing,
 )
 
-      problem = Problem(f, Array(bounds))
-      convergence = State[]
-      seed!(method.options.seed)
-      method.options.debug && @info("Initializing population...")
 
-
-      method.status.start_time = time()
-      initialize!(
-            method.status,
-            method.parameters,
-            problem,
-            method.information,
-            method.options
-      )
 
       #####################################
       # common methods
       #####################################
-      status = method.status
+      # status = method.status
       information = method.information
       options = method.options
+      parameters = method.parameters
       ###################################
+
+      problem = Problem(f, Array(bounds))
+      seed!(options.seed)
+      options.debug && @info("Initializing population...")
+
+      ###################################
+
+      start_time = time()
+
+      status = initialize!(
+            parameters,
+            problem,
+            information,
+            options
+      )
+
+
+      status.start_time = start_time
+
+      #= improve this line
+      status = State(status.best_sol,
+                     status.population,
+                     f_calls=nfes(status))
+      =#
+
+
+      convergence = typeof(status.best_sol)[]
+
+
 
       ###################################
       # store convergence
@@ -71,20 +88,20 @@ function optimize(
             update_convergence!(convergence, status)
       end
 
-      method.options.debug && @info("Starting main loop...")
+      options.debug && @info("Starting main loop...")
 
-      status.iteration = 0
+      status.iteration = 1
       logger(status)
 
       while !status.stop
             status.iteration += 1
 
             update_state!(
-                          method.status,
-                          method.parameters,
+                          status,
+                          parameters,
                           problem,
-                          method.information,
-                          method.options
+                          information,
+                          options
                          )
 
             if options.debug
@@ -107,11 +124,11 @@ function optimize(
       status.overall_time = time() - status.start_time
 
       final_stage!(
-                   method.status,
-                   method.parameters,
+                   status,
+                   parameters,
                    problem,
-                   method.information,
-                   method.options
+                   information,
+                   options
                   )
 
       status.convergence = convergence

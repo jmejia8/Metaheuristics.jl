@@ -46,9 +46,9 @@ julia> minimizer(state)
  -8.358428300092186e-82
 ```
 """
-mutable struct State
-    best_sol::Any
-    population::Array
+mutable struct State{T}
+    best_sol::T
+    population::Array{T}
 
     f_calls::Int
     g_calls::Int
@@ -87,7 +87,7 @@ function State(
 
         # upper level parameters
         promote(f_calls, g_calls, h_calls, iteration)...,
-        Real(success_rate),
+        Float64(success_rate),
         State[],
         start_time,
         final_time,

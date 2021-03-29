@@ -92,19 +92,19 @@ julia> state = optimize(f, bounds, ECA(options=options))
 
 """
 function Options(;
-    x_tol::Real = 0.0,
-    f_tol::Real = 0.0,
-    g_tol::Real = 0.0,
-    h_tol::Real = 0.0,
-    f_calls_limit::Real = 0,
-    g_calls_limit::Real = 0,
-    h_calls_limit::Real = 0,
+    x_tol = 0.0,
+    f_tol = 0.0,
+    g_tol = 0.0,
+    h_tol = 0.0,
+    f_calls_limit = 0.0,
+    g_calls_limit = 0.0,
+    h_calls_limit = 0.0,
     iterations::Int = 0,
-    time_limit::Real = Inf,
-    store_convergence::Bool = false,
-    show_results::Bool = true,
-    debug::Bool = false,
-    search_type::Symbol = :minimize,
+    time_limit::Float64 = Inf,
+    store_convergence = false,
+    show_results = true,
+    debug = false,
+    search_type = :minimize,
     seed = rand(UInt)
 )
 

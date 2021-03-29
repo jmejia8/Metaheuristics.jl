@@ -1,5 +1,5 @@
-mutable struct Bee
-    sol
+mutable struct Bee{T}
+    sol::T
     fit::Float64
     t::Int
 end
@@ -23,6 +23,8 @@ get_position(bee::Bee) = bee.sol.x
 Get the fitness of a bee when optimize using ABC algorithm.
 """
 fval(bee::Bee) = bee.sol.f
+
+minimum(st::State{Bee{xf_indiv}}) = st.best_sol.sol.f
 
 @inline function updateFit!(bee::Bee)
     bee.fit = fit(bee.sol.f)
@@ -108,11 +110,11 @@ function scoutPhase!(bees, f, genPos::Function, limit::Int)
     return length(bees_scout)
 end
 
-function getBest(bees::Bees)
-    best = bees[1].sol
+function getBestBee(bees)
+    best = bees[1]
     for bee in bees
-        if bee.sol.f < best.f
-            best = bee.sol
+        if bee.sol.f < best.sol.f
+            best = bee
         end
     end
  
@@ -120,8 +122,8 @@ function getBest(bees::Bees)
 end
 
 function chooseBest(bees, best)
-    bee_cand = getBest(bees) 
-    if bee_cand.f < best.f
+    bee_cand = getBestBee(bees) 
+    if bee_cand.sol.f < best.sol.f
         return deepcopy(bee_cand)
     end
 

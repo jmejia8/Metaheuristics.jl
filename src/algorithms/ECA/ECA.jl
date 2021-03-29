@@ -98,7 +98,7 @@ end
 
 
 function update_state!(
-    status::State,
+    status,
     parameters::ECA,
     problem::AbstractProblem,
     information::Information,
@@ -220,7 +220,6 @@ end
 
 
 function initialize!(
-    status::State,
     parameters::ECA,
     problem::AbstractProblem,
     information::Information,
@@ -245,7 +244,8 @@ function initialize!(
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    initialize!(problem, nothing, parameters, status, information, options)
+    # initialize!(problem, nothing, parameters, status, information, options)
+    status = gen_initial_state(problem,parameters,information,options)
 
     N_init = parameters.N
 
@@ -256,10 +256,12 @@ function initialize!(
         parameters.p_cr = parameters.p_bin .* ones(D)
     end
 
+    status
+
 end
 
 function final_stage!(
-    status::State,
+    status,
     parameters::ECA,
     problem::AbstractProblem,
     information::Information,

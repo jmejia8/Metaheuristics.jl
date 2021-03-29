@@ -1,22 +1,27 @@
 function initialize!(
-        status::State,
-        parameters::AbstractParameters,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-)
-    return
+                parameters::AbstractParameters,
+                problem,
+                information,
+                options,
+                args...;
+                kargs...
+        )
+
+
+    m = string(typeof(parameters))
+    println("Method $m is calling the template function.")
+    println("Redefine your own function using template")
+    error("Method $m is calling the template function.")
+    return State(0.0, zeros(0))
 end
 
 
 function update_state!(
-        status::State,
+        status,
         parameters::AbstractParameters,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
+        problem,
+        information,
+        options,
         args...;
         kargs...
 )
@@ -27,11 +32,11 @@ end
 
 
 function final_stage(
-        status::State,
+        status,
         parameters::AbstractParameters,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
+        problem,
+        information,
+        options,
         args...;
         kargs...
 )
@@ -39,11 +44,11 @@ function final_stage(
 end
 
 function stop_criteria!(
-        status::State,
+        status,
         parameters::AbstractParameters,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
+        problem,
+        information,
+        options,
         args...;
         kargs...
     )

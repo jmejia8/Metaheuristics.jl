@@ -112,7 +112,6 @@ function MOEAD_DE(D, nobjectives;
 end
 
 function initialize!(
-    status::State,
     parameters::MOEAD_DE,
     problem::AbstractProblem,
     information::Information,
@@ -136,8 +135,9 @@ function initialize!(
 
 
 
-    initialize!(problem, nothing, parameters, status, information, options)
+    status = gen_initial_state(problem,parameters,information,options)
     update_reference_point!(parameters.z, status.population)
+    return status
 
 end
 
@@ -278,6 +278,6 @@ function final_stage!(
     kargs...
     )
     status.final_time = time()
-    status.best_sol = get_pareto_front(status.population, is_better_eca)
+    # status.best_sol = get_pareto_front(status.population, is_better_eca)
     # @show length(status.best_sol)
 end

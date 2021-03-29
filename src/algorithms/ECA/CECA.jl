@@ -178,7 +178,6 @@ end
 
 
 function initialize!(
-    status::State,
     parameters::CECA,
     problem::AbstractProblem,
     information::Information,
@@ -203,7 +202,7 @@ function initialize!(
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    initialize!(problem, nothing, parameters, status, information, options)
+    return gen_initial_state(problem,parameters,information,options)
 
 end
 

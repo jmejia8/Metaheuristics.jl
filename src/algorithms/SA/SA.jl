@@ -81,7 +81,6 @@ function SA(;
 end
 
 function initialize!(
-    status::State,
     parameters::SA,
     problem::AbstractProblem,
     information::Information,
@@ -109,10 +108,13 @@ function initialize!(
 	# the current point and fx=f(x)
 	x = parameters.x_initial
 	fx= problem.f(x)
-    status.best_sol = generateChild(x, fx)
+    best_sol = generateChild(x, fx)
+    status = State(best_sol, [best_sol])
     parameters.x = x
     parameters.fx = fx
     status.f_calls = 1
+
+    return status
 
 end
 

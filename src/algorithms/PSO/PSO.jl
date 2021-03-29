@@ -70,7 +70,6 @@ Algorithm(
 end
 
 function initialize!(
-    status::State,
     parameters::PSO,
     problem::AbstractProblem,
     information::Information,
@@ -97,7 +96,7 @@ function initialize!(
 
 
 
-    initialize!(problem, nothing, parameters, status, information, options)
+    status = gen_initial_state(problem,parameters,information,options)
 
     parameters.v = zeros(parameters.N, D)
 
@@ -105,12 +104,13 @@ function initialize!(
 
     parameters.flock = status.population
 
+    status
 
 end
 
 
 function update_state!(
-    status::State,
+    status,
     parameters::PSO,
     problem::AbstractProblem,
     information::Information,
@@ -151,7 +151,7 @@ function update_state!(
 end
 
 function final_stage!(
-    status::State,
+    status,
     parameters::PSO,
     problem::AbstractProblem,
     information::Information,

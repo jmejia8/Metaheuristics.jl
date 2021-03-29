@@ -64,7 +64,6 @@ function WOA(;N = 30, information = Information(), options = Options())
 end
 
 function initialize!(
-    status::State,
     parameters::WOA,
     problem::AbstractProblem,
     information::Information,
@@ -83,9 +82,15 @@ function initialize!(
 
 
     P = generate_population(problem.f, parameters.N, problem.bounds)
+    best_sol = deepcopy(get_best(P))
+    status = State(best_sol, P)
+    #=
 	status.population = P
-    status.f_calls = parameters.N
     status.best_sol = deepcopy(get_best(status.population))
+    =#
+    status.f_calls = parameters.N
+
+    status
 	
 end
 

@@ -78,7 +78,7 @@ end
 
 
 function update_state!(
-        status::State,
+        status,
         parameters::DE,
         problem::AbstractProblem,
         information::Information,
@@ -144,7 +144,6 @@ function update_state!(
 end
 
 function initialize!(
-        status::State,
         parameters::DE,
         problem::AbstractProblem,
         information::Information,
@@ -176,12 +175,11 @@ function initialize!(
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    initialize!(problem, nothing, parameters, status, information, options)
-
+    return gen_initial_state(problem,parameters,information,options)
 end
 
 function final_stage!(
-        status::State,
+        status,
         parameters::DE,
         problem::AbstractProblem,
         information::Information,

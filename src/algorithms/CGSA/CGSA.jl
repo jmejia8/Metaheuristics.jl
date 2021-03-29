@@ -114,7 +114,6 @@ function CGSA(;
 end
 
 function initialize!(
-        status::State,
         parameters::CGSA,
         problem::AbstractProblem,
         information::Information,
@@ -139,12 +138,13 @@ function initialize!(
 
     # random initialization for agents.
     P = generate_population(fobj, N, problem.bounds)
-    status.population = P
-    status.f_calls = N
 
     # Current best
     theBest = get_best(P)
-    status.best_sol = theBest
+
+
+    status = State(theBest, P)
+    status.f_calls = N
 
     # Velocity
     parameters.V = isempty(parameters.V) ? zeros(N,D) : parameters.V
@@ -153,10 +153,12 @@ function initialize!(
     # function values
     parameters.fitness = isempty(parameters.fitness) ? fvals(status) : parameters.fitness
 
+    return status
+
 end
 
 function update_state!(
-        status::State,
+        status,
         parameters::CGSA,
         problem::AbstractProblem,
         information::Information,
@@ -235,7 +237,7 @@ end
 
 
 function final_stage!(
-        status::State,
+        status,
         parameters::CGSA,
         problem::AbstractProblem,
         information::Information,

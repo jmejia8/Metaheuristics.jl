@@ -1,6 +1,6 @@
 include("bee_dynamics.jl")
 
-mutable struct ABC <: AbstractAlgorithm
+mutable struct ABC <: AbstractParameters
     N::Int
     Ne::Int
     No::Int
@@ -69,11 +69,10 @@ function ABC(;
 end
 
 function initialize!(
-        status::State,
         parameters::ABC,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
+        problem,
+        information,
+        options,
         args...;
         kargs...
     )
@@ -89,17 +88,19 @@ function initialize!(
     bees = initialbees(problem.f, parameters.N, problem.bounds)
     nevals = length(bees)
 
-    status.best_sol = deepcopy(getBest(bees))
-    status.population = bees
-    status.f_calls = nevals
+    best_sol = deepcopy(getBestBee(bees))
+    population = bees
+    f_calls = nevals
+
+    return State(best_sol, population; f_calls = f_calls)
 end
 
 function update_state!(
-        status::State,
+        status,#::State{Bee},
         parameters::ABC,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
+        problem,
+        information,
+        options,
         args...;
         kargs...
     )
@@ -127,7 +128,7 @@ end
 
 
 function final_stage!(
-        status::State,
+        status,#::State{Bee{xf_indiv}},
         parameters::ABC,
         problem::AbstractProblem,
         information::Information,
@@ -136,7 +137,7 @@ function final_stage!(
         kargs...
     )
     status.final_time = time()
-    status.population = map(b -> b.sol, status.population)
+    # status.population = map(b -> b.sol, status.population)
     # status.best_sol = status.best_sol.sol
 end
 
@@ -144,7 +145,7 @@ is_better_abc(bee1, bee2) = is_better(bee1.sol, bee2.sol)
 
 
 function stop_criteria!(
-        status::State,
+        status,#::State{Bee},
         parameters::ABC,
         problem::AbstractProblem,
         information::Information,
@@ -152,10 +153,15 @@ function stop_criteria!(
         args...;
         kargs...
     )
-    cond2 = call_limit_stop_check(status, information, options) ||
-    iteration_stop_check(status, information, options)
+    cond_budget = call_limit_stop_check(status, information, options) ||
+                  iteration_stop_check(status, information, options)
 
-    cond = cond2 || !isnan(information.f_optimum) && abs(status.best_sol.f - information.f_optimum) < options.f_tol
+    if cond_budget
+        return true
+    end
+
+    cond = !isnan(information.f_optimum) &&
+           abs(status.best_sol.sol.f - information.f_optimum) < options.f_tol
 
     options.debug && cond && @info("Stopped since accuracy was met.")
     cond
