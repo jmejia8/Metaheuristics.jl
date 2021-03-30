@@ -3,12 +3,6 @@ mutable struct xf_indiv <: AbstractSolution # Single Objective
     f::Float64
 end
 
-mutable struct xfg_indiv # Single Objective Constraied
-    x::Vector{Float64}
-    f::Float64
-    g::Vector{Float64}
-end
-
 mutable struct xfgh_indiv # Single Objective Constraied
     x::Vector{Float64}
     f::Float64
@@ -64,7 +58,7 @@ end
 
 
 
-Solution = Union{xf_indiv, xfg_indiv, xfgh_indiv, xFgh_indiv}
+Solution = Union{xf_indiv, xfgh_indiv, xFgh_indiv}
 Population = Array{Solution, 1}
 
 
@@ -128,9 +122,6 @@ function inferType(fVal::Tuple{Float64})
     return xf_indiv
 end
 
-function inferType(fVal::Tuple{Float64,Array{Float64,1}})
-    return xfg_indiv
-end
 
 function inferType(fVal::Tuple{Float64,Array{Float64,1},Array{Float64,1}})
     return xfgh_indiv

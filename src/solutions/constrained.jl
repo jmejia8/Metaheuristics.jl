@@ -35,9 +35,6 @@ function isfeasible(element::xf_indiv)
     return true
 end
 
-function isfeasible(element::xfg_indiv)
-    return countViolations(element.g, []) == 0
-end
 
 function isfeasible(element::xfgh_indiv)
     return countViolations(element.g, element.h) == 0

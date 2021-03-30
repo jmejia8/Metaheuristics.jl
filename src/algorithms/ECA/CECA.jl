@@ -1,77 +1,3 @@
-mutable struct CECA <: AbstractParameters
-    η_max::Float64
-    K::Int
-    N::Int
-    ε::Float64
-end
-
-"""
-    CECA(;
-        η_max = 2.0,
-        K = 7,
-        N = 0,
-        ε = 0.0,
-        information = Information(),
-        options = Options()
-    )
-
-Parameters for the metaheuristic ECA: step-size `η_max`,`K` is number of vectors to
-generate the center of mass, `N` is the population size.
-
-# Example
-
-```jldoctest
-julia> f(x) = sum(x.^2)
-f (generic function with 1 method)
-
-julia> optimize(f, [-1 -1 -1; 1 1 1.0], CECA())
-
-+=========== RESULT ==========+
-| Iter.: 1021
-| f(x) = 1.68681e-163
-| solution.x = [2.5517634463667404e-82, -2.9182760041942484e-82, -1.3565584801935802e-82]
-| f calls: 21454
-| Total time: 0.0894 s
-+============================+
-
-julia> optimize(f, [-1 -1 -1; 1 1 1.0], ECA(N = 10, η_max = 1.0, K = 3))
-+=========== RESULT ==========+
-| Iter.: 1506
-| f(x) = 0.000172391
-| solution.x = [-6.340714627875324e-5, -0.004127226953894587, 0.012464071313908906]
-| f calls: 15069
-| Total time: 0.0531 s
-+============================+
-```
-
-"""
-function CECA(;
-    η_max::Float64 = 2.0,
-    K::Int = 7,
-    N::Int = 0,
-    ε::Float64 = 0.5,
-    information = Information(),
-    options = Options(),
-)
-
-
-
-
-    parameters = CECA(
-        η_max,
-        K,
-        N,
-        ε,
-    )
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
-
-end
-
-
 function center_ceca(U, max_fitness, ε)
     mass = getMass(U, max_fitness, ε)
     return center(U, mass),
@@ -82,8 +8,8 @@ end
 
 
 function update_state!(
-    status::State,
-    parameters::CECA,
+    status::State{xfgh_indiv},
+    parameters::ECA,
     problem::AbstractProblem,
     information::Information,
     options::Options,
@@ -177,38 +103,9 @@ function update_state!(
 end
 
 
-function initialize!(
-    parameters::CECA,
-    problem::AbstractProblem,
-    information::Information,
-    options::Options,
-    args...;
-    kargs...
-)
-    D = size(problem.bounds, 2)
-
-
-    if parameters.N <= parameters.K
-        parameters.N = parameters.K * D
-    end
-
-    if options.f_calls_limit == 0
-        options.f_calls_limit = 10000D
-        options.debug &&
-            @warn( "f_calls_limit increased to $(options.f_calls_limit)")
-    end
-
-    if options.iterations == 0
-        options.iterations = div(options.f_calls_limit, parameters.N) + 1
-    end
-
-    return gen_initial_state(problem,parameters,information,options)
-
-end
-
 function final_stage!(
-    status::State,
-    parameters::CECA,
+    status::State{xfgh_indiv},
+    parameters::ECA,
     problem::AbstractProblem,
     information::Information,
     options::Options,
@@ -217,10 +114,5 @@ function final_stage!(
 )
     status.final_time = time()
 
-    # compute Pareto front if it is a multiobjective problem
-    if typeof(status.population[1].f) <: Array
-        options.debug && @info "Computing Pareto front..."
-        status.best_sol = get_pareto_front(status.population, is_better_eca)
-    end
 end
 

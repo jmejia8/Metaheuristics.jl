@@ -10,6 +10,7 @@ mutable struct ECA <: AbstractParameters
     p_exploit::Float64
     p_bin::Float64
     p_cr::Array{Float64}
+    ε::Float64
     adaptive::Bool
     resize_population::Bool
 end
@@ -67,6 +68,7 @@ function ECA(;
     p_exploit::Float64 = 0.95,
     p_bin::Float64 = 0.02,
     p_cr::Array{Float64} = Float64[],
+    ε::Float64 = 0.0,
     adaptive::Bool = false,
     resize_population::Bool = false,
     information = Information(),
@@ -85,6 +87,7 @@ function ECA(;
         p_exploit,
         p_bin,
         p_cr,
+        ε,
         adaptive,
         resize_population,
     )
