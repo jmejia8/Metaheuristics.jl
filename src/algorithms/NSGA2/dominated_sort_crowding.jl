@@ -85,6 +85,7 @@ end
 
 function truncate_population!(population, N, is_better)
     fast_non_dominated_sort!(population, is_better)
+    sort!(population, by = x -> x.rank, alg = Base.Sort.QuickSort)
 
     #update_crowding_distance!(population)
 

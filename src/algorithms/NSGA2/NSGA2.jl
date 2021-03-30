@@ -113,8 +113,8 @@ function update_state!(
         polynomial_mutation!(c2,problem.bounds,parameters.η_m, parameters.p_m)
        
         # rapair solutions if necesary
-        replace_with_random_in_bounds!(c1, problem.bounds)
-        replace_with_random_in_bounds!(c2, problem.bounds)
+        reset_to_violated_bounds!(c1, problem.bounds)
+        reset_to_violated_bounds!(c2, problem.bounds)
 
         # evaluate children
         child1 = create_solution(c1, problem)
@@ -130,7 +130,6 @@ function update_state!(
     end
     
     # non-dominated sort, crowding distance, elitist removing
-    sort!(status.population, by = x -> x.rank, alg = Base.Sort.QuickSort)
     truncate_population!(status.population, parameters.N, is_better)
 
     stop_criteria!(status, parameters, problem, information, options)

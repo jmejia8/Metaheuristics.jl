@@ -6,12 +6,11 @@ function tournament_selection(P, i, is_better)
 end
 
 
-function gen_β(β, η, D)
+function gen_β(β, η, D, R)
     α = 2.0 .- β .^ (-  η - 1.0 )
-    R = rand(D)
     mask = R .<= 1.0 ./ α
     s = 1.0 / (η + 1.0)
-    βq = [ mask[i] ?  (R[i] * α[i])^s : (1.0 / (2 - R[i]*α[i]))^s for i in 1:D]
+    βq = [ mask[i] ?  (R[i] * α[i])^s : (1.0 / (2.0 - R[i]*α[i]))^s for i in 1:D]
     βq
 end
 
@@ -29,13 +28,15 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     Δ = max.(eps(), y2 - y1)
 
 
+    R = rand(D)
+
     β = @. 1.0 + (2.0 * (y1 - xl) / Δ)
-    βq = gen_β(β, η, D) 
+    βq = gen_β(β, η, D, R) 
     c1 = @. 0.5*(y1 + y2 -  βq*Δ)
 
     β = @. 1.0 + (2.0 * (y1 - xl) / Δ)
-    βq = gen_β(β, η, D) 
-    c2 = @. 0.5*(y1 + y2 -  βq*Δ)
+    βq = gen_β(β, η, D, R) 
+    c2 = @. 0.5*(y1 + y2 +  βq*Δ)
 
     # swap
     mask = rand(Bool, D)
@@ -47,6 +48,10 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     cc1[do_crossover] = c1[do_crossover]
     cc2 = copy(vector2)
     cc2[do_crossover] = c2[do_crossover]
+
+
+    reset_to_violated_bounds!(cc1, bounds)
+    reset_to_violated_bounds!(cc2, bounds)
 
     return cc1, cc2
 end
@@ -63,16 +68,18 @@ function polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
 
     D = length(xu)
     R = rand(D)
-    mask = rand(Bool, D) .< 0.5
+    mask = R .< 0.5
     s = η+1.0
     mut_pow = 1.0 / (η + 1.0)
     δq = [ mask[i] ?
-            ^(2R[i] + (1 - 2R[i]) * ^(1 - δ1[i], s), mut_pow) - 1.0 :
-            (2.0 * (1.0 - R[i]) + 2.0 * (R[i] - 0.5) * ^(1.0 - δ2[i], s))^mut_pow
+            ^(2.0R[i] + (1. - 2.0R[i]) * ^(1.0 - δ1[i], s), mut_pow) - 1.0 :
+            1.0 - (2.0 * (1.0 - R[i]) + 2.0 * (R[i] - 0.5) * ^(1.0 - δ2[i], s))^mut_pow
             for i in 1:D
         ]
 
     vector[do_mutation] = x + δq .* ( xu - xl)
     # correct using reset to bound
+    #
+    vector
 
 end
