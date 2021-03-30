@@ -233,16 +233,14 @@ end
 
 """
     pareto_front(state::State)
-Returns solutions in `state.best_sol` or non-dominated solutions in st.population.
+Returns the non-dominated solutions in state.population.
 """
-pareto_front(st::State) = !isempty(st.best_sol) ?
-                        fvals(st.best_sol) :
-                        fvals( get_pareto_front(st.population, is_better_eca))
+pareto_front(st::State) = pareto_front(st.population)
 
 
 """
     pareto_front(population::Array)
 Returns non-dominated solutions.
 """
-pareto_front(population::Array) = fvals(get_pareto_front(population, is_better_eca))
+pareto_front(population::Array) = fvals(get_non_dominated_solutions(population, is_better_eca))
 

@@ -90,7 +90,7 @@ end
     `3` if both arguments 1 (a) and 2 (b) are incomparable.
     `0` if both arguments 1 (a) and 2 (b) are equal.
 """
-function compare(a, b)
+function compare(a::Vector, b::Vector)
     k = length(a)
     @assert k == length(b)
 
@@ -123,6 +123,9 @@ function compare(a, b)
     return 2 # b dominates a
     
 end
+
+
+compare(a::xFgh_indiv, b::xFgh_indiv) = compare(a.f, b.f)
 
 """
     argworst(population)

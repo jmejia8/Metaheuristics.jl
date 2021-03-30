@@ -81,3 +81,24 @@ function update_crowding_distance!(pop)
     pop
 end
 
+
+
+function truncate_population!(population, N, is_better)
+    fast_non_dominated_sort!(population, is_better)
+
+    #update_crowding_distance!(population)
+
+    let f::Int = 1
+        ind = 0
+        indnext = findlast(x -> x.rank == f, population)
+        while 0 < indnext <= N
+            ind = indnext
+            f += 1
+            indnext = findlast(x -> x.rank == f, population)
+        end
+        indnext == 0 && (indnext = length(population))
+        update_crowding_distance!(view(population, ind+1:indnext))
+        sort!(view(population, ind+1:indnext), by = x -> x.crowding, rev = true, alg = PartialQuickSort(N-ind))
+    end
+    deleteat!(population, N+1:length(population))
+end
