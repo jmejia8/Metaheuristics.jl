@@ -117,10 +117,10 @@ function update_state!(
         replace_with_random_in_bounds!(c2, problem.bounds)
 
         # evaluate children
-        child1 = generateChild(c1, problem.f(c1))
+        child1 = create_solution(c1, problem)
         child1.sum_violations = violationsSum(child1.g, child1.h, ε = parameters.ε)
 
-        child2 = generateChild(c2, problem.f(c2)) 
+        child2 = create_solution(c2, problem) 
         child2.sum_violations = violationsSum(child2.g, child2.h, ε = parameters.ε)
         status.f_calls += 2
        

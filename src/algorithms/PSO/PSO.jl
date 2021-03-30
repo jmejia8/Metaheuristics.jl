@@ -129,7 +129,7 @@ function update_state!(
         x = reset_to_violated_bounds!(x + parameters.v[i, :], problem.bounds)
         # x += parameters.v[i, :]
 
-        sol = generateChild(x, problem.f(x), ε = options.h_tol)
+        sol = create_solution(x, problem, ε = options.h_tol)
         status.f_calls += 1
 
         if is_better(sol, status.population[i])

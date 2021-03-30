@@ -1,3 +1,4 @@
+#=
 function initialize!(problem,engine,parameters,status,information,options)
     a, b = problem.bounds[1,:], problem.bounds[2,:]
     D = length(a)
@@ -18,10 +19,11 @@ function initialize!(problem,engine,parameters,status,information,options)
     # status.stop = engine.stop_criteria(status, information, options)
 
 end
+=#
 
 function gen_initial_state(problem,parameters,information,options)
     # population array
-    population = generate_population(problem.f, parameters.N, problem.bounds,ε=options.h_tol)
+    population = generate_population(parameters.N, problem,ε=options.h_tol)
 
     # best solution
     best_solution = get_best(population)

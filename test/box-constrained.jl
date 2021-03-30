@@ -10,15 +10,24 @@ using Test
 
         desired_accuracy = 1e-4
 
-        f, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
+        ff, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
+
+        # number of function evaluations
+        f_calls = 0
+
+        f(x) = begin
+            global f_calls += 1
+            ff(x)
+        end
 
         information = Information(f_optimum = 0.0)
         options = Options(f_tol = desired_accuracy, seed = 1)
+        options_2 = Options(f_tol = desired_accuracy, seed = 1, store_convergence=true)
 
         methods = [
                    ABC(options = options, information = information),
                    CGSA(options = options, information = information),
-                   DE(CR = 0.5, options = options, information = information),
+                   DE(CR = 0.5, options = options_2, information = information),
                    ECA(options = options, information = information),
                    PSO(options = options, information = information),
                    SA(options = options, information = information),
@@ -26,8 +35,13 @@ using Test
                   ]
 
         for method in methods
-            fitness = minimum( optimize(f, bounds, method) ) 
+            global f_calls = 0
+            res = optimize(f, bounds, method)
+            fitness = minimum( res ) 
             test_result(fitness, desired_accuracy)
+
+            # also count the mumber of function evaluations
+            @test f_calls == res.f_calls
         end
     end
 

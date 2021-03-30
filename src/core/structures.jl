@@ -20,7 +20,7 @@ function Algorithm(
 end
 
 
-struct Problem <: AbstractProblem
+mutable struct Problem <: AbstractProblem
     f::Function
     bounds::Array{Float64,2}
     f_calls::Int
@@ -34,4 +34,10 @@ function Problem(f::Function, bounds::Array)
 
     Problem(f, bounds, 0)
 end
+
+function evaluate(x, problem::Problem)
+    problem.f_calls += 1
+    return problem.f(x)
+end
+
 

@@ -44,20 +44,20 @@ function fit(fx)
     1.0 + abs(fx)
 end
 
-function updateBee!(bee, bee2, f, bounds)
+function updateBee!(bee, bee2, problem)
     D = length(bee.sol.x)
     ϕ = -1.0 + 2.0rand()
 
     v = ϕ*(bee.sol.x - bee2.sol.x)
 
     x_new = bee.sol.x + v
+    replace_with_random_in_bounds!(x_new, problem.bounds)
 
-    fx = f(x_new)
+    new_sol = create_solution(x_new, problem)
 
-    if fx < bee.sol.f
-        bee.sol.x = x_new
-        bee.sol.f = fx
-        bee.fit = fit(fx)
+    if is_better(new_sol, bee.sol) #fx < bee.sol.f
+        bee.sol = new_sol
+        bee.fit = fit(new_sol.f)
         bee.t = 0
     else
         bee.t += 1
@@ -65,13 +65,17 @@ function updateBee!(bee, bee2, f, bounds)
 end
 
 function getK(i, N)
-    return rand(union(1:i-1, i+1:N))
+    j = rand(1:N)
+    while j == i
+        j = rand(1:N)
+    end
+    j
 end
 
-function employedPhase!(bees, f, Ne, bounds)
+function employedPhase!(bees, problem, Ne)
     N = length(bees)
     for i in randperm(N)[1:Ne]
-        updateBee!(bees[i], bees[getK(i, N)], f, bounds)
+        updateBee!(bees[i], bees[getK(i, N)], problem)
     end
 end
 
@@ -89,21 +93,20 @@ function roulettSelect(bees, sum_f)
     return length(bees)
 end
 
-function outlookerPhase!(bees, f, No::Int, bounds)
+function outlookerPhase!(bees, problem, No::Int)
     N = length(bees)
     sum_f = sum(map(x->x.fit, bees))
 
     for i=1:No
         j = roulettSelect(bees, sum_f)
-        updateBee!(bees[j], bees[getK(j, N)], f, bounds)
+        updateBee!(bees[j], bees[getK(j, N)], problem)
     end
 end
 
-function scoutPhase!(bees, f, genPos::Function, limit::Int)
+function scoutPhase!(bees, problem, genPos::Function, limit::Int)
     bees_scout = filter(x->x.t >= limit, bees)
     for i in 1:length(bees_scout)
-        bees_scout[i].sol.x = genPos()
-        bees_scout[i].sol.f = f(bees_scout[i].sol.x)
+        bees_scout[i].sol = create_solution(genPos(), problem)
         bees_scout[i].t = 0
     end
 
@@ -130,8 +133,8 @@ function chooseBest(bees, best)
     return best
 end
 
-function initialbees(f, N, bounds)
-     P = generate_population(f, N, bounds)
+function initialbees(N, problem)
+     P = generate_population(N, problem)
 
      return [ Bee(sol) for sol in P ]
 end 

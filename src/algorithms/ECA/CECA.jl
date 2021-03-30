@@ -147,7 +147,7 @@ function update_state!(
 
         evo_boundary_repairer!(y, c, problem.bounds)
 
-        sol = generateChild(y, problem.f(y), ε=options.h_tol)
+        sol = create_solution(y, problem, ε=options.h_tol)
         status.f_calls += 1
 
 

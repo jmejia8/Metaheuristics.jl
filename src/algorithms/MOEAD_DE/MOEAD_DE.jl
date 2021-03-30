@@ -219,7 +219,7 @@ function update_state!(
         v = replace_with_random_in_bounds!(v, problem.bounds)
 
         # instance child
-        h = generateChild(v, problem.f(v))
+        h = create_solution(v, problem)
         status.f_calls += 1
 
         update_reference_point!(parameters.z, h)

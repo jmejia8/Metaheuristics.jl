@@ -107,8 +107,8 @@ function initialize!(
 
 	# the current point and fx=f(x)
 	x = parameters.x_initial
-	fx= problem.f(x)
-    best_sol = generateChild(x, fx)
+    best_sol = create_solution(x, problem)
+	fx = best_sol.f
     status = State(best_sol, [best_sol])
     parameters.x = x
     parameters.fx = fx
@@ -120,7 +120,7 @@ end
 
 
 function update_state!(
-    status::State,
+    status::State{xf_indiv},
     parameters::SA,
     problem::AbstractProblem,
     information::Information,
@@ -151,10 +151,12 @@ function update_state!(
         x1 = parameters.x + dx
 
         # Next step is to keep solution within bounds
-        x1 = (x1 .< l).*l+(l .<= x1).*(x1 .<= u).*x1+(u .< x1).*u			
-        fx1 = problem.f(x1)
+        #x1 = (x1 .< l).*l+(l .<= x1).*(x1 .<= u).*x1+(u .< x1).*u			
+        reset_to_violated_bounds!(x1, problem.bounds)
+        fx1 = evaluate(x1, problem)
 
         status.f_calls += 1
+
 
         df  = fx1 - parameters.fx
 

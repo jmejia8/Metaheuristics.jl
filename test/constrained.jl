@@ -7,21 +7,35 @@ using Test
         @test ≈(fitness, 0.0, atol=tol)
     end
 
-    desired_accuracy = 1e-4
+    function run_methods_cop()
+        desired_accuracy = 1e-4
 
-    f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:constrained1)
+        ff, bounds, optimums = Metaheuristics.TestProblems.get_problem(:constrained1)
 
-    information = Information(f_optimum = 0.0)
-    options = Options(f_tol = desired_accuracy, h_tol=1e-5, seed = 2)
+        # number of function evaluations
+        f_calls = 0
 
-    methods = [
-               CECA(options = options, information = information),
-               #DE(options = options, information = information),
-              ]
+        f(x) = begin
+            global f_calls += 1
+            ff(x)
+        end
 
-    for method in methods
-        res = optimize(f, bounds, method)
-        fitness = minimum( res ) 
-        test_result(fitness, desired_accuracy)
+        information = Information(f_optimum = 0.0)
+        options = Options(f_tol = desired_accuracy, h_tol=1e-5, seed = 2)
+
+        methods = [
+                   CECA(options = options, information = information),
+                   #DE(options = options, information = information),
+                  ]
+
+        for method in methods
+            global f_calls = 0
+            res = optimize(f, bounds, method)
+            fitness = minimum( res ) 
+            test_result(fitness, desired_accuracy)
+            @test f_calls == res.f_calls
+        end
     end
+
+    run_methods_cop()
 end

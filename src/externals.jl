@@ -1,16 +1,8 @@
 if VERSION >= v"0.7.0"
-	# import DelimitedFiles.writedlm
 	import Random: randperm, shuffle!, seed!
 	import Printf.@printf
 	import LinearAlgebra: norm, Diagonal, dot
 	import Statistics: var, mean, std
 	using UnicodePlots
 	import Base.minimum
-	indmin = argmin
-	indmax = argmax
-
-	eye(n) = Diagonal(ones(n))
-
-	repmat(X, n) = repeat(X, n)
-	# writecsv(f, A) = writedlm(f, A, ',')
 end

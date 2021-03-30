@@ -162,9 +162,7 @@ function update_state!(
 
         evo_boundary_repairer!(y, c, problem.bounds)
 
-        sol = generateChild(y, problem.f(y))
-
-        status.f_calls += 1
+        sol = create_solution(y, problem)
 
         # replace worst element
         if is_better(sol, status.population[i])
@@ -183,6 +181,8 @@ function update_state!(
         stop_criteria!(status, parameters, problem, information, options)
         status.stop && break
     end
+
+    status.f_calls = problem.f_calls
 
     if status.stop
         return

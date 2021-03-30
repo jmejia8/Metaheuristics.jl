@@ -85,7 +85,7 @@ function initialize!(
         options.debug && @info "Increasing f calls limit to $(options.f_calls_limit)"
     end
 
-    bees = initialbees(problem.f, parameters.N, problem.bounds)
+    bees = initialbees(parameters.N, problem)
     nevals = length(bees)
 
     best_sol = deepcopy(getBestBee(bees))
@@ -114,13 +114,13 @@ function update_state!(
     a = view(bounds, 1,:)
     b = view(bounds, 2,:)
 
-    employedPhase!(bees, fobj, Ne, bounds)        
-    outlookerPhase!(bees, fobj, No, bounds)
+    employedPhase!(bees,problem,  Ne)
+    outlookerPhase!(bees,problem, No)
 
     @inline genPos(D=D, a=Array(a), b = Array(b)) = a + (b - a) .* rand(D)
     best = chooseBest(bees, status.best_sol)
 
-    status.f_calls += Ne + No + scoutPhase!(bees, fobj, genPos, parameters.limit)
+    status.f_calls += Ne + No + scoutPhase!(bees, problem, genPos, parameters.limit)
     status.best_sol = best
     stop_criteria!(status, parameters, problem, information, options)
 

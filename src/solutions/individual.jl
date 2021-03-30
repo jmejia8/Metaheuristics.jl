@@ -111,6 +111,19 @@ function generate_population(func::Function, N::Int, bounds;ε=0.0)
     return population
 end
 
+
+function generate_population(N::Int, problem;ε=0.0)
+    a = view(problem.bounds, 1, :)'
+    b = view(problem.bounds, 2, :)'
+    D = length(a)
+
+    X = a .+ (b - a) .* rand(N, D)
+
+    population = [ create_solution(X[i,:], problem; ε=ε) for i in 1:N]
+
+    return population
+end
+
 function inferType(fVal::Tuple{Float64})
     return xf_indiv
 end
@@ -178,6 +191,12 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 
 """
 create_child(x, fx) = generateChild(x, fx)
+
+function create_solution(x, problem::Problem; ε=0.0)
+    problem.f_calls += 1
+    return generateChild(x, problem.f(x), ε=ε)
+end
+
 
 
 # getters for the above structures

@@ -81,7 +81,7 @@ function initialize!(
                             options.iterations * parameters.N : options.f_calls_limit
 
 
-    P = generate_population(problem.f, parameters.N, problem.bounds)
+    P = generate_population(parameters.N, problem)
     best_sol = deepcopy(get_best(P))
     status = State(best_sol, P)
     #=
@@ -158,7 +158,7 @@ function update_state!(
     end # for j
 
     x = reset_to_violated_bounds!(x, problem.bounds)
-    status.population[i] = generateChild(x, problem.f(x))
+    status.population[i] = create_solution(x, problem)
     status.f_calls += 1
 
     if is_better(status.population[i], status.best_sol)

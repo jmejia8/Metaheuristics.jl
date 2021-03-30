@@ -119,7 +119,7 @@ function update_state!(
 
         # instance child
         v = evo_boundary_repairer!(v, xBest, problem.bounds)
-        h = generateChild(v, problem.f(v),ε=options.h_tol)
+        h = create_solution(v, problem,ε=options.h_tol)
         status.f_calls += 1
 
         # select survivals

@@ -97,35 +97,6 @@ include("algorithms/ECA/MECA.jl")
 #           D E P R E C A T E D                       #
 #                                                     #
 #######################################################
-#include("deprecated/tools.jl")
-#include("deprecated/methods.jl")
-
-# Grasshopper optimisation algorithm: Theory and application
-# S Saremi, S Mirjalili, A Lewis - Advances in Engineering Software, 2017
-#include("deprecated/GOA.jl")
-
-# GSA: a gravitational search algorithm
-# E Rashedi, H Nezamabadi-Pour, S Saryazdi - Information sciences, 2009
-#include("deprecated/GSA.jl")
-
-# Li, Zhenhua, and Qingfu Zhang.
-# "An efficient rank-1 update for Cholesky CMA-ES using auxiliary evolution path."
-# Evolutionary Computation (CEC), 2017 IEEE Congress on. IEEE, 2017.
-#include("deprecated/CMAES_AEP.jl")
-
-# R.A. Formato Central force optimization:
-# a new metaheuristic with applications in applied electromagnetics
-# Progress in Electromagnetics Research, PIER 77 (2007), pp. 425-491, 10.2528/PIER07082403
-#include("deprecated/CFO.jl")
-
-# Brest, J., Maučec, M. S., & Bošković, B. (2017, June).
-# Single objective real-parameter optimization: Algorithm jSO.
-# In Evolutionary Computation (CEC), 2017 IEEE Congress on (pp. 1311-1318). IEEE.
-#include("deprecated/jso.jl")
-
-
-# deprecated functions/optimizers/etc
-#include("deprecated/deprecated.jl")
-
+# nothing to deprecate yet
 
 end # module

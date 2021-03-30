@@ -69,15 +69,7 @@ function optimize(
 
 
       status.start_time = start_time
-
-      #= improve this line
-      status = State(status.best_sol,
-                     status.population,
-                     f_calls=nfes(status))
-      =#
-
-
-      convergence = typeof(status.best_sol)[]
+      convergence = State{typeof(status.best_sol)}[]
 
 
 
@@ -94,7 +86,6 @@ function optimize(
       logger(status)
 
       while !status.stop
-            status.iteration += 1
 
             update_state!(
                           status,
@@ -103,22 +94,29 @@ function optimize(
                           information,
                           options
                          )
+            
+            # store the number of fuction evaluations
+            status.f_calls = problem.f_calls
 
             if options.debug
                   status.final_time = time()
+                  msg = "Current Status of " * string(typeof(parameters))
+                  @info msg
                   display(status)
             end
 
             if options.store_convergence
                   update_convergence!(convergence, status)
             end
-            
+
             status.overall_time = time() - status.start_time
             logger(status)
             status.stop = status.stop || 
                         call_limit_stop_check(status, information, options) ||
                         iteration_stop_check(status, information, options)  ||
                         time_stop_check(status, information, options)
+
+            status.iteration += 1
       end
 
       status.overall_time = time() - status.start_time

@@ -13,8 +13,16 @@ end
     function run_methods(problem)
 
 
-        f, bounds, pf = Metaheuristics.TestProblems.get_problem(problem)
+        ff, bounds, pf = Metaheuristics.TestProblems.get_problem(problem)
         D = size(bounds, 2)
+
+        # number of function evaluations
+        f_calls = 0
+
+        f(x) = begin
+            global f_calls += 1
+            ff(x)
+        end
 
         options = Options( seed = 1, iterations = 200)
 
@@ -25,8 +33,10 @@ end
               ]
 
         for method in methods
+            global f_calls = 0
             result = ( optimize(f, bounds, method) ) 
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
+            @test f_calls == result.f_calls
         end
     end
 

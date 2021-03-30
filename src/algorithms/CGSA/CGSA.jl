@@ -137,7 +137,7 @@ function initialize!(
     options.f_calls_limit = options.f_calls_limit == 0 ? options.iterations * N : options.f_calls_limit
 
     # random initialization for agents.
-    P = generate_population(fobj, N, problem.bounds)
+    P = generate_population(N, problem)
 
     # Current best
     theBest = get_best(P)
@@ -213,10 +213,10 @@ function update_state!(
     for i = 1:N
         x = reset_to_violated_bounds!(X[i,:], problem.bounds)
         X[i,:] = x
-        P[i] = generateChild(x, problem.f(x))
+        P[i] = create_solution(x, problem)
         fitness[i] = P[i].f
     end
-    status.f_calls += N
+    status.f_calls = problem.f_calls
 
     parameters.X = X
     parameters.fitness = fitness
