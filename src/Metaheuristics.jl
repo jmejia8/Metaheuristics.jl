@@ -27,13 +27,13 @@ include("core/structures.jl")
 
 include("common/multi-objective-functions.jl")
 include("common/repair.jl")
-include("common/stop.jl")
 
 include("solutions/individual.jl")
 include("solutions/constrained.jl")
 include("solutions/display.jl")
 
 
+include("common/stop.jl")
 include("common/compare.jl")
 
 

@@ -7,10 +7,10 @@ using Test
         @test ≈(fitness, 0.0, atol=tol)
     end
 
-    function run_methods_cop()
+    function run_methods_cop(problem)
         desired_accuracy = 1e-4
 
-        ff, bounds, optimums = Metaheuristics.TestProblems.get_problem(:constrained1)
+        ff, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
 
         # number of function evaluations
         f_calls = 0
@@ -21,10 +21,10 @@ using Test
         end
 
         information = Information(f_optimum = 0.0)
-        options = Options(f_tol = desired_accuracy, h_tol=1e-5, seed = 2)
+        options = Options(f_tol = desired_accuracy, h_tol=1e-5, seed = 2, debug=false)
 
         methods = [
-                   ECA(options = options, information = information),
+                   ECA(ε=1.0,options = options, information = information),
                    #DE(options = options, information = information),
                   ]
 
@@ -37,5 +37,7 @@ using Test
         end
     end
 
-    run_methods_cop()
+    for problem in [:constrained1, :constrained3]
+        run_methods_cop(problem)
+    end
 end

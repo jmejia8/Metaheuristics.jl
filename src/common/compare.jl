@@ -15,7 +15,7 @@ function is_better(A::xfgh_indiv, B::xfgh_indiv)
 
     if A_vio < B_vio
         return true
-    elseif B_vio > A_vio
+    elseif B_vio < A_vio
         return false
     end
 
@@ -35,7 +35,7 @@ function is_better(
 
     if A_vio < B_vio
         return true
-    elseif B_vio > A_vio
+    elseif B_vio < A_vio
         return false
     end
 
@@ -71,9 +71,9 @@ function get_best(population::Array)
     end
     
     best = population[1]
-    for sol in population
-        if is_better(sol, best)
-            best = sol
+    for i in 2:length(population)
+        if is_better(population[i], best)
+            best = population[i]
         end
     end
 

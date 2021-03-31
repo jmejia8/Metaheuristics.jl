@@ -30,9 +30,10 @@ function update_state!(
 
     p = status.f_calls / options.f_calls_limit
 
-    if parameters.ε > 0
-        ε = parameters.ε * (p - 1)^4
+    if parameters.ε > 0.0
+        ε = parameters.ε * (p - 1.0)^4
     end
+
 
 
     feasible_solutions = findall( s->s.is_feasible, status.population )
@@ -52,8 +53,6 @@ function update_state!(
         x = status.population[i].x
 
         # generate U masses
-        #U = getU(status.population, parameters.K, I, i, parameters.N, feasible_solutions)
-
         U_ids = getU_ids(parameters.K, I, i, parameters.N, feasible_solutions)
         U = population[U_ids]
 
@@ -61,19 +60,26 @@ function update_state!(
         mass = weights[U_ids]
         c = center(U, mass)
         u_worst = argmin(mass)
+        u_best = argmax(mass)
 
         # stepsize
         η = parameters.η_max * rand()
 
         # u: worst element in U
         u = U[u_worst].x
+        v = U[u_best].x
 
         # current-to-center/bin
         y = x .+ η .* (c .- u)
+        
+        mask = rand(length(y)) .< 1.0 / length(y)
+        y[mask] = v[mask]
+        
+        
 
         evo_boundary_repairer!(y, c, problem.bounds)
 
-        sol = create_solution(y, problem, ε=options.h_tol)
+        sol = create_solution(y, problem, ε=ε)
         status.f_calls += 1
 
 

@@ -22,3 +22,20 @@ function constrained2(D = 5)
     
 end
 
+function constrained3()
+    f(y) = begin
+        x = zeros(2)
+        return x[1] + 2x[2] + y[1] + y[2] + 2y[3],
+                    [0.0], # g
+                    [ 
+                     - y[1] + y[2] + y[3] + y[4] - 1,
+                     2x[1] - y[1] + 2y[2] - 0.5y[3] + y[5] - 1,
+                     2x[2] + 2y[1] - y[2] - 0.5y[3] + y[6] - 1
+                    ]
+    end
+
+
+    bounds = Array([zeros(6) 100.0ones(6)]')
+    y = zeros(6)
+    return f, bounds, [generateChild(y, f(y)) ]
+end
