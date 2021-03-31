@@ -24,7 +24,7 @@ using Test
         options = Options(f_tol = desired_accuracy, h_tol=1e-5, seed = 2, debug=false)
 
         methods = [
-                   ECA(ε=1.0,options = options, information = information),
+                   ECA(ε=1e-3, options = options, information = information),
                    #DE(options = options, information = information),
                   ]
 
