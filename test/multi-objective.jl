@@ -20,7 +20,7 @@ end
         f_calls = 0
 
         f(x) = begin
-            global f_calls += 1
+            f_calls += 1
             ff(x)
         end
 
@@ -33,7 +33,7 @@ end
               ]
 
         for method in methods
-            global f_calls = 0
+            f_calls = 0
             result = ( optimize(f, bounds, method) ) 
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
             # number of function evaluations should be reported correctly

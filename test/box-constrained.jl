@@ -16,7 +16,7 @@ using Test
         f_calls = 0
 
         f(x) = begin
-            global f_calls += 1
+            f_calls += 1
             ff(x)
         end
 
@@ -35,7 +35,7 @@ using Test
                   ]
 
         for method in methods
-            global f_calls = 0
+            f_calls = 0
             res = optimize(f, bounds, method)
             fitness = minimum( res ) 
             test_result(fitness, desired_accuracy)
