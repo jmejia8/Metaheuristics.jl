@@ -1,0 +1,310 @@
+mutable struct NSGA3 <: AbstractParameters
+    N::Int
+    η_cr::Float64
+    p_cr::Float64
+    η_m::Float64
+    p_m::Float64
+    ε::Float64
+    partitions::Int
+    reference_points::Array{Vector{Float64},1}
+end
+
+
+"""
+    function NSGA3(;
+        N = 100,
+        η_cr = 20,
+        p_cr = 0.9,
+        η_m = 20,
+        p_m = 1.0 / D,
+        ε = eps(),
+        information = Information(),
+        options = Options(),
+    )
+
+Parameters for the metaheuristic NSGA-II.
+
+Parameters:
+
+- `N` Population size.
+- `η_cr`  η for the crossover.
+- `p_cr` Crossover probability.
+- `η_m`  η for the mutation operator.
+- `p_m` Mutation probability (1/D for D-dimensional problem by default).
+
+To use NSGA3, the output from the objective function should be a 3-touple
+`(f::Vector, g::Vector, h::Vector)`, where `f` contains the objective functions,
+`g` and `h` are the equality and inequality constraints respectively.
+
+A feasible solution is such that `g_i(x) ≤ 0 and h_j(x) = 0`.
+
+
+```julia
+using Metaheuristics
+
+# Dimension
+D = 2
+
+# Objective function
+f(x) = ( x, [sum(x.^2) - 1], [0.0] ) 
+
+# bounds
+bounds = [-1 -1;
+           1  1.0
+        ]
+
+# define the parameters (use `NSGA3()` for using default parameters)
+nsga3 = NSGA3(N = 100, p_cr = 0.85)
+
+# optimize
+status = optimize(f, bounds, nsga3)
+
+# show results
+display(status)
+```
+
+"""
+function NSGA3(;
+    N = 100,
+    η_cr = 20,
+    p_cr = 0.9,
+    η_m = 20,
+    p_m = -1,
+    ε = eps(),
+    partitions=12,
+    reference_points=Vector{Float64}[],
+    information = Information(),
+    options = Options(),
+)
+
+    parameters = NSGA3(N, promote( Float64(η_cr), p_cr, η_m, p_m, ε )..., partitions,
+                      reference_points)
+    Algorithm(
+        parameters,
+        information = information,
+        options = options,
+    )
+
+end
+
+
+
+function update_state!(
+    status::State,
+    parameters::NSGA3,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
+
+
+    I = randperm(parameters.N)
+    for i = 1:parameters.N ÷ 2
+
+        pa = status.population[I[2i-1]]
+        pb = status.population[I[2i]]
+
+        # crossover
+        c1, c2 = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
+                              parameters.η_cr, parameters.p_cr)
+       
+        # mutation
+        polynomial_mutation!(c1,problem.bounds,parameters.η_m, parameters.p_m)
+        polynomial_mutation!(c2,problem.bounds,parameters.η_m, parameters.p_m)
+       
+        # rapair solutions if necesary
+        reset_to_violated_bounds!(c1, problem.bounds)
+        reset_to_violated_bounds!(c2, problem.bounds)
+
+        # evaluate children
+        child1 = create_solution(c1, problem)
+        child1.sum_violations = violationsSum(child1.g, child1.h, ε = parameters.ε)
+
+        child2 = create_solution(c2, problem) 
+        child2.sum_violations = violationsSum(child2.g, child2.h, ε = parameters.ε)
+        status.f_calls += 2
+       
+        # save children
+        push!(status.population, child1)
+        push!(status.population, child2)
+    end
+    
+    # non-dominated sort, crowding distance, elitist removing
+    fast_non_dominated_sort!(status.population, is_better)
+
+    k = 1
+    l = 1
+    while l <= parameters.N#length(status.population)
+        k = status.population[l].rank
+        l += 1
+    end
+
+    l = findlast(sol -> sol.rank == k, status.population)
+    deleteat!(status.population, l+1:length(status.population))
+    l = findfirst(sol -> sol.rank == k, status.population)
+    niching!(status.population, parameters.reference_points, parameters.N, l)
+
+    stop_criteria!(status, parameters, problem, information, options)
+end
+
+distance_point_to_rect(s, w) = norm(s - (w'*s)*w / (w' * w))
+
+function associate!(nich, nich_freq, distance, F, reference_points, l) 
+    N = size(F,1)
+
+    # find closest nich to corresponding solution
+    for i = 1:N
+        Fx = view(F, i,:)
+        for j = 1:length(reference_points)
+            d = distance_point_to_rect(Fx, reference_points[j])
+
+            distance[i] < d && continue
+
+            distance[i] = d
+            nich[i] = j
+        end
+
+        # not associate last  front
+        if i < l
+            nich_freq[nich[i]] += 1
+        end
+        
+    end
+end
+
+function normalize(F) 
+    ideal = minimum(F, dims=1)
+    nadir = maximum(F, dims=1)
+
+    b = nadir - ideal
+
+    # prevent division by zero
+    mask = b .< eps()
+    b[mask] .= eps()
+
+    return (F .- ideal) ./ b
+end
+
+get_last_front(id, population) = findall(s -> s.rank == id, population)
+
+pick_random(itr, item) = rand(findall(i -> i == item, itr))
+
+
+function niching!(population, reference_points, N, l)
+    if length(population) == N
+        return
+    end
+    
+    F = normalize(fvals(population))
+    k = l
+
+    # allocate memory
+    nich = zeros(Int, length(population))
+    nich_freq = zeros(Int, length(reference_points))
+    available_niches = ones(Bool, length(reference_points))
+    distance = fill(Inf, length(population))
+
+    # associate to niches
+    associate!(nich, nich_freq, distance, F, reference_points, l)
+
+    # keep last front
+    last_front_id = get_last_front(population[end].rank, population)
+    last_front = population[last_front_id]
+    deleteat!(population, last_front_id)
+
+    # last front niches information
+    niches_last_front = nich[last_front_id]
+    distance_last_front = distance[last_front_id]
+    
+    # save survivors
+    i = 1
+    while k <= N
+        mini = minimum(view(nich_freq, available_niches))
+        # nich to be assigned
+        j_hat = pick_random(nich_freq, mini)
+
+        # candidate solutions 
+        I_j_hat = findall( j -> j==j_hat, niches_last_front )
+        if isempty(I_j_hat)
+            available_niches[j_hat] = false
+            continue
+        end
+
+        if mini == 0
+            s = I_j_hat[argmin(distance_last_front[I_j_hat])]
+            push!(population, last_front[s])
+        else
+            s = rand(I_j_hat)
+            push!(population, last_front[s])
+        end
+
+        nich_freq[j_hat] += 1
+        deleteat!(last_front, s)
+        deleteat!(niches_last_front, s)
+        deleteat!(distance_last_front, s)
+
+        k += 1
+        
+        
+    end
+
+
+    nothing
+end
+
+
+
+function initialize!(
+    parameters::NSGA3,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+)
+    D = size(problem.bounds, 2)
+
+    if parameters.p_m < 0.0
+        parameters.p_m = 1.0 / D
+    end
+
+    if options.iterations == 0
+        options.iterations = 500
+    end
+
+    if options.f_calls_limit == 0
+        options.f_calls_limit = options.iterations * parameters.N + 1
+    end
+
+    status = gen_initial_state(problem,parameters,information,options)
+
+    if isempty(parameters.reference_points)
+        options.debug && @info "Initializing reference points..."
+        # number of objectives
+        m = length(status.population[1].f)
+
+        # initialize reference points
+        parameters.reference_points = gen_weights(m, parameters.partitions)
+    end
+
+    status
+
+end
+
+function final_stage!(
+    status::State,
+    parameters::NSGA3,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...
+    )
+    status.final_time = time()
+
+    #status.best_sol = get_pareto_front(status.population, is_better)
+
+end
+
