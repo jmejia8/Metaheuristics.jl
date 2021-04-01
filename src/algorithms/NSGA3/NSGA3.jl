@@ -120,10 +120,10 @@ function update_state!(
 
         # evaluate children
         child1 = create_solution(c1, problem)
-        child1.sum_violations = violationsSum(child1.g, child1.h, ε = parameters.ε)
+        #child1.sum_violations = violationsSum(child1.g, child1.h, ε = parameters.ε)
 
         child2 = create_solution(c2, problem) 
-        child2.sum_violations = violationsSum(child2.g, child2.h, ε = parameters.ε)
+        #child2.sum_violations = violationsSum(child2.g, child2.h, ε = parameters.ε)
         status.f_calls += 2
        
         # save children
@@ -141,24 +141,26 @@ function update_state!(
         l += 1
     end
 
-    l = findlast(sol -> sol.rank == k, status.population)
-    deleteat!(status.population, l+1:length(status.population))
+    let k = k
+        l = findlast(sol -> sol.rank == k, status.population)
+        deleteat!(status.population, l+1:length(status.population))
+    end
+
     l = findfirst(sol -> sol.rank == k, status.population)
     niching!(status.population, parameters.reference_points, parameters.N, l)
 
     stop_criteria!(status, parameters, problem, information, options)
 end
 
-distance_point_to_rect(s, w) = norm(s - (w'*s)*w / (w' * w))
+distance_point_to_rect(s, w) = @fastmath norm(s - (dot(w,s) / dot(w, w))*w  )
 
 function associate!(nich, nich_freq, distance, F, reference_points, l) 
-    N = size(F,1)
+    N = length(F)
 
     # find closest nich to corresponding solution
     for i = 1:N
-        Fx = view(F, i,:)
         for j = 1:length(reference_points)
-            d = distance_point_to_rect(Fx, reference_points[j])
+            d = distance_point_to_rect(F[i], reference_points[j])
 
             distance[i] < d && continue
 
@@ -174,9 +176,16 @@ function associate!(nich, nich_freq, distance, F, reference_points, l)
     end
 end
 
-function normalize(F) 
-    ideal = minimum(F, dims=1)
-    nadir = maximum(F, dims=1)
+function normalize(population) 
+    obj_normalized = typeof(population[1].f)[]
+    ideal = population[1].f
+    nadir = population[1].f
+
+    for i = 2:length(population)
+        ideal = min.(ideal, population[i].f)
+        nadir = max.(nadir, population[i].f)
+    end
+    
 
     b = nadir - ideal
 
@@ -184,12 +193,13 @@ function normalize(F)
     mask = b .< eps()
     b[mask] .= eps()
 
-    return (F .- ideal) ./ b
+    return [ (sol.f - ideal) ./ b for sol in population ]
 end
 
-get_last_front(id, population) = findall(s -> s.rank == id, population)
+# get_last_front(id, population) = findall(s -> s.rank == id, population)
 
 pick_random(itr, item) = rand(findall(i -> i == item, itr))
+find_item(itr, item)  = findall(i -> i == item, itr)
 
 
 function niching!(population, reference_points, N, l)
@@ -197,7 +207,7 @@ function niching!(population, reference_points, N, l)
         return
     end
     
-    F = normalize(fvals(population))
+    F = normalize(population)
     k = l
 
     # allocate memory
@@ -210,7 +220,7 @@ function niching!(population, reference_points, N, l)
     associate!(nich, nich_freq, distance, F, reference_points, l)
 
     # keep last front
-    last_front_id = get_last_front(population[end].rank, population)
+    last_front_id = k:length(population)#get_last_front(population[end].rank, population)
     last_front = population[last_front_id]
     deleteat!(population, last_front_id)
 
@@ -226,14 +236,15 @@ function niching!(population, reference_points, N, l)
         j_hat = pick_random(nich_freq, mini)
 
         # candidate solutions 
-        I_j_hat = findall( j -> j==j_hat, niches_last_front )
+        I_j_hat = find_item( niches_last_front, j_hat )
         if isempty(I_j_hat)
             available_niches[j_hat] = false
             continue
         end
 
         if mini == 0
-            s = I_j_hat[argmin(distance_last_front[I_j_hat])]
+            ds = view(distance_last_front, I_j_hat)
+            s = I_j_hat[argmin(ds)]
             push!(population, last_front[s])
         else
             s = rand(I_j_hat)
