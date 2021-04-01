@@ -44,26 +44,6 @@ function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int)
 end
 
 
-function getU(P::Array{xfgh_indiv}, K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions)
-    # at least half of the population is feasible to generate random centers
-    if length(feasible_solutions) >= 0.5N || length(feasible_solutions) == 0
-        return getU(P, K, I, i, N)
-    end
-    
-    # center of mass is generated with at least one feasible solution
-    K -= 1
-    if i <= N - K
-        U_ids = I[i:K+i]
-    else
-        j = (i:K+i) .% N
-        U_ids = I[j.+1]
-    end
-    
-    push!(U_ids, rand(feasible_solutions))
-
-    return P[U_ids]
-end
-
 
 function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions)
     # at least half of the population is feasible to generate random centers

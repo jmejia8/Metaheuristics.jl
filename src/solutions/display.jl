@@ -56,16 +56,10 @@ function display(status::State)
         println("Population")
         display(Array(status.population))
 
-        b = nothing
-        try
-            b = Array(status.best_sol)
-        catch
-            b = nothing
-        end
-        if !isnothing(b) && !isempty(b)
-            println("\nBest solution(s)")
-            display(b)
-        end
+        # non-dominated
+        pf = get_non_dominated_solutions(status.population)
+        println("\nNon-dominated solution(s)")
+        display(pf)
         print("\n")
     end
 

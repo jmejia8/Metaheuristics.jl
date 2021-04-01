@@ -233,5 +233,5 @@ pareto_front(st::State) = pareto_front(st.population)
     pareto_front(population::Array)
 Returns non-dominated solutions.
 """
-pareto_front(population::Array) = fvals(get_non_dominated_solutions(population, is_better_eca))
+pareto_front(population::Array) = fvals(get_non_dominated_solutions(population))
 

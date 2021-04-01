@@ -215,8 +215,7 @@ function update_state!(
         status.population = resizePop!(
             status.population,
             parameters.N,
-            K,
-            (a, b) -> is_better(a, b),
+            K
         )
     end
 end
@@ -281,37 +280,3 @@ function final_stage!(
     end
 end
 
-
-function is_better_eca(
-    New::xFgh_indiv,
-    Old::xFgh_indiv;
-    searchType = :minimize,
-    ε = 0.0,
-)
-
-    old_vio = Old.sum_violations
-    new_vio = New.sum_violations
-
-    if new_vio < old_vio
-        return true
-    elseif new_vio > old_vio
-        return false
-    end
-
-    if searchType == :minimize
-        for i in 1:length(Old.f)
-            if Old.f[i] < New.f[i]
-                return false
-            end
-        end
-        return true
-    end
-
-    for i in 1:length(Old.f)
-        if Old.f[i] > New.f[i]
-            return false
-        end
-    end
-
-    return true
-end

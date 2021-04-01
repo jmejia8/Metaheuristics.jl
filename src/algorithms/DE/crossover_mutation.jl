@@ -1,4 +1,4 @@
-function DE_mutation(population, i::Int, F::Float64, strategy::Symbol=:rand1, xBest=nothing)
+function DE_mutation(population, i::Int, F::Float64, strategy::Symbol=:rand1, best_ind=0)
 
     N = length(population)
     # select participats
@@ -28,6 +28,7 @@ function DE_mutation(population, i::Int, F::Float64, strategy::Symbol=:rand1, xB
         u = a + F * (b - c)
     elseif strategy == :best1
         # DE/best/1
+        xBest = population[argbest(population)].x
         u = xBest + F * (b - c)
     elseif strategy == :rand2
         # DE/rand/2
@@ -48,17 +49,20 @@ function DE_mutation(population, i::Int, F::Float64, strategy::Symbol=:rand1, xB
         u = ee + F * (a - b + c - d)
     elseif strategy == :randToBest1
         # DE/rand-to-best/1
+        xBest = population[argbest(population)].x
         u = x + F * (xBest - x + a - b)
     elseif strategy == :best2
         # DE/best/2
         r4 = rand(1:N)
+        best_ind = argbest(population)
+        xBest = population[best_ind].x
         while r4 == i || r4 == r1 || r4 == r2 || r4 == r3 || r4 == best_ind
             r4 = rand(1:N)
         end
         d = population[r4].x
         u = xBest + F * (a - b + c - d)
     else
-        @error("Unknown strategy $(strategy)")
+        error("Unknown strategy " * string(strategy))
     end
 
     return u

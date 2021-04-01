@@ -1,5 +1,5 @@
 function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
-    p_best = p_cr[indmin(M)]
+    p_best = p_cr[argmin(M)]
 
     for i = 1:length(p_cr)
         if M[i] > 0.3
@@ -18,7 +18,7 @@ function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
     return p_cr
 end
 
-function resizePop!(P::Array, N_new::Int, K::Int; is_better = is_better)
+function resizePop!(P::Array, N_new::Int, K::Int)
     N = length(P)
 
     if N == N_new

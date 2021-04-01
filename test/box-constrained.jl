@@ -25,14 +25,27 @@ using Test
         options_2 = Options(f_tol = desired_accuracy, seed = 1, store_convergence=true)
 
         methods = [
-                   ABC(options = options, information = information),
-                   CGSA(options = options, information = information),
+                   ABC(options = options, information = information), 
+
+                   # differential evolution
                    DE(CR = 0.5, options = options_2, information = information),
+                   DE(CR = 0.4, strategy=:best1, options = options_2, information = information),
+                   DE(CR = 0.3, strategy=:rand2, options = options_2, information = information),
+                   DE(CR = 0.5, strategy=:randToBest1, options = options_2, information = information),
+                   DE(CR = 0.3, strategy=:best2, options = options_2, information = information),
+
                    ECA(options = options, information = information),
+                   ECA(adaptive=true, resize_population=true, options = options, information = information),
+
                    PSO(options = options, information = information),
                    SA(options = options, information = information),
                    WOA(options = options, information = information),
                   ]
+
+        # CGSA
+        for i = 1:10
+            push!(methods, CGSA(chaosIndex=i,options = options, information = information))
+        end
 
         for method in methods
             f_calls = 0
@@ -41,7 +54,7 @@ using Test
             test_result(fitness, desired_accuracy)
 
             # also count the mumber of function evaluations
-            @test f_calls == res.f_calls
+            @test f_calls == nfes(res)
         end
     end
 
