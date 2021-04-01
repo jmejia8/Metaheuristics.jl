@@ -159,14 +159,6 @@ function initialize!(
     end
 
     status = gen_initial_state(problem,parameters,information,options)
-    fast_non_dominated_sort!(status.population, is_better)
-
-    indiv_type = typeof(status.population[1])
-    if indiv_type <: xfgh_indiv || indiv_type <: xFgh_indiv
-        for sol in status.population
-            sol.sum_violations = violationsSum(sol.g, sol.h, ε = parameters.ε)
-        end
-    end
 
     status
 
