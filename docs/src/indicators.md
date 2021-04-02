@@ -31,3 +31,13 @@
  Metaheuristics.PerformanceIndicators.igd_plus
 ```
 
+
+```@docs
+ Metaheuristics.PerformanceIndicators.spacing
+```
+
+
+```@docs
+ Metaheuristics.PerformanceIndicators.covering
+```
+
