@@ -34,7 +34,7 @@ Parameters:
 
 To use NSGA2, the output from the objective function should be a 3-touple
 `(f::Vector, g::Vector, h::Vector)`, where `f` contains the objective functions,
-`g` and `h` are the equality and inequality constraints respectively.
+`g` and `h` are inequality, equality constraints respectively.
 
 A feasible solution is such that `g_i(x) ≤ 0 and h_j(x) = 0`.
 

@@ -22,7 +22,7 @@ end
         options = Options(),
     )
 
-Parameters for the metaheuristic NSGA-II.
+Parameters for the metaheuristic NSGA-III.
 
 Parameters:
 
@@ -34,7 +34,7 @@ Parameters:
 
 To use NSGA3, the output from the objective function should be a 3-touple
 `(f::Vector, g::Vector, h::Vector)`, where `f` contains the objective functions,
-`g` and `h` are the equality and inequality constraints respectively.
+`g` and `h` are inequality, equality constraints respectively.
 
 A feasible solution is such that `g_i(x) ≤ 0 and h_j(x) = 0`.
 
@@ -42,19 +42,13 @@ A feasible solution is such that `g_i(x) ≤ 0 and h_j(x) = 0`.
 ```julia
 using Metaheuristics
 
-# Dimension
-D = 2
 
-# Objective function
-f(x) = ( x, [sum(x.^2) - 1], [0.0] ) 
+# Objective function, bounds, and the True Pareto front
+f, bounds, pf = Metaheuristics.TestProblems.get_problem(:DTLZ2)
 
-# bounds
-bounds = [-1 -1;
-           1  1.0
-        ]
 
 # define the parameters (use `NSGA3()` for using default parameters)
-nsga3 = NSGA3(N = 100, p_cr = 0.85)
+nsga3 = NSGA3(p_cr = 0.9)
 
 # optimize
 status = optimize(f, bounds, nsga3)

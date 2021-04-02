@@ -17,7 +17,7 @@ mutable struct MOEAD_DE <: AbstractParameters
 end
 
 """
-    MOEAD_DE(D::Int, nobjectives::Int)
+    MOEAD_DE(weights)
 
 `MOEAD_DE` implements the original version of MOEA/D-DE. It uses the contraint handling method
 based on the sum of violations (for constrained optimizaton):
@@ -61,8 +61,14 @@ bounds = [-1 -1;
            1  1.0
         ]
 
+nobjectives = 2
+npartitions = 100
+
+# reference points (Das and Dennis's method)
+weights = gen_ref_dirs(nobjectives, npartitions)
+
 # define the parameters
-moead_de = MOEAD_DE(D, 2, N = 300, options=Options(debug=false, iterations = 500))
+moead_de = MOEAD_DE(weights, options=Options(debug=false, iterations = 250))
 
 # optimize
 status_moead = optimize(f, bounds, moead_de)
