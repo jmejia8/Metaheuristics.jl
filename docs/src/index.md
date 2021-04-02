@@ -23,7 +23,7 @@ global optimization.
 
 ## Installation
 
-Open the Julia (Julia 1.0 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia (Julia 1.1 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 ```
 pkg> add Metaheuristics
