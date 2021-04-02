@@ -24,18 +24,21 @@ end
             ff(x)
         end
 
-        options = Options( seed = 1, iterations = 200)
+        options = Options( seed = 1, iterations = 250)
+        nobjectives = length(pf[1].f)
+        npartitions = nobjectives == 2 ? 100 : 12
 
         methods = [
-                # ECA(N = 100, options=options),
-                MOEAD_DE(D, 2, N = 300, options=options),
-                NSGA2(options=options)
+                NSGA2(options=options),
+                MOEAD_DE(gen_ref_dirs(nobjectives, npartitions), options=Options( seed = 1, iterations = 500)),
+                NSGA3(options=options),
               ]
 
         for method in methods
             f_calls = 0
             result = ( optimize(f, bounds, method) ) 
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
+
             # number of function evaluations should be reported correctly
             @test f_calls == result.f_calls
 
@@ -50,7 +53,7 @@ end
     end
 
 
-    for problem in [:ZDT3]
+    for problem in [:ZDT3, :DTLZ2]
         run_methods(problem) 
     end
 

@@ -162,7 +162,9 @@ function ZDT6(D = 10, n_solutions = 100)
     return f, bounds, pareto_set
 end
 
-function DTLZ2(m=3, n_solutions=100)
+generic_sphere(ref_dirs) = ref_dirs ./ ([norm(v) for v in ref_dirs])
+
+function DTLZ2(m=3, ref_dirs = gen_ref_dirs(m, 12))
     f(x,m=m) = begin
         g = sum( (x[m:end] .- 0.5).^2 )
         fx = zeros(m)
@@ -182,6 +184,9 @@ function DTLZ2(m=3, n_solutions=100)
 
     bounds = Array([zeros(D) ones(D)]')
 
-    return f, bounds, zeros(0,0)
+    pf = generic_sphere(ref_dirs)
+    pareto_set = [ generateChild(zeros(0), (fx, [0.0], [0.0])) for fx in pf ]
+
+    return f, bounds, pareto_set
 end
 

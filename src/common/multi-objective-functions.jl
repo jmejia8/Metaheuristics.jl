@@ -28,3 +28,37 @@ function get_non_dominated_solutions(Population, is_better = is_better)
 
 end
 
+
+"""
+    gen_ref_dirs(dimension, n_paritions)
+Generates Das and Dennis's structured reference points. `dimension` could be
+the number of objective functions in multi-objective functions.
+"""
+function gen_ref_dirs(dimension, n_paritions)
+    return  gen_weights(dimension, n_paritions)
+end
+
+function gen_weights(a, b)
+    nobj = a;
+    H    = b;
+    a    = zeros(nobj);
+    d    = H;
+    w    = [];
+    produce_weight!(a, 1, d, H, nobj, w)
+    return Array.(w)
+end
+
+function  produce_weight!(a, i, d, H, nobj, w)
+    for k=0:d
+        if i<nobj
+            a[i] = k;
+            d2   = d - k;
+            produce_weight!(a, i+1, d2, H, nobj, w);
+        else
+            a[i] = d;
+            push!(w, a/H)
+            break;
+        end
+    end
+end
+

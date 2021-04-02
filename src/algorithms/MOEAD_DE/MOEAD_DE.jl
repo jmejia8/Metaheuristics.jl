@@ -1,7 +1,6 @@
 include("weights_and_ideal.jl")
 
 mutable struct MOEAD_DE <: AbstractParameters
-    D::Int
     nobjectives::Int
     N::Int
     F::Float64
@@ -9,7 +8,6 @@ mutable struct MOEAD_DE <: AbstractParameters
     λ::Array{Vector{Float64}}
     η::Float64
     p_m::Float64
-    H::Int
     T::Int
     δ::Float64
     n_r::Float64
@@ -74,26 +72,42 @@ display(status_moead)
 ```
 
 """
-function MOEAD_DE(D, nobjectives;
-    N::Int = 0,
+function MOEAD_DE(weights ;
     F = 0.5,
     CR = 1.0,
     λ = Array{Vector{Float64}}[],
     η = 20,
-    p_m = 1.0 / D,
-    H = nobjectives == 2 ? 299 : 33,
+    p_m = -1.0,
     T = 20,
     δ = 0.9,
     n_r = 2,
-    z::Vector{Float64} = fill(Inf, nobjectives),
+    z::Vector{Float64} = zeros(0),
     B = Array{Int}[],
     s1 = 0.5,
     information = Information(),
     options = Options(),
 )
 
+    
+    if isempty(weights)
+        error("Provide weights points")
+    end
 
-    parameters = MOEAD_DE(D, nobjectives, N, promote(F, CR)..., λ, η,p_m, H, T, δ, n_r, z, B, s1)
+
+    
+    nobjectives = length(weights[1])
+    N = length(weights)
+
+    if isempty(z)
+        z = fill(Inf, nobjectives)
+    end
+
+    # @show nobjectives, N, F, CR, weights, η, p_m, T, δ, n_r, z, B, s1
+
+    parameters = MOEAD_DE(nobjectives, N, F, CR, weights, η, p_m, T, δ, n_r, z, B, s1)
+
+
+    initialize_closest_weight_vectors!(parameters)
 
     alg = Algorithm(
         parameters,
@@ -102,10 +116,6 @@ function MOEAD_DE(D, nobjectives;
     )
 
 
-    if isempty(λ)
-        initialize_weight_vectors!(alg.parameters, alg.parameters)
-        initialize_closest_weight_vectors!(alg.parameters, alg.parameters)
-    end
 
     alg
 
@@ -119,11 +129,8 @@ function initialize!(
     args...;
     kargs...
 )
-    D = size(problem.bounds, 2)
-    if isempty(parameters.λ)
-        initialize_weight_vectors!(parameters, problem)
-        initialize_closest_weight_vectors!(parameters, problem)
-    end
+
+
 
     if options.iterations == 0
         options.iterations = 500
@@ -136,6 +143,20 @@ function initialize!(
 
 
     status = gen_initial_state(problem,parameters,information,options)
+    D = size(problem.bounds, 2)
+    parameters.nobjectives = length(status.population[1].f)
+    parameters.p_m = parameters.p_m < 0.0 ? 1.0 / D : parameters.p_m
+
+    #=
+    if isempty(parameters.λ)
+        initialize_weight_vectors!(parameters, problem)
+        initialize_closest_weight_vectors!(parameters, problem)
+    elseif parameters.nobjectives != length(parameters.λ)
+        error("Dimension of reference points is not valid.")
+    end
+    =#
+
+
     update_reference_point!(parameters.z, status.population)
     return status
 

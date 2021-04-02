@@ -13,7 +13,7 @@ function initialize_weight_vectors!(parameters, problem)
     end
 end
 
-function initialize_closest_weight_vectors!(parameters, problem)
+function initialize_closest_weight_vectors!(parameters)
     distances = zeros(parameters.N, parameters.N)
     λ = parameters.λ
     for i in 1:parameters.N
@@ -54,35 +54,5 @@ function g(fx, λ, z)
     end
     
     return m
-end
-
-
-
-"""
-    gen_weights(n_objectives, H)
-
-"""
-function gen_weights(a, b)
-    nobj = a;
-    H    = b;
-    a    = zeros(nobj);
-    d    = H;
-    w    = [];
-    produce_weight!(a, 1, d, H, nobj, w)
-    return w
-end
-
-function  produce_weight!(a, i, d, H, nobj, w)
-    for k=0:d
-        if i<nobj
-            a[i] = k;
-            d2   = d - k;
-            produce_weight!(a, i+1, d2, H, nobj, w);
-        else
-            a[i] = d;
-            push!(w, a/H)
-            break;
-        end
-    end
 end
 

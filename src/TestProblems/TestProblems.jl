@@ -1,6 +1,6 @@
 module TestProblems
 
-import ..generateChild
+import ..generateChild, ..gen_ref_dirs, ..norm
 
 include("box-constrained.jl")
 include("constrained.jl")
