@@ -24,13 +24,14 @@ using Test
         options = Options(f_tol = desired_accuracy, h_tol=1e-5, seed = 2, debug=false)
 
         methods = [
-                   ECA(ε=1e-3, options = options, information = information),
+                   ECA(ε=0.5, options = options, information = information),
                    #DE(options = options, information = information),
                   ]
 
         for method in methods
             f_calls = 0
             res = optimize(f, bounds, method)
+            show(IOBuffer(), res)
             fitness = minimum( res ) 
             test_result(fitness, desired_accuracy)
             @test f_calls == res.f_calls

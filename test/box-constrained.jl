@@ -50,6 +50,7 @@ using Test
         for method in methods
             f_calls = 0
             res = optimize(f, bounds, method)
+            show(IOBuffer(), res)
             fitness = minimum( res ) 
             test_result(fitness, desired_accuracy)
 

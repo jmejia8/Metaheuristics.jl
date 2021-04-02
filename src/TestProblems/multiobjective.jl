@@ -94,7 +94,7 @@ function ZDT3(D = 30, n_solutions = 100)
     x = [vcat(x[i], zeros(D - 1)) for i in 1:n_solutions]
     pareto_set = [ generateChild(x, f(x)) for x in x ]
      
-    return f, bounds, pareto_set
+    return f, bounds, get_non_dominated_solutions(pareto_set)
 
 end
 

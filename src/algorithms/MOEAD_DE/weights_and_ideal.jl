@@ -1,18 +1,3 @@
-function initialize_weight_vectors!(parameters, problem)
-    values = gen_weights(parameters.nobjectives, parameters.H)
-
-    if 0 < parameters.N < length(values)
-        n = length(values) ÷ parameters.N
-        mask = 1:n:length(values)
-        parameters.λ = values[mask] 
-    elseif parameters.N > length(values)
-        error("Increase H or decrease N.")
-    else
-        parameters.N = length(values)
-        parameters.λ = values
-    end
-end
-
 function initialize_closest_weight_vectors!(parameters)
     distances = zeros(parameters.N, parameters.N)
     λ = parameters.λ

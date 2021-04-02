@@ -37,6 +37,7 @@ end
         for method in methods
             f_calls = 0
             result = ( optimize(f, bounds, method) ) 
+            show(IOBuffer(), "text/html", result)
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
 
             # number of function evaluations should be reported correctly
