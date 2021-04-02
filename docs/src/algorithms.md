@@ -59,3 +59,10 @@ WOA
 ```@docs
 NSGA2
 ```
+
+
+## NSGA-III
+
+```@docs
+NSGA3
+```

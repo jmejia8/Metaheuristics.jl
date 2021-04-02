@@ -6,7 +6,9 @@ Please, be free to send me your PR, issue or any comment about this package for 
 
 When you call the [`optimize`](@ref) function, the following steps are carried out:
 
-1. Initialization: `initialize!(problem, engine, parameters, status, information, options)`
+1. Initialization: `status = initialize!(parameters, problem, information, options)`
+   this function should initialize a `State` with population members according
+   to the parameters provided.
 2. Main optimization loop: while `status.stop == false` do
     - update population, parameters via `update_state!(problem, engine, parameters, status, information, options, iteration)`, and 
     - mainly set `status.stop = engine.stop_criteria(status, information, options)`
@@ -18,14 +20,16 @@ When you call the [`optimize`](@ref) function, the following steps are carried o
 
 ```julia
 function initialize!(
-    problem::Problem,
-    engine::Engine,
-    parameters::Any,
-    status::State,
-    information::Information,
-    options::Options,
-   )
+                parameters::AbstractParameters,
+                problem,
+                information,
+                options,
+                args...;
+                kargs...
+        )
     # initialize parameters, population, etc.
+    # return the status
+    return State(0.0, zeros(0))
 end
 ```
 
@@ -34,15 +38,16 @@ function which is called at each iteration/generation.
 
 ```julia
 function update_state!(
-        problem::Problem,
-        engine::Engine,
-        parameters::Any,
-        status::State,
-        information::Information,
-        options::Options,
-        iteration::Int,
-       )
+        status,
+        parameters::AbstractParameters,
+        problem,
+        information,
+        options,
+        args...;
+        kargs...
+)
     # update any element in State 
+    return
 end
 ```
 
@@ -50,20 +55,27 @@ end
 **Final Step:**
 
 ```julia
-function final_stage!(status::State, information::Information, options::Options)
-    # used to a final update of the status. 
+function final_stage(
+        status,
+        parameters::AbstractParameters,
+        problem,
+        information,
+        options,
+        args...;
+        kargs...
+)
+    return
 end
 ```
 
-### Parameter
+### Parameters
 
 Any proposed algorithm, let's say "XYZ", uses different parameters, then it is suggested to store them in a
 structure, e.g.:
 
 ```julia
-
-# structure
-mutable struct XYZ <: AbstractAlgorithm
+# structure with algorithm parameters
+mutable struct XYZ <: AbstractParameters
     N::Int # population size
     p_crossover::Float64 # crossover probability
     p_mutation::Float64 # mutation probability
@@ -75,14 +87,10 @@ function XYZ(;N = 0, p_crossover = 0.9, p_mutation = 0.1)
 
     Algorithm(
         parameters,
-        initialize! = initialize!,
-        update_state! = update_state!,
-        is_better = is_better,
-        stop_criteria = stop_check,
-        final_stage! = final_stage!,
         information = information,
         options = options,
     )
 end
 ```
 
+**TODO** Tutorial for creating and updating existent metaheuristics in this package.
