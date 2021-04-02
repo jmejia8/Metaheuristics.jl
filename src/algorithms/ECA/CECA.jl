@@ -1,12 +1,3 @@
-function center_ceca(U, max_fitness, ε)
-    mass = getMass(U, max_fitness, ε)
-    return center(U, mass),
-    argworst(U), # worst
-    argbest(U)  # best
-end
-
-
-
 function update_state!(
     status::State{xfgh_indiv},
     parameters::ECA,

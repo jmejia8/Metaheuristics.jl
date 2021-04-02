@@ -62,7 +62,8 @@ julia> PerformanceIndicators.igd_plus(front, front)
 """
 module PerformanceIndicators
 
-import ..State, ..fvals, ..norm, ..xFgh_indiv
+import ..State, ..fvals, ..norm, ..xFgh_indiv, ..fval, ..compare, ..mean
+import ..get_non_dominated_solutions
 
 """
 	generational_distance(front, true_pareto_front; p = 1, inverted = false, plus=false)
@@ -189,6 +190,86 @@ Returns the Inverted Generational Distance Plus.
 	- `Array{xFgh_indiv}` (usually `State.population`)
 """
 igd_plus(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, inverted=true, p=p, plus=true)
+
+
+"""
+	spacing(A)
+Computes the Schott spacing indicator. `spacing(A) == 0` means that vectors in `A` are
+uniformly distributed.
+"""
+function spacing(A::Array{Array{Float64,1},1})
+    n = length(A)
+
+    d = zeros(n)
+    for i = 1:n
+    	@inbounds d[i] = minimum( [ sum( abs.(A[i] - A[j]) ) for j in deleteat!(collect(1:n), i) ] )
+    end
+
+    d_hat = mean(d)
+    s = (1.0 / ( n - 1.0 )) * sum( (d_hat .- d) .^ 2 )
+    return sqrt(s)
+    
+end
+
+
+spacing(A::Array{xFgh_indiv}) = spacing( fval.(A) )
+spacing(A::State{xFgh_indiv}) = spacing(A.population)
+spacing(A::Matrix) = spacing([A[i,:] for i in 1:size(A,1)])
+
+"""
+	covering(A, B)
+Computes the covering indicator (percentage of vectors in B that are dominated by vectors in A)
+from two sets with non-dominated solutions.
+
+A and B with size (n, m) where n is number of samples and m is the vector dimension.
+
+Note that `covering(A, B) == 1` means that all solutions in B are dominated by those
+in A. Moreover, `covering(A, B) != covering(B, A)` in general.
+
+If `A::State` and `B::State`, the computes `covering(A.population, B.population)` after
+ignoring dominated solutions in each set.
+"""
+function covering(A::Array{Vector{T}}, B::Array{Vector{T}}) where T <: Real
+    n_a = length(A)
+    n_b = length(B)
+    s = 0.0
+    for i = 1:n_b
+        for j = 1:n_a
+			# `compare` returns 1 if argument 1 dominates argument 2
+            if compare(A[j], B[i]) == 1
+                s += 1.0
+                break
+            end    
+        end
+        
+    end
+
+    return s / n_b
+    
+end
+
+covering(A::Vector{xFgh_indiv}, B::Vector{xFgh_indiv}) = covering(fval.(A), fval.(B))
+
+function covering(A::State{xFgh_indiv}, B::State{xFgh_indiv})
+	A_non_dominated = get_non_dominated_solutions(A.population)
+	B_non_dominated = get_non_dominated_solutions(B.population)
+	
+	length(A_non_dominated) != length(A.population) &&
+	@warn "Some solutions in B dominate each other (solutions ignored)."
+
+
+	length(B_non_dominated) != length(B.population) &&
+	@warn "Some solutions in B dominate each other (solutions ignored)."
+
+	covering(A_non_dominated, B_non_dominated)
+end
+
+
+function covering(A::Matrix, B::Matrix)
+	A_arr = [ A[i,:] for i in 1:size(A,1) ]
+	B_arr = [ B[i,:] for i in 1:size(B,1) ]
+	covering(A_arr, B_arr)
+end
 
 
 end

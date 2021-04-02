@@ -71,11 +71,6 @@ function generateChild(x::Vector{Float64}, fResult::Float64;ε=0.0)
     return xf_indiv(x, fResult)
 end
 
-function generateChild(x::Vector{Float64}, fResult::Tuple{Float64,Array{Float64,1}};ε=0.0)
-    f, g = fResult
-    return xfgh_indiv(x, f, g, [0.0];ε=ε)
-end
-
 function generateChild(x::Vector{Float64},
         fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}};
         ε=0.0
@@ -93,18 +88,6 @@ function generateChild(x::Vector{Float64},
 end
 
 
-function generate_population(func::Function, N::Int, bounds;ε=0.0)
-    a = view(bounds, 1, :)'
-    b = view(bounds, 2, :)'
-    D = length(a)
-
-    X = a .+ (b - a) .* rand(N, D)
-
-    population = [ generateChild(X[i,:], func(X[i,:]); ε=ε) for i in 1:N]
-
-    return population
-end
-
 
 function generate_population(N::Int, problem;ε=0.0)
     a = view(problem.bounds, 1, :)'
@@ -118,18 +101,6 @@ function generate_population(N::Int, problem;ε=0.0)
     return population
 end
 
-function inferType(fVal::Tuple{Float64})
-    return xf_indiv
-end
-
-
-function inferType(fVal::Tuple{Float64,Array{Float64,1},Array{Float64,1}})
-    return xfgh_indiv
-end
-
-function inferType(fVal::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}})
-    return xFgh_indiv
-end
 
 """
     Metaheuristics.create_child(x, fx)

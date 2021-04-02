@@ -33,7 +33,6 @@ julia> result = optimize(f, bounds)
 +============================+
 ```
 """
-
 function optimize(
       f::Function, # objective function
       bounds::AbstractMatrix,

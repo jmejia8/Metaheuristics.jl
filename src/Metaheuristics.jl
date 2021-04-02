@@ -91,7 +91,6 @@ include("algorithms/NSGA2/NSGA2.jl")
 include("algorithms/NSGA3/NSGA3.jl")
 
 
-include("algorithms/ECA/MECA.jl")
 
 #######################################################
 #                                                     #

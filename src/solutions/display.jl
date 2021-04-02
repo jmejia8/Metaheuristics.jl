@@ -1,75 +1,83 @@
-import Base.Multimedia.display
+import Base.show
 
-function display(solution::xf_indiv)
-    @printf("| f(x) = %g\n| ", solution.f)
-    println("| x = ", solution.x)
+function Base.show(io::IO, solution::xf_indiv)
+    @printf(io, "| f(x) = %g\n| ", solution.f)
+    println(io, "| x = ", solution.x)
 
 
 end
 
-function display(solution::xfgh_indiv)
-    @printf("| f(x) = %g\n", solution.f)
-    @printf("| g(x) = ")
-    println(solution.g)
-    @printf("| h(x) = ")
-    println(solution.h)
+function Base.show(io::IO, solution::xfgh_indiv)
+    @printf(io,"| f(x) = %g\n", solution.f)
+    @printf(io,"| g(x) = ")
+    println(io, solution.g)
+    @printf(io,"| h(x) = ")
+    println(io, solution.h)
     # @printf("| Σ max(0,g(x)) + Σ |h(x)| = ")
     # println(solution.sum_violations)
-    println("| x = ", solution.x)
+    println(io, "| x = ", solution.x)
 
 
 end
 
 
-function display(solution::xFgh_indiv)
-    @printf("| f(x) = ")
-    println(solution.f)
-    @printf("| g(x) = ")
-    println(solution.g)
-    @printf("| h(x) = ")
-    println(solution.h)
-    println("| x = ", solution.x)
+function Base.show(io::IO, solution::xFgh_indiv)
+    @printf(io,"| f(x) = ")
+    println(io, solution.f)
+    @printf(io,"| g(x) = ")
+    println(io, solution.g)
+    @printf(io,"| h(x) = ")
+    println(io, solution.h)
+    println(io, "| x = ", solution.x)
 
 
 end
 
-function display(population::Array{xFgh_indiv})
+function Base.show(io::IO, population::Array{xFgh_indiv})
     x = map(s -> s.f[1], population)
     y = map(s -> s.f[2], population)
     plt = scatterplot(x, y, title="F space", xlabel="f_1", ylabel="f_2")
-    display(plt)
+    show(io, plt)
 end
 
-function display(status::State)
+function Base.show(io::IO, status::State)
 
     # if typeof(status.best_sol) != xf_indiv
     #     return println(status)
     # end
 
-    println("+=========== RESULT ==========+")
-    @printf("| Iter.: %.0f\n", status.iteration)
+    println(io, "+=========== RESULT ==========+")
+    @printf(io,"| Iter.: %.0f\n", status.iteration)
 
     if typeof(status.best_sol) <: xf_indiv || typeof(status.best_sol) <: xfgh_indiv
-        display(status.best_sol)
+        show(io, status.best_sol)
 
     elseif typeof(Array(status.population)) <: Array{xFgh_indiv}
-        println("Population")
-        display(Array(status.population))
+        println(io, "Population")
+        show(io, Array(status.population))
 
         # non-dominated
         pf = get_non_dominated_solutions(status.population)
-        println("\nNon-dominated solution(s)")
-        display(pf)
-        print("\n")
+        println(io, "\nNon-dominated solution(s)")
+        show(io, pf)
+        print(io, "\n")
     end
 
 
 
-    @printf("| f calls: %.0f\n", status.f_calls)
+    @printf(io,"| f calls: %.0f\n", status.f_calls)
     if typeof(status.population[1]) <: Union{xfgh_indiv, xFgh_indiv}
         n = sum(map(s -> s.sum_violations ≈ 0, status.population))
-        @printf("| feasibles: %d / %d in final population\n", n, length(status.population))
+        @printf(io,"| feasibles: %d / %d in final population\n", n, length(status.population))
     end
-    @printf("| Total time: %.4f s\n", status.final_time - status.start_time)
-    println("+============================+")
+    @printf(io,"| Total time: %.4f s\n", status.final_time - status.start_time)
+    println(io, "+============================+")
 end
+
+
+function Base.show(io::IO, ::MIME"text/html", status::State)
+    println(io, "<code>")
+    show(io, "text/plain", status)
+    println(io, "</code>")
+end
+
