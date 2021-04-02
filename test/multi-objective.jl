@@ -39,6 +39,8 @@ end
             result = ( optimize(f, bounds, method) ) 
             show(IOBuffer(), "text/html", result)
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
+            @test Metaheuristics.PerformanceIndicators.spacing(result) < 0.2
+            @test Metaheuristics.PerformanceIndicators.covering(pf, result.population) <= 1.0
 
             # number of function evaluations should be reported correctly
             @test f_calls == result.f_calls

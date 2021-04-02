@@ -1,5 +1,6 @@
 using Metaheuristics
 using Test
+import Random: seed!
 
 @testset "Common Methods" begin
     function simple_test()
@@ -49,10 +50,31 @@ using Test
             @test length(fx) == length(optimums[1].f)
 
             # test performance indicators
+            ## generational distance
             @test Metaheuristics.PerformanceIndicators.igd(optimums, pf) ≈ 0.0
             @test Metaheuristics.PerformanceIndicators.igd_plus(optimums, pf) ≈ 0.0
             @test Metaheuristics.PerformanceIndicators.gd(optimums, pf) ≈ 0.0
             @test Metaheuristics.PerformanceIndicators.gd_plus(optimums, pf) ≈ 0.0
+
+
+            ## spacing
+            seed!(1)
+            X = rand(100, 7)
+
+            @test Metaheuristics.PerformanceIndicators.spacing(X) < 0.5
+            @test Metaheuristics.PerformanceIndicators.spacing(optimums) < 0.2
+
+            ## covering
+            ## non dominated solutions
+            X = fvals(pf)
+            Y = copy(X)
+            # 50% of solutions in Y will be dominated by X
+            mask = 1:size(X,1) ÷ 2
+            Y[mask,1] = Y[mask,1] .+ 1.0
+            Cxy=Metaheuristics.PerformanceIndicators.covering(X, Y)
+            Cyx=Metaheuristics.PerformanceIndicators.covering(Y, X)
+            @test Cxy == (size(X,1) ÷ 2) / size(X,1)
+            @test Cyx == 0.0
         end
 
 	
