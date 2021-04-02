@@ -1,14 +1,14 @@
 # Metaheuristics
 
-A Julia package for metaheuristic optimization algorithms. Evolutionary are considered.
+High performance metaheuristics for optimization purely coded in Julia.
 
 [![Build Status](https://travis-ci.org/jmejia8/Metaheuristics.jl.svg?branch=master)](https://travis-ci.org/jmejia8/Metaheuristics.jl)
 [![Coverage Status](https://coveralls.io/repos/github/jmejia8/Metaheuristics.jl/badge.svg?branch=master)](https://coveralls.io/github/jmejia8/Metaheuristics.jl?branch=master)
-[![Doc](https://img.shields.io/badge/docs-dev-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/dev/)
+[![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/stable/)
 
 ## Installation
 
-Open the Julia (Julia 1.0 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia (Julia 1.1 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 ```
 pkg> add Metaheuristics
@@ -24,15 +24,17 @@ julia> import Pkg; Pkg.add("Metaheuristics")
 
 ## Algorithms
 
-- Evolutionary Centers Algorithm
-- Differential Evolution
-- Particle Swarm Optimization
-- Artificial Bee Colony
-- MOEA/D-DE
-- Gravitational Search Algorithm
-- Simulated Annealing
-- Whale Optimization Algorithm
-- NSGA-II
+- ECA: Evolutionary Centers Algorithm
+- DE:  Differential Evolution
+- PSO: Particle Swarm Optimization
+- ABC: Artificial Bee Colony
+- MOEA/D-DE: Multi-objective Evolutionary Algorithm based on Decomposition
+- GSA: Gravitational Search Algorithm
+- SA:  Simulated Annealing
+- WOA: Whale Optimization Algorithm
+- NSGA-II:  A fast and elitist multi-objective genetic algorithm: NSGA-II
+- NSGA-III: Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
+  Nondominated Sorting Approach
 
 ## Quick Start
 
