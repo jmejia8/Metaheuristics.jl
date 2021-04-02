@@ -102,7 +102,6 @@ function MOEAD_DE(weights ;
         z = fill(Inf, nobjectives)
     end
 
-    # @show nobjectives, N, F, CR, weights, η, p_m, T, δ, n_r, z, B, s1
 
     parameters = MOEAD_DE(nobjectives, N, F, CR, weights, η, p_m, T, δ, n_r, z, B, s1)
 
@@ -146,15 +145,6 @@ function initialize!(
     D = size(problem.bounds, 2)
     parameters.nobjectives = length(status.population[1].f)
     parameters.p_m = parameters.p_m < 0.0 ? 1.0 / D : parameters.p_m
-
-    #=
-    if isempty(parameters.λ)
-        initialize_weight_vectors!(parameters, problem)
-        initialize_closest_weight_vectors!(parameters, problem)
-    elseif parameters.nobjectives != length(parameters.λ)
-        error("Dimension of reference points is not valid.")
-    end
-    =#
 
 
     update_reference_point!(parameters.z, status.population)
