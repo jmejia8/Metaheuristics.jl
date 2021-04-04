@@ -19,6 +19,9 @@ function Algorithm(
 
 end
 
+function Base.show(io::IO, alg::Algorithm)
+    Base.show(io, alg.parameters)
+end
 
 mutable struct Problem <: AbstractProblem
     f::Function

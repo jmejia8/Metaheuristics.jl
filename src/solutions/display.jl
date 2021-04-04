@@ -66,7 +66,7 @@ function Base.show(io::IO, status::State)
 
 
     @printf(io,"| f calls: %.0f\n", status.f_calls)
-    if typeof(status.population[1]) <: Union{xfgh_indiv, xFgh_indiv}
+    if !isempty(status.population) &&  typeof(status.population[1]) <: Union{xfgh_indiv, xFgh_indiv}
         n = sum(map(s -> s.sum_violations ≈ 0, status.population))
         @printf(io,"| feasibles: %d / %d in final population\n", n, length(status.population))
     end
