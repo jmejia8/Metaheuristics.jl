@@ -99,10 +99,11 @@ function update_state!(
 
     I = randperm(parameters.N)
     J = randperm(parameters.N)
+    Q = typeof(status.population[1])[]
     for i = 1:2:parameters.N
 
-        pa = tournament_selection(status.population, I[i], is_better)
-        pb = tournament_selection(status.population, J[i], is_better)
+        pa = tournament_selection(status.population, I[i])
+        pb = tournament_selection(status.population, J[i])
 
         # crossover
         c1, c2 = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
@@ -125,12 +126,14 @@ function update_state!(
         status.f_calls += 2
        
         # save children
-        push!(status.population, child1)
-        push!(status.population, child2)
+        push!(Q, child1)
+        push!(Q, child2)
     end
-    
+
+    status.population = vcat(status.population, Q)
+
     # non-dominated sort, crowding distance, elitist removing
-    truncate_population!(status.population, parameters.N, is_better)
+    truncate_population!(status.population, parameters.N)
 
     stop_criteria!(status, parameters, problem, information, options)
 end

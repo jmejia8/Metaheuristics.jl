@@ -1,4 +1,4 @@
-function tournament_selection(P, i, is_better)
+function tournament_selection(P, i)
     a = i
     b = rand(1:length(P))
     

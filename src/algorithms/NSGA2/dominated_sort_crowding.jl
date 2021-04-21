@@ -1,4 +1,4 @@
-function fast_non_dominated_sort!(pop, is_better)
+function fast_non_dominated_sort!(pop)
     n = length(pop)
 
     dom_list = [ Int[] for i in 1:n ]
@@ -83,8 +83,8 @@ end
 
 
 
-function truncate_population!(population, N, is_better)
-    fast_non_dominated_sort!(population, is_better)
+function truncate_population!(population, N)
+    fast_non_dominated_sort!(population)
     sort!(population, by = x -> x.rank, alg = Base.Sort.QuickSort)
 
     #update_crowding_distance!(population)

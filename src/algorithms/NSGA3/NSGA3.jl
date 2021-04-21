@@ -125,25 +125,29 @@ function update_state!(
         push!(status.population, child2)
     end
     
-    # non-dominated sort, crowding distance, elitist removing
-    fast_non_dominated_sort!(status.population, is_better)
+    # non-dominated sort, elitist removing via niching
+    truncate_population_nsga3!(status.population,parameters.reference_points,parameters.N)
 
+    stop_criteria!(status, parameters, problem, information, options)
+end
+
+function truncate_population_nsga3!(population, reference_points, N)
+    fast_non_dominated_sort!(population)
+    
     k = 1
     l = 1
-    while l <= parameters.N#length(status.population)
-        k = status.population[l].rank
+    while l <= N
+        k = population[l].rank
         l += 1
     end
 
     let k = k
-        l = findlast(sol -> sol.rank == k, status.population)
-        deleteat!(status.population, l+1:length(status.population))
+        l = findlast(sol -> sol.rank == k, population)
+        deleteat!(population, l+1:length(population))
     end
 
-    l = findfirst(sol -> sol.rank == k, status.population)
-    niching!(status.population, parameters.reference_points, parameters.N, l)
-
-    stop_criteria!(status, parameters, problem, information, options)
+    l = findfirst(sol -> sol.rank == k, population)
+    niching!(population, reference_points, N, l)
 end
 
 distance_point_to_rect(s, w) = @fastmath norm(s - (dot(w,s) / dot(w, w))*w  )
