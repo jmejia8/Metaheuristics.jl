@@ -16,6 +16,14 @@ import Random: seed!
         x[end] -= 1.0
         @test Metaheuristics.compare(x, y) == 3
 
+        sol_feasible   = Metaheuristics.create_child(x, (x, zeros(2), zeros(2)))
+        sol_infeasible = Metaheuristics.create_child(x, (x, rand(4), rand(8)))
+
+        @test Metaheuristics.compare(sol_feasible, sol_infeasible) == 1
+        @test Metaheuristics.compare(sol_infeasible, sol_feasible) == 2
+        @test Metaheuristics.is_better(sol_feasible, sol_infeasible) # true
+        @test !Metaheuristics.is_better(sol_infeasible, sol_feasible)# !false == true
+
     end 
 
     function test_problems()
