@@ -66,6 +66,8 @@ function optimize(
             options
       )
 
+      status.iteration = 1
+
 
       status.start_time = start_time
       convergence = State{typeof(status.best_sol)}[]
@@ -81,10 +83,10 @@ function optimize(
 
       options.debug && @info("Starting main loop...")
 
-      status.iteration = 1
       logger(status)
 
       while !status.stop
+            status.iteration += 1
 
             update_state!(
                           status,
@@ -115,7 +117,6 @@ function optimize(
                         iteration_stop_check(status, information, options)  ||
                         time_stop_check(status, information, options)
 
-            status.iteration += 1
       end
 
       status.overall_time = time() - status.start_time
