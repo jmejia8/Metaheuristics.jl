@@ -24,11 +24,13 @@ end
             ff(x)
         end
 
-        options = Options( seed = 1, iterations = 250)
+        options_micro = Options( seed = 1, iterations=10000, f_calls_limit = 25000)
+        options = Options( seed = 1, iterations=10000, f_calls_limit = 25000)
         nobjectives = length(pf[1].f)
         npartitions = nobjectives == 2 ? 100 : 12
 
         methods = [
+                μGA(N = 4,options=options_micro),
                 NSGA2(options=options),
                 MOEAD_DE(gen_ref_dirs(nobjectives, npartitions), options=Options( seed = 1, iterations = 500)),
                 NSGA3(options=options),
