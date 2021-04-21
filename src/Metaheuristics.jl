@@ -12,7 +12,7 @@ export MOEAD_DE
 # v2.1 items
 export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fval, NSGA2
 
-export NSGA3, gen_ref_dirs, μGA
+export NSGA3, gen_ref_dirs
 
 export PerformanceIndicators, pareto_front
 
@@ -89,7 +89,6 @@ include("algorithms/MOEAD_DE/MOEAD_DE.jl")
 # Non-dominate sorting Genetic Algorithm
 include("algorithms/NSGA2/NSGA2.jl")
 include("algorithms/NSGA3/NSGA3.jl")
-include("algorithms/microGA/microGA.jl")
 
 
 
