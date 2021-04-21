@@ -115,7 +115,19 @@ function compare(a::Vector, b::Vector)
 end
 
 
-compare(a::xFgh_indiv, b::xFgh_indiv) = compare(a.f, b.f)
+function compare(a::xFgh_indiv, b::xFgh_indiv)
+
+    A_vio = a.sum_violations
+    B_vio = b.sum_violations
+
+    if A_vio < B_vio
+        return 1
+    elseif B_vio < A_vio
+        return 2
+    end
+
+    compare(a.f, b.f)
+end
 
 """
     argworst(population)
