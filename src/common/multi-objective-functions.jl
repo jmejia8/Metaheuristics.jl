@@ -1,12 +1,12 @@
-function get_non_dominated_solutions(Population, is_better = is_better)
+function get_non_dominated_solutions_perm(population)
     ids = Int[1]
-    n = length(Population)
+    n = length(population)
 
     for i in 2:n
         j = 1
         while j <= length(ids)
             jj = ids[j]
-            relation = compare(Population[i], Population[jj])
+            relation = compare(population[i], population[jj])
  
             if relation == 2 # j dominates i
                 break
@@ -24,7 +24,14 @@ function get_non_dominated_solutions(Population, is_better = is_better)
         
     end
 
-    return Population[ids]
+    return ids
+end
+
+
+function get_non_dominated_solutions(population)
+
+    mask = get_non_dominated_solutions_perm(population)
+    return population[mask]
 
 end
 

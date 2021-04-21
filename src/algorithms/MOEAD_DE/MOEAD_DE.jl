@@ -204,9 +204,9 @@ function update_state!(
             r3 = rand(P_idx)
         end
 
-        a = population[r1].x
-        b = population[r2].x
-        c = population[r3].x
+        a = get_position(population[r1])# population[r1].x
+        b = get_position(population[r2])# population[r2].x
+        c = get_position(population[r3])# population[r3].x
 
 
         # binomial crossover

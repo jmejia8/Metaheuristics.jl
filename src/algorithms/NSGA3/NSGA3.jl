@@ -114,10 +114,8 @@ function update_state!(
 
         # evaluate children
         child1 = create_solution(c1, problem)
-        #child1.sum_violations = violationsSum(child1.g, child1.h, ε = parameters.ε)
 
         child2 = create_solution(c2, problem) 
-        #child2.sum_violations = violationsSum(child2.g, child2.h, ε = parameters.ε)
         status.f_calls += 2
        
         # save children
@@ -287,7 +285,7 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-    status = gen_initial_state(problem,parameters,information,options)
+    status = gen_initial_state(problem, parameters, information, options)
 
     if isempty(parameters.reference_points)
         options.debug && @info "Initializing reference points..."
@@ -313,7 +311,6 @@ function final_stage!(
     )
     status.final_time = time()
 
-    #status.best_sol = get_pareto_front(status.population, is_better)
 
 end
 
