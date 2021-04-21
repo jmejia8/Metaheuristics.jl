@@ -40,17 +40,7 @@ function is_better(
     end
 
     
-    # A dominates an objective in B
-    A_dominates_B = false
-    for i in 1:length(A.f)
-        if B.f[i] < A.f[i]
-            return false
-        elseif A.f[i] < B.f[i]
-            A_dominates_B = true
-        end
-    end
-
-    return A_dominates_B
+    compare(A.f, B.f) == 1
 
 end
 

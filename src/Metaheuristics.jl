@@ -89,6 +89,7 @@ include("algorithms/MOEAD_DE/MOEAD_DE.jl")
 # Non-dominate sorting Genetic Algorithm
 include("algorithms/NSGA2/NSGA2.jl")
 include("algorithms/NSGA3/NSGA3.jl")
+include("algorithms/microGA/microGA.jl")
 
 
 
