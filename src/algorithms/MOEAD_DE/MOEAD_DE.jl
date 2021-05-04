@@ -127,6 +127,7 @@ function MOEAD_DE(weights ;
 end
 
 function initialize!(
+    status,
     parameters::MOEAD_DE,
     problem::AbstractProblem,
     information::Information,
@@ -147,7 +148,7 @@ function initialize!(
 
 
 
-    status = gen_initial_state(problem,parameters,information,options)
+    status = gen_initial_state(problem,parameters,information,options,status)
     D = size(problem.bounds, 2)
     parameters.nobjectives = length(status.population[1].f)
     parameters.p_m = parameters.p_m < 0.0 ? 1.0 / D : parameters.p_m

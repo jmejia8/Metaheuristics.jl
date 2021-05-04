@@ -140,6 +140,7 @@ end
 
 
 function initialize!(
+    status,
     parameters::NSGA2,
     problem::AbstractProblem,
     information::Information,
@@ -161,7 +162,7 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-    status = gen_initial_state(problem,parameters,information,options)
+    status = gen_initial_state(problem,parameters,information,options,status)
 
     status
 

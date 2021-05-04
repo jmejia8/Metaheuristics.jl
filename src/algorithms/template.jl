@@ -1,4 +1,5 @@
 function initialize!(
+                status,
                 parameters::AbstractParameters,
                 problem,
                 information,

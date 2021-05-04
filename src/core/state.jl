@@ -11,9 +11,9 @@ function returns a `State`.
 - `iteration` is the current iteration.
 - `success_rate` percentage of new generated solutions better that their parents. 
 - `convergence` used save the `State` at each iteration.
-- `start_time` saves the `time()` before the optimization proccess.
-- `final_time` saves the `time()` after the optimization proccess.
-- `stop` if true, then stops the optimization proccess.
+- `start_time` saves the `time()` before the optimization process.
+- `final_time` saves the `time()` after the optimization process.
+- `stop` if true, then stops the optimization process.
 
 # Example
 
@@ -73,7 +73,7 @@ function State(
     f_calls = 0,
     g_calls = 0,
     h_calls = 0,
-    iteration = 0,
+    iteration = 1,
     success_rate = 0,
     convergence = State[],
     start_time = 0.0,

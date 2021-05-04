@@ -31,7 +31,7 @@ end
         g_calls_limit::Real = 0,
         h_calls_limit::Real = 0,
         time_limit::Real = Inf,
-        iterations::Int = 0,
+        iterations::Int = 1,
         store_convergence::Bool = false,
         debug::Bool = false,
         seed = rand(UInt)

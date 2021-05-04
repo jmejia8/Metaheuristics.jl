@@ -222,13 +222,14 @@ end
 
 
 function initialize!(
-    parameters::ECA,
-    problem::AbstractProblem,
-    information::Information,
-    options::Options,
-    args...;
-    kargs...
-)
+        status,
+        parameters::ECA,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
     D = size(problem.bounds, 2)
 
 
@@ -246,9 +247,6 @@ function initialize!(
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    # initialize!(problem, nothing, parameters, status, information, options)
-    status = gen_initial_state(problem,parameters,information,options)
-
     N_init = parameters.N
 
 
@@ -258,7 +256,10 @@ function initialize!(
         parameters.p_cr = parameters.p_bin .* ones(D)
     end
 
-    status
+
+    # initialize!(problem, nothing, parameters, status, information, options)
+    st = gen_initial_state(problem,parameters,information,options, status)
+    st
 
 end
 

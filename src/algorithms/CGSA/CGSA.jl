@@ -114,6 +114,7 @@ function CGSA(;
 end
 
 function initialize!(
+        status,
         parameters::CGSA,
         problem::AbstractProblem,
         information::Information,

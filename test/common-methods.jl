@@ -87,8 +87,35 @@ import Random: seed!
 
 	
     end
+
+    function test_prev_pop()
+        f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere)
+
+        options=Options(f_calls_limit=10000, seed=1)
+
+        method = DE(options = options)
+        res = optimize(f, bounds, method)
+        optimum = minimum(res)
+        N = length(res.population)
+
+        methods = [ECA(N=N,options = options),
+                   PSO(N=N,options = options),
+                   DE(N=N,options = options)]
+
+        for method in methods
+            prev_status = State(res.best_sol, res.population)
+            method.status = prev_status
+            res = optimize(f, bounds, method)
+            optimum = minimum(res)
+        end
+        
+        @test optimum < 1e-5
+    end
+    
     
 
     simple_test()
     test_problems()
+    test_prev_pop()
+
 end

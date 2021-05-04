@@ -70,6 +70,7 @@ Algorithm(
 end
 
 function initialize!(
+    status,
     parameters::PSO,
     problem::AbstractProblem,
     information::Information,
@@ -96,7 +97,7 @@ function initialize!(
 
 
 
-    status = gen_initial_state(problem,parameters,information,options)
+    status = gen_initial_state(problem,parameters,information,options,status)
 
     parameters.v = zeros(parameters.N, D)
 

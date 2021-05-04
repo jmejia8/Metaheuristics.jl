@@ -1,8 +1,8 @@
 abstract type AbstractAlgorithm end
 
 
-mutable struct Algorithm <: AbstractAlgorithm
-    parameters::AbstractParameters
+mutable struct Algorithm{T} <: AbstractAlgorithm
+    parameters::T
     status::State
     information::Information
     options::Options

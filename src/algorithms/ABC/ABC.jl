@@ -69,6 +69,7 @@ function ABC(;
 end
 
 function initialize!(
+        status,
         parameters::ABC,
         problem,
         information,

@@ -81,6 +81,7 @@ function SA(;
 end
 
 function initialize!(
+    status,
     parameters::SA,
     problem::AbstractProblem,
     information::Information,

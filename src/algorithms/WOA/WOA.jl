@@ -64,6 +64,7 @@ function WOA(;N = 30, information = Information(), options = Options())
 end
 
 function initialize!(
+    status,
     parameters::WOA,
     problem::AbstractProblem,
     information::Information,

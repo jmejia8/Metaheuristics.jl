@@ -144,6 +144,7 @@ function update_state!(
 end
 
 function initialize!(
+        status,
         parameters::DE,
         problem::AbstractProblem,
         information::Information,
@@ -175,7 +176,7 @@ function initialize!(
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    return gen_initial_state(problem,parameters,information,options)
+    return gen_initial_state(problem,parameters,information,options,status)
 end
 
 function final_stage!(

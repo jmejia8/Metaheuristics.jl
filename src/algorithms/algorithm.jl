@@ -1,25 +1,20 @@
-#=
-function initialize!(problem,engine,parameters,status,information,options)
-    a, b = problem.bounds[1,:], problem.bounds[2,:]
-    D = length(a)
-
-    # population array
-    Population = generate_population(problem.f, parameters.N, problem.bounds,ε=options.h_tol)
-    status.population = Population
-    # current evaluations
-    status.f_calls = parameters.N
+gen_initial_state(problem,parameters,information,options,status::State{Any}) = gen_initial_state(problem,parameters,information,options)
 
 
-    # current generation
-    status.iteration = 0
+function gen_initial_state(problem,parameters,information,options, status)
+    if parameters.N != length(status.population)
+        error("Population size in provided State differs from that in parameters")
+    end
 
-    # best solution
-    status.best_sol = get_best(Population)
 
-    # status.stop = engine.stop_criteria(status, information, options)
+    if size(problem.bounds,2) != length(get_position(status.best_sol))
+        error("Invalid population (dimension does not match with bounds)")
+    end
 
+    return State(status.best_sol, status.population)
+
+    
 end
-=#
 
 function gen_initial_state(problem,parameters,information,options)
     # population array

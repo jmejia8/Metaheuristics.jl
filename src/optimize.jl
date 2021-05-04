@@ -34,104 +34,102 @@ julia> result = optimize(f, bounds)
 ```
 """
 function optimize(
-      f::Function, # objective function
-      bounds::AbstractMatrix,
-      method::AbstractAlgorithm = ECA();
-      logger::Function = (status) -> nothing,
-)
+        f::Function, # objective function
+        bounds::AbstractMatrix,
+        method::AbstractAlgorithm = ECA();
+        logger::Function = (status) -> nothing,
+    )
 
 
 
-      #####################################
-      # common methods
-      #####################################
-      # status = method.status
-      information = method.information
-      options = method.options
-      parameters = method.parameters
-      ###################################
+    #####################################
+    # common methods
+    #####################################
+    # status = method.status
+    information = method.information
+    options = method.options
+    parameters = method.parameters
+    ###################################
 
-      problem = Problem(f, Array(bounds))
-      seed!(options.seed)
-      options.debug && @info("Initializing population...")
+    problem = Problem(f, Array(bounds))
+    seed!(options.seed)
 
-      ###################################
+    ###################################
 
-      start_time = time()
+    start_time = time()
 
-      status = initialize!(
-            parameters,
-            problem,
-            information,
-            options
-      )
+    status = method.status
+    options.debug && @info("Initializing population...")
+    status = initialize!(status,parameters, problem, information, options)
+    method.status = status
 
-      status.iteration = 1
+    if options.debug
+        status.final_time = time()
+        msg = "Current Status of " * string(typeof(parameters))
+        @info msg
+        display(status)
+    end
+
+    status.iteration = 1
 
 
-      status.start_time = start_time
-      convergence = State{typeof(status.best_sol)}[]
+    status.start_time = start_time
+    convergence = State{typeof(status.best_sol)}[]
 
 
 
-      ###################################
-      # store convergence
-      ###################################
-      if options.store_convergence
+    ###################################
+    # store convergence
+    ###################################
+    if options.store_convergence
+        update_convergence!(convergence, status)
+    end
+
+    options.debug && @info("Starting main loop...")
+
+    logger(status)
+
+    while !status.stop
+        status.iteration += 1
+
+        update_state!(status, parameters, problem, information, options)
+
+        # store the number of fuction evaluations
+        status.f_calls = problem.f_calls
+
+        if options.debug
+            status.final_time = time()
+            msg = "Current Status of " * string(typeof(parameters))
+            @info msg
+            display(status)
+        end
+
+        if options.store_convergence
             update_convergence!(convergence, status)
-      end
+        end
 
-      options.debug && @info("Starting main loop...")
+        status.overall_time = time() - status.start_time
+        logger(status)
+        status.stop = status.stop || 
+        call_limit_stop_check(status, information, options) ||
+        iteration_stop_check(status, information, options)  ||
+        time_stop_check(status, information, options)
 
-      logger(status)
+    end
 
-      while !status.stop
-            status.iteration += 1
+    status.overall_time = time() - status.start_time
 
-            update_state!(
-                          status,
-                          parameters,
-                          problem,
-                          information,
-                          options
-                         )
-            
-            # store the number of fuction evaluations
-            status.f_calls = problem.f_calls
+    final_stage!(
+                 status,
+                 parameters,
+                 problem,
+                 information,
+                 options
+                )
 
-            if options.debug
-                  status.final_time = time()
-                  msg = "Current Status of " * string(typeof(parameters))
-                  @info msg
-                  display(status)
-            end
+    status.convergence = convergence
 
-            if options.store_convergence
-                  update_convergence!(convergence, status)
-            end
-
-            status.overall_time = time() - status.start_time
-            logger(status)
-            status.stop = status.stop || 
-                        call_limit_stop_check(status, information, options) ||
-                        iteration_stop_check(status, information, options)  ||
-                        time_stop_check(status, information, options)
-
-      end
-
-      status.overall_time = time() - status.start_time
-
-      final_stage!(
-                   status,
-                   parameters,
-                   problem,
-                   information,
-                   options
-                  )
-
-      status.convergence = convergence
-
-      return status
+    return status
 
 end
 
