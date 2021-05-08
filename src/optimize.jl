@@ -110,10 +110,15 @@ function optimize(
 
         status.overall_time = time() - status.start_time
         logger(status)
-        status.stop = status.stop || 
+
+        # common stop criteria
+        status.stop = status.stop ||
         call_limit_stop_check(status, information, options) ||
         iteration_stop_check(status, information, options)  ||
         time_stop_check(status, information, options)
+
+        # user defined stop criteria
+        stop_criteria!(status, parameters, problem, information, options)
 
     end
 
