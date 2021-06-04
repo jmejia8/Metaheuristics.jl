@@ -24,7 +24,7 @@ function ZDT1(D = 30, n_solutions = 100)
 
     X = [vcat(x[i], zeros(D - 1)) for i in 1:n_solutions]
     pareto_set = [ generateChild(x, f(x)) for x in X ]
-     
+
     return f, bounds, pareto_set
 end
 
@@ -53,7 +53,7 @@ function ZDT2(D = 30, n_solutions = 100)
 
     x = [vcat(x[i], zeros(D - 1)) for i in 1:n_solutions]
     pareto_set = [ generateChild(x, f(x)) for x in x ]
-     
+
     return f, bounds, pareto_set
 end
 
@@ -93,7 +93,7 @@ function ZDT3(D = 30, n_solutions = 100)
 
     x = [vcat(x[i], zeros(D - 1)) for i in 1:n_solutions]
     pareto_set = [ generateChild(x, f(x)) for x in x ]
-     
+
     return f, bounds, get_non_dominated_solutions(pareto_set)
 
 end
@@ -114,7 +114,7 @@ Main properties:
 """
 function ZDT4(D = 10, n_solutions = 100)
     f(x) = begin
-        gx = 1.0 + 10*(length(x)-1) + sum( x[2:end].^2 - 10cos.(4π*x[2:end])) 
+        gx = 1.0 + 10*(length(x)-1) + sum( x[2:end].^2 - 10cos.(4π*x[2:end]))
         return ( [x[1], gx*(1 - sqrt(x[1] / gx))  ], [0.0], [0.0] )
     end
     bounds = Array([-5zeros(D) 5ones(D)]')
@@ -124,7 +124,7 @@ function ZDT4(D = 10, n_solutions = 100)
 
     x = [vcat(x[i], zeros(D - 1)) for i in 1:n_solutions]
     pareto_set = [ generateChild(x, f(x)) for x in x ]
-     
+
     return f, bounds, pareto_set
 end
 
@@ -146,7 +146,7 @@ Main properties:
 function ZDT6(D = 10, n_solutions = 100)
     f(x) = begin
         gx = 1.0 + 9.0 * ( sum(x[2:end]) / (length(x)-1.0) )^(0.25)
-        ff1 = 1.0 - exp(-4.0x[1])*sin(6.0π*x[1])^6 
+        ff1 = 1.0 - exp(-4.0x[1])*sin(6.0π*x[1])^6
         return ( [ ff1 , gx*(1.0 - (ff1 / gx)^2)  ], [0.0], [0.0] )
     end
 
@@ -156,10 +156,32 @@ function ZDT6(D = 10, n_solutions = 100)
 
     #x = [vcat(x[i], zeros(D - 1)) for i in 1:n_solutions]
     xx = range(0.2807753191, 1, length=100)
-    yy = 1 .- (xx).^2 
+    yy = 1 .- (xx).^2
     pareto_set = [ generateChild(zeros(0), ([xx[i], yy[i]], [0.0], [0.0])) for i in 1:length(xx) ]
 
     return f, bounds, pareto_set
+end
+
+function MTP(D = 10, n_solutions = 100)
+    f(x) = begin
+        Q = 1.0 .+ sum((x[3:end] .- 0.8).^2)
+        fx = [x[1], x[2]] .* Q
+        g = [ (x[1] - 1)^2 + (x[2] - 1)^2 - 1 ]
+        h = [0.0]
+        return fx, g, h
+    end
+
+    bounds = Array([ -5ones(D) 5ones(D)]')
+    θ = range(π, 1.5π, length=n_solutions)
+
+    x = 1.0 .+ cos.(θ)
+    y = 1.0 .+ sin.(θ)
+
+    pareto_set = [ generateChild(zeros(0), ([x[i], y[i]], [0.0], [0.0])) for i in 1:length(θ) ]
+
+    return f, bounds, pareto_set
+
+
 end
 
 generic_sphere(ref_dirs) = ref_dirs ./ ([norm(v) for v in ref_dirs])
@@ -189,4 +211,3 @@ function DTLZ2(m=3, ref_dirs = gen_ref_dirs(m, 12))
 
     return f, bounds, pareto_set
 end
-

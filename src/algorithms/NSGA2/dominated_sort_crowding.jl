@@ -7,7 +7,7 @@ function fast_non_dominated_sort!(pop)
 
     for i in 1:n
         for j in i+1:n
-            comparison = compare(pop[i].f, pop[j].f)
+            comparison = compare(pop[i], pop[j])
             if comparison == 1 #is_better(pop[i], pop[j])
                 push!(dom_list[i], j)
                 dom_count[j] += 1

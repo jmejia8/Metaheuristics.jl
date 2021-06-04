@@ -54,7 +54,7 @@ A solution can be:
 D = 2
 
 # Objective function
-f(x) = ( x, [sum(x.^2) - 1], [0.0] ) 
+f(x) = ( x, [sum(x.^2) - 1], [0.0] )
 
 # bounds
 bounds = [-1 -1;
@@ -89,18 +89,18 @@ function MOEAD_DE(weights ;
     n_r = 2,
     z::Vector{Float64} = zeros(0),
     B = Array{Int}[],
-    s1 = 0.5,
+    s1 = 1000.5,
     information = Information(),
     options = Options(),
 )
 
-    
+
     if isempty(weights)
         error("Provide weights points")
     end
 
 
-    
+
     nobjectives = length(weights[1])
     N = length(weights)
 
@@ -270,8 +270,14 @@ function update_state!(
 end
 
 function is_better_constrained_MOEAD_DE(g1, g2, sol1, sol2, parameters)
-    s1 = parameters.s1
-    return g1 + s1*sol1.sum_violations <= g2 + s1*sol2.sum_violations
+    # s1 = parameters.s1
+    # return g1 + s1*sol1.sum_violations <= g2 + s1*sol2.sum_violations
+    if sol2.sum_violations > sol1.sum_violations
+        return true
+    elseif sol2.sum_violations < sol1.sum_violations
+        return false
+    end
+    return g1 < g2
 end
 
 
