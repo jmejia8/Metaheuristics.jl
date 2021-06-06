@@ -1,39 +1,58 @@
 import Base.show
 
 function Base.show(io::IO, solution::xf_indiv)
-    @printf(io, "| f(x) = %g\n| ", solution.f)
-    println(io, "| x = ", solution.x)
+    @printf(io, "f(x) = %.4e\n", solution.f)
+    println(io, " x   = ", solution.x)
 
 
 end
 
 function Base.show(io::IO, solution::xfgh_indiv)
-    @printf(io,"| f(x) = %g\n", solution.f)
-    @printf(io,"| g(x) = ")
+    @printf(io,"f(x) = %.4e\n", solution.f)
+    @printf(io,"g(x) = ")
     println(io, solution.g)
-    @printf(io,"| h(x) = ")
+    @printf(io,"h(x) = ")
     println(io, solution.h)
     # @printf("| Σ max(0,g(x)) + Σ |h(x)| = ")
     # println(solution.sum_violations)
-    println(io, "| x = ", solution.x)
+    println(io, "x = ", solution.x)
 
 
 end
 
 
 function Base.show(io::IO, solution::xFgh_indiv)
-    @printf(io,"| f(x) = ")
+    if get(io, :compact, false)
+        print(io,"xFgh_indiv(")
+        show(io, solution.f)
+        print(io, ",x,g,h)")
+        return nothing
+    end
+
+    @printf(io,"f(x) = ")
     println(io, solution.f)
-    @printf(io,"| g(x) = ")
+    @printf(io,"g(x) = ")
     println(io, solution.g)
-    @printf(io,"| h(x) = ")
+    @printf(io,"h(x) = ")
     println(io, solution.h)
-    println(io, "| x = ", solution.x)
+    println(io,"x = ", solution.x)
 
 
 end
 
-function Base.show(io::IO, population::Array{xFgh_indiv})
+
+function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
+    n = sum(s -> sum_violations(s) ≈ 0.0, population)
+    print(io, length(population), "-population with ", n, " feasible solutions.\n")
+
+    fs = fvals(population)
+    V = sum_violations.(population)
+    plt = boxplot(["f", "V"], [fs, V], title="", xlabel="")
+    show(io, plt)
+    println(io, "\nV = Sum of contraint violations.")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
     x = map(s -> s.f[1], population)
     y = map(s -> s.f[2], population)
     plt = scatterplot(x, y, title="F space", xlabel="f_1", ylabel="f_2")
