@@ -37,8 +37,7 @@ end
         for method in methods
             f_calls = 0
             result = ( optimize(f, bounds, method) )
-            display(result)
-            #show(IOBuffer(), "text/html", result)
+            show(IOBuffer(), "text/html", result)
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
             @test Metaheuristics.PerformanceIndicators.spacing(result) < 0.2
             @test Metaheuristics.PerformanceIndicators.covering(pf, result.population) <= 1.0
@@ -58,7 +57,7 @@ end
     end
 
 
-    for problem in [:MTP] #[:ZDT3, :DTLZ2]
+    for problem in [:ZDT3, :DTLZ2, :MTP]
         run_methods(problem)
     end
 
