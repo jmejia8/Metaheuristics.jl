@@ -171,7 +171,7 @@ function MTP(D = 10, n_solutions = 100)
         return fx, g, h
     end
 
-    bounds = Array([ -5ones(D) 5ones(D)]')
+    bounds = Array([ zeros(D) 2.0ones(D)]')
     θ = range(π, 1.5π, length=n_solutions)
 
     x = 1.0 .+ cos.(θ)

@@ -14,6 +14,8 @@ mutable struct MOEAD_DE <: AbstractParameters
     z::Vector{Float64}
     B::Array{Vector{Int}}
     s1::Float64
+    s2::Float64
+    τ::Float64
 end
 
 """
@@ -84,12 +86,13 @@ function MOEAD_DE(weights ;
     λ = Array{Vector{Float64}}[],
     η = 20,
     p_m = -1.0,
-    T = 20,
+    T = round(Int, 0.2*length(weights)),
     δ = 0.9,
-    n_r = 2,
+    n_r = round(Int, 0.02*length(weights)),
     z::Vector{Float64} = zeros(0),
     B = Array{Int}[],
-    s1 = 1000.5,
+    s1 = 0.01,
+    s2 = 20.0,
     information = Information(),
     options = Options(),
 )
@@ -109,7 +112,7 @@ function MOEAD_DE(weights ;
     end
 
 
-    parameters = MOEAD_DE(nobjectives, N, F, CR, weights, η, p_m, T, δ, n_r, z, B, s1)
+    parameters = MOEAD_DE(nobjectives, N, F, CR, weights, η, p_m, T, δ, n_r, z, B, s1, s2, 0.0)
 
 
     initialize_closest_weight_vectors!(parameters)
@@ -193,6 +196,10 @@ function update_state!(
             P_idx = collect(1:N)
         end
 
+        Vmin = minimum(sum_violations.(population[P_idx]))
+        Vmax = maximum(sum_violations.(population[P_idx]))
+        parameters.τ = Vmin + 0.3*(Vmax - Vmin)
+
         # select participats
         r1 = i
         r2 = rand(P_idx)
@@ -269,15 +276,26 @@ function update_state!(
 
 end
 
+g_te_ap(gx, V, τ, s1, s2) = V < τ ? gx + s1*V^2 : gx + s1*τ^2 + s2*(V - τ)
+
 function is_better_constrained_MOEAD_DE(g1, g2, sol1, sol2, parameters)
-    # s1 = parameters.s1
-    # return g1 + s1*sol1.sum_violations <= g2 + s1*sol2.sum_violations
-    if sol2.sum_violations > sol1.sum_violations
-        return true
-    elseif sol2.sum_violations < sol1.sum_violations
-        return false
+    V1 = (sol1.sum_violations)
+    V2 = (sol2.sum_violations)
+
+    if V1 == 0.0 && V2 == 0.0
+        return g1 <= g2
     end
-    return g1 < g2
+    
+
+
+    τ = parameters.τ
+    s1 = parameters.s1
+    s2 = parameters.s2
+
+    V1 = (sol1.sum_violations)
+    V2 = (sol2.sum_violations)
+
+    return g_te_ap(g1, V1, τ, s1, s2) <= g_te_ap(g2, V2, τ, s1, s2)
 end
 
 
