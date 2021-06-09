@@ -56,15 +56,18 @@ end
 
 
 function Base.show(io::IO, ::MIME"text/plain", population::Array{xf_indiv})
+    isempty(population) && show(io, population) && return
+    
     if get(io, :compact, false)
         for sol in population
-            show(io, population)
+            show(io, sol)
         end
         return
     end
 
 
     print(io, "Population with ", length(population), " solutions.\n")
+
 
     fs = fvals(population)
     plt = boxplot(["f"], [fs], title="", xlabel="")
@@ -78,15 +81,17 @@ end
 
 
 function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
+    isempty(population) && show(io, population) && return
 
     if get(io, :compact, false)
         for sol in population
-            show(io, population)
+            show(io, sol)
         end
         return
     end
+
     n = sum(s -> sum_violations(s) ≈ 0.0, population)
-    print(io, length(population), "-population with ", n, " feasible solutions.\n")
+    print(io, "Population with ", n, "/", length(population)," feasible solutions.\n")
 
     fs = fvals(population)
     V = sum_violations.(population)
@@ -96,6 +101,8 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
 end
 
 function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
+    isempty(population) && show(io, population) && return
+
     if get(io, :compact, true)
         x = map(s -> s.f[1], population)
         y = map(s -> s.f[2], population)
@@ -125,12 +132,12 @@ function Base.show(io::IO, status::State)
 
     elseif typeof(Array(status.population)) <: Array{xFgh_indiv}
         println(io, "Population")
-        show(io, Array(status.population))
+        show(io, "text/plain", Array(status.population))
 
         # non-dominated
         pf = get_non_dominated_solutions(status.population)
         println(io, "\nNon-dominated solution(s)")
-        show(io, pf)
+        show(io, "text/plain", pf)
         print(io, "\n")
     end
 
