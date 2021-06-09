@@ -51,6 +51,8 @@ using Test
             f_calls = 0
             res = optimize(f, bounds, method)
             show(IOBuffer(), res)
+            show(IOBuffer(), res.population)
+            show(IOBuffer(), res.population[1])
             fitness = minimum( res ) 
             test_result(fitness, desired_accuracy)
 

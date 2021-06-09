@@ -38,6 +38,8 @@ end
             f_calls = 0
             result = ( optimize(f, bounds, method) )
             show(IOBuffer(), "text/html", result)
+            show(IOBuffer(), result.population)
+            show(IOBuffer(), result.population[1])
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
             @test Metaheuristics.PerformanceIndicators.spacing(result) < 0.2
             @test Metaheuristics.PerformanceIndicators.covering(pf, result.population) <= 1.0
