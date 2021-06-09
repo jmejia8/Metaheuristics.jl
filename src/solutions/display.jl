@@ -1,47 +1,109 @@
 import Base.show
 
-function Base.show(io::IO, solution::xf_indiv)
-    @printf(io, "f(x) = %.4e\n", solution.f)
-    println(io, " x   = ", solution.x)
-
-
-end
-
-function Base.show(io::IO, solution::xfgh_indiv)
-    @printf(io,"f(x) = %.4e\n", solution.f)
-    @printf(io,"g(x) = ")
-    println(io, solution.g)
-    @printf(io,"h(x) = ")
-    println(io, solution.h)
-    # @printf("| Σ max(0,g(x)) + Σ |h(x)| = ")
-    # println(solution.sum_violations)
-    println(io, "x = ", solution.x)
-
-
-end
-
-
-function Base.show(io::IO, solution::xFgh_indiv)
-    if get(io, :compact, false)
-        print(io,"xFgh_indiv(")
-        show(io, solution.f)
-        print(io, ",x,g,h)")
-        return nothing
+function print_vector(io, vector)
+    if length(vector) < 5
+        show(io, vector)
+        print(io, "\n")
+        return
     end
 
-    @printf(io,"f(x) = ")
-    println(io, solution.f)
-    @printf(io,"g(x) = ")
-    println(io, solution.g)
-    @printf(io,"h(x) = ")
-    println(io, solution.h)
-    println(io,"x = ", solution.x)
+    @printf(io, "[")
+
+    for x in vector[1:2]
+        @printf(io, "%1.3e, ", x)
+    end
+    print(io, "…, ")
+    for x in vector[end:end]
+        @printf(io, "%1.3e", x)
+    end
+
+    @printf(io, "]")
+    print(io, "\n")
+end
+
+function Base.show(io::IO, solution::xf_indiv)
+    @printf(io, "f = %.4e\n", solution.f)
+    print(io, "x = ")
+
+    if get(io, :compact, true) && length(solution.x) > 5
+        print_vector(io, solution.x)
+    else
+        show(io, solution.x)
+        print(io, "\n")
+    end
 
 
+
+
+end
+
+
+function Base.show(io::IO, solution::xfgh_indiv)
+    @printf(io, "f = %.4e\n", solution.f)
+
+    if get(io, :compact, true)
+        print(io, "g = ")
+        print_vector(io, solution.g)
+        print(io, "h = ")
+        print_vector(io, solution.h)
+        print(io, "x = ")
+        print_vector(io, solution.x)
+    else
+        show(io, solution.x)
+        print(io, "\n")
+    end
+
+end
+
+function Base.show(io::IO, solution::xFgh_indiv)
+
+    if get(io, :compact, true)
+        print(io, "f = ")
+        print_vector(io, solution.f)
+        print(io, "g = ")
+        print_vector(io, solution.g)
+        print(io, "h = ")
+        print_vector(io, solution.h)
+        print(io, "x = ")
+        print_vector(io, solution.x)
+    else
+        show(io, solution.x)
+        print(io, "\n")
+    end
+
+end
+
+
+function Base.show(io::IO, ::MIME"text/plain", population::Array{xf_indiv})
+    if get(io, :compact, false)
+        for sol in population
+            show(io, population)
+        end
+        return
+    end
+
+
+    print(io, "Population with ", length(population), " solutions.\n")
+
+    fs = fvals(population)
+    plt = boxplot(["f"], [fs], title="", xlabel="")
+    show(io, plt)
+    
+    @printf(io, "\n%7s%14s%12s%12s", "Min.", "Mean.", "Max.", "Std.\n")
+    @printf(io, "%.4e | %.4e | %.4e | %.4e\n", minimum(fs), mean(fs), maximum(fs), std(fs))
+
+    return nothing
 end
 
 
 function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
+
+    if get(io, :compact, false)
+        for sol in population
+            show(io, population)
+        end
+        return
+    end
     n = sum(s -> sum_violations(s) ≈ 0.0, population)
     print(io, length(population), "-population with ", n, " feasible solutions.\n")
 
@@ -53,11 +115,20 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
 end
 
 function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
-    x = map(s -> s.f[1], population)
-    y = map(s -> s.f[2], population)
-    plt = scatterplot(x, y, title="F space", xlabel="f_1", ylabel="f_2")
-    show(io, plt)
+    if get(io, :compact, true)
+        x = map(s -> s.f[1], population)
+        y = map(s -> s.f[2], population)
+        plt = scatterplot(x, y, title="F space", xlabel="f_1", ylabel="f_2")
+        show(io, plt)
+    else
+        for sol in population
+            show(io, population)
+        end
+    end
+    return nothing
 end
+
+
 
 function Base.show(io::IO, status::State)
 
