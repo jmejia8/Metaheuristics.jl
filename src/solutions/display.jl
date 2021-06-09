@@ -1,7 +1,8 @@
 import Base.show
 
 function print_vector(io, vector)
-    if length(vector) < 5
+    n_items_in_vector = 5
+    if length(vector) < n_items_in_vector
         show(io, vector)
         print(io, "\n")
         return
@@ -25,15 +26,7 @@ function Base.show(io::IO, solution::xf_indiv)
     @printf(io, "f = %.4e\n", solution.f)
     print(io, "x = ")
 
-    if get(io, :compact, true) && length(solution.x) > 5
-        print_vector(io, solution.x)
-    else
-        show(io, solution.x)
-        print(io, "\n")
-    end
-
-
-
+    print_vector(io, solution.x)
 
 end
 
@@ -41,35 +34,23 @@ end
 function Base.show(io::IO, solution::xfgh_indiv)
     @printf(io, "f = %.4e\n", solution.f)
 
-    if get(io, :compact, true)
-        print(io, "g = ")
-        print_vector(io, solution.g)
-        print(io, "h = ")
-        print_vector(io, solution.h)
-        print(io, "x = ")
-        print_vector(io, solution.x)
-    else
-        show(io, solution.x)
-        print(io, "\n")
-    end
-
+    print(io, "g = ")
+    print_vector(io, solution.g)
+    print(io, "h = ")
+    print_vector(io, solution.h)
+    print(io, "x = ")
+    print_vector(io, solution.x)
 end
 
 function Base.show(io::IO, solution::xFgh_indiv)
-
-    if get(io, :compact, true)
-        print(io, "f = ")
-        print_vector(io, solution.f)
-        print(io, "g = ")
-        print_vector(io, solution.g)
-        print(io, "h = ")
-        print_vector(io, solution.h)
-        print(io, "x = ")
-        print_vector(io, solution.x)
-    else
-        show(io, solution.x)
-        print(io, "\n")
-    end
+    print(io, "f = ")
+    print_vector(io, solution.f)
+    print(io, "g = ")
+    print_vector(io, solution.g)
+    print(io, "h = ")
+    print_vector(io, solution.h)
+    print(io, "x = ")
+    print_vector(io, solution.x)
 
 end
 
