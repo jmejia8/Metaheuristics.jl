@@ -25,6 +25,9 @@ Get the fitness of a bee when optimize using ABC algorithm.
 fval(bee::Bee) = bee.sol.f
 
 minimum(st::State{Bee{xf_indiv}}) = st.best_sol.sol.f
+minimum(st::State{Bee{xfgh_indiv}}) = st.best_sol.sol.f
+minimizer(st::State{Bee{xf_indiv}}) = st.best_sol.sol.x
+minimizer(st::State{Bee{xfgh_indiv}}) = st.best_sol.sol.x
 
 @inline function updateFit!(bee::Bee)
     bee.fit = fit(bee.sol.f)
