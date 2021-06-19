@@ -51,3 +51,8 @@ Metaheuristics.TestProblems.ZDT4
 ```@docs
 Metaheuristics.TestProblems.ZDT6
 ```
+
+
+```@docs
+Metaheuristics.TestProblems.DTLZ2
+```

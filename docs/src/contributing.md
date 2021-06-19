@@ -20,6 +20,7 @@ When you call the [`optimize`](@ref) function, the following steps are carried o
 
 ```julia
 function initialize!(
+                status, # an initiliazed State (if apply)
                 parameters::AbstractParameters,
                 problem,
                 information,
@@ -27,9 +28,9 @@ function initialize!(
                 args...;
                 kargs...
         )
-    # initialize parameters, population, etc.
-    # return the status
-    return State(0.0, zeros(0))
+
+    # initialize the stuff here
+    return State(0.0, zeros(0)) # replace this
 end
 ```
 

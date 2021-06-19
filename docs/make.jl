@@ -1,6 +1,10 @@
 using Documenter, Metaheuristics
+using DocumenterCitations
+
+bib = CitationBibliography(joinpath(@__DIR__, "references.bib"))
 
 makedocs(
+         bib,
          format = Documenter.HTML(
                                   prettyurls = get(ENV, "CI", nothing) == "true",
                                   assets = ["assets/favicon.ico"],
@@ -17,6 +21,7 @@ makedocs(
                   "Visualization" => "visualization.md",
                   "API References" => "api.md",
                   "Contributing" => "contributing.md",
+                  "References" => "references.md",
                  ]
         )
 
