@@ -186,9 +186,24 @@ end
 
 generic_sphere(ref_dirs) = ref_dirs ./ ([norm(v) for v in ref_dirs])
 
+"""
+    DTLZ2(m = 3, ref_dirs = gen_ref_dirs(m, 12))
+
+DTLZ2 returns `(f::function, bounds::Matrix{Float64}, pareto_set::Array{xFgh_indiv})`
+where `f` is the objective function and `pareto_set` is an array with optimal Pareto solutions
+with `n_solutions`.
+
+### Parameters
+- `m` number of objective functions
+- `ref_dirs` number of Pareto solutions (default: Das and Dennis' method).
+
+Main properties:
+- nonconvex
+- unifrontal
+"""
 function DTLZ2(m=3, ref_dirs = gen_ref_dirs(m, 12))
     f(x,m=m) = begin
-        g = sum( (x[m:end] .- 0.5).^2 )
+        g = sum( (view(x, m:length(x)) .- 0.5).^2 )
         fx = zeros(m)
         for i = 1:m
             fx[i] = (1.0 + g)
