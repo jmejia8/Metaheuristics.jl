@@ -59,6 +59,9 @@ The metaheuristics accept its parameters but share two common and **optional** s
 algorithm = ECA(information = information, options = options)
 ```
 
+!!! warning "Consider changing the default parameters."
+    Change population size for high dimensional problems.
+
 ## Optimize
 
 Now, we are able to approximate the optimum. To do that is necessary to use the `optimize`
