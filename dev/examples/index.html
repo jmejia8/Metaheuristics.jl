@@ -27,9 +27,9 @@ julia&gt; result = optimize(f, bounds, algorithm) # start the minimization procc
 +=========== RESULT ==========+
   iteration: 1286
     minimum: 2.98488
-  minimizer: [2.5678716009500958e-9, 7.394673190759344e-10, 4.781233267594645e-9, 8.895288127777451e-10, 6.13621059991254e-10, -0.9949586394042904, -0.9949586381418594, -0.9949586384490066, -3.832325020995066e-9, -1.7201787923045119e-9]
+  minimizer: [2.5128395896392614e-9, 1.5877121915440073e-10, -1.299915251560524e-9, -1.1194176870303987e-9, -0.9949586398482366, 0.9949586375797373, -0.9949586372745028, 2.395573054769594e-10, -2.0371388907775387e-10, -6.534103147303096e-10]
     f calls: 89951
- total time: 2.6362 s
+ total time: 2.1489 s
 +============================+
 
 julia&gt; minimum(result)
@@ -37,24 +37,24 @@ julia&gt; minimum(result)
 
 julia&gt; minimizer(result)
 10-element Array{Float64,1}:
-  2.5678716009500958e-9
-  7.394673190759344e-10
-  4.781233267594645e-9
-  8.895288127777451e-10
-  6.13621059991254e-10
- -0.9949586394042904
- -0.9949586381418594
- -0.9949586384490066
- -3.832325020995066e-9
- -1.7201787923045119e-9
+  2.5128395896392614e-9
+  1.5877121915440073e-10
+ -1.299915251560524e-9
+ -1.1194176870303987e-9
+ -0.9949586398482366
+  0.9949586375797373
+ -0.9949586372745028
+  2.395573054769594e-10
+ -2.0371388907775387e-10
+ -6.534103147303096e-10
 
 julia&gt; result = optimize(f, bounds, algorithm) # note that second run is faster
 +=========== RESULT ==========+
   iteration: 1286
     minimum: 2.98488
-  minimizer: [2.5678716009500958e-9, 7.394673190759344e-10, 4.781233267594645e-9, 8.895288127777451e-10, 6.13621059991254e-10, -0.9949586394042904, -0.9949586381418594, -0.9949586384490066, -3.832325020995066e-9, -1.7201787923045119e-9]
+  minimizer: [2.5128395896392614e-9, 1.5877121915440073e-10, -1.299915251560524e-9, -1.1194176870303987e-9, -0.9949586398482366, 0.9949586375797373, -0.9949586372745028, 2.395573054769594e-10, -2.0371388907775387e-10, -6.534103147303096e-10]
     f calls: 89881
- total time: 0.4349 s
+ total time: 0.2940 s
 +============================+</code></pre><h2 id="Providing-Initial-Solutions"><a class="docs-heading-anchor" href="#Providing-Initial-Solutions">Providing Initial Solutions</a><a id="Providing-Initial-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Providing-Initial-Solutions" title="Permalink"></a></h2><p>Sometimes you may need to use the starter solutions you need before the optimization process begins, well, this example illustrates how to do it.</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere);
@@ -90,10 +90,10 @@ julia&gt; method.status = prev_status; # say to ECA that you have generated a po
 julia&gt; optimize(f, bounds, method) # optimize
 +=========== RESULT ==========+
   iteration: 5001
-    minimum: 7.43309e-124
-  minimizer: [6.272563140788442e-64, 5.741397539500504e-66, 1.1423725985393195e-62, 1.2430983909793407e-62, -2.545769596230245e-63, 1.7894814632080884e-62, 9.570862119745387e-63, -3.415692156920035e-63, -3.071580542176799e-64, 5.274134554530044e-63]
+    minimum: 3.7499e-123
+  minimizer: [-2.3971819897426473e-63, 2.9201241812641137e-62, 2.6588179584932636e-62, -1.1803874904180877e-62, 1.8521732535721829e-62, -7.561782566375396e-63, 2.0614049713560087e-62, 1.0402252623019905e-62, 4.679807240878156e-63, -3.3013619694436084e-62]
     f calls: 99981
- total time: 0.3487 s
+ total time: 0.1913 s
 +============================+</code></pre><h2 id="Constrained-Optimization"><a class="docs-heading-anchor" href="#Constrained-Optimization">Constrained Optimization</a><a id="Constrained-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Constrained-Optimization" title="Permalink"></a></h2><p>It is common that optimization models include constraints that must be satisfied for example: <a href="https://en.wikipedia.org/wiki/Test_functions_for_optimization">The Rosenbrock function constrained to a disk</a></p><p>Minimize:</p><p class="math-container">\[{\displaystyle f(x,y)=(1-x)^{2}+100(y-x^{2})^{2}}\]</p><p>subject to:</p><p class="math-container">\[{\displaystyle x^{2}+y^{2}\leq 2}\]</p><p>where <span>$-2 \leq x,y \leq 2$</span>.</p><p>In <code>Metaheuristics.jl</code>, a feasible solution is such that <span>$g(x) \leq 0$</span> and <span>$h(x) \approx 0$</span>. Hence, in this example the constraint is given by <span>$g(x) = x^2 + y^2 - 2 \leq 0$</span>. Moreover, the equality and inequality constraints must be saved into  <code>Array</code>s.</p><div class="admonition is-compat"><header class="admonition-header">Constriants handling</header><div class="admonition-body"><p>In this package, if the algorithm was not designed for constrained optimization, then solutions with lower constraint violation sum will be preferred.</p></div></div><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; function f(x)
@@ -116,11 +116,11 @@ julia&gt; bounds = [-2.0 -2; 2 2]
 julia&gt; optimize(f, bounds, ECA(N=30, K=3))
 +=========== RESULT ==========+
   iteration: 667
-    minimum: 0.00802247
-  minimizer: [0.9105664767965466, 0.8286402212881385]
+    minimum: 0.00235014
+  minimizer: [0.9515885680425076, 0.9052664311078269]
     f calls: 20010
   feasibles: 30 / 30 in final population
- total time: 1.5151 s
+ total time: 1.2302 s
 +============================+</code></pre><h2 id="Multiobjective-Optimization"><a class="docs-heading-anchor" href="#Multiobjective-Optimization">Multiobjective Optimization</a><a id="Multiobjective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multiobjective-Optimization" title="Permalink"></a></h2><p>To implement a multiobjective optimization and solve it, you can proceed as usual. Here, you need provide constraints if they exists, otherwise put <code>gx = [0.0]; hx = [0.0];</code> to indicate an unconstrained multiobjective problem</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; function f(x)
@@ -156,12 +156,12 @@ julia&gt; optimize(f, bounds, NSGA2())
          │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
    f_2   │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
          │⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠈⢢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠀⠀⠈⠓⠤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠀⠀⠀⠀⠀⠀⠉⠒⠲⠤⢄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠒⠤⠤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-       0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⠒⠦⢤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠘⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠘⠦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠀⠀⠈⠓⠤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠀⠀⠀⠀⠀⠀⠁⠓⠢⠄⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠑⠒⠄⠄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+       0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠓⠒⠦⠤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
          └────────────────────────────────────────┘
          0                                        3
                             f_1
@@ -177,18 +177,18 @@ non-dominated solution(s):
          │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
    f_2   │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
          │⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠈⢢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠀⠀⠈⠓⠤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠀⠀⠀⠀⠀⠀⠉⠒⠲⠤⢄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠒⠤⠤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-       0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⠒⠦⢤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠘⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠘⠦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠀⠀⠈⠓⠤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠀⠀⠀⠀⠀⠀⠁⠓⠢⠄⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠑⠒⠄⠄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+       0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠓⠒⠦⠤⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
          └────────────────────────────────────────┘
          0                                        3
                             f_1
     f calls: 50000
   feasibles: 100 / 100 in final population
- total time: 5.4945 s
+ total time: 4.7509 s
 +============================+</code></pre><h2 id="Modifying-an-Existing-Metaheuristic"><a class="docs-heading-anchor" href="#Modifying-an-Existing-Metaheuristic">Modifying an Existing Metaheuristic</a><a id="Modifying-an-Existing-Metaheuristic-1"></a><a class="docs-heading-anchor-permalink" href="#Modifying-an-Existing-Metaheuristic" title="Permalink"></a></h2><p>You may need to modify one of the implemented metaheuristic to improve the algorithm performance or test new mechanisms. This example illustrate how to do it.</p><div class="admonition is-warning"><header class="admonition-header">Modifying algorithms could break stuff</header><div class="admonition-body"><p>It is recommended to put the new methods in <code>module</code>s rather than in global scope in order to avoid errors.</p></div></div><p>Let assume that we want to modify the stop criteria for <code>ECA</code>. See <a href="../contributing/#Contributing">Contributing</a>  for more details.</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; import LinearAlgebra: norm
@@ -239,11 +239,11 @@ julia&gt; f, bounds, opt = Metaheuristics.TestProblems.get_problem(:sphere);
 
 julia&gt; optimize(f, bounds, ECA())
 [ Info: Diversity-based stop criteria
-distances_mean = 0.000997490763714239
+distances_mean = 0.0009910651021390355
 +=========== RESULT ==========+
-  iteration: 190
-    minimum: 2.54035e-07
-  minimizer: [-0.0003271816685247404, -3.287237572174742e-5, 6.69432139594231e-5, -5.476817196246205e-5, 3.399626823329593e-5, 0.00015042467133904167, -0.00017730175922916645, -0.0002850159441118441, 1.8847934610224937e-5, -4.0207497872715606e-5]
-    f calls: 13280
- total time: 1.2574 s
-+============================+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial/">« Tutorial</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 20 June 2021 01:49">Sunday 20 June 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  iteration: 184
+    minimum: 3.0707e-07
+  minimizer: [0.0001212932791986262, 9.505385605933225e-5, 4.765609541901113e-5, -6.505980686329616e-5, 0.00034078436553025603, 5.4134499509709806e-5, -0.00012669397329672684, 0.0002333160315232152, -5.6158310926972943e-5, 0.0002900212540921837]
+    f calls: 12828
+ total time: 0.9461 s
++============================+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial/">« Tutorial</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 20 June 2021 02:24">Sunday 20 June 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
