@@ -13,8 +13,9 @@ makedocs(
          sitename="Metaheuristics.jl",
          authors = "Jesús Mejía",
          pages = [
-                  "Introduction" => "index.md",
+                  "Home" => "index.md",
                   "Tutorial" => "tutorial.md",
+                  "Examples" =>  "examples.md",
                   "Algorithms" => "algorithms.md",
                   "Problems" => "problems.md",
                   "Performance Idicators" => "indicators.md",
