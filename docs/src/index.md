@@ -7,7 +7,6 @@ High performance algorithms for optimization purely coded in a high performance 
 
 [![Build Status](https://travis-ci.org/jmejia8/Metaheuristics.jl.svg?branch=master)](https://travis-ci.org/jmejia8/Metaheuristics.jl)
 [![Coverage Status](https://coveralls.io/repos/github/jmejia8/Metaheuristics.jl/badge.svg?branch=master)](https://coveralls.io/github/jmejia8/Metaheuristics.jl?branch=master)
-[![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/stable/)
 
 ## Introduction
 
@@ -84,3 +83,11 @@ For instance, you may use mainly two functions to obtain such approximation.
 @show minimizer(result)
 ```
 
+
+## Related packages
+
+- [Evolutionary.jl](https://github.com/wildart/Evolutionary.jl): Genetic algorithms, "Evolution" Strategies, among others.
+- [GeneticAlgorithms.jl](https://github.com/WestleyArgentum/GeneticAlgorithms.jl): Genetic Algorithms
+- [BlackBoxOptim.jl](https://github.com/robertfeldt/BlackBoxOptim.jl): Optimizers for black-box optimization (no information about the objective function).
+- [NODAL.jl](https://github.com/phrb/NODAL.jl): Stochastic Local Search methods, such as Simulated Annealing and Tabu Search.
+- [Other Packages.](https://www.juliaopt.org/packages/)
