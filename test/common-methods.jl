@@ -88,6 +88,26 @@ import Random: seed!
 	
     end
 
+
+    function test_hypervolume()
+        front = [[0.        ,0.        ,1.1       ],
+                 [0.        ,1.07863874,0.21572775],
+                 [0.13540064,0.94780448,0.54160256],
+                 [0.29938208,0.7484552 ,0.7484552 ],
+                 [0.46669048,0.62225397,0.77781746],
+                 [0.6350853 ,0.6350853 ,0.6350853 ],
+                 [0.7484552 ,0.7484552 ,0.29938208],
+                 [0.89510682,0.        ,0.63936201],
+                 [0.98386991,0.49193496,0.        ],
+                 [2.0, 3, 2], # only for testing
+                 [1.1       ,0.        ,0.        ]]
+
+        referencePoint = [2.0, 2, 2]
+        hyperVolume = Metaheuristics.PerformanceIndicators.hypervolume(front, referencePoint)
+
+        @test hyperVolume ≈ 6.793879034744429
+    end
+
     function test_prev_pop()
         f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere)
 
@@ -117,5 +137,6 @@ import Random: seed!
     simple_test()
     test_problems()
     test_prev_pop()
+    test_hypervolume()
 
 end
