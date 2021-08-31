@@ -5,10 +5,12 @@
 This module includes performance indicators to assess evolutionary multi-objective
 optimization algorithms.
 
-- `gd` Generational Distance
-- `igd` Inverted Generational Distance
-- `gd_plus` Generational Distance plus
-- `igd_plus` Inverted Generational Distance plus
+- `gd` Generational Distance.
+- `igd` Inverted Generational Distance.
+- `gd_plus` Generational Distance plus.
+- `igd_plus` Inverted Generational Distance plus.
+- `covering` Covering indicator (C-metric).
+- `hypervolume` Hypervolume indicator.
 
 ### Example
 
@@ -64,6 +66,8 @@ module PerformanceIndicators
 
 import ..State, ..fvals, ..norm, ..xFgh_indiv, ..fval, ..compare, ..mean
 import ..get_non_dominated_solutions
+
+include("hypervolume.jl")
 
 """
 	generational_distance(front, true_pareto_front; p = 1, inverted = false, plus=false)
@@ -226,7 +230,7 @@ A and B with size (n, m) where n is number of samples and m is the vector dimens
 Note that `covering(A, B) == 1` means that all solutions in B are dominated by those
 in A. Moreover, `covering(A, B) != covering(B, A)` in general.
 
-If `A::State` and `B::State`, the computes `covering(A.population, B.population)` after
+If `A::State` and `B::State`, then computes `covering(A.population, B.population)` after
 ignoring dominated solutions in each set.
 """
 function covering(A::Array{Vector{T}}, B::Array{Vector{T}}) where T <: Real
@@ -271,5 +275,51 @@ function covering(A::Matrix, B::Matrix)
 	covering(A_arr, B_arr)
 end
 
+
+"""
+	hypervolume(front, reference_point)
+Computes the hypervolume indicator, i.e., volume/Lebesge-meassure between points
+in `front` and `reference_point`.
+
+Note that each point in `front` must (weakly) dominates to `reference_point`.
+
+If `front::State` and `reference_point::Vector`, then computes `hypervolume(front.population, reference_point)` after
+ignoring solutions in `front` that do not dominate `reference_point`.
+"""
+function hypervolume(front::Array{Vector{T}}, reference_point::Vector{T}) where T <: Real
+
+	weaklyDominates(point, other) = begin
+		for i in 1:length(point)
+			if point[i] > other[i]
+				return false
+			end
+		end
+		return true
+	end
+
+
+	relevantPoints = Vector[]
+	for point in front
+		# only consider points that dominate the reference point
+		if weaklyDominates(point, reference_point)
+			push!(relevantPoints, point)
+		end
+	end
+
+	if length(relevantPoints) != length(front)
+		@warn "Ignoring points dominated by the reference point."
+	end
+
+
+	return HyperVolume.hv(relevantPoints, reference_point)
+end
+
+hypervolume(front::Vector{xFgh_indiv}, reference_point::Vector{xFgh_indiv}) = hypervolume(fval.(front), fval(reference_point))
+hypervolume(front::Vector{xFgh_indiv}, reference_point::Vector) = hypervolume(fval.(front), reference_point)
+
+function hypervolume(front::Matrix, reference_point::Vector)
+	front_ = [ front[i,:] for i in 1:size(A,1) ]
+	hypervolume(front_, reference_point)
+end
 
 end
