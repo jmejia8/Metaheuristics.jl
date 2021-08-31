@@ -146,9 +146,10 @@ Returns the Generational Distance.
 ### Parameters
 
 `front` and `true_pareto_front` can be:
-	- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
-	- `State`
-	- `Array{xFgh_indiv}` (usually `State.population`)
+
+- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
+- `State`
+- `Array{xFgh_indiv}` (usually `State.population`)
 """
 gd(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, p=p)
 
@@ -161,9 +162,11 @@ Returns the Inverted Generational Distance.
 ### Parameters
 
 `front` and `true_pareto_front` can be:
-	- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
-	- `State`
-	- `Array{xFgh_indiv}` (usually `State.population`)
+
+- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
+- `State`
+- `Array{xFgh_indiv}` (usually `State.population`)
+
 """
 igd(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, inverted=true, p=p)
 
@@ -175,9 +178,10 @@ Returns the Generational Distance Plus.
 ### Parameters
 
 `front` and `true_pareto_front` can be:
-	- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
-	- `State`
-	- `Array{xFgh_indiv}` (usually `State.population`)
+
+- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
+- `State`
+- `Array{xFgh_indiv}` (usually `State.population`)
 """
 gd_plus(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, p=p, plus=true)
 
@@ -189,9 +193,11 @@ Returns the Inverted Generational Distance Plus.
 ### Parameters
 
 `front` and `true_pareto_front` can be:
-	- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
-	- `State`
-	- `Array{xFgh_indiv}` (usually `State.population`)
+
+- `N×m` matrix where `N` is the number of points and `m` is the number of objectives. 
+- `State`
+- `Array{xFgh_indiv}` (usually `State.population`)
+
 """
 igd_plus(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, inverted=true, p=p, plus=true)
 
@@ -323,3 +329,4 @@ function hypervolume(front::Matrix, reference_point::Vector)
 end
 
 end
+

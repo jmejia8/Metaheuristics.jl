@@ -92,3 +92,4 @@ For instance, you may use mainly two functions to obtain such approximation.
 - [BlackBoxOptim.jl](https://github.com/robertfeldt/BlackBoxOptim.jl): Optimizers for black-box optimization (no information about the objective function).
 - [NODAL.jl](https://github.com/phrb/NODAL.jl): Stochastic Local Search methods, such as Simulated Annealing and Tabu Search.
 - [Other Packages.](https://www.juliaopt.org/packages/)
+
