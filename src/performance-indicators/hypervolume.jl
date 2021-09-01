@@ -1,4 +1,15 @@
 module HyperVolume
+#=
+Based on the file:
+http://ls11-www.cs.uni-dortmund.de/_media/rudolph/hypervolume/hv_python.zip
+written in python by Simon Wessing (2010).
+
+This implementation is for the variant 3 detailed in:
+C. M. Fonseca, L. Paquete, and M. Lopez-Ibanez. An improved dimension-sweep
+algorithm for the hypervolume indicator. In IEEE Congress on Evolutionary
+Computation, pages 1157-1163, Vancouver, Canada, July 2006.
+
+=#
 
 include("hypervolume-utils.jl")
 

@@ -85,6 +85,13 @@ For instance, you may use mainly two functions to obtain such approximation.
 ```
 
 
+## Contents
+
+```@contents
+Pages = ["tutorial.md", "examples.md", "algorithms.md", "problems.md", "indicators.md", "visualization.md", "api.md"]
+Depth = 2
+```
+
 ## Related packages
 
 - [Evolutionary.jl](https://github.com/wildart/Evolutionary.jl): Genetic algorithms, "Evolution" Strategies, among others.
