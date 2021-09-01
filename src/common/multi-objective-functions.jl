@@ -69,3 +69,53 @@ function  produce_weight!(a, i, d, H, nobj, w)
     end
 end
 
+
+"""
+    ideal(points)
+
+Computes the neal point from a provided array of `Vector`s or a population or row vectors
+in a `Matrix`.
+"""
+function ideal(points::Array{Vector{T}}) where T <: Real 
+    if isempty(points)
+        return zeros(0)
+    end
+    
+    ideal = points[1]
+
+    for point in points
+        ideal = min.(ideal, point)
+    end
+
+    return ideal
+
+end
+
+
+"""
+    nadir(points)
+
+Computes the nadir point from a provided array of `Vector`s or a population or row vectors
+in a `Matrix`.
+"""
+function nadir(points::Array{Vector{T}})  where T <: Real
+ 
+    if isempty(points)
+        return zeros(0)
+    end
+    
+    nadir = points[1]
+
+    for point in points
+        nadir = max.(nadir, point)
+    end
+
+    return nadir
+end
+
+
+ideal(population::Array{xFgh_indiv}) = ideal(fval.(population))
+ideal(A::Matrix) = ideal([A[i,:]  for i in 1:size(A,1)])
+
+nadir(population::Array{xFgh_indiv}) = nadir(fval.(population))
+nadir(A::Matrix) = nadir([A[i,:]  for i in 1:size(A,1)])

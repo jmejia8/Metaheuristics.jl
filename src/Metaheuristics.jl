@@ -14,7 +14,7 @@ export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fv
 
 export NSGA3, gen_ref_dirs
 
-export PerformanceIndicators, pareto_front
+export PerformanceIndicators, pareto_front, nadir, ideal
 
 include("externals.jl")
 
@@ -26,13 +26,12 @@ include("core/state.jl")
 include("core/structures.jl")
 
 
-include("common/multi-objective-functions.jl")
-include("common/repair.jl")
-
 include("solutions/individual.jl")
 include("solutions/constrained.jl")
 include("solutions/display.jl")
 
+include("common/multi-objective-functions.jl")
+include("common/repair.jl")
 
 include("common/stop.jl")
 include("common/compare.jl")

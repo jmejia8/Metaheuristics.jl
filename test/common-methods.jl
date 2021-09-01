@@ -109,6 +109,10 @@ import Random: seed!
         front_ = Array(hcat(front...)')
         hyperVolume = Metaheuristics.PerformanceIndicators.hypervolume(front_, referencePoint)
         @test hyperVolume ≈ 6.793879034744429
+
+        # testing nadir and ideal pint
+        @test ideal(front) == ideal(Array(hcat(front...)')) == zeros(3)
+        @test nadir(front) == nadir(Array(hcat(front...)')) == [2.0, 3, 2]
     end
 
     function test_prev_pop()

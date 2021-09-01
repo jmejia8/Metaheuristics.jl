@@ -59,3 +59,11 @@ Metaheuristics.create_child
 ```
 
 
+```@docs
+nadir
+```
+
+```@docs
+ideal
+```
+

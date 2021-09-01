@@ -80,6 +80,13 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xf_indiv})
 end
 
 
+function Base.show(io::IO, ::MIME"text/html", population::Array{xf_indiv})
+    println(io, "<pre>")
+    show(io, "text/plain", population)
+    println(io, "</pre>")
+end
+
+
 function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
     isempty(population) && show(io, population) && return
 
@@ -100,6 +107,13 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
     println(io, "\nV = Sum of contraint violations.")
 end
 
+
+function Base.show(io::IO, ::MIME"text/html", population::Array{xfgh_indiv})
+    println(io, "<pre>")
+    show(io, "text/plain", population)
+    println(io, "</pre>")
+end
+
 function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
     isempty(population) && show(io, population) && return
 
@@ -114,6 +128,13 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
         end
     end
     return nothing
+end
+
+
+function Base.show(io::IO, ::MIME"text/html", population::Array{xFgh_indiv})
+    println(io, "<pre>")
+    show(io, "text/plain", population)
+    println(io, "</pre>")
 end
 
 
@@ -156,8 +177,8 @@ end
 
 
 function Base.show(io::IO, ::MIME"text/html", status::State)
-    println(io, "<code>")
+    println(io, "<pre>")
     show(io, "text/plain", status)
-    println(io, "</code>")
+    println(io, "</pre>")
 end
 
