@@ -33,6 +33,7 @@ using Test
             res = optimize(f, bounds, method)
             show(IOBuffer(), res)
             show(IOBuffer(), "text/plain", res.population)
+            show(IOBuffer(), "text/html", res.population)
             show(IOBuffer(), res.population[1])
             fitness = minimum( res ) 
             test_result(fitness, desired_accuracy)

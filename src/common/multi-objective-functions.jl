@@ -77,9 +77,8 @@ Computes the neal point from a provided array of `Vector`s or a population or ro
 in a `Matrix`.
 """
 function ideal(points::Array{Vector{T}}) where T <: Real 
-    if isempty(points)
-        return zeros(0)
-    end
+
+    isempty(points) && isempty(points[1]) && return zeros(0)
     
     ideal = points[1]
 
@@ -100,9 +99,7 @@ in a `Matrix`.
 """
 function nadir(points::Array{Vector{T}})  where T <: Real
  
-    if isempty(points)
-        return zeros(0)
-    end
+    isempty(points) && isempty(points[1]) && return zeros(0)
     
     nadir = points[1]
 

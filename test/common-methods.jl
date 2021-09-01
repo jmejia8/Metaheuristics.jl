@@ -113,6 +113,10 @@ import Random: seed!
         # testing nadir and ideal pint
         @test ideal(front) == ideal(Array(hcat(front...)')) == zeros(3)
         @test nadir(front) == nadir(Array(hcat(front...)')) == [2.0, 3, 2]
+
+        f, bounds, front2 = Metaheuristics.TestProblems.get_problem(:DTLZ2);
+        @test Metaheuristics.PerformanceIndicators.hypervolume(front2, nadir(front2)) > 0
+        @test ideal(front2) != nadir(front2) 
     end
 
     function test_prev_pop()

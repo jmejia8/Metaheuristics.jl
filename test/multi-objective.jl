@@ -39,6 +39,7 @@ end
             result = ( optimize(f, bounds, method) )
             show(IOBuffer(), "text/html", result)
             show(IOBuffer(), "text/plain", result.population)
+            show(IOBuffer(), "text/html", result.population)
             show(IOBuffer(), result.population[1])
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
             @test Metaheuristics.PerformanceIndicators.spacing(result) < 0.2
