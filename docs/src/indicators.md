@@ -1,6 +1,17 @@
 # Performance Indicators
 
 
+Metaheuristics.jl includes performance indicators to assess evolutionary optimization
+algorithms performance.
+
+Available indicators:
+
+```@contents
+Pages = [ "indicators.md"]
+Depth = 3
+```
+
+![Performance Indicators](figs/performance-indicators.png)
 
 ```@docs
  Metaheuristics.PerformanceIndicators
@@ -8,6 +19,7 @@
 
 ## Generational Distance
 
+![Generational Distance](figs/gd.png)
 
 ```@docs
  Metaheuristics.PerformanceIndicators.gd
@@ -21,14 +33,17 @@
 ```
 
 
-## Generational Inverted Distance
+## Inverted Generational Distance
+
+
+![Inverted Generational Distance](figs/igd.png)
 
 ```@docs
  Metaheuristics.PerformanceIndicators.igd
 ```
 
 
-## Generational Inverted Distance Plus
+## Inverted Generational Distance Plus
 
 ```@docs
  Metaheuristics.PerformanceIndicators.igd_plus
@@ -48,6 +63,8 @@
 
 
 ## Hypervolume
+
+![Hypervolume Indicator](figs/hv.png)
 
 ```@docs
  Metaheuristics.PerformanceIndicators.hypervolume
