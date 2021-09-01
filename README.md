@@ -25,17 +25,28 @@ julia> import Pkg; Pkg.add("Metaheuristics")
 
 ## Algorithms
 
-- ECA: Evolutionary Centers Algorithm
-- DE:  Differential Evolution
-- PSO: Particle Swarm Optimization
-- ABC: Artificial Bee Colony
-- MOEA/D-DE: Multi-objective Evolutionary Algorithm based on Decomposition
-- GSA: Gravitational Search Algorithm
-- SA:  Simulated Annealing
-- WOA: Whale Optimization Algorithm
-- NSGA-II:  A fast and elitist multi-objective genetic algorithm: NSGA-II
-- NSGA-III: Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
+- **ECA**: Evolutionary Centers Algorithm
+- **DE**:  Differential Evolution
+- **PSO**: Particle Swarm Optimization
+- **ABC**: Artificial Bee Colony
+- **MOEA/D-DE**: Multi-objective Evolutionary Algorithm based on Decomposition
+- **GSA**: Gravitational Search Algorithm
+- **SA**:  Simulated Annealing
+- **WOA**: Whale Optimization Algorithm
+- **NSGA-II**:  A fast and elitist multi-objective genetic algorithm: NSGA-II
+- **NSGA-III**: Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
   Nondominated Sorting Approach
+
+## Performance Indicators
+
+
+- **GD**: Generational Distance
+- **IGD, IGD+**: Inverted Generational Distance (Plus)
+- **C-metric**: Covering Indicator
+- **HV**: Hypervolume
+- Spacing Indicator
+- [and more...](https://jmejia8.github.io/Metaheuristics.jl/stable/indicators/)
+
 
 ## Quick Start
 
@@ -91,3 +102,4 @@ For instance, you may use mainly two functions to obtain such approximation.
 
 
 Please, be free to send me your PR, issue or any comment about this package for Julia.
+
