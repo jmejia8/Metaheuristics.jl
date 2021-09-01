@@ -73,7 +73,7 @@ end
 """
     ideal(points)
 
-Computes the neal point from a provided array of `Vector`s or a population or row vectors
+Computes the ideal point from a provided array of `Vector`s or a population or row vectors
 in a `Matrix`.
 """
 function ideal(points::Array{Vector{T}}) where T <: Real 
