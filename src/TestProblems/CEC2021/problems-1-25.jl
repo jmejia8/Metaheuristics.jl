@@ -1,3 +1,5 @@
+round5(type::DataType, x) = floor(type, x + 0.5)
+
 function  CEC2021_func_1_25(x,func)
     # CEC2021_func Real world Multi-objective Constrained Optimization Test Suite 
     # Abhishek Kumar (email: abhishek.kumar.eee13@iitbhu.ac.in, Indian Institute of Technology (BHU), Varanasi) 
@@ -17,8 +19,8 @@ function  CEC2021_func_1_25(x,func)
 
     if func == 1
         ## Pressure Vessal Problems
-        x1 = round(x[1]);
-        x2 = round(x[2]);
+        x1 = round5(x[1]);
+        x2 = round5(x[2]);
         x3 = x[3];
         x4 = x[4];
         z1 = 0.0625*x1;
@@ -123,14 +125,14 @@ function  CEC2021_func_1_25(x,func)
         ## Speed Reducer Design Problem
         x1 = x[1];
         x2 = x[2];
-        x3 = round(x[3]);
+        x3 = round5(x[3]);
         x4 = x[4];
         x5 = x[5];
         x6 = x[6];
         x7 = x[7];
         ## objective function
         f = zeros(2);
-        f[1] = 0.7854 .* x1 .* x2 .^ 2 .* (10 .* x3 .^ 2/3+14.933 .* x3-43.0934) - 1.508 .* x1 .* (x6 .^ 2+x7 .^ 2)+7.477 .* (x6 .^ 3+x7 .^ 3)+0.7854 .* (x4 .* x6 .^ 2+x5 .* x7 .^ 2);
+        f[1] = 0.7854 * x1 * x2 ^ 2 * (10 *(x3 ^ 2)/3+14.933 * x3-43.0934) - 1.508 * x1 * (x6 ^ 2+x7 ^ 2)+7.477 * (x6 ^ 3+x7 ^ 3)+0.7854 * (x4 * x6 ^ 2+x5 * x7 ^ 2);
         f[2] = sqrt((745 .* x4 ./ (x2 .* x3)) .^ 2+1.69e7) ./ (0.1 .* x6 .^ 3);
         ## constraints
         g = zeros(11);
@@ -259,13 +261,12 @@ function  CEC2021_func_1_25(x,func)
         ## constraints
         g = zeros(1);
         h = zeros(1);
-        g[1] = -16 + 180000*x1 ./ (x3 .* ((x1 - 2*x4) .^ 3)+2*x2 .* x4 .* (4 .* x4 .* x4+3*x1 .* (x1-2*x4)))
-        + 15000 .* x2 ./ ((x1-2 .* x4) .* x3 .^ 3+2 .* x4 .* x2 .^ 3);
+        g[1] = -16 + 180000*x1 ./ (x3 .* ((x1 - 2*x4) .^ 3)+2*x2 .* x4 .* (4 .* x4 .* x4+3*x1 .* (x1-2*x4))) + 15000 .* x2 ./ ((x1-2 .* x4) .* x3 .^ 3 + 2 .* x4 .* x2 .^ 3);
     elseif func == 13
         ## Gear box design 
         x1 = x[1];
         x2 = x[2];
-        x3 = round(x[3]);
+        x3 = round5(x[3]);
         x4 = x[4];
         x5 = x[5];
         x6 = x[6];
@@ -317,7 +318,7 @@ function  CEC2021_func_1_25(x,func)
         h      = zeros(1);
     elseif func == 15
         ## Spring design Problem  
-        x1 = round(x[1]);
+        x1 = round5(x[1]);
         x2 = x[2];
         d  = [0.009,0.0095,0.0104,0.0118,0.0128,0.0132,0.014,
               0.015, 0.0162, 0.0173, 0.018, 0.020, 0.023, 0.025,
@@ -325,7 +326,7 @@ function  CEC2021_func_1_25(x,func)
               0.072, 0.080, 0.092, 0.0105, 0.120, 0.135, 0.148,
               0.162, 0.177, 0.192, 0.207, 0.225, 0.244, 0.263,
               0.283, 0.307, 0.331, 0.362,0.394,0.4375,0.500];
-        x3 = d[max(1,min(42,round(Int, x[3])))];# x3 = x3(:);
+        x3 = d[max(1,min(42,round5(Int, x[3])))];# x3 = x3(:);
         ## constants
         cf = (4 .* x2 ./ x3-1) ./ (4 .* x2 ./ x3-4)+0.615 .* x3 ./ x2;
         K  = (11.5 .* 10 .^ 6 .* x3 .^ 4) ./ (8 .* x1 .* x2 .^ 3);
@@ -450,7 +451,7 @@ function  CEC2021_func_1_25(x,func)
         H = 6000; alp = 250; beta = 0.6;
         Q1 = 40000; Q2 = 20000;
         ## decision Variable
-        N1 = round(x[1]); N2 = round(x[2]); N3 = round(x[3]);
+        N1 = round5(x[1]); N2 = round5(x[2]); N3 = round5(x[3]);
         V1 = x[4]; V2 = x[5]; V3 = x[6];
         TL1 = x[7]; TL2 = x[8];
         B1 = x[9]; B2 = x[10];
@@ -577,7 +578,7 @@ function  CEC2021_func_1_25(x,func)
         ## process Design and Synthesis
     elseif func == 25
         ## process synthesis problem
-        x1 = x[1]; x2 = round(x[2]);
+        x1 = x[1]; x2 = round5(x[2]);
         ## objective function
         f = zeros(2);
         f[1] = x2 + 2*x1;

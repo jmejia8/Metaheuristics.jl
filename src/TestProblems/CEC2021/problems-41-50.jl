@@ -92,9 +92,10 @@ function  CEC2021_func_41_50(x,func)
         delP = Psp-Pg+P;
         delQ = Qsp-Qg+Q;
         ## objective calculation
-        f = zeros(2)
+        f = zeros(3)
         f[1] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
         f[2] = imag(V[1] .* conj(I[2]))+sum(Qsp[2:14]);
+        f[3] = sum( (1 .- abs.(V[2:14])) .^ 2 )
         h = vcat(delP[2:14],delQ[2:14]);
 
         g = zeros(1);

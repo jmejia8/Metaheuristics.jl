@@ -14,7 +14,7 @@ function  CEC2021_func_26_40(x,func)
     D = length(x);
     if func == 26
         ## Process sythesis and Design Problems
-        x1 = x[1]; x2 = x[2]; x3 = round(x[3]);
+        x1 = x[1]; x2 = x[2]; x3 = round5(x[3]);
         ## objective function
         f = zeros(2);
         f[1] = -x3 + x2 + 2*x1;
@@ -43,8 +43,8 @@ function  CEC2021_func_26_40(x,func)
         x2 = x[2];
         v1 = x[3];
         v2 = x[4];
-        y1 = round(x[5]);
-        y2 = round(x[6]);
+        y1 = round5(x[5]);
+        y2 = round5(x[6]);
         x_ = x[7];
 
         z1 = 0.9*(1-exp(-0.5 .* v1)) .* x1;
@@ -66,8 +66,8 @@ function  CEC2021_func_26_40(x,func)
         g[4] = x2 - 20*y2;
     elseif func == 29
         ## process synthesis problem
-        x1 = x[1]; x2 = x[2]; x3 = x[3]; x4 = round(x[4]);
-        x5 = round(x[5]); x6 = round(x[6]); x7 = round(x[7]);
+        x1 = x[1]; x2 = x[2]; x3 = x[3]; x4 = round5(x[4]);
+        x5 = round5(x[5]); x6 = round5(x[6]); x7 = round5(x[7]);
         ## objective function
         f = zeros(2);
         f[1] = (1-x4) .^ 2 + (1-x5) .^ 2 + (1-x6) .^ 2 - log(abs(1+x7)+1e-6);
