@@ -76,7 +76,7 @@ function  CEC2021_func_41_50(x,func)
 
         Y = G+im*B;
         ## voltage initilization
-        V = zeros(14);
+        V = zeros(Complex, 14);
         V[1]    = 1;
         Pg      = zeros(14);
         Qg      = zeros(14);
@@ -173,7 +173,7 @@ function  CEC2021_func_41_50(x,func)
         Qsp  = imag(S);
         delP = Psp-Pg+P;
         delQ = Qsp-Qg+Q;
-            ## objective calculation
+        ## objective calculation
         f = zeros(2)
         f[1] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
         f[2] = sum((1 .- abs.(V[2:14])) .^ 2);
@@ -251,17 +251,17 @@ function  CEC2021_func_41_50(x,func)
         V[2:14]   =     x[1:13 ]+ im*x[14:26];
         Pg[[2,3,6,8]] = x[27:30];
         Qg[[2,3,6,8]] = x[31:34];
-            ## current calculation
-            I    = Y*V;
-            S    = V .* conj(I);
-            Psp  = real(S);
-            Qsp  = imag(S);
-            delP = Psp-Pg+P;
-            delQ = Qsp-Qg+Q;
-            ## objective calculation
-            f = zeros(2)
-            f[1] = sum(a1 + b1 .* Pg[ng] + c1 .* (Pg[ng] .^ 2));
-            f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
+        ## current calculation
+        I    = Y*V;
+        S    = V .* conj(I);
+        Psp  = real(S);
+        Qsp  = imag(S);
+        delP = Psp-Pg+P;
+        delQ = Qsp-Qg+Q;
+        ## objective calculation
+        f = zeros(2)
+        f[1] = sum(a1 + b1 .* Pg[ng] + c1 .* (Pg[ng] .^ 2));
+        f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
         h = vcat(delP[2:14],delQ[2:14]);
 
         g = zeros(1);
@@ -337,19 +337,19 @@ function  CEC2021_func_41_50(x,func)
         V[2:14]   =     x[1:13 ]+ im*x[14:26];
         Pg[[2,3,6,8]] = x[27:30];
         Qg[[2,3,6,8]] = x[31:34];
-            ## current calculation
-            I    = Y*V;
-            S    = V .* conj(I);
-            Psp  = real(S);
-            Qsp  = imag(S);
-            delP = Psp-Pg+P;
-            delQ = Qsp-Qg+Q;
-            ## objective calculation
-            
+        ## current calculation
+        I    = Y*V;
+        S    = V .* conj(I);
+        Psp  = real(S);
+        Qsp  = imag(S);
+        delP = Psp-Pg+P;
+        delQ = Qsp-Qg+Q;
+        ## objective calculation
+
         f = zeros(3)
         f[1] = sum(a1 + b1 .* Pg[ng] + c1 .* (Pg[ng] .^ 2));
-            f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
-            f[3] = imag(V[1] .* conj(I[1]))+sum(Qsp[2:14]);
+        f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
+        f[3] = imag(V[1] .* conj(I[1]))+sum(Qsp[2:14]);
         h = vcat(delP[2:14],delQ[2:14]);
         g = zeros(1);
     elseif (func == 45)
@@ -425,18 +425,18 @@ function  CEC2021_func_41_50(x,func)
         V[2:14]   =     x[1:13 ]+ im*x[14:26];
         Pg[[2,3,6,8]] = x[27:30];
         Qg[[2,3,6,8]] = x[31:34];
-            ## current calculation
-            I    = Y*V;
-            S    = V .* conj(I);
-            Psp  = real(S);
-            Qsp  = imag(S);
-            delP = Psp-Pg+P;
-            delQ = Qsp-Qg+Q;
-            ## objective calculation
-            f = zeros(3)
-            f[1] = sum(a1 + b1 .* Pg[ng] + c1 .* (Pg[ng] .^ 2));
-            f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
-            f[3] = sum((1 .- abs.(V[2:14])) .^ 2);
+        ## current calculation
+        I    = Y*V;
+        S    = V .* conj(I);
+        Psp  = real(S);
+        Qsp  = imag(S);
+        delP = Psp-Pg+P;
+        delQ = Qsp-Qg+Q;
+        ## objective calculation
+        f = zeros(3)
+        f[1] = sum(a1 + b1 .* Pg[ng] + c1 .* (Pg[ng] .^ 2));
+        f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
+        f[3] = sum((1 .- abs.(V[2:14])) .^ 2);
         h = vcat(delP[2:14],delQ[2:14]);
 
         g = zeros(1);
@@ -513,20 +513,20 @@ function  CEC2021_func_41_50(x,func)
         V[2:14]   =     x[1:13 ]+ im*x[14:26];
         Pg[[2,3,6,8]] = x[27:30];
         Qg[[2,3,6,8]] = x[31:34];
-            ## current calculation
-            I    = Y*V;
-            S    = V .* conj(I);
-            Psp  = real(S);
-            Qsp  = imag(S);
-            delP = Psp-Pg+P;
-            delQ = Qsp-Qg+Q;
+        ## current calculation
+        I    = Y*V;
+        S    = V .* conj(I);
+        Psp  = real(S);
+        Qsp  = imag(S);
+        delP = Psp-Pg+P;
+        delQ = Qsp-Qg+Q;
 
-            ## objective calculation
-            f = zeros(4)
-            f[1] = sum(a1 + b1 .* Pg[ng] + c1 .* (Pg[ng] .^ 2));
-            f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
-            f[3] = imag(V[1] .* conj(I[1]))+sum(Qsp[2:14]);
-            f[4] = sum((1 .-abs.(V[2:14])) .^ 2);
+        ## objective calculation
+        f = zeros(4)
+        f[1] = sum(a1 + b1 .* Pg[ng] + c1 .* (Pg[ng] .^ 2));
+        f[2] = real(V[1] .* conj(I[1]))+sum(Psp[2:14]);
+        f[3] = imag(V[1] .* conj(I[1]))+sum(Qsp[2:14]);
+        f[4] = sum((1 .-abs.(V[2:14])) .^ 2);
         h = vcat(delP[2:14],delQ[2:14]);
 
         g = zeros(1);
@@ -559,33 +559,34 @@ function  CEC2021_func_41_50(x,func)
 
 
         V[2:6]   = x[1:5]+im*x[6:10];
-            w         = x[11];
-            V[1]      = x[12]+1e-5;
+        w         = x[11];
+        V[1]      = x[12]+1e-5;
 
-            Pc[[4,5,6]] = x[13:15];
-            Qc[[4,5,6]] = x[16:18];
+        Pc[[4,5,6]] = x[13:15];
+        Qc[[4,5,6]] = x[16:18];
 
-            ## current calculation
-            Y    = ybus(L,w);
-            I    = Y*V;
-            Ir   = real(I);
-            Im   = imag(I);
-            Vr   = real(V);
-            Vm   = imag(V);
+        ## current calculation
+        Y    = ybus(L,w);
+        I    = Y*V;
+        Ir   = real(I);
+        Im   = imag(I);
+        Vr   = real(V);
+        Vm   = imag(V);
 
-            Psp  = Pc .* (1-w)-P[:,1] .* (abs.(V) ./ P[:,5]) .^ P[:,6];
-            Qsp  = Qc .* (1 .- sqrt.(Vr .^ 2+Vm .^ 2))-Q[:,1] .* (abs.(V) ./ Q[:,5]) .^ Q[:,6];
-            spI  = conj((Psp+im*Qsp) ./ V);
-            spIr = real(spI);
-            spIm = imag(spI);
-            delIr = Ir-spIr;
-            delIm = Im-spIm;
-            ## objective calculation
-            f = zeros(2)
-            f[1] = sum(Psp) ;
-            f[2] = sum(Qsp) ;
+        Psp  = Pc .* (1-w)-P[:,1] .* (abs.(V) ./ P[:,5]) .^ P[:,6];
+        Qsp  = Qc .* (1 .- sqrt.(Vr .^ 2+Vm .^ 2))-Q[:,1] .* (abs.(V) ./ Q[:,5]) .^ Q[:,6];
+        spI  = conj((Psp+im*Qsp) ./ V);
+        spIr = real(spI);
+        spIm = imag(spI);
+        delIr = Ir-spIr;
+        delIm = Im-spIm;
 
-            h = vcat(delIr[1:6], delIm[1:6]);
+        ## objective calculation
+        f = zeros(2)
+        f[1] = sum(Psp) ;
+        f[2] = sum(Qsp) ;
+
+        h = vcat(delIr[1:6], delIm[1:6]);
 
         g = zeros(1); 
 
@@ -615,29 +616,30 @@ function  CEC2021_func_41_50(x,func)
         Qc     = zeros(6);
 
         V[2:6]   =  x[1:5]+im*x[6:10];
-            w         = x[ 11];
-            V[1]      = x[ 12]+1e-5;
-            Pc[[4,5,6]] = x[13:15];
-            Qc[[4,5,6]] = x[16:18];
-            ## current calculation
-            Y    = ybus(L,w);
-            I    = Y*V;
-            Ir   = real(I);
-            Im   = imag(I);
-            Vr   = real(V);
-            Vm   = imag(V);
-            Psp  = Pc .* (1-w)-P[:,1] .* (abs.(V) ./ P[:,5]) .^ P[:,6];
-            Qsp  = Qc .* (1 .-sqrt.(Vr .^ 2+Vm .^ 2))-Q[:,1] .* (abs.(V) ./ Q[:,5]) .^ Q[:,6];
-            spI  = conj((Psp+im*Qsp) ./ V);
-            spIr = real(spI);
-            spIm = imag(spI);
-            delIr = Ir-spIr;
-            delIm = Im-spIm;
-            ## objective calculation
-            f = zeros(2)
-            f[1] = sum(Psp) ;
-            f[2] = sum((1 .-abs.(V)) .^ 2) ;
-            h = vcat(delIr[1:6], delIm[1:6]);
+        w         = x[ 11];
+        V[1]      = x[ 12]+1e-5;
+        Pc[[4,5,6]] = x[13:15];
+        Qc[[4,5,6]] = x[16:18];
+        ## current calculation
+        Y    = ybus(L,w);
+        I    = Y*V;
+        Ir   = real(I);
+        Im   = imag(I);
+        Vr   = real(V);
+        Vm   = imag(V);
+        Psp  = Pc .* (1-w)-P[:,1] .* (abs.(V) ./ P[:,5]) .^ P[:,6];
+        Qsp  = Qc .* (1 .-sqrt.(Vr .^ 2+Vm .^ 2))-Q[:,1] .* (abs.(V) ./ Q[:,5]) .^ Q[:,6];
+
+        spI  = conj((Psp+im*Qsp) ./ V);
+        spIr = real(spI);
+        spIm = imag(spI);
+        delIr = Ir-spIr;
+        delIm = Im-spIm;
+        ## objective calculation
+        f = zeros(2)
+        f[1] = sum(Psp) ;
+        f[2] = sum((1 .-abs.(V)) .^ 2) ;
+        h = vcat(delIr[1:6], delIm[1:6]);
 
         g = zeros(1); 
     elseif (func == 49)
@@ -666,33 +668,33 @@ function  CEC2021_func_41_50(x,func)
         Qc     = zeros(6);
 
         V[2:6]   = x[1:5]+im*x[6:10];
-            w         = x[11];
-            V[1]      = x[12]+1e-5;
+        w         = x[11];
+        V[1]      = x[12]+1e-5;
 
-            Pc[[4,5,6]] = x[13:15];
-            Qc[[4,5,6]] = x[16:18];
+        Pc[[4,5,6]] = x[13:15];
+        Qc[[4,5,6]] = x[16:18];
 
-            ## current calculation
-            Y    = ybus(L,w);
-            I    = Y*V;
-            Ir   = real(I);
-            Im   = imag(I);
-            Vr   = real(V);
-            Vm   = imag(V);
-            Psp  = Pc .* (1-w)-P[:,1] .* (abs.(V) ./ P[:,5]) .^ P[:,6];
-            Qsp  = Qc .* (1 .-sqrt.(Vr .^ 2+Vm .^ 2))-Q[:,1] .* (abs.(V) ./ Q[:,5]) .^ Q[:,6];
-            spI  = conj((Psp+im*Qsp) ./ V);
-            spIr = real(spI);
-            spIm = imag(spI);
-            delIr = Ir-spIr;
-            delIm = Im-spIm;
-            ## objective calculation
-            f = zeros(3)
-            f[1] = sum(Psp) ;
-            f[2] = sum(Qsp) ;
-            f[3] = sum((1 .- abs.(V)) .^ 2) ;
-            h = vcat(delIr[1:6], delIm[1:6]);
-        
+        ## current calculation
+        Y    = ybus(L,w);
+        I    = Y*V;
+        Ir   = real(I);
+        Im   = imag(I);
+        Vr   = real(V);
+        Vm   = imag(V);
+        Psp  = Pc .* (1-w)-P[:,1] .* (abs.(V) ./ P[:,5]) .^ P[:,6];
+        Qsp  = Qc .* (1 .-sqrt.(Vr .^ 2+Vm .^ 2))-Q[:,1] .* (abs.(V) ./ Q[:,5]) .^ Q[:,6];
+        spI  = conj((Psp+im*Qsp) ./ V);
+        spIr = real(spI);
+        spIm = imag(spI);
+        delIr = Ir-spIr;
+        delIm = Im-spIm;
+        ## objective calculation
+        f = zeros(3)
+        f[1] = sum(Psp) ;
+        f[2] = sum(Qsp) ;
+        f[3] = sum((1 .- abs.(V)) .^ 2) ;
+        h = vcat(delIr[1:6], delIm[1:6]);
+
         g = zeros(1); 
     elseif func == 50
         ## Power Distribution System Planning
@@ -700,11 +702,11 @@ function  CEC2021_func_41_50(x,func)
         P = x;
         PD = 1200;
         B =[140 17 15 19 26 22;
-             17 60 13 16 15 20;
-             15 13 65 17 24 19;
-             19 16 17 71 30 25;
-             26 15 24 30 69 32;
-             22 20 19 25 32 85] * 10^-6;
+            17 60 13 16 15 20;
+            15 13 65 17 24 19;
+            19 16 17 71 30 25;
+            26 15 24 30 69 32;
+            22 20 19 25 32 85] * 10^-6;
         a = [756.7988 451.3251 1243.5311 1049.9977 1356.6592 1658.5696];
         b = [38.5390  46.1591 38.3055  40.3965 38.2704 36.3278];
         c = [0.15247  0.10587  0.03546  0.02803  0.01799 0.02111];

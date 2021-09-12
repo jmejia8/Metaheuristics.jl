@@ -18,7 +18,8 @@ end
 function test()
     for i in 1:50 
         n, fn, g, h, xmin, xmax = Cal_par(i)
-        x = xmin + 0.5*(xmax - xmin) 
+
+        x = xmin + 0.9*(xmax - xmin) 
         @show i  CEC2021_func(x, i)
     end
 end
