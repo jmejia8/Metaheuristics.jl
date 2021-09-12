@@ -38,7 +38,7 @@ include("common/compare.jl")
 
 
 include("TestProblems/TestProblems.jl")
-include("performance-indicators/PerformanceIndicators.jl")
+include("PerformanceIndicators/PerformanceIndicators.jl")
 
 
 include("algorithms/algorithm.jl")
