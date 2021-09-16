@@ -313,9 +313,10 @@ function hypervolume(front::Array{Vector{T}}, reference_point::Vector) where T <
 	end
 
 	if length(relevantPoints) != length(front)
-		@warn "Ignoring points dominated by the reference point."
+		ign = length(front) - length(relevantPoints)
+		rel = length(relevantPoints)
+		@warn "Ignoring $ign points dominated by the reference point ($rel points are used)."
 	end
-
 
 	return HyperVolume.hv(relevantPoints, reference_point)
 end
