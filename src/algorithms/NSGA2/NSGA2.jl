@@ -117,17 +117,14 @@ function update_state!(
         reset_to_violated_bounds!(c1, problem.bounds)
         reset_to_violated_bounds!(c2, problem.bounds)
 
-        # evaluate children
-        child1 = create_solution(c1, problem)
-        child1.sum_violations = violationsSum(child1.g, child1.h, ε = parameters.ε)
+        # evaluate offspring
+        offspring1 = create_solution(c1, problem)
 
-        child2 = create_solution(c2, problem) 
-        child2.sum_violations = violationsSum(child2.g, child2.h, ε = parameters.ε)
-        status.f_calls += 2
+        offspring2 = create_solution(c2, problem) 
        
-        # save children
-        push!(Q, child1)
-        push!(Q, child2)
+        # save offsprings
+        push!(Q, offspring1)
+        push!(Q, offspring2)
     end
 
     status.population = vcat(status.population, Q)

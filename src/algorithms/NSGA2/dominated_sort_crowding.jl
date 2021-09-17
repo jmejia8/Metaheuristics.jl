@@ -85,9 +85,6 @@ end
 
 function truncate_population!(population, N)
     fast_non_dominated_sort!(population)
-    sort!(population, by = x -> x.rank, alg = Base.Sort.QuickSort)
-
-    #update_crowding_distance!(population)
 
     let f::Int = 1
         ind = 0
