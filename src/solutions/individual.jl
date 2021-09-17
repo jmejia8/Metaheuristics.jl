@@ -183,7 +183,7 @@ sum_violations(solution::xfgh_indiv) = solution.sum_violations
 sum_violations(solution::xFgh_indiv) = solution.sum_violations
 
 
-fvals(population::Array) = begin
+fvals(population::AbstractArray) = begin
     if !isempty(population) && typeof(population[1].f) <: Vector
         return Array(hcat(map(fval, population)...)')
     end
