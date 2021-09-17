@@ -84,3 +84,9 @@ An Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Base
 ```@docs
 NSGA3
 ```
+
+## SMS-EMOA
+An EMO algorithm using the hypervolume measure as selection criterion [Emmerich2005](@cite).
+```@docs
+SMS_EMOA
+```
