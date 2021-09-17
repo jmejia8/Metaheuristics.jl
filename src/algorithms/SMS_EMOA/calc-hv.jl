@@ -1,3 +1,27 @@
+function sortslicesperm(A::AbstractArray; dims::Union{Integer, Tuple{Vararg{Integer}}}, kws...)
+    _sortslicesperm(A, Val{dims}(); kws...)
+end
+
+function _sortslicesperm(A::AbstractArray, d::Val{dims}; kws...) where dims
+    itspace = Base.compute_itspace(A, d)
+    vecs = map(its->view(A, its...), itspace)
+    p = sortperm(vecs; kws...)
+    if ndims(A) == 2 && isa(dims, Integer) && isa(A, Array)
+        # At the moment, the performance of the generic version is subpar
+        # (about 5x slower). Hardcode a fast-path until we're able to
+        # optimize this.
+        # return dims == 1 ? A[p, :] : A[:, p]
+        return p
+    else
+        B = similar(A)
+        for (x, its) in zip(p, itspace)
+            B[its...] = vecs[x]
+        end
+        B
+    end
+end
+
+
 function calculate_hv(points,bounds,k,nSample)
 
     # This function is modified from the code in
@@ -8,19 +32,21 @@ function calculate_hv(points,bounds,k,nSample)
         # Use the estimated method for three or more objectives
         alpha = zeros(1,N); 
         for i = 1 : k 
-            alpha[i] = prod((k-[1:i-1])./(N-[1:i-1]))./i; 
+            J = 1:i-1
+            alpha[i] = prod((k .- J)./(N .- J ))./i; 
         end
         Fmin = ideal(points);
         # S    = unifrnd(repmat(Fmin,nSample,1),repmat(bounds,nSample,1));
-        S = Fmin + (bounds - Fmin) .* rand(nSample, M)
+        S = Fmin' .+ (bounds - Fmin)' .* rand(nSample, M)
         PdS  = zeros(Bool, N,nSample);
-        dS   = zeros(1,nSample);
+        dS   = zeros(Int, nSample);
         for i = 1 : N
-            x        = sum(points[i,:]' .- S <= 0, dims = 2) == M;
-            PdS[i,x] = true;
-            dS[x]    = dS[x] + 1;
+            x        = sum(points[i,:]' .- S .<= 0, dims = 2) .== M;
+            mask = x[:,1]
+            PdS[i, mask] .= true;
+            dS[mask]    = dS[mask] .+ 1;
         end
-        F = zeros(1,N);
+        F = zeros(N);
         for i = 1 : N
             F[i] = sum(alpha[dS[PdS[i,:]]]);
         end
@@ -44,10 +70,9 @@ function hypesub(l,A,M,bounds,pvec,alpha,k)
 
     h     = zeros(1,l); 
     #[S,mask] = sortrows(A,M); 
-    S = sortslices( view(A, :, M), dims=1 )
-
-    # FIXME: this works but improvement is needed for performance purpurses
-    mask = [ findfirs(a -> a = S[i,:]) for i in 1:size(S,1) ]
+    _A = view(A, :, M)
+    maks = sortslicesperm( _A, dims=1 )
+    S = A[mask,:]
 
     pvec  = pvec[mask]; 
     for i = 1 : size(S,1) 

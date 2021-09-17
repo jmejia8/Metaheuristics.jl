@@ -1,12 +1,14 @@
-include("front-contribution.jl")
-
 mutable struct SMS_EMOA <: AbstractParameters
     N::Int
     η_cr::Float64
     p_cr::Float64
     η_m::Float64
     p_m::Float64
+    n_samples::Int
 end
+
+
+include("update-population.jl")
 
 """
     function SMS_EMOA(;
@@ -15,11 +17,12 @@ end
         p_cr = 0.9,
         η_m = 20,
         p_m = 1.0 / D,
+        n_samples = 10_000,
         information = Information(),
         options = Options(),
     )
 
-Parameters for the metaheuristic NSGA-II.
+Parameters for the metaheuristic SMS-EMOA.
 
 Parameters:
 
@@ -28,6 +31,7 @@ Parameters:
 - `p_cr` Crossover probability.
 - `η_m`  η for the mutation operator.
 - `p_m` Mutation probability (1/D for D-dimensional problem by default).
+- `n_samples` number of samples to approximate hypervolume in many-objective (M > 2).
 
 To use SMS_EMOA, the output from the objective function should be a 3-touple
 `(f::Vector, g::Vector, h::Vector)`, where `f` contains the objective functions,
@@ -67,11 +71,12 @@ function SMS_EMOA(;
     p_cr = 0.9,
     η_m = 20,
     p_m = -1,
+    n_samples = 10_000,
     information = Information(),
     options = Options(),
 )
 
-    parameters = SMS_EMOA(N, promote( Float64(η_cr), p_cr, η_m, p_m)...)
+    parameters = SMS_EMOA(N, promote( Float64(η_cr), p_cr, η_m, p_m)..., n_samples)
     Algorithm(
         parameters,
         information = information,
@@ -95,41 +100,29 @@ function update_state!(
 
     I = randperm(parameters.N)
     J = randperm(parameters.N)
-    Q = typeof(status.population[1])[]
-    for i = 1:2:parameters.N
+
+    for i = 1:parameters.N
 
         pa = tournament_selection(status.population, I[i])
         pb = tournament_selection(status.population, J[i])
 
         # crossover
-        c1, c2 = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
+        _, c = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
                               parameters.η_cr, parameters.p_cr)
        
         # mutation
-        polynomial_mutation!(c1,problem.bounds,parameters.η_m, parameters.p_m)
-        polynomial_mutation!(c2,problem.bounds,parameters.η_m, parameters.p_m)
+        polynomial_mutation!(c, problem.bounds, parameters.η_m, parameters.p_m)
        
-        # rapair solutions if necesary
-        reset_to_violated_bounds!(c1, problem.bounds)
-        reset_to_violated_bounds!(c2, problem.bounds)
+        # repair solutions if necesary
+        reset_to_violated_bounds!(c, problem.bounds)
 
         # evaluate children
-        child1 = create_solution(c1, problem)
-
-        child2 = create_solution(c2, problem) 
-        status.f_calls += 2
+        child = create_solution(c, problem)
        
-        # save children
-        push!(Q, child1)
-        push!(Q, child2)
+        # save child in population if child contributes to the front
+        update_population!(status.population, child, parameters.n_samples)
     end
 
-    status.population = vcat(status.population, Q)
-
-    # non-dominated sort, crowding distance, elitist removing
-    compute_contribution!(status.population)
-
-    stop_criteria!(status, parameters, problem, information, options)
 end
 
 
