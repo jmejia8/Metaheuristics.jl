@@ -22,39 +22,43 @@ function _sortslicesperm(A::AbstractArray, d::Val{dims}; kws...) where dims
 end
 
 
-function calculate_hv(points,bounds,k,nSample)
+function calculate_hv(points, bounds, k, n_sample)
 
     # This function is modified from the code in
     # http://www.tik.ee.ethz.ch/sop/download/supplementary/hype/
 
-    N,M = size(points);
+    N, M = size(points)
     if M > 2
         # Use the estimated method for three or more objectives
         alpha = zeros(1,N); 
-        for i = 1 : k 
+        for i = 1:k 
             J = 1:i-1
-            alpha[i] = prod((k .- J)./(N .- J ))./i; 
-        end
-        Fmin = ideal(points);
-        # S    = unifrnd(repmat(Fmin,nSample,1),repmat(bounds,nSample,1));
-        S = Fmin' .+ (bounds - Fmin)' .* rand(nSample, M)
-        PdS  = zeros(Bool, N,nSample);
-        dS   = zeros(Int, nSample);
-        for i = 1 : N
-            x        = sum(points[i,:]' .- S .<= 0, dims = 2) .== M;
-            mask = x[:,1]
-            PdS[i, mask] .= true;
-            dS[mask]    = dS[mask] .+ 1;
-        end
-        F = zeros(N);
-        for i = 1 : N
-            F[i] = sum(alpha[dS[PdS[i,:]]]);
+            alpha[i] = prod((k .- J)./(N .- J ))./i
         end
 
-        return F .* prod(bounds-Fmin) / nSample;
+        f_min = ideal(points)
+        S = f_min' .+ (bounds - f_min)' .* rand(n_sample, M)
+
+        PdS  = zeros(Bool, N,n_sample)
+        dS   = zeros(Int, n_sample)
+        for i = 1:N
+            x = sum(points[i,:]' .- S .<= 0, dims = 2) .== M
+            mask = view(x, :,1)
+            PdS[i, mask] .= true
+            dS[mask]    = dS[mask] .+ 1
+        end
+
+        F = zeros(N)
+        for i = 1:N
+            mask = view(dS, view(PdS, i,:))
+            F[i] = sum(alpha[mask])
+        end
+
+        # ΔS
+        return F .* prod(bounds - f_min) / n_sample
     end
 
-    NaN
+    return zeros(0)
 
     #= ignored since  computation is carried out in `compute_contribution!(...) when M == 2`
     #
