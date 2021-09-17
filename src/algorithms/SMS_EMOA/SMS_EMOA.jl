@@ -55,10 +55,10 @@ bounds = [-1 -1;
         ]
 
 # define the parameters (use `SMS_EMOA()` for using default parameters)
-nsga2 = SMS_EMOA(N = 100, p_cr = 0.85)
+sms_emoa = SMS_EMOA(N = 100, p_cr = 0.85)
 
 # optimize
-status = optimize(f, bounds, nsga2)
+status = optimize(f, bounds, sms_emoa)
 
 # show results
 display(status)
@@ -107,8 +107,11 @@ function update_state!(
         pb = tournament_selection(status.population, J[i])
 
         # crossover
-        _, c = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
-                              parameters.η_cr, parameters.p_cr)
+        _, c = SBX_crossover(get_position(pa),
+                             get_position(pb),
+                             problem.bounds,
+                             parameters.η_cr,
+                             parameters.p_cr)
        
         # mutation
         polynomial_mutation!(c, problem.bounds, parameters.η_m, parameters.p_m)
@@ -116,11 +119,12 @@ function update_state!(
         # repair solutions if necesary
         reset_to_violated_bounds!(c, problem.bounds)
 
-        # evaluate children
-        child = create_solution(c, problem)
+        # evaluate offspring
+        offspring = create_solution(c, problem)
        
-        # save child in population if child contributes to the front
-        update_population!(status.population, child, parameters.n_samples)
+        # Reduce: save offspring in population and reduce population according to
+        # front contribution
+        update_population!(status.population, offspring, parameters.n_samples)
     end
 
 end
