@@ -111,7 +111,11 @@ function nadir(points::Array{Vector{T}})  where T <: Real
 end
 
 
-ideal(population::Array{xFgh_indiv}) = ideal(fval.(population))
+function ideal(population::Array{xFgh_indiv})
+    mask = sum_violations.(population) .== 0
+
+    ideal(fval.(population[mask]))
+end
 ideal(A::Matrix) = ideal([A[i,:]  for i in 1:size(A,1)])
 
 nadir(population::Array{xFgh_indiv}) = nadir(fval.(population))
