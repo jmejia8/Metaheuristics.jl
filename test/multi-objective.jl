@@ -29,6 +29,7 @@ end
         npartitions = nobjectives == 2 ? 100 : 12
 
         methods = [
+                SMS_EMOA(N = 50, n_samples=500, options=options),
                 NSGA2(options=options),
                 MOEAD_DE(gen_ref_dirs(nobjectives, npartitions), options=Options( seed = 1, iterations = 500)),
                 NSGA3(options=options),

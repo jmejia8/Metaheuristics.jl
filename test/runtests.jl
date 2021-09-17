@@ -9,7 +9,7 @@ else
     seed!(31415926534)
 end
 
-@testset "Metaheuristics" for tests in [
+for tests in [
             "common-methods.jl",
             "box-constrained.jl",
             "constrained.jl",
