@@ -14,6 +14,8 @@ export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fv
 
 export NSGA3, gen_ref_dirs
 
+export SMS_EMOA
+
 export PerformanceIndicators, pareto_front, nadir, ideal
 
 include("externals.jl")
@@ -88,6 +90,7 @@ include("algorithms/MOEAD_DE/MOEAD_DE.jl")
 # Non-dominate sorting Genetic Algorithm
 include("algorithms/NSGA2/NSGA2.jl")
 include("algorithms/NSGA3/NSGA3.jl")
+include("algorithms/SMS_EMOA/SMS_EMOA.jl")
 
 
 
