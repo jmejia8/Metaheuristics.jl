@@ -36,11 +36,17 @@ function compute_contribution!(population, last_front, n_samples)
         ΔS = calculate_hv(Fs, nadir(population)*1.1, 1, n_samples)
     end
 
+    # save contribution for further analysis
+    for i in eachindex(ΔS)
+        population[last_front[i]].crowding = ΔS[i]
+    end
+
 
     worst = argmin(ΔS)
     deleteat!(population, last_front[worst])
 end
 
+get_contribution(sol::xFgh_indiv) = sol.crowding
 
 function get_last_front(population, N = length(population) - 1)
     let f::Int = 1

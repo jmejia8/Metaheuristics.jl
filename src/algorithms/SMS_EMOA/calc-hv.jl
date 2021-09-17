@@ -54,6 +54,11 @@ function calculate_hv(points,bounds,k,nSample)
         return F .* prod(bounds-Fmin) / nSample;
     end
 
+    NaN
+
+    #= ignored since  computation is carried out in `compute_contribution!(...) when M == 2`
+    #
+    #
     # Use the accurate method for two objectives
     pvec  = 1:size(points,1);
     alpha = zeros(1,k);
@@ -63,8 +68,10 @@ function calculate_hv(points,bounds,k,nSample)
     end
 
     return hypesub(N,points,M,bounds,pvec,alpha,k);
+    =#
 end
 
+#=
 function hypesub(l,A,M,bounds,pvec,alpha,k)
     # The recursive function for the accurate method
 
@@ -95,3 +102,4 @@ function hypesub(l,A,M,bounds,pvec,alpha,k)
 
     return h
 end
+=#
