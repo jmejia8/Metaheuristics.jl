@@ -173,23 +173,31 @@ function associate!(nich, nich_freq, distance, F, reference_points, l)
 end
 
 function normalize(population) 
-    obj_normalized = typeof(population[1].f)[]
-    ideal = population[1].f
-    nadir = population[1].f
+    M = length(fval(population[1]))
 
-    for i = 2:length(population)
-        ideal = min.(ideal, population[i].f)
-        nadir = max.(nadir, population[i].f)
+    Zmin = ideal(population)
+
+    Fx = fvals(population) .- Zmin'
+
+    # identify extreme points
+    extreme_points = zeros(Int, M)
+    w = LinearAlgebra.I + fill(1e-6, M, M)
+
+    for i in 1:M
+        extreme_points[i] = argmin(nadir(Fx' ./ w[i,:]))
     end
-    
 
-    b = nadir - ideal
+    # intercepts
+    S = Fx[extreme_points,:]
+    if LinearAlgebra.det(S) ≈ 0
+        a = nadir(population) - Zmin;
+    else
+        hyperplane = S \ ones(M)
+        a = 1 ./ hyperplane
+    end
 
-    # prevent division by zero
-    mask = b .< eps()
-    b[mask] .= eps()
-
-    return [ (sol.f - ideal) ./ b for sol in population ]
+    # normalize
+    return [ Fx[i,:] ./ a for i in eachindex(population) ]
 end
 
 # get_last_front(id, population) = findall(s -> s.rank == id, population)
