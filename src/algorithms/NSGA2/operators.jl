@@ -1,8 +1,12 @@
-function tournament_selection(P, i)
-    a = i
+function tournament_selection(P, a = rand(1:length(P)))
+    # chose two different solutions at random
     b = rand(1:length(P))
-    
-    is_better(P[a], P[b]) || (!is_better(P[b], P[a]) && P[a].crowding > P[b].crowding ) ? P[a] : P[b]
+    while a == b 
+        b = rand(1:length(P))
+    end
+
+    # perform selection
+    P[a].rank < P[b].rank || (P[a].rank == P[b].rank && P[a].crowding > P[b].crowding ) ? P[a] : P[b]
 end
 
 

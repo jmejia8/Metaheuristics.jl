@@ -17,7 +17,6 @@ end
         p_cr = 0.9,
         η_m = 20,
         p_m = 1.0 / D,
-        ε = eps(),
         information = Information(),
         options = Options(),
     )

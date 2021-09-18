@@ -17,6 +17,11 @@ function compute_contribution!(population, last_front, n_samples)
         return 
     end
 
+    # reset contribution
+    for sol in population
+        sol.crowding = Inf
+    end
+
     M = length(fval(population[1]))
 
 

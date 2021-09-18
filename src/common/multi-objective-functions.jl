@@ -118,5 +118,10 @@ function ideal(population::Array{xFgh_indiv})
 end
 ideal(A::Matrix) = ideal([A[i,:]  for i in 1:size(A,1)])
 
-nadir(population::Array{xFgh_indiv}) = nadir(fval.(population))
+function nadir(population::Array{xFgh_indiv})
+    mask = sum_violations.(population) .== 0
+
+    nadir(fval.(population[mask]))
+end
+
 nadir(A::Matrix) = nadir([A[i,:]  for i in 1:size(A,1)])
