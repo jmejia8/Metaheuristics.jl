@@ -83,6 +83,9 @@ import Random: seed!
             Cyx=Metaheuristics.PerformanceIndicators.covering(Y, X)
             @test Cxy == (size(X,1) ÷ 2) / size(X,1)
             @test Cyx == 0.0
+ 
+            ## Δₚ (delta p)
+            @test PerformanceIndicators.deltap(pf, optimums) == PerformanceIndicators.Δₚ(pf, optimums)
         end
 
 	

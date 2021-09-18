@@ -60,7 +60,7 @@ Depth = 3
  Metaheuristics.PerformanceIndicators.spacing
 ```
 
-## Covering Indicator (C-metric)
+## Covering Indicator ($C$-metric)
 
 ```@docs
  Metaheuristics.PerformanceIndicators.covering
@@ -112,4 +112,10 @@ reference_point = nadir(result.population)
 hv = hypervolume(approx_front, reference_point)
 ```
 
+
+## $\Delta_p$ (Delta $p$)
+
+```@docs
+ Metaheuristics.PerformanceIndicators.deltap
+```
 
