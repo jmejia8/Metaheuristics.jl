@@ -52,7 +52,7 @@ Evolutionary Centers Algorithm (ECA), Differential Evolution (DE), Particle Swar
 Optimization (PSO), etc. In this tutorial we will use `ECA`, but you can use another
 algorithm following the same steps.
 
-The metaheuristics accept its parameters but share two common and **optional** settings
+The metaheuristics accept their parameters but share two common and **optional** settings
 `information` and `options`.
 
 ```julia
@@ -64,7 +64,7 @@ algorithm = ECA(information = information, options = options)
 
 ## Optimize
 
-Now, we are able to approximate the optimum. To do that is necessary to use the `optimize`
+Now, we are able to approximate the optimum. To do that it is necessary to use the `optimize`
 function as follows:
 
 ```julia
