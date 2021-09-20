@@ -50,7 +50,7 @@ options = Options(f_calls_limit = 9000*10, f_tol = 1e-5)
 `Metaheuristics.jl` provides different metaheuristics for optimization such as
 Evolutionary Centers Algorithm (ECA), Differential Evolution (DE), Particle Swarm
 Optimization (PSO), etc. In this tutorial we will use `ECA`, but you can use another
-algorithm following but the same steps.
+algorithm following the same steps.
 
 The metaheuristics accept its parameters but share two common and **optional** settings
 `information` and `options`.
@@ -89,7 +89,7 @@ x = minimizer(result)
 
 ## Get Information about the Resulting Population
 
-Sometimes is useful to analyze the resulting population (for population-based metaheuristics).
+Sometimes it is useful to analyze the resulting population (for population-based metaheuristics).
 To do that you can use `fvals` to get objective function evaluation and `positions` to
 get their positions.
 
