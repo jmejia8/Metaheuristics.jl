@@ -47,7 +47,8 @@ import Random: seed!
         end
         
         # multi-objective
-        for problem = [:ZDT1, :ZDT2, :ZDT3, :ZDT4, :ZDT6, :DTLZ2]
+        for problem = [:ZDT1, :ZDT2, :ZDT3, :ZDT4, :ZDT6,
+                       :DTLZ1, :DTLZ2, :DTLZ3, :DTLZ4, :DTLZ5, :DTLZ6]
             f, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
             pf = Metaheuristics.get_non_dominated_solutions(optimums)
 
