@@ -3,6 +3,7 @@
 High performance metaheuristics for optimization purely coded in Julia.
 
 [![Build Status](https://travis-ci.com/jmejia8/Metaheuristics.jl.svg?branch=master)](https://app.travis-ci.com/jmejia8/Metaheuristics.jl)
+[![codecov](https://codecov.io/gh/jmejia8/Metaheuristics.jl/branch/master/graph/badge.svg?token=5B5KhU17or)](https://codecov.io/gh/jmejia8/Metaheuristics.jl)
 [![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/stable/)
 [![Doc](https://img.shields.io/badge/docs-dev-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/dev/)
 [![DOI](https://zenodo.org/badge/108706706.svg)](https://zenodo.org/badge/latestdoi/108706706)

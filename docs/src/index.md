@@ -6,7 +6,7 @@ High performance algorithms for optimization purely coded in a high performance 
 
 
 [![Build Status](https://travis-ci.com/jmejia8/Metaheuristics.jl.svg?branch=master)](https://travis-ci.com/jmejia8/Metaheuristics.jl)
-[![Coverage Status](https://coveralls.io/repos/github/jmejia8/Metaheuristics.jl/badge.svg?branch=master)](https://coveralls.io/github/jmejia8/Metaheuristics.jl?branch=master)
+[![codecov](https://codecov.io/gh/jmejia8/Metaheuristics.jl/branch/master/graph/badge.svg?token=5B5KhU17or)](https://codecov.io/gh/jmejia8/Metaheuristics.jl)
 [![DOI](https://zenodo.org/badge/108706706.svg)](https://zenodo.org/badge/latestdoi/108706706)
 
 ## Introduction
