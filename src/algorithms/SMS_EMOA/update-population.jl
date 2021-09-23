@@ -3,30 +3,31 @@ include("calc-hv.jl")
 function update_population!(population, offspring, n_samples)
     push!(population, offspring)
 
-    # FIXME performance improvement required (update front)
+    # FIXME performance improvement required (yep, it is fast but could be faster)
     fast_non_dominated_sort!(population) 
 
     last_front = get_last_front(population)
 
-    compute_contribution!(population, last_front, n_samples)
+    # reset and update contribution in last front
+    update_contribution!(population, last_front, n_samples)
+
+    # element with minimum contribution
+    worst = argmin(get_contribution.(population[last_front]))
+
+    deleteat!(population, last_front[worst])
 end
 
-function compute_contribution!(population, last_front, n_samples)
+
+function compute_contribution(population, n_samples = 10_000)
     if isempty(population)
         # nothing to do
         return 
     end
 
-    # reset contribution
-    for sol in population
-        sol.crowding = Inf
-    end
-
     M = length(fval(population[1]))
 
-
     # objetive function values
-    Fs = fvals(population[last_front])
+    Fs = fvals(population)
     N = size(Fs, 1)
     ΔS = fill(Inf, N) 
 
@@ -41,14 +42,24 @@ function compute_contribution!(population, last_front, n_samples)
         ΔS = calculate_hv(Fs, nadir(population)*1.1, 1, n_samples)
     end
 
+    return ΔS
+
+end
+
+function update_contribution!(population, last_front, n_samples)
+
+    # reset contribution
+    for sol in population
+        sol.crowding = Inf
+    end
+
+    ΔS = compute_contribution(population[last_front], n_samples)
+
     # save contribution for further analysis
     for i in eachindex(ΔS)
         population[last_front[i]].crowding = ΔS[i]
     end
 
-
-    worst = argmin(ΔS)
-    deleteat!(population, last_front[worst])
 end
 
 get_contribution(sol::xFgh_indiv) = sol.crowding
