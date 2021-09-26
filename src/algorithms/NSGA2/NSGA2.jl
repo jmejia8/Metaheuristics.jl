@@ -7,7 +7,6 @@ mutable struct NSGA2 <: AbstractParameters
     p_cr::Float64
     η_m::Float64
     p_m::Float64
-    ε::Float64
 end
 
 """
@@ -69,12 +68,11 @@ function NSGA2(;
     p_cr = 0.9,
     η_m = 20,
     p_m = -1,
-    ε = eps(),
     information = Information(),
     options = Options(),
 )
 
-    parameters = NSGA2(N, promote( Float64(η_cr), p_cr, η_m, p_m, ε )...)
+    parameters = NSGA2(N, promote( Float64(η_cr), p_cr, η_m, p_m )...)
     Algorithm(
         parameters,
         information = information,

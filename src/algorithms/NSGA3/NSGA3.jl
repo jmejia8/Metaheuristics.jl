@@ -4,7 +4,6 @@ mutable struct NSGA3 <: AbstractParameters
     p_cr::Float64
     η_m::Float64
     p_m::Float64
-    ε::Float64
     partitions::Int
     reference_points::Array{Vector{Float64},1}
 end
@@ -67,14 +66,13 @@ function NSGA3(;
     p_cr = 0.9,
     η_m = 20,
     p_m = -1,
-    ε = eps(),
     partitions=12,
     reference_points=Vector{Float64}[],
     information = Information(),
     options = Options(),
 )
 
-    parameters = NSGA3(N, promote( Float64(η_cr), p_cr, η_m, p_m, ε )..., partitions,
+    parameters = NSGA3(N, promote( Float64(η_cr), p_cr, η_m, p_m )..., partitions,
                       reference_points)
     Algorithm(
         parameters,
