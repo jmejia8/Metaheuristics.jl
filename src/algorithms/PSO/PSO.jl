@@ -22,7 +22,7 @@ end
     )
 
 Parameters for Particle Swarm Optimization (PSO) algorithm: learning rates `C1` and `C2`,
-`N` is the population size and `ω` controlls the inertia weight. 
+`N` is the population size and `ω` controls the inertia weight. 
 # Example
 
 ```jldoctest

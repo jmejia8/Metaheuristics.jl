@@ -10,7 +10,7 @@ end
 
 
 """
-    function NSGA3(;
+    NSGA3(;
         N = 100,
         η_cr = 20,
         p_cr = 0.9,

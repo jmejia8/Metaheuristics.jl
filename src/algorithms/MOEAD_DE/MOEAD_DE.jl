@@ -19,7 +19,21 @@ mutable struct MOEAD_DE <: AbstractParameters
 end
 
 """
-    MOEAD_DE(weights)
+    MOEAD_DE(weights ;
+        F = 0.5,
+        CR = 1.0,
+        λ = Array{Vector{Float64}}[], # ref. points
+        η = 20,
+        p_m = -1.0,
+        T = round(Int, 0.2*length(weights)),
+        δ = 0.9,
+        n_r = round(Int, 0.02*length(weights)),
+        z = zeros(0),
+        B = Array{Int}[],
+        s1 = 0.01,
+        s2 = 20.0,
+        information = Information(),
+        options = Options())
 
 `MOEAD_DE` implements the original version of MOEA/D-DE. It uses the contraint handling method
 based on the sum of violations (for constrained optimizaton):

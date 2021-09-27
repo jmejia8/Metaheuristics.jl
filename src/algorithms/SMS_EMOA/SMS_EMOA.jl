@@ -11,7 +11,7 @@ end
 include("update-population.jl")
 
 """
-    function SMS_EMOA(;
+    SMS_EMOA(;
         N = 100,
         η_cr = 20,
         p_cr = 0.9,

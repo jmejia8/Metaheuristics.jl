@@ -10,7 +10,7 @@ mutable struct NSGA2 <: AbstractParameters
 end
 
 """
-    function NSGA2(;
+    NSGA2(;
         N = 100,
         η_cr = 20,
         p_cr = 0.9,

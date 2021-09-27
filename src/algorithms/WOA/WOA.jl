@@ -18,7 +18,7 @@ mutable struct WOA <: AbstractParameters
 end
 
 """
-  WOA(;N = 30, information = Information(), options = Options())
+    WOA(;N = 30, information = Information(), options = Options())
 
 Parameters for the Whale Optimization Algorithm. `N` is the population size (number of
 whales).

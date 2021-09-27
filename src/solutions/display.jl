@@ -4,7 +4,6 @@ function print_vector(io, vector)
     n_items_in_vector = 5
     if length(vector) < n_items_in_vector
         show(io, vector)
-        print(io, "\n")
         return
     end
 
@@ -19,38 +18,39 @@ function print_vector(io, vector)
     end
 
     @printf(io, "]")
-    print(io, "\n")
 end
 
 function Base.show(io::IO, solution::xf_indiv)
-    @printf(io, "f = %.4e\n", solution.f)
+    @printf(io, "(f = %.4e, ", solution.f)
     print(io, "x = ")
-
     print_vector(io, solution.x)
+    print(io, ")")
 
 end
 
 
 function Base.show(io::IO, solution::xfgh_indiv)
-    @printf(io, "f = %.4e\n", solution.f)
+    @printf(io, "(f = %.4e", solution.f)
 
-    print(io, "g = ")
+    print(io, ", g = ")
     print_vector(io, solution.g)
-    print(io, "h = ")
+    print(io, ", h = ")
     print_vector(io, solution.h)
-    print(io, "x = ")
+    print(io, ", x = ")
     print_vector(io, solution.x)
+    print(io, ")")
 end
 
 function Base.show(io::IO, solution::xFgh_indiv)
-    print(io, "f = ")
+    print(io, "(f = ")
     print_vector(io, solution.f)
-    print(io, "g = ")
+    print(io, ", g = ")
     print_vector(io, solution.g)
-    print(io, "h = ")
+    print(io, ", h = ")
     print_vector(io, solution.h)
-    print(io, "x = ")
+    print(io, ", x = ")
     print_vector(io, solution.x)
+    print(io, ")")
 
 end
 
@@ -120,7 +120,7 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
     if get(io, :compact, true)
         x = map(s -> s.f[1], population)
         y = map(s -> s.f[2], population)
-        plt = scatterplot(x, y, title="F space", xlabel="f_1", ylabel="f_2")
+        plt = scatterplot(x, y, title="F space", xlabel="f₁", ylabel="f₂")
         show(io, plt)
     else
         for sol in population

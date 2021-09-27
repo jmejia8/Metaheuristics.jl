@@ -3,7 +3,7 @@ mutable struct xf_indiv <: AbstractSolution # Single Objective
     f::Float64
 end
 
-mutable struct xfgh_indiv # Single Objective Constraied
+mutable struct xfgh_indiv <: AbstractSolution # Single Objective Constraied
     x::Vector{Float64}
     f::Float64
     g::Vector{Float64}
@@ -28,7 +28,7 @@ function xfgh_indiv(
     xfgh_indiv(x, f, g, h, sum_violations, sum_violations == 0.0)
 end
 
-mutable struct xFgh_indiv # Single Objective Constraied
+mutable struct xFgh_indiv <: AbstractSolution# Single Objective Constraied
     x::Vector{Float64}
     f::Vector{Float64}
     g::Vector{Float64}
@@ -58,8 +58,8 @@ end
 
 
 
-Solution = Union{xf_indiv, xfgh_indiv, xFgh_indiv}
-Population = Array{Solution, 1}
+const Solution = Union{xf_indiv, xfgh_indiv, xFgh_indiv}
+const Population = Array{Solution, 1}
 
 
 ############################################################
@@ -170,9 +170,14 @@ Get the position vector.
 """
 get_position(solution::Solution) = solution.x
 
-positions(population::Array) = 
-    isempty(population) ? zeros(0,0) : Array(hcat(map(get_position, population)...)')
+function positions(population::AbstractArray)
+    if isempty(population)
+        zeros(0,0)
+    end
 
+    D = length(get_position(population[1]))
+    [ get_position(sol)[i] for sol in population, i in 1:D]
+end
 """
     fval(solution)
 
@@ -183,13 +188,16 @@ sum_violations(solution::xfgh_indiv) = solution.sum_violations
 sum_violations(solution::xFgh_indiv) = solution.sum_violations
 
 
-fvals(population::AbstractArray) = begin
-    if !isempty(population) && typeof(population[1].f) <: Vector
-        return Array(hcat(map(fval, population)...)')
+function fvals(population::AbstractArray{xFgh_indiv})
+    if isempty(population)
+        return zeros(0, 0)
     end
-
-    return map(fval, population)
+    
+    M = length(fval(population[1]))
+    [ fval(sol)[i] for sol in population, i in 1:M]
 end
+
+fvals(population::AbstractArray) = fval.(population)
 
 
 
