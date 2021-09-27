@@ -24,6 +24,18 @@ import Random: seed!
         @test Metaheuristics.is_better(sol_feasible, sol_infeasible) # true
         @test !Metaheuristics.is_better(sol_infeasible, sol_feasible)# !false == true
 
+        # repair
+        x = collect(range(-10, 10, length=20))
+        bounds = [-ones(20) ones(20)]'
+        for repair in [Metaheuristics.reflected_back_to_bound!,
+                       Metaheuristics.replace_with_random_in_bounds!,
+                       Metaheuristics.wrap_to_bounds!,
+                       Metaheuristics.reset_to_violated_bounds!,
+                      ]
+            @test Metaheuristics.is_in_bounds(repair(x, bounds), bounds)
+        end
+        @test Metaheuristics.is_in_bounds(Metaheuristics.evo_boundary_repairer!(x, zeros(20), bounds), bounds)
+
     end 
 
     function test_problems()

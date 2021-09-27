@@ -3,7 +3,7 @@ function reflected_back_to_bound!(x, bounds)
         l = bounds[1, i]
         u = bounds[2, i]
         while !( l <= x[i] <= u )
-            @inbounds x[i] = x[i] < l ? 2l - x[i] : 2u - x[i]
+            x[i] = x[i] < l ? 2l - x[i] : 2u - x[i]
         end
 
     end
@@ -15,7 +15,7 @@ function replace_with_random_in_bounds!(x, bounds)
         l = bounds[1, i]
         u = bounds[2, i]
         if !( l <= x[i] <= u )
-            @inbounds x[i] = l + rand() * (u - l)
+            x[i] = l + rand() * (u - l)
         end
 
     end
@@ -28,7 +28,7 @@ function wrap_to_bounds!(x, bounds)
         u = bounds[2, i]
         if !( l <= x[i] <= u )
             ρ = u - l
-            @inbounds x[i] = x[i] < l ? u - (l - x[i]) % ρ : l + (x[i] - u) % ρ
+            x[i] = x[i] < l ? u - (l - x[i]) % ρ : l + (x[i] - u) % ρ
         end
 
     end
@@ -40,9 +40,9 @@ function reset_to_violated_bounds!(x, bounds)
         l = bounds[1, i]
         u = bounds[2, i]
         if l > x[i]
-            @inbounds x[i] = l
+            x[i] = l
         elseif x[i] > u 
-            @inbounds x[i] = u
+            x[i] = u
         end
 
     end
