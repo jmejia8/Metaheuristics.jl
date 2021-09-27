@@ -1,6 +1,6 @@
 # Metaheuristics
 
-High performance metaheuristics for optimization purely coded in Julia.
+High performance metaheuristics for global optimization.
 
 [![Build Status](https://travis-ci.com/jmejia8/Metaheuristics.jl.svg?branch=master)](https://app.travis-ci.com/jmejia8/Metaheuristics.jl)
 [![codecov](https://codecov.io/gh/jmejia8/Metaheuristics.jl/branch/master/graph/badge.svg?token=5B5KhU17or)](https://codecov.io/gh/jmejia8/Metaheuristics.jl)
@@ -37,6 +37,7 @@ julia> import Pkg; Pkg.add("Metaheuristics")
 - **NSGA-II**:  A fast and elitist multi-objective genetic algorithm: NSGA-II
 - **NSGA-III**: Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
   Nondominated Sorting Approach
+- **SMS-EMOA**: An EMO algorithm using the hypervolume measure as selection criterion
 
 ## Performance Indicators
 
@@ -45,8 +46,10 @@ julia> import Pkg; Pkg.add("Metaheuristics")
 - **IGD, IGD+**: Inverted Generational Distance (Plus)
 - **C-metric**: Covering Indicator
 - **HV**: Hypervolume
+- **Δₚ** (Delta p): Averaged Hausdorff distance
 - Spacing Indicator
 - [and more...](https://jmejia8.github.io/Metaheuristics.jl/stable/indicators/)
+
 
 
 ## Quick Start
@@ -98,6 +101,10 @@ For instance, you may use mainly two functions to obtain such approximation.
 @show minimizer(result)
 ```
 
+
+## Documentation
+
+See the [documentation](https://jmejia8.github.io/Metaheuristics.jl/stable/) for more details, examples and options.
 
 ## Contributing
 

@@ -1,6 +1,7 @@
 # Algorithms
 
-List of implemented metaheuristics.
+List of implemented metaheuristics. The algorithms were implemented based on the
+contributor's understanding of the algorithms detailed in the published paper.
 
 ## Evolutionary Centers Algorithm
 
@@ -86,6 +87,7 @@ NSGA3
 ```
 
 ## SMS-EMOA
+
 An EMO algorithm using the hypervolume measure as selection criterion [Emmerich2005](@cite).
 ```@docs
 SMS_EMOA
