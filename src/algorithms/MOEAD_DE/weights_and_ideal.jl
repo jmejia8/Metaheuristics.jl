@@ -32,7 +32,7 @@ end
 function g(fx, λ, z) 
     m = -Inf
     for i in eachindex(z)
-        @inbounds v = λ[i] * abs(fx[i] - z[i])
+        v = λ[i] * abs(fx[i] - z[i])
         if m < v
             m = v
         end

@@ -198,74 +198,31 @@ function update_state!(
 
     N = parameters.N
 
-    la = problem.bounds[1, :]
-    lb = problem.bounds[2, :]
-
     population = status.population
 
-    for i = 1:N
+    for i in 1:N
+        # solection of mating
         if rand() < parameters.δ
             P_idx = copy(parameters.B[i])
         else
             P_idx = collect(1:N)
         end
 
+        # reproduction
+        v = MOEAD_DE_reproduction(i, P_idx, population, parameters, problem)
+        # repair
+        replace_with_random_in_bounds!(v, problem.bounds)
+        h = create_solution(v, problem)
+        # update z
+        update_reference_point!(parameters.z, h)
+
+
         Vmin = minimum(sum_violations.(population[P_idx]))
         Vmax = maximum(sum_violations.(population[P_idx]))
         parameters.τ = Vmin + 0.3*(Vmax - Vmin)
 
-        # select participats
-        r1 = i
-        r2 = rand(P_idx)
-        while r1 == r2
-            r2 = rand(P_idx)
-        end
-
-        r3 = rand(P_idx)
-        while r3 == r1 || r3 == r2
-            r3 = rand(P_idx)
-        end
-
-        a = get_position(population[r1])# population[r1].x
-        b = get_position(population[r2])# population[r2].x
-        c = get_position(population[r3])# population[r3].x
-
-
-        # binomial crossover
-        v = zeros(D)
-
-        # binomial crossover
-        for j = 1:D
-            # binomial crossover
-            if rand() < CR
-                v[j] = a[j] + F * (b[j] - c[j])
-            else
-                v[j] = a[j]
-            end
-            # polynomial mutation
-
-            if rand() < parameters.p_m
-                r = rand()
-                if r < 0.5
-                    σ_k = (2.0 * r)^(1.0 / (parameters.η + 1)) - 1
-                else
-                    σ_k = 1 - (2.0 - 2.0 * r)^(1.0 / (parameters.η + 1))
-                end
-                v[j] = v[j] + σ_k * (lb[j] - la[j])
-            end
-        end
-
-        v = replace_with_random_in_bounds!(v, problem.bounds)
-
-        # instance child
-        h = create_solution(v, problem)
-        status.f_calls += 1
-
-        update_reference_point!(parameters.z, h)
-
-
+        # update solutions
         c = 0
-
         z = parameters.z
         shuffle!(P_idx)
         while c < parameters.n_r && !isempty(P_idx)
@@ -285,45 +242,56 @@ function update_state!(
         end
     end
 
+end
+
+function MOEAD_DE_reproduction(i, P_idx, population, parameters::MOEAD_DE, problem)
+    # select participats
+    r1 = i 
+    r2 = rand(P_idx)
+    while r1 == r2
+        r2 = rand(P_idx)
+    end
+
+    r3 = rand(P_idx)
+    while r3 == r1 || r3 == r2
+        r3 = rand(P_idx)
+    end
 
 
+    a = get_position(population[r1])# population[r1].x
+    b = get_position(population[r2])# population[r2].x
+    c = get_position(population[r3])# population[r3].x
 
+    # see /common/mutation.jl
+    MOEAD_DE_reproduction(a, b, c,
+                          parameters.F,
+                          parameters.CR,
+                          parameters.p_m,
+                          parameters.η,
+                          problem.bounds)
 end
 
 g_te_ap(gx, V, τ, s1, s2) = V < τ ? gx + s1*V^2 : gx + s1*τ^2 + s2*(V - τ)
 
 function is_better_constrained_MOEAD_DE(g1, g2, sol1, sol2, parameters)
-    V1 = (sol1.sum_violations)
-    V2 = (sol2.sum_violations)
+    CV1 = sum_violations(sol1)
+    CV2 = sum_violations(sol2)
 
-    if V1 == 0.0 && V2 == 0.0
+    if CV1 == 0.0 && CV2 == 0.0
         return g1 <= g2
     end
-    
-
 
     τ = parameters.τ
     s1 = parameters.s1
     s2 = parameters.s2
 
-    V1 = (sol1.sum_violations)
-    V2 = (sol2.sum_violations)
+    CV1 = (sol1.sum_violations)
+    CV2 = (sol2.sum_violations)
 
-    return g_te_ap(g1, V1, τ, s1, s2) <= g_te_ap(g2, V2, τ, s1, s2)
+    return g_te_ap(g1, CV1, τ, s1, s2) <= g_te_ap(g2, CV2, τ, s1, s2)
 end
 
 
-function stop_criteria_moead_de(
-    status::State,
-    parameters::MOEAD_DE,
-    problem::AbstractProblem,
-    information::Information,
-    options::Options,
-    args...;
-    kargs...
-    )
-    return status.iteration > options.iterations
-end
 function final_stage!(
     status::State,
     parameters::MOEAD_DE,
@@ -333,7 +301,6 @@ function final_stage!(
     args...;
     kargs...
     )
+
     status.final_time = time()
-    # status.best_sol = get_pareto_front(status.population, is_better_eca)
-    # @show length(status.best_sol)
 end
