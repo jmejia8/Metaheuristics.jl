@@ -44,12 +44,23 @@ function non_dominated_sort(pop)
     return rank
 end
 
-function get_fronts(population)
-    ranks = non_dominated_sort(population)
+"""
+    get_fronts(population, computed_ranks = true)
 
-    fronts = Vector{Int}[]
-    for r in sort(unique(ranks))
-        push!(fronts, findall( rr -> r==rr, ranks))
+Return each sub-front in an array. If `computed_ranks == true`, this method assumes that
+`fast_non_dominated_sort!(population)` has been called before.
+"""
+function get_fronts(population, computed_ranks = true)
+    if computed_ranks
+        ranks = [s.rank for s in population]
+    else
+        ranks = non_dominated_sort(population)
+    end
+
+    fronts = [Int[] for i in eachindex(unique(ranks))]
+
+    for (i, r) in enumerate(ranks)
+        push!(fronts[r], i)
     end
 
     return fronts

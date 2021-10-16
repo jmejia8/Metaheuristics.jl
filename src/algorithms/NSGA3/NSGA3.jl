@@ -127,7 +127,6 @@ function update_state!(
     # non-dominated sort, elitist removing via niching
     truncate_population_nsga3!(status.population,parameters.reference_points,parameters.N)
 
-    stop_criteria!(status, parameters, problem, information, options)
 end
 
 function truncate_population_nsga3!(population, reference_points, N)
