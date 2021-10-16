@@ -69,6 +69,46 @@ Algorithm(
 )
 end
 
+function update_state!(
+        status,
+        parameters::PSO,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
+    xGBest = get_position(status.best_sol)
+
+    # For each elements in population
+    for i in 1:parameters.N
+        x = get_position(parameters.flock[i])
+        xPBest = get_position(status.population[i])
+
+        parameters.v[i, :] = velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
+        x += parameters.v[i, :]
+        reset_to_violated_bounds!(x, problem.bounds)
+
+        sol = create_solution(x, problem, ε = options.h_tol)
+
+        if is_better(sol, status.population[i])
+            status.population[i] = sol
+
+            if is_better(sol, status.best_sol)
+                status.best_sol = sol
+                xGBest = get_position(status.best_sol)
+            end
+        end
+
+        parameters.flock[i] = sol
+
+        # stop condition
+        stop_criteria!(status, parameters, problem, information, options)
+        status.stop && break
+    end
+
+end
+
 function initialize!(
     status,
     parameters::PSO,
@@ -106,48 +146,6 @@ function initialize!(
     parameters.flock = status.population
 
     status
-
-end
-
-
-function update_state!(
-    status,
-    parameters::PSO,
-    problem::AbstractProblem,
-    information::Information,
-    options::Options,
-    args...;
-    kargs...
-       )
-    xGBest = status.best_sol.x
-    # For each elements in population
-    for i = 1:parameters.N
-        x = parameters.flock[i].x
-        xPBest = status.population[i].x
-
-        parameters.v[i, :] =
-        velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
-        x = reset_to_violated_bounds!(x + parameters.v[i, :], problem.bounds)
-        # x += parameters.v[i, :]
-
-        sol = create_solution(x, problem, ε = options.h_tol)
-        status.f_calls += 1
-
-        if is_better(sol, status.population[i])
-            status.population[i] = sol
-
-            if is_better(sol, status.best_sol)
-                status.best_sol = sol
-                xGBest = status.best_sol.x
-            end
-        end
-
-        parameters.flock[i] = sol
-
-        # stop condition
-        stop_criteria!(status, parameters, problem, information, options)
-        status.stop && break
-    end
 
 end
 
