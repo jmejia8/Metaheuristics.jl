@@ -48,3 +48,21 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     return cc1, cc2
 end
 
+function DE_crossover(x, u, CR)
+    D = length(x)
+    # binomial crossover
+    v = zeros(D)
+    j_rand = rand(1:D)
+
+    # binomial crossover
+    for j = 1:D
+        if rand() < CR || j == j_rand
+            v[j] = u[j]
+        else
+            v[j] = x[j]
+        end
+    end
+
+    return v
+end
+

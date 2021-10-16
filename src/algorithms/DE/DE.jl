@@ -1,5 +1,3 @@
-include("crossover_mutation.jl")
-
 mutable struct DE <: AbstractParameters
     N::Int
     F::Float64
@@ -87,7 +85,7 @@ function update_state!(
         kargs...
 )
     population = status.population
-    currentPop = copy(population)
+    current_pop = copy(population)
 
     F = parameters.F
     CR = parameters.CR
@@ -106,24 +104,21 @@ function update_state!(
     N = parameters.N
     strategy = parameters.strategy
 
-    xBest = status.best_sol.x
+    xBest = get_position(status.best_sol)
+    best_ind = 1
 
-    for i = 1:N
+    for i in 1:N
+        x = get_position(current_pop[i])
 
-        if strategy == :randToBest1
-            u = DE_mutation(currentPop, i, F, strategy, xBest)
-        else
-            u = DE_mutation(currentPop, i, F, strategy)
-        end
-        v = DE_crossover(currentPop[i].x, u, CR)
+        u = DE_mutation(current_pop, F, strategy, best_ind)
+        v = DE_crossover(x, u, CR)
 
         # instance child
         v = evo_boundary_repairer!(v, xBest, problem.bounds)
         h = create_solution(v, problem,ε=options.h_tol)
-        status.f_calls += 1
 
         # select survivals
-        if is_better(h, currentPop[i])
+        if is_better(h, current_pop[i])
             population[i] = h
 
             if is_better(h, status.best_sol)
