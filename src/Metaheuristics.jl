@@ -37,6 +37,10 @@ include("common/repair.jl")
 
 include("common/stop.jl")
 include("common/compare.jl")
+include("common/crossover.jl")
+include("common/mutation.jl")
+include("common/selection.jl")
+include("common/non-dominated-sorting.jl")
 
 
 include("TestProblems/TestProblems.jl")

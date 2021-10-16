@@ -1,5 +1,5 @@
-include("operators.jl")
-include("dominated_sort_crowding.jl")
+#include("operators.jl")
+include("crowding-distance.jl")
 
 mutable struct NSGA2 <: AbstractParameters
     N::Int
@@ -173,7 +173,17 @@ function final_stage!(
     )
     status.final_time = time()
 
-    #status.best_sol = get_pareto_front(status.population, is_better)
+end
 
+
+function tournament_selection(P, a = rand(1:length(P)))
+    # chose two different solutions at random
+    b = rand(1:length(P))
+    while a == b 
+        b = rand(1:length(P))
+    end
+
+    # perform selection
+    P[a].rank < P[b].rank || (P[a].rank == P[b].rank && P[a].crowding > P[b].crowding ) ? P[a] : P[b]
 end
 

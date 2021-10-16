@@ -1,15 +1,3 @@
-function tournament_selection(P, a = rand(1:length(P)))
-    # chose two different solutions at random
-    b = rand(1:length(P))
-    while a == b 
-        b = rand(1:length(P))
-    end
-
-    # perform selection
-    P[a].rank < P[b].rank || (P[a].rank == P[b].rank && P[a].crowding > P[b].crowding ) ? P[a] : P[b]
-end
-
-
 function gen_β(β, η, D, R)
     α = 2.0 .- β .^ (-  η - 1.0 )
     mask = R .<= 1.0 ./ α
@@ -60,30 +48,3 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     return cc1, cc2
 end
 
-function polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
-    do_mutation = rand(length(vector)) .< prob
-
-    xu = view(bounds, 2,do_mutation)
-    xl = view(bounds, 1,do_mutation)
-    x = view(vector, do_mutation)
-
-    δ1 = (x - xl) ./ (xu - xl)
-    δ2 = (xu - x) ./ (xu - xl)
-
-    D = length(xu)
-    R = rand(D)
-    mask = R .< 0.5
-    s = η+1.0
-    mut_pow = 1.0 / (η + 1.0)
-    δq = [ mask[i] ?
-            ^(2.0R[i] + (1. - 2.0R[i]) * ^(1.0 - δ1[i], s), mut_pow) - 1.0 :
-            1.0 - (2.0 * (1.0 - R[i]) + 2.0 * (R[i] - 0.5) * ^(1.0 - δ2[i], s))^mut_pow
-            for i in 1:D
-        ]
-
-    vector[do_mutation] = x + δq .* ( xu - xl)
-    # correct using reset to bound
-    #
-    vector
-
-end
