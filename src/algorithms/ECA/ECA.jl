@@ -1,4 +1,3 @@
-include("mass.jl")
 include("adaptive_parameters.jl")
 include("center_of_mass.jl")
 

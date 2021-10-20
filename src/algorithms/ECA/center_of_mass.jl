@@ -1,3 +1,36 @@
+################################################
+# Unconstrained
+################################################
+function fitnessToMass(fitness::Vector{Float64})
+    m = minimum(fitness)
+
+    if m < 0
+        fitness = 2 * abs(m) .+ fitness
+    end
+    
+    fitness = 2 * maximum(fitness) .- fitness
+
+    return fitness
+end
+
+"""
+    getMass(U, max_fitness, epsilon)
+    get the mass in a vector `m[i] = f[i] + 2*max_fitness*sum_vio[i] `, tolerance
+    in equality constraints are given by `epsilon`
+"""
+function getMass(U::Array{xf_indiv,1})
+    n, d = length(U), length(U[1].x)
+
+    fitness = zeros(Float64, n)
+
+    for i = 1:n
+        fitness[i] = U[i].f
+    end
+
+    return fitnessToMass(fitness)
+end
+
+
 function center(U, mass)
     d = length(U[1].x)
 
@@ -80,5 +113,34 @@ function crossover(
     end
 
     return y, tmp2
+end
+
+
+function ECA_operator(
+        population::AbstractArray{xf_indiv}, K, η_max;
+        i = rand(1:length(population)),
+        U = rand(population, K),
+        bounds = nothing
+    )
+
+    x = get_position(population[i])
+
+    # generate center of mass
+    c, u_worst, u_best = center(U)
+
+    # stepsize
+    η = η_max * rand()
+
+    # u: worst element in U
+    u = get_position(U[u_worst])
+
+    y = x .+ η .* (c .- u)
+    if isnothing(bounds)
+        return y
+    end
+
+    evo_boundary_repairer!(y, c, bounds)
+
+    return y
 end
 
