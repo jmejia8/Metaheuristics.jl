@@ -11,10 +11,12 @@ When you call the [`optimize`](@ref) function, the following steps are carried o
    to the parameters provided.
 2. Main optimization loop: while `status.stop == false` do
     - update population, parameters via `update_state!(status, parameters, problem, information, options)`, and 
-    - mainly set `status.stop = stop_criteria(status, information, options)`
-3. When the loop in step 2 beaks, then a final function is called `final_stage!` in order
-   to update or refine the final state, e.g., delete infeasible solutions in population,
+    - and `stop_criteria!(status, parameters, problem, information, options)` will change `status.stop`.
+3. When the loop in step 2 breaks, then a final function is called `final_stage!`
+   for the final update of the state, e.g., delete infeasible solutions in population,
    get non-dominated solutions, etc. 
+
+See the tutorial [Create Your Own Metaheuristic](@ref) for creating new metaheuristics.
 
 **Initialization**:
 
@@ -56,7 +58,7 @@ end
 **Final Step:**
 
 ```julia
-function final_stage(
+function final_stage!(
         status,
         parameters::AbstractParameters,
         problem,
@@ -68,6 +70,8 @@ function final_stage(
     return
 end
 ```
+
+
 
 ### Parameters
 
@@ -94,4 +98,3 @@ function XYZ(;N = 0, p_crossover = 0.9, p_mutation = 0.1)
 end
 ```
 
-**TODO** Tutorial for creating and updating existent metaheuristics in this package.
