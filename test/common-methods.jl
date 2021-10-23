@@ -22,6 +22,8 @@ import Random: seed!
         @test Metaheuristics.compare(sol_feasible, sol_infeasible) == 1
         @test Metaheuristics.compare(sol_infeasible, sol_feasible) == 2
         @test Metaheuristics.is_better(sol_feasible, sol_infeasible) # true
+        @test !Metaheuristics.is_feasible(sol_infeasible) # false
+        @test Metaheuristics.is_feasible(sol_feasible) # true
         @test !Metaheuristics.is_better(sol_infeasible, sol_feasible)# !false == true
 
         # repair

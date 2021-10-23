@@ -1,9 +1,14 @@
-mutable struct xf_indiv <: AbstractSolution # Single Objective
+abstract type AbstractUnconstrainedSolution <: AbstractSolution end
+abstract type AbstractConstrainedSolution   <: AbstractSolution end
+# multi-objective solution are constrained by default
+abstract type AbstractMultiObjectiveSolution <: AbstractConstrainedSolution end
+
+mutable struct xf_indiv <: AbstractUnconstrainedSolution # Single Objective
     x::Vector{Float64}
     f::Float64
 end
 
-mutable struct xfgh_indiv <: AbstractSolution # Single Objective Constraied
+mutable struct xfgh_indiv <: AbstractConstrainedSolution # Single Objective Constraied
     x::Vector{Float64}
     f::Float64
     g::Vector{Float64}
@@ -28,7 +33,7 @@ function xfgh_indiv(
     xfgh_indiv(x, f, g, h, sum_violations, sum_violations == 0.0)
 end
 
-mutable struct xFgh_indiv <: AbstractSolution# Single Objective Constraied
+mutable struct xFgh_indiv <: AbstractMultiObjectiveSolution# Single Objective Constraied
     x::Vector{Float64}
     f::Vector{Float64}
     g::Vector{Float64}
@@ -184,11 +189,25 @@ end
 Get the objective function value (fitness) of a solution.
 """
 fval(solution::Solution) = solution.f
-sum_violations(solution::xfgh_indiv) = solution.sum_violations
-sum_violations(solution::xFgh_indiv) = solution.sum_violations
+sum_violations(solution::T) where T <: AbstractConstrainedSolution = solution.sum_violations
+
+"""
+    gval(solution)
+
+Get the inequality constraints of a solution.
+"""
+gval(solution::T) where T <: AbstractConstrainedSolution = solution.g
 
 
-function fvals(population::AbstractArray{xFgh_indiv})
+"""
+    hval(solution)
+
+Get the equality constraints of a solution.
+"""
+hval(solution::T) where T <: AbstractConstrainedSolution = solution.h
+
+
+function fvals(population::AbstractArray{T}) where T <: AbstractMultiObjectiveSolution
     if isempty(population)
         return zeros(0, 0)
     end
@@ -197,9 +216,35 @@ function fvals(population::AbstractArray{xFgh_indiv})
     [ fval(sol)[i] for sol in population, i in 1:M]
 end
 
-fvals(population::AbstractArray) = fval.(population)
+fvals(population::AbstractArray{T}) where T <: AbstractSolution = fval.(population)
 
 
+function gvals(population::AbstractArray{T}) where T <: AbstractConstrainedSolution
+    if isempty(population)
+        return zeros(0, 0)
+    end
+    
+    M = length(gval(population[1]))
+    [ gval(sol)[i] for sol in population, i in 1:M]
+end
+
+
+function hvals(population::AbstractArray{T}) where T <: AbstractConstrainedSolution
+    if isempty(population)
+        return zeros(0, 0)
+    end
+    
+    M = length(hval(population[1]))
+    [ hval(sol)[i] for sol in population, i in 1:M]
+end
+
+
+"""
+    is_feasible(solution)
+Returns `true` if solution is feasible, otherwise returns `false`.
+"""
+is_feasible(solution::T) where T <: AbstractConstrainedSolution = solution.is_feasible
+is_feasible(solution::T) where T <: AbstractSolution = true
 
 """
     pareto_front(state::State)
@@ -212,5 +257,7 @@ pareto_front(st::State) = pareto_front(st.population)
     pareto_front(population::Array)
 Returns non-dominated solutions.
 """
-pareto_front(population::Array) = fvals(get_non_dominated_solutions(population))
+function pareto_front(population::AbstractArray{T}) where T <: AbstractMultiObjectiveSolution
+    return fvals(get_non_dominated_solutions(population))
+end
 

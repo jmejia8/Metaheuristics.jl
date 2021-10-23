@@ -64,7 +64,7 @@ julia> PerformanceIndicators.igd_plus(front, front)
 """
 module PerformanceIndicators
 
-import ..State, ..fvals, ..norm, ..xFgh_indiv, ..fval, ..compare, ..mean
+import ..State, ..fvals, ..norm, ..AbstractMultiObjectiveSolution, ..fval, ..compare, ..mean
 import ..get_non_dominated_solutions
 
 include("hypervolume.jl")
@@ -118,22 +118,21 @@ function generational_distance(front, true_pareto_front; p = 1, inverted = false
 end
 
 
-function generational_distance(front::Union{Array{xFgh_indiv}, State},
-						       true_pareto_front::Union{Array{xFgh_indiv}, State};
+function generational_distance(front::Union{Array{T}, State},
+						       true_pareto_front::Array{T};
 								p = 1,
 								inverted = false,
 								plus = false
-		)
+		) where T <: AbstractMultiObjectiveSolution
 	generational_distance(fvals(front), fvals(true_pareto_front); p=p,inverted=inverted,plus=plus)
 end
 
 
-function generational_distance(front::Union{Array{xFgh_indiv}, State},
-						       true_pareto_front;
-								p = 1,
-								inverted = false,
-								plus = false
-		)
+function generational_distance(front::Union{Array{T}, State}, true_pareto_front;
+		p = 1,
+		inverted = false,
+		plus = false
+		) where T <: AbstractMultiObjectiveSolution
 	generational_distance(fvals(front), (true_pareto_front); p=p,inverted=inverted,plus=plus)
 end
 
@@ -222,8 +221,8 @@ function spacing(A::Array{Array{Float64,1},1})
 end
 
 
-spacing(A::Array{xFgh_indiv}) = spacing( fval.(A) )
-spacing(A::State{xFgh_indiv}) = spacing(A.population)
+spacing(A::Array{T}) where T <: AbstractMultiObjectiveSolution = spacing( fval.(A) )
+spacing(A::State{T}) where T <: AbstractMultiObjectiveSolution = spacing(A.population)
 spacing(A::Matrix) = spacing([A[i,:] for i in 1:size(A,1)])
 
 """
@@ -258,9 +257,9 @@ function covering(A::Array{Vector{T}}, B::Array{Vector{T}}) where T <: Real
     
 end
 
-covering(A::Vector{xFgh_indiv}, B::Vector{xFgh_indiv}) = covering(fval.(A), fval.(B))
+covering(A::Vector{T}, B::Vector{T}) where T <: AbstractMultiObjectiveSolution = covering(fval.(A), fval.(B))
 
-function covering(A::State{xFgh_indiv}, B::State{xFgh_indiv})
+function covering(A::State{T}, B::State{T}) where T <: AbstractMultiObjectiveSolution
 	A_non_dominated = get_non_dominated_solutions(A.population)
 	B_non_dominated = get_non_dominated_solutions(B.population)
 	
@@ -321,8 +320,8 @@ function hypervolume(front::Array{Vector{T}}, reference_point::Vector) where T <
 	return HyperVolume.hv(relevantPoints, reference_point)
 end
 
-hypervolume(front::Vector{xFgh_indiv}, reference_point::Vector{xFgh_indiv}) = hypervolume(fval.(front), fval(reference_point))
-hypervolume(front::Vector{xFgh_indiv}, reference_point::Vector) = hypervolume(fval.(front), reference_point)
+hypervolume(front::Vector{T}, reference_point::Vector{T}) where T <: AbstractMultiObjectiveSolution = hypervolume(fval.(front), fval(reference_point))
+hypervolume(front::Vector{T}, reference_point::Vector) where T <: AbstractMultiObjectiveSolution = hypervolume(fval.(front), reference_point)
 
 function hypervolume(front::Matrix, reference_point::Vector)
 	front_ = [ front[i,:] for i in 1:size(front,1) ]
@@ -362,7 +361,7 @@ function deltap(front::Array{Vector{T}}, true_pareto_front::Array{Vector{T}}; p 
 end
 
 
-deltap(front::Vector{xFgh_indiv}, true_pareto_front::Vector{xFgh_indiv}; kargs...) = deltap(fval.(front), fval.(true_pareto_front); kargs...)
+deltap(front::Vector{T}, true_pareto_front::Vector{T}; kargs...) where T <: AbstractMultiObjectiveSolution = deltap(fval.(front), fval.(true_pareto_front); kargs...)
 
 function deltap(front::AbstractMatrix, true_pareto_front::AbstractMatrix; kargs...)
 	front_ = [ front[i,:] for i in 1:size(front,1) ]
