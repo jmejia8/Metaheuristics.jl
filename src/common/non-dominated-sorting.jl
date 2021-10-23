@@ -1,7 +1,7 @@
 """
     non_dominated_sort(population)
 
-Return the non-dominated rank from population.
+Return a vector of integers `r` containing in `r[i]` the rank for `population[i]`.
 """
 function non_dominated_sort(pop)
     n = length(pop)
@@ -67,6 +67,12 @@ function get_fronts(population, computed_ranks = true)
 end
 
 
+"""
+    fast_non_dominated_sort!(population)
+
+Sort population using the fast non dominated sorting algorithm. Note that `s.rank` is
+updated for each solution `s ∈ population`.
+"""
 function fast_non_dominated_sort!(pop)
     rank = non_dominated_sort(pop)
 
@@ -79,6 +85,12 @@ function fast_non_dominated_sort!(pop)
 end
 
 
+"""
+    get_non_dominated_solutions_perm(population)
+
+Return a vector of integers `v` such that `population[v]` are the non dominated
+solutions contained in `population`.
+"""
 function get_non_dominated_solutions_perm(population)
     ids = Int[1]
     n = length(population)
@@ -109,6 +121,11 @@ function get_non_dominated_solutions_perm(population)
 end
 
 
+"""
+    get_non_dominated_solutions(population)
+
+Return the non dominated solutions contained in `population`.
+"""
 function get_non_dominated_solutions(population)
     return population[get_non_dominated_solutions_perm(population)]
 end

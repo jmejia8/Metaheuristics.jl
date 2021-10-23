@@ -1,3 +1,7 @@
+"""
+    binary_tournament(population)
+Apply binary tournament to obtain a solution from from population.
+"""
 function binary_tournament(population) 
     a, b = rand(1:length(P), 2)
 

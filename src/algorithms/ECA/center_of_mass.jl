@@ -116,6 +116,12 @@ function crossover(
 end
 
 
+"""
+    ECA_operator(population, K, η_max)
+
+Compute a solution using ECA variation operator, `K` is the number of solutions used to
+calculate the center of mass and `η_max` is the maximum stepsize.
+"""
 function ECA_operator(
         population::AbstractArray{xf_indiv}, K, η_max;
         i = rand(1:length(population)),
