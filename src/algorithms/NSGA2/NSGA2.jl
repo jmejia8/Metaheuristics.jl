@@ -1,7 +1,9 @@
-#include("operators.jl")
 include("crowding-distance.jl")
 
-mutable struct NSGA2 <: AbstractParameters
+abstract type AbstractNSGA <: AbstractParameters end
+
+# Abstracts for algorithm parameter
+mutable struct NSGA2 <: AbstractNSGA
     N::Int
     η_cr::Float64
     p_cr::Float64
@@ -85,7 +87,7 @@ end
 
 function update_state!(
     status::State,
-    parameters::NSGA2,
+    parameters::AbstractNSGA,
     problem::AbstractProblem,
     information::Information,
     options::Options,
@@ -96,46 +98,46 @@ function update_state!(
 
     I = randperm(parameters.N)
     J = randperm(parameters.N)
-    Q = typeof(status.population[1])[]
+    Q = empty(status.population)
     for i = 1:2:parameters.N
 
         pa = tournament_selection(status.population, I[i])
         pb = tournament_selection(status.population, J[i])
 
-        # crossover
-        c1, c2 = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
-                              parameters.η_cr, parameters.p_cr)
-       
-        # mutation
-        polynomial_mutation!(c1,problem.bounds,parameters.η_m, parameters.p_m)
-        polynomial_mutation!(c2,problem.bounds,parameters.η_m, parameters.p_m)
-       
-        # rapair solutions if necesary
-        reset_to_violated_bounds!(c1, problem.bounds)
-        reset_to_violated_bounds!(c2, problem.bounds)
-
-        # evaluate offspring
-        offspring1 = create_solution(c1, problem)
-
-        offspring2 = create_solution(c2, problem) 
+        offspring1, offspring2 = reproduction(pa, pb, parameters, problem)
        
         # save offsprings
-        push!(Q, offspring1)
-        push!(Q, offspring2)
+        push!(Q, offspring1, offspring2)
     end
 
     status.population = vcat(status.population, Q)
 
     # non-dominated sort, crowding distance, elitist removing
-    truncate_population!(status.population, parameters.N)
+    environmental_selection!(status.population, parameters)
 
-    stop_criteria!(status, parameters, problem, information, options)
 end
 
+function reproduction(pa, pb, parameters::AbstractNSGA, problem)
+    # crossover and mutation
+    c1, c2 = GA_reproduction(get_position(pa),
+                             get_position(pb),
+                             problem.bounds;
+                             η_cr = parameters.η_cr,
+                             p_cr = parameters.p_cr,
+                             η_m = parameters.η_m,
+                             p_m = parameters.p_m)
+
+    # evaluate offspring
+    create_solution(c1, problem), create_solution(c2, problem) 
+end
+
+function environmental_selection!(population, parameters::AbstractNSGA)
+    truncate_population!(population, parameters.N)
+end
 
 function initialize!(
     status,
-    parameters::NSGA2,
+    parameters::AbstractNSGA,
     problem::AbstractProblem,
     information::Information,
     options::Options,
@@ -164,7 +166,7 @@ end
 
 function final_stage!(
     status::State,
-    parameters::NSGA2,
+    parameters::AbstractNSGA,
     problem::AbstractProblem,
     information::Information,
     options::Options,

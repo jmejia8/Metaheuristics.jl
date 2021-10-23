@@ -1,3 +1,8 @@
+"""
+    polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
+
+Polynomial Mutation applied to a vector of real numbers.
+"""
 function polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
     do_mutation = rand(length(vector)) .< prob
 

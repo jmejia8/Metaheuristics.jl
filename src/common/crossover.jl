@@ -6,6 +6,11 @@ function gen_β(β, η, D, R)
     βq
 end
 
+"""
+    SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
+
+Simulated binomial crossover for given two `Vectors{Real}`.
+"""
 function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     xu = view(bounds, 2,:)
     xl = view(bounds, 1,:)
@@ -48,6 +53,12 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     return cc1, cc2
 end
 
+"""
+    DE_crossover(x, u, CR)
+
+Binomial crossover between x and u for Differential Evolution with probability CR, i.e.,
+`v[j] = u[j]` if `rand() < CR`, otherwise `v[j] = x[j]`. Return `v`.
+"""
 function DE_crossover(x, u, CR)
     D = length(x)
     # binomial crossover

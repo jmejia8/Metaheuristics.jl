@@ -40,6 +40,7 @@ include("common/compare.jl")
 include("common/crossover.jl")
 include("common/mutation.jl")
 include("common/selection.jl")
+include("common/generic-reproduction.jl")
 include("common/non-dominated-sorting.jl")
 
 
