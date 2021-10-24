@@ -66,29 +66,34 @@ fval
 ```
 
 ```@docs
-gval
+Metaheuristics.gval
 ```
 
 ```@docs
-hval
+Metaheuristics.hval
 ```
 
 ```@docs
-is_feasible
+Metaheuristics.is_feasible
 ```
 
 ```@docs
-is_better
-```
-
-
-```@docs
-dominates
+Metaheuristics.is_better
 ```
 
 
 ```@docs
-compare
+Metaheuristics.dominates
+```
+
+
+```@docs
+Metaheuristics.compare
+```
+
+
+```@docs
+Metaheuristics.gen_initial_state
 ```
 
 ## Variation Operators
@@ -156,7 +161,7 @@ ideal
 ```
 
 ```@docs
-pareto_front(st::Array)
+Metaheuristics.pareto_front(st::Array)
 ```
 
 

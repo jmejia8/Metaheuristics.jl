@@ -1,3 +1,10 @@
+"""
+    gen_initial_state(problem,parameters,information,options)
+
+Generate an initial state, i.e., compute uniformly distributed random vectors in bounds,
+after that are evaluated in objective function. This method require that `parameters.N`
+is valid attribute.
+"""
 gen_initial_state(problem,parameters,information,options,status::State{Any}) = gen_initial_state(problem,parameters,information,options)
 
 
