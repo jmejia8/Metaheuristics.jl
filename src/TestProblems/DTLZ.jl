@@ -14,6 +14,17 @@ function DTLZ_hypersphere!(fx, x; α = 1)
     return fx
 end
 
+function DTLZ_hyperplane!(fx, x)
+    m = length(fx)
+    for i in 1:m
+        fx[i] *= prod(x[1:m-i])
+        if i > 1
+            fx[i] *= 1 - x[1+m - i]
+        end
+    end
+    fx
+end
+
 function DTLZ_g1(x, m)
     y = view(x, m:length(x)) .- 0.5
     return 100*( length(y) + sum( y.^2 - cos.(20π*y) ))
@@ -23,6 +34,16 @@ function DTLZ_g2(x, m)
     return sum( (view(x, m:length(x)) .- 0.5).^2 )
 end
 
+
+function DTLZ1_f(x, m = 3)
+    g = DTLZ_g1(x, m)
+    D = length(x)
+
+    fx = fill(0.5*(1 + g), m)
+    DTLZ_hyperplane!(fx, x)
+
+    return fx, [0.0], [0.0]
+end
 
 
 """
@@ -41,20 +62,6 @@ Main properties:
 - multifrontal
 """
 function DTLZ1(m=3, ref_dirs = gen_ref_dirs(m, 12))
-    f(x,m=m) = begin
-        g = DTLZ_g1(x, m)
-        D = length(x)
-
-        fx = fill(0.5*(1 + g), m)
-        for i in 1:m
-            fx[i] *= prod(x[1:m-i])
-            if i > 1
-                fx[i] *= 1 - x[1+m - i]
-            end
-        end
-
-        return fx, [0.0], [0.0]
-    end
 
     D = 10 + m - 1
 
@@ -63,9 +70,17 @@ function DTLZ1(m=3, ref_dirs = gen_ref_dirs(m, 12))
     pf = 0.5ref_dirs
     pareto_set = [ generateChild(zeros(0), (fx, [0.0], [0.0])) for fx in pf ]
 
-    return f, bounds, pareto_set
+    return DTLZ1_f, bounds, pareto_set
 end
 
+
+function DTLZ2_f(x, m = 3)
+    g = DTLZ_g2(x, m)
+    fx = fill(1.0 + g, m)
+    DTLZ_hypersphere!(fx, x)
+
+    return fx, [0.0], [0.0]
+end
 
 """
     DTLZ2(m = 3, ref_dirs = gen_ref_dirs(m, 12))
@@ -83,13 +98,6 @@ Main properties:
 - unifrontal
 """
 function DTLZ2(m=3, ref_dirs = gen_ref_dirs(m, 12))
-    f(x,m=m) = begin
-        g = DTLZ_g2(x, m)
-        fx = fill(1.0 + g, m)
-        DTLZ_hypersphere!(fx, x)
-
-        return fx, [0.0], [0.0]
-    end
 
     D = 10 + m - 1
 
@@ -98,9 +106,17 @@ function DTLZ2(m=3, ref_dirs = gen_ref_dirs(m, 12))
     pf = generic_sphere(ref_dirs)
     pareto_set = [ generateChild(zeros(0), (fx, [0.0], [0.0])) for fx in pf ]
 
-    return f, bounds, pareto_set
+    return DTLZ2_f, bounds, pareto_set
 end
 
+
+function DTLZ3_f(x,m=3)
+    g = DTLZ_g1(x, m)
+    fx = fill(1 + g, m)
+    DTLZ_hypersphere!(fx, x)
+
+    return fx, [0.0], [0.0]
+end
 
 """
     DTLZ3(m = 3, ref_dirs = gen_ref_dirs(m, 12))
@@ -118,13 +134,6 @@ Main properties:
 - multifrontal
 """
 function DTLZ3(m = 3, ref_dirs = gen_ref_dirs(m, 12))
-    f(x,m=m) = begin
-        g = DTLZ_g1(x, m)
-        fx = fill(1 + g, m)
-        DTLZ_hypersphere!(fx, x)
-
-        return fx, [0.0], [0.0]
-    end
 
     D = 10 + m - 1
 
@@ -133,9 +142,17 @@ function DTLZ3(m = 3, ref_dirs = gen_ref_dirs(m, 12))
     pf = generic_sphere(ref_dirs)
     pareto_set = [ generateChild(zeros(0), (fx, [0.0], [0.0])) for fx in pf ]
 
-    return f, bounds, pareto_set
+    return DTLZ3_f, bounds, pareto_set
 end
 
+
+function DTLZ4_f(x,m=3)
+    g = DTLZ_g2(x, m)
+    fx = fill(1.0 + g, m)
+    DTLZ_hypersphere!(fx, x; α = 100)
+
+    return fx, [0.0], [0.0]
+end
 
 """
     DTLZ4(m = 3, ref_dirs = gen_ref_dirs(m, 12))
@@ -153,13 +170,6 @@ Main properties:
 - unifrontal
 """
 function DTLZ4(m = 3, ref_dirs = gen_ref_dirs(m, 12))
-    f(x,m=m) = begin
-        g = DTLZ_g2(x, m)
-        fx = fill(1.0 + g, m)
-        DTLZ_hypersphere!(fx, x; α = 100)
-
-        return fx, [0.0], [0.0]
-    end
 
     D = 10 + m - 1
 
@@ -168,10 +178,20 @@ function DTLZ4(m = 3, ref_dirs = gen_ref_dirs(m, 12))
     pf = generic_sphere(ref_dirs)
     pareto_set = [ generateChild(zeros(0), (fx, [0.0], [0.0])) for fx in pf ]
 
-    return f, bounds, pareto_set
+    return DTLZ4_f, bounds, pareto_set
 end
 
+function DTLZ5_f(x,m = 3)
+    g = DTLZ_g2(x, m)
+    fθ = fill(1.0 + g, m)
+    θ = @. 1 / (2*(1 + g)) * (1 + 2g * x[1:m-1] )
+    θ[1] = x[1]
 
+
+    DTLZ_hypersphere!(fθ, θ)
+
+    return fθ, [0.0], [0.0]
+end
 
 """
     DTLZ5(m = 3)
@@ -185,17 +205,6 @@ with `n_solutions`.
 
 """
 function DTLZ5(m = 3)
-    f(x,m=m) = begin
-        g = DTLZ_g2(x, m)
-        fθ = fill(1.0 + g, m)
-        θ = @. 1 / (2*(1 + g)) * (1 + 2g * x[1:m-1] )
-        θ[1] = x[1]
-
-
-        DTLZ_hypersphere!(fθ, θ)
-
-        return fθ, [0.0], [0.0]
-    end
 
     D = 10 + m - 1
 
@@ -208,15 +217,27 @@ function DTLZ5(m = 3)
         for i in eachindex(ref_dirs)
             X[i,1:2] = ref_dirs[i]
         end
-        pareto_set = [ generateChild(X[i,:], f(X[i,:])) for i in eachindex(ref_dirs) ]
-        
+        pareto_set = [ generateChild(X[i,:], DTLZ5_f(X[i,:])) for i in eachindex(ref_dirs) ]
+
     else
         pareto_set = []
     end
-    
-    return f, bounds, pareto_set
+
+    return DTLZ5_f, bounds, pareto_set
 end
 
+
+function DTLZ6_f(x,m=3)
+    g = sum(x[m:end] .^ 0.1)
+    fθ = fill(1.0 + g, m)
+    θ = @. 1 / (2*(1 + g)) * (1 + 2g * x[1:m-1] )
+    θ[1] = x[1]
+
+
+    DTLZ_hypersphere!(fθ, θ)
+
+    return fθ, [0.0], [0.0]
+end
 
 """
     DTLZ6(m = 3)
@@ -230,17 +251,6 @@ with `n_solutions`.
 
 """
 function DTLZ6(m = 3)
-    f(x,m=m) = begin
-        g = sum(x[m:end] .^ 0.1)
-        fθ = fill(1.0 + g, m)
-        θ = @. 1 / (2*(1 + g)) * (1 + 2g * x[1:m-1] )
-        θ[1] = x[1]
-
-
-        DTLZ_hypersphere!(fθ, θ)
-
-        return fθ, [0.0], [0.0]
-    end
 
     D = 10 
 
@@ -253,11 +263,110 @@ function DTLZ6(m = 3)
         for i in eachindex(ref_dirs)
             X[i,1:2] = ref_dirs[i]
         end
-        pareto_set = [ generateChild(X[i,:], f(X[i,:])) for i in eachindex(ref_dirs) ]
-        
+        pareto_set = [ generateChild(X[i,:], DTLZ6_f(X[i,:])) for i in eachindex(ref_dirs) ]
+
     else
         pareto_set = []
     end
 
-    return f, bounds, pareto_set
+    return DTLZ6_f, bounds, pareto_set
+end
+
+#=
+####################################################################################
+####################################################################################
+####################################################################################
+#                Constrained DTLZ
+####################################################################################
+####################################################################################
+####################################################################################
+=#
+
+function C1_DTLZ1_f(x, m = 3)
+    g = DTLZ_g1(x, m)
+    D = length(x)
+
+    fx = fill(0.5*(1 + g), m)
+    DTLZ_hyperplane!(fx, x)
+
+
+    c = fx[end]/0.6 + sum(fx[1:end-1]/0.5) - 1;
+    return fx, [c], [0.0]
+end
+
+
+"""
+    C1_DTLZ1(m = 3, ref_dirs = gen_ref_dirs(m, 12))
+
+C1_DTLZ1 returns `(f::function, bounds::Matrix{Float64}, pareto_set::Array{xFgh_indiv})`
+where `f` is the objective function and `pareto_set` is an array with optimal Pareto solutions
+with `n_solutions`.
+
+### Parameters
+- `m` number of objective functions
+- `ref_dirs` number of Pareto solutions (default: Das and Dennis' method).
+
+Main properties:
+- convex
+- multifrontal
+- constrained type 1
+"""
+function C1_DTLZ1(m=3, ref_dirs = gen_ref_dirs(m, 12))
+
+    D = 10 + m - 1
+
+    bounds = Array([zeros(D) ones(D)]')
+
+    pf = 0.5ref_dirs
+    pareto_set = [ generateChild(zeros(0), (fx, [0.0], [0.0])) for fx in pf ]
+
+    return C1_DTLZ1_f, bounds, pareto_set
+end
+
+
+function C1_DTLZ3_f(x,m=3)
+    g = DTLZ_g1(x, m)
+    fx = fill(1 + g, m)
+    DTLZ_hypersphere!(fx, x)
+
+    if m == 2
+        r = 6
+    elseif m <= 3
+        r = 9
+    elseif m <= 8
+        r = 12.5
+    else
+        r = 15
+    end
+    c = -(sum(fx .^ 2) - 16) * (sum(fx .^ 2) - r^2);
+
+    return fx, [c], [0.0]
+end
+
+"""
+    C1_DTLZ3(m = 3, ref_dirs = gen_ref_dirs(m, 12))
+
+DTLZ3 returns `(f::function, bounds::Matrix{Float64}, pareto_set::Array{xFgh_indiv})`
+where `f` is the objective function and `pareto_set` is an array with optimal Pareto solutions
+with `n_solutions`.
+
+### Parameters
+- `m` number of objective functions
+- `ref_dirs` number of Pareto solutions (default: Das and Dennis' method).
+
+Main properties:
+- nonconvex
+- multifrontal
+- constrained type 1
+"""
+function C1_DTLZ3(m = 3, ref_dirs = gen_ref_dirs(m, 12))
+
+    D = 10 + m - 1
+
+    bounds = Array([zeros(D) ones(D)]')
+
+    pf = generic_sphere(ref_dirs)
+    pareto_set = [ generateChild(zeros(0), (fx, [0.0], [0.0])) for fx in pf ]
+
+    return C1_DTLZ3_f, bounds, pareto_set
 end
