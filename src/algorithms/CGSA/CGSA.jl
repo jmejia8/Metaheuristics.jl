@@ -152,7 +152,11 @@ function initialize!(
     # Postions
     parameters.X = isempty(parameters.X) ? positions(status) : parameters.X
     # function values
-    parameters.fitness = isempty(parameters.fitness) ? fvals(status) : parameters.fitness
+    if isempty(parameters.fitness)
+
+        parameters.fitness = fval.(status.population)
+    end
+    
 
     return status
 

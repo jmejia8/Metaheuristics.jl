@@ -94,57 +94,57 @@ compare
 ## Variation Operators
 
 ```@docs
-SBX_crossover
+Metaheuristics.SBX_crossover
 ```
 
 
 ```@docs
-ECA_operator
+Metaheuristics.ECA_operator
 ```
 
 ```@docs
-DE_crossover
+Metaheuristics.DE_crossover
 ```
 
 ```@docs
-polynomial_mutation!
+Metaheuristics.polynomial_mutation!
 ```
 
 ```@docs
-DE_mutation
+Metaheuristics.DE_mutation
 ```
 
 ```@docs
-MOEAD_DE_reproduction
+Metaheuristics.MOEAD_DE_reproduction
 ```
 
 ```@docs
-binary_tournament
-```
-
-
-```@docs
-GA_reproduction
+Metaheuristics.binary_tournament
 ```
 
 
 ```@docs
-GA_reproduction_half
+Metaheuristics.GA_reproduction
+```
+
+
+```@docs
+Metaheuristics.GA_reproduction_half
 ```
 
 ## Population
 
 
 ```@docs
-get_best
+Metaheuristics.get_best
 ```
 
 ```@docs
-argworst
+Metaheuristics.argworst
 ```
 
 ```@docs
-argbest
+Metaheuristics.argbest
 ```
 
 ```@docs
@@ -161,24 +161,24 @@ pareto_front(st::Array)
 
 
 ```@docs
-non_dominated_sort
+Metaheuristics.non_dominated_sort
 ```
 
 ```@docs
-get_fronts
+Metaheuristics.get_fronts
 ```
 
 ```@docs
-fast_non_dominated_sort!
+Metaheuristics.fast_non_dominated_sort!
 ```
 
 ```@docs
-get_non_dominated_solutions_perm
+Metaheuristics.get_non_dominated_solutions_perm
 ```
 
 
 ```@docs
-get_non_dominated_solutions
+Metaheuristics.get_non_dominated_solutions
 ```
 
 

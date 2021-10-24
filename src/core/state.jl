@@ -120,7 +120,7 @@ positions(s::State) = positions(s.population)
 If `state.population` has `N` solutions, then returns a `Vector` with the 
 objective function values from items in `state.population`.
 """
-fvals(s::State) = fvals(s.population)
+fvals(s::State{T}) where T <: AbstractSolution = fvals(s.population)
 
 """
     nfes(state)
