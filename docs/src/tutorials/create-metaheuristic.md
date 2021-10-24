@@ -23,7 +23,7 @@ import Metaheuristics: reset_to_violated_bounds!
 
 ## Step 1: The Parameters
 
-Define the parameters for your genetic algorithm.
+Due to we are creating a simple Genetic Algorithm (GA), let's define the parameters for the GA.
 
 ```julia
 # structure with algorithm parameters
@@ -55,6 +55,9 @@ end
 ## Step 2: Initialization
 
 Initialize population, parameters and settings before the optimization process begins.
+The most common initialization method is generating uniformly distribution random 
+number in provided bounds. Here, [`gen_initial_state`](@ref) for that purpose. Note
+that [`gen_initial_state`](@ref) require that `parameters.N` is defined.
 
 ```julia
 function initialize!(
@@ -83,7 +86,8 @@ end
 
 ## Step 3: Evolve Population
 
-Now, it is time to update (evolve) your population.
+Now, it is time to update (evolve) your population by using genetic operators: selection,
+crossover, mutation and environmental selection.
 
 ```julia
 function update_state!(
@@ -100,6 +104,7 @@ function update_state!(
     N = parameters.N
 
     for i in 1:N
+        # selection
         parent_1 = get_position(rand(population))
         parent_2 = get_position(rand(population))
 
@@ -117,6 +122,7 @@ function update_state!(
         push!(population, offspring)
     end
 
+    # environmental selection
     sort!(population, lt = is_better, alg=PartialQuickSort(N))
     deleteat!(population, N+1:length(population))
 
@@ -125,7 +131,8 @@ end
 
 ## Step 4: After Evolution
 
-This step is optional, but here is used to get the elite solution.
+This step is optional, but here is used to get the elite solution aka the best solution
+found be our GA.
 
 ```julia
 function final_stage!(
@@ -147,7 +154,7 @@ end
 
 ## Step 5: Time to Optimize
 
-Now, we are able to optimize using our genetic algorithm.
+Now, we are able to solve and optimization problem using our genetic algorithm.
 
 
 !!! compat "Optimization Problems"
@@ -159,10 +166,11 @@ Now, we are able to optimize using our genetic algorithm.
 
 ```julia
 function main()
+    # test problem
     f, bounds, _ = Metaheuristics.TestProblems.rastrigin()
 
+    # optimize and get the results
     res = optimize(f, bounds, MyGeneticAlgorithm())
-
     display(res)
 end
 
@@ -185,6 +193,6 @@ See [`optimize`](@ref) for more information.
 
 ### Exercises
 
-1. Test your algorithm with a multi-objective optimization problem. Suggestion: change `rastrigin`
+1. Test your algorithm on a multi-objective optimization problem. Suggestion: change `rastrigin`
    by `ZDT1`.
 2. Implement an interest metaheuristic and make a PR to the [Metaheuristics.jl](https://github.com/jmejia8/Metaheuristics.jl) in github.

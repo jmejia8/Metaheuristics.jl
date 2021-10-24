@@ -1,5 +1,8 @@
 # Visualization
 
+
+![Soving ZDT6 using SMS-EMOA in Julia](figs/ZDT6.gif)
+
 Present the results using fancy plots is an important part of solving optimization problems.
 In this part, we use the [Plots.jl](http://docs.juliaplots.org/latest/) package which can be installed via de Pkg prompt within
 Julia:
@@ -197,6 +200,9 @@ savefig("convergence.png")
 
 Also, you can plot the population and convergence in the same figure.
 
+
+### Single-Objective Problem
+
 ```julia
 using Metaheuristics
 using Plots
@@ -244,6 +250,43 @@ mp4(animation, "anim-convergence.mp4", fps=30)
 ```
 
 ![](figs/anim-convergence.mp4)
+
+
+### Multi-Objective Problem
+
+
+```julia
+import Metaheuristics: optimize, SMS_EMOA, TestProblems, pareto_front, Options
+import Metaheuristics.PerformanceIndicators: Δₚ
+using Plots; gr()
+
+# get test function
+f, bounds, pf = TestProblems.ZDT6();
+
+# optimize using SMS-EMOA
+result = optimize(f, bounds, SMS_EMOA(N=70,options=Options(iterations=500,seed=0, store_convergence=true)))
+
+# true pareto front
+B = pareto_front(pf)
+# error to the true front
+err = [ Δₚ(r.population, pf) for r in result.convergence]
+# generate plots
+a = @animate for i in 1:5:length(result.convergence)
+    A = pareto_front(result.convergence[i])
+
+    p = plot(B[:, 1], B[:,2], label="True Pareto Front", lw=2,layout=(1,2), size=(850, 400))
+    scatter!(p[1], A[:, 1], A[:,2], label="SMS-EMOA", markersize=4, color=:black, title="ZDT6")
+    plot!(p[2], eachindex(err), err, ylabel="Δₚ", legend=false)
+    plot!(p[2], 1:i, err[1:i], title="Generation $i")
+    scatter!(p[2], [i], err[i:i])
+end
+
+# save animation
+gif(a, "ZDT6.gif", fps=20)
+```
+
+
+![Soving ZDT6 using SMS-EMOA in Julia](figs/ZDT6.gif)
 
 
 ## Pareto Front
