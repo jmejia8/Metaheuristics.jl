@@ -12,7 +12,7 @@ import Metaheuristics: initialize!, update_state!, final_stage!
 import Metaheuristics: AbstractParameters, gen_initial_state, Algorithm, get_position
 # genetic operators
 import Metaheuristics: SBX_crossover, polynomial_mutation!, create_solution, is_better
-import Metaheuristics: reset_to_violated_bounds!</code></pre><h2 id="Step-1:-The-Parameters"><a class="docs-heading-anchor" href="#Step-1:-The-Parameters">Step 1: The Parameters</a><a id="Step-1:-The-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Step-1:-The-Parameters" title="Permalink"></a></h2><p>Define the parameters for your genetic algorithm.</p><pre><code class="language-julia"># structure with algorithm parameters
+import Metaheuristics: reset_to_violated_bounds!</code></pre><h2 id="Step-1:-The-Parameters"><a class="docs-heading-anchor" href="#Step-1:-The-Parameters">Step 1: The Parameters</a><a id="Step-1:-The-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Step-1:-The-Parameters" title="Permalink"></a></h2><p>Due to we are creating a simple Genetic Algorithm (GA), let&#39;s define the parameters for the GA.</p><pre><code class="language-julia"># structure with algorithm parameters
 mutable struct MyGeneticAlgorithm &lt;: AbstractParameters
     N::Int # population size
     p_crossover::Float64 # crossover probability
@@ -30,7 +30,7 @@ end</code></pre><pre><code class="language-julia">function MyGeneticAlgorithm(;N
         information = information,
         options = options,
     )
-end</code></pre><h2 id="Step-2:-Initialization"><a class="docs-heading-anchor" href="#Step-2:-Initialization">Step 2: Initialization</a><a id="Step-2:-Initialization-1"></a><a class="docs-heading-anchor-permalink" href="#Step-2:-Initialization" title="Permalink"></a></h2><p>Initialize population, parameters and settings before the optimization process begins.</p><pre><code class="language-julia">function initialize!(
+end</code></pre><h2 id="Step-2:-Initialization"><a class="docs-heading-anchor" href="#Step-2:-Initialization">Step 2: Initialization</a><a id="Step-2:-Initialization-1"></a><a class="docs-heading-anchor-permalink" href="#Step-2:-Initialization" title="Permalink"></a></h2><p>Initialize population, parameters and settings before the optimization process begins. The most common initialization method is generating uniformly distribution random  number in provided bounds. Here, <a href="tutorials/@ref"><code>gen_initial_state</code></a> for that purpose. Note that <a href="tutorials/@ref"><code>gen_initial_state</code></a> require that <code>parameters.N</code> is defined.</p><pre><code class="language-julia">function initialize!(
         status,
         parameters::MyGeneticAlgorithm,
         problem,
@@ -51,7 +51,7 @@ end</code></pre><h2 id="Step-2:-Initialization"><a class="docs-heading-anchor" h
     # gen_initial_state require that `parameters.N` is defined.
     return gen_initial_state(problem,parameters,information,options,status)
 
-end</code></pre><h2 id="Step-3:-Evolve-Population"><a class="docs-heading-anchor" href="#Step-3:-Evolve-Population">Step 3: Evolve Population</a><a id="Step-3:-Evolve-Population-1"></a><a class="docs-heading-anchor-permalink" href="#Step-3:-Evolve-Population" title="Permalink"></a></h2><p>Now, it is time to update (evolve) your population.</p><pre><code class="language-julia">function update_state!(
+end</code></pre><h2 id="Step-3:-Evolve-Population"><a class="docs-heading-anchor" href="#Step-3:-Evolve-Population">Step 3: Evolve Population</a><a id="Step-3:-Evolve-Population-1"></a><a class="docs-heading-anchor-permalink" href="#Step-3:-Evolve-Population" title="Permalink"></a></h2><p>Now, it is time to update (evolve) your population by using genetic operators: selection, crossover, mutation and environmental selection.</p><pre><code class="language-julia">function update_state!(
         status,
         parameters::MyGeneticAlgorithm,
         problem,
@@ -65,6 +65,7 @@ end</code></pre><h2 id="Step-3:-Evolve-Population"><a class="docs-heading-anchor
     N = parameters.N
 
     for i in 1:N
+        # selection
         parent_1 = get_position(rand(population))
         parent_2 = get_position(rand(population))
 
@@ -82,10 +83,11 @@ end</code></pre><h2 id="Step-3:-Evolve-Population"><a class="docs-heading-anchor
         push!(population, offspring)
     end
 
+    # environmental selection
     sort!(population, lt = is_better, alg=PartialQuickSort(N))
     deleteat!(population, N+1:length(population))
 
-end</code></pre><h2 id="Step-4:-After-Evolution"><a class="docs-heading-anchor" href="#Step-4:-After-Evolution">Step 4: After Evolution</a><a id="Step-4:-After-Evolution-1"></a><a class="docs-heading-anchor-permalink" href="#Step-4:-After-Evolution" title="Permalink"></a></h2><p>This step is optional, but here is used to get the elite solution.</p><pre><code class="language-julia">function final_stage!(
+end</code></pre><h2 id="Step-4:-After-Evolution"><a class="docs-heading-anchor" href="#Step-4:-After-Evolution">Step 4: After Evolution</a><a id="Step-4:-After-Evolution-1"></a><a class="docs-heading-anchor-permalink" href="#Step-4:-After-Evolution" title="Permalink"></a></h2><p>This step is optional, but here is used to get the elite solution aka the best solution found be our GA.</p><pre><code class="language-julia">function final_stage!(
         status,
         parameters::MyGeneticAlgorithm,
         problem,
@@ -99,11 +101,12 @@ end</code></pre><h2 id="Step-4:-After-Evolution"><a class="docs-heading-anchor" 
     status.best_sol = status.population[1]
     status.final_time=time()
     return
-end</code></pre><h2 id="Step-5:-Time-to-Optimize"><a class="docs-heading-anchor" href="#Step-5:-Time-to-Optimize">Step 5: Time to Optimize</a><a id="Step-5:-Time-to-Optimize-1"></a><a class="docs-heading-anchor-permalink" href="#Step-5:-Time-to-Optimize" title="Permalink"></a></h2><p>Now, we are able to optimize using our genetic algorithm.</p><div class="admonition is-compat"><header class="admonition-header">Optimization Problems</header><div class="admonition-body"><p>As you can see, <code>MyGeneticAlgorithm</code> was not restricted to any kind of optization problems, however works for constrained, unconstrained single- and multi-objective problems; why? The method <code>gen_initial_state</code> creates an <a href="../../api/#Metaheuristics.State"><code>State</code></a> according to the output of the objective function <code>f</code> and <code>is_better</code> is comparing solutions according to the solution type.</p></div></div><pre><code class="language-julia">function main()
+end</code></pre><h2 id="Step-5:-Time-to-Optimize"><a class="docs-heading-anchor" href="#Step-5:-Time-to-Optimize">Step 5: Time to Optimize</a><a id="Step-5:-Time-to-Optimize-1"></a><a class="docs-heading-anchor-permalink" href="#Step-5:-Time-to-Optimize" title="Permalink"></a></h2><p>Now, we are able to solve and optimization problem using our genetic algorithm.</p><div class="admonition is-compat"><header class="admonition-header">Optimization Problems</header><div class="admonition-body"><p>As you can see, <code>MyGeneticAlgorithm</code> was not restricted to any kind of optization problems, however works for constrained, unconstrained single- and multi-objective problems; why? The method <code>gen_initial_state</code> creates an <a href="../../api/#Metaheuristics.State"><code>State</code></a> according to the output of the objective function <code>f</code> and <code>is_better</code> is comparing solutions according to the solution type.</p></div></div><pre><code class="language-julia">function main()
+    # test problem
     f, bounds, _ = Metaheuristics.TestProblems.rastrigin()
 
+    # optimize and get the results
     res = optimize(f, bounds, MyGeneticAlgorithm())
-
     display(res)
 end
 
@@ -113,4 +116,4 @@ main()</code></pre><p><strong>Output:</strong></p><pre><code class="language-non
   minimizer: [6.98505513305995e-6, -1.1651666613615994e-5, -4.343967193003195e-6, 3.567365134464557e-5, 1.3393840640183734e-5, 5.591802709915942e-5, -1.477407456986382e-5, 6.325103756718973e-6, 1.9153467328726614e-5, 4.132106648380982e-5]
     f calls: 50000
  total time: 1.3685 s
-+============================+</code></pre><p>See <a href="../../api/#Metaheuristics.optimize"><code>optimize</code></a> for more information.</p><h3 id="Exercises"><a class="docs-heading-anchor" href="#Exercises">Exercises</a><a id="Exercises-1"></a><a class="docs-heading-anchor-permalink" href="#Exercises" title="Permalink"></a></h3><ol><li>Test your algorithm with a multi-objective optimization problem. Suggestion: change <code>rastrigin</code> by <code>ZDT1</code>.</li><li>Implement an interest metaheuristic and make a PR to the <a href="https://github.com/jmejia8/Metaheuristics.jl">Metaheuristics.jl</a> in github.</li></ol></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../simple-tutorial/">« Tutorial for Beginners</a><a class="docs-footer-nextpage" href="../../examples/">Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 24 October 2021 00:16">Sunday 24 October 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
++============================+</code></pre><p>See <a href="../../api/#Metaheuristics.optimize"><code>optimize</code></a> for more information.</p><h3 id="Exercises"><a class="docs-heading-anchor" href="#Exercises">Exercises</a><a id="Exercises-1"></a><a class="docs-heading-anchor-permalink" href="#Exercises" title="Permalink"></a></h3><ol><li>Test your algorithm on a multi-objective optimization problem. Suggestion: change <code>rastrigin</code> by <code>ZDT1</code>.</li><li>Implement an interest metaheuristic and make a PR to the <a href="https://github.com/jmejia8/Metaheuristics.jl">Metaheuristics.jl</a> in github.</li></ol></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../simple-tutorial/">« Tutorial for Beginners</a><a class="docs-footer-nextpage" href="../../examples/">Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 24 October 2021 03:12">Sunday 24 October 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
