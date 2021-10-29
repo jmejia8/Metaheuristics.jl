@@ -1,5 +1,17 @@
 # COP functions
 function violationsSum(g::Vector, h::Vector; ε =0.0)
+    if isempty(g) && isempty(h)
+        return 0.0
+    end
+    
+    if isempty(g)
+        g = [0.0]
+    end
+
+    if isempty(h)
+        h = [0.0]
+    end
+    
     sum_g = sum(max.(0.0, g))
     sum_h = 0.0
 

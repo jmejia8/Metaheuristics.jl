@@ -38,6 +38,13 @@ import Random: seed!
         end
         @test Metaheuristics.is_in_bounds(Metaheuristics.evo_boundary_repairer!(x, zeros(20), bounds), bounds)
 
+        # handling empty constraints
+        sol = Metaheuristics.create_child(x, (1.0, zeros(0), zeros(2)))
+        @test !isnan(Metaheuristics.sum_violations(sol)) && Metaheuristics.sum_violations(sol) == 0
+        sol = Metaheuristics.create_child(x, (1.0, -ones(1), zeros(0)))
+        @test !isnan(Metaheuristics.sum_violations(sol)) && Metaheuristics.sum_violations(sol) == 0
+        sol = Metaheuristics.create_child(x, (1.0, zeros(0), zeros(0)))
+        @test sol isa Metaheuristics.xf_indiv
     end 
 
     function test_problems()

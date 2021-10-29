@@ -81,6 +81,8 @@ function generateChild(x::Vector{Float64},
         ε=0.0
     )
     f, g, h = fResult
+    isempty(g) && isempty(h) && (return xf_indiv(x, f))
+
     return xfgh_indiv(x, f, g, h; ε=ε)
 end
 
