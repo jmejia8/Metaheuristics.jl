@@ -156,10 +156,6 @@ nadir
 ideal
 ```
 
-```@docs
-Metaheuristics.pareto_front(st::Array)
-```
-
 
 ```@docs
 Metaheuristics.non_dominated_sort
