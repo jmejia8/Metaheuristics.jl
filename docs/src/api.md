@@ -46,10 +46,6 @@ fvals
 nfes
 ```
 
-```@docs
-pareto_front(st::State)
-```
-
 
 
 ```@docs

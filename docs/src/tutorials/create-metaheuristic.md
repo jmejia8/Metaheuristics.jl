@@ -1,13 +1,112 @@
 # Create Your Own Metaheuristic
 
+## Introduction 
+
+Firstly, you need to know what occurs when the [`optimize`](@ref) function is called.
+
+### Optimization Process
+
+
+1. **Initialization**: `status = initialize!(status, parameters, problem, information, options)`
+   this function should initialize a `State` with population members according
+   to the parameters provided.
+2. **Main optimization loop**: while `status.stop == false` do
+    - update population, parameters via `update_state!(status, parameters, problem, information, options)`,
+    - and `stop_criteria!(status, parameters, problem, information, options)` will change `status.stop`.
+3. **Final Stage**: When the loop in step 2 breaks, then a final function is called `final_stage!`
+   for the final update of the state, e.g., delete infeasible solutions in population,
+   get non-dominated solutions, etc. 
+
+
+**Initialization**:
+
+```julia
+function initialize!(
+                status, # an initiliazed State (if apply)
+                parameters::AbstractParameters,
+                problem,
+                information,
+                options,
+                args...;
+                kargs...
+        )
+
+    # initialize the stuff here
+    return State(0.0, zeros(0)) # replace this
+end
+```
+
+**Optimization Process**: In this step, the [`State`](@ref) is updated using the following
+function which is called at each iteration/generation.
+
+```julia
+function update_state!(
+        status,
+        parameters::AbstractParameters,
+        problem,
+        information,
+        options,
+        args...;
+        kargs...
+)
+    # update any element in State 
+    return
+end
+```
+
+
+**Final Step:**
+
+```julia
+function final_stage!(
+        status,
+        parameters::AbstractParameters,
+        problem,
+        information,
+        options,
+        args...;
+        kargs...
+)
+    return
+end
+```
+
+### The Algorithm Parameters
+
+Any proposed algorithm, let's say "XYZ", uses different parameters, then it is suggested to store them in a
+structure, e.g.:
+
+```julia
+# structure with algorithm parameters
+mutable struct XYZ <: AbstractParameters
+    N::Int # population size
+    p_crossover::Float64 # crossover probability
+    p_mutation::Float64 # mutation probability
+end
+
+# a "constructor" 
+function XYZ(;N = 0, p_crossover = 0.9, p_mutation = 0.1)
+    parameters = XYZ(N, p_crossover, p_mutation)
+
+    Algorithm(
+        parameters,
+        information = information,
+        options = options,
+    )
+end
+```
+
 
 If you want to implement an algorithm outside of the `Metaheuristics` module, then
 include explicitly the methods you require (or use the `Metaheuristics.` prefix)
 as in Step 0, otherwise go to Step 1.
 
+
+## Implementing a Simple Genetic Algorithm
+
 The following steps describe how to implement a simple Genetic Algorithm.
 
-## Step 0
+### Step 0
 
 Including stuff from `Metaheuristics` we need.
 
@@ -21,7 +120,7 @@ import Metaheuristics: SBX_crossover, polynomial_mutation!, create_solution, is_
 import Metaheuristics: reset_to_violated_bounds!
 ```
 
-## Step 1: The Parameters
+### Step 1: The Parameters
 
 Due to we are creating a simple Genetic Algorithm (GA), let's define the parameters for the GA.
 
@@ -52,7 +151,7 @@ end
 ```
 
 
-## Step 2: Initialization
+### Step 2: Initialization
 
 Initialize population, parameters and settings before the optimization process begins.
 The most common initialization method is generating uniformly distribution random 
@@ -84,7 +183,7 @@ function initialize!(
 end
 ```
 
-## Step 3: Evolve Population
+### Step 3: Evolve Population
 
 Now, it is time to update (evolve) your population by using genetic operators: selection,
 crossover, mutation and environmental selection.
@@ -129,10 +228,10 @@ function update_state!(
 end
 ```
 
-## Step 4: After Evolution
+### Step 4: After Evolution
 
 This step is optional, but here is used to get the elite solution aka the best solution
-found be our GA.
+found by our GA.
 
 ```julia
 function final_stage!(
@@ -152,7 +251,7 @@ function final_stage!(
 end
 ```
 
-## Step 5: Time to Optimize
+### Step 5: Time to Optimize
 
 Now, we are able to solve and optimization problem using our genetic algorithm.
 
@@ -160,8 +259,8 @@ Now, we are able to solve and optimization problem using our genetic algorithm.
 !!! compat "Optimization Problems"
     As you can see, `MyGeneticAlgorithm` was not restricted to any kind of optization problems,
     however works for constrained, unconstrained single- and multi-objective problems; why?
-    The method `gen_initial_state` creates an [`State`](@ref) according to the output
-    of the objective function `f` and `is_better` is comparing solutions according
+    The method `gen_initial_state` creates a [`State`](@ref) according to the output
+    of the objective function `f`, whilst `is_better` is comparing solutions according
     to the solution type.
 
 ```julia
@@ -195,4 +294,4 @@ See [`optimize`](@ref) for more information.
 
 1. Test your algorithm on a multi-objective optimization problem. Suggestion: change `rastrigin`
    by `ZDT1`.
-2. Implement an interest metaheuristic and make a PR to the [Metaheuristics.jl](https://github.com/jmejia8/Metaheuristics.jl) in github.
+2. Implement an interest metaheuristic and make a PR to the [Metaheuristics.jl](https://github.com/jmejia8/Metaheuristics.jl) on github.
