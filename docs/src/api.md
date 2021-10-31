@@ -183,3 +183,31 @@ Metaheuristics.get_non_dominated_solutions
 ```
 
 
+## Stopping Criteria
+
+
+```@docs
+Metaheuristics.diff_check
+```
+
+
+```@docs
+Metaheuristics.call_limit_stop_check
+```
+
+```@docs
+Metaheuristics.iteration_stop_check
+```
+
+```@docs
+Metaheuristics.time_stop_check
+```
+
+```@docs
+Metaheuristics.accuracy_stop_check
+```
+
+```@docs
+Metaheuristics.var_stop_check
+```
+

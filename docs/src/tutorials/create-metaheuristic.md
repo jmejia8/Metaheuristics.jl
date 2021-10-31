@@ -54,6 +54,17 @@ function update_state!(
 end
 ```
 
+**Stopping Criteria:** By default, the metaheuristics will stop in when either the
+number of function evaluations or iteration is exceeded. Also, you can stablish a
+different criteria via:
+
+```julia
+function stop_criteria!(status, parameters::MyMetaheuristics, problem, information, options)
+    # your stopping criteria here!
+    #...
+    status.stop = true
+end
+```
 
 **Final Step:**
 
