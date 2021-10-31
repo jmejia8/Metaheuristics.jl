@@ -10,7 +10,7 @@ High performance metaheuristics for global optimization.
 
 ## Installation
 
-Open the Julia (Julia 1.1 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia (Julia 1.1 or later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 ```
 pkg> add Metaheuristics
@@ -26,14 +26,25 @@ julia> import Pkg; Pkg.add("Metaheuristics")
 
 ## Algorithms
 
+Some representative metaheuristics have developed here, including those for single- and
+multi-objective optimization. Moreover, some constraint handling techniques have been
+considered in most of the implemented algorithms.
+
+### Single-Objective Optimization
+
 - **ECA**: Evolutionary Centers Algorithm
 - **DE**:  Differential Evolution
 - **PSO**: Particle Swarm Optimization
 - **ABC**: Artificial Bee Colony
-- **MOEA/D-DE**: Multi-objective Evolutionary Algorithm based on Decomposition
 - **GSA**: Gravitational Search Algorithm
 - **SA**:  Simulated Annealing
 - **WOA**: Whale Optimization Algorithm
+
+### Muli-Objective Optimization
+
+[![SMS-EMOA in Metaheuristics.jl](https://jmejia8.github.io/Metaheuristics.jl/dev/figs/ZDT6.gif)](https://jmejia8.github.io/Metaheuristics.jl/stable/visualization/)
+
+- **MOEA/D-DE**: Multi-objective Evolutionary Algorithm based on Decomposition
 - **NSGA-II**:  A fast and elitist multi-objective genetic algorithm: NSGA-II
 - **NSGA-III**: Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
   Nondominated Sorting Approach
