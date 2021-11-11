@@ -1,9 +1,8 @@
 __precompile__()
 module Metaheuristics
 
-# ECA algorithm
-export eca, diffEvolution, pso, WOA, GOA, GSA, CGSA, SA, CMAES_AEP
-export CFO, jso, DE, ABC, PSO
+export WOA, GOA, GSA, CGSA, SA, CMAES_AEP
+export CFO, DE, ABC, PSO
 
 # v2 items
 export optimize, ECA, Options, State, Information, Engine, Problem
@@ -14,7 +13,7 @@ export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fv
 
 export NSGA3, gen_ref_dirs
 
-export SMS_EMOA
+export SMS_EMOA, SPEA2
 
 export PerformanceIndicators, pareto_front, nadir, ideal
 
@@ -96,6 +95,7 @@ include("algorithms/MOEAD_DE/MOEAD_DE.jl")
 include("algorithms/NSGA2/NSGA2.jl")
 include("algorithms/NSGA3/NSGA3.jl")
 include("algorithms/SMS_EMOA/SMS_EMOA.jl")
+include("algorithms/SPEA2/SPEA2.jl")
 
 
 
