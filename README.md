@@ -56,6 +56,7 @@ considered in most of the implemented algorithms.
 - **NSGA-III**: Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
   Nondominated Sorting Approach
 - **SMS-EMOA**: An EMO algorithm using the hypervolume measure as selection criterion
+- **SPEA2**: Improved Strength Pareto Evolutionary Algorithm
 
 ## Performance Indicators
 

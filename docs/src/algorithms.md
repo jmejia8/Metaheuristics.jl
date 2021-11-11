@@ -92,3 +92,11 @@ An EMO algorithm using the hypervolume measure as selection criterion [Emmerich2
 ```@docs
 SMS_EMOA
 ```
+
+
+## SPEA2
+
+Improved strength Pareto evolutionary algorithm [Zitzler2001](@cite).
+```@docs
+SPEA2
+```
