@@ -121,11 +121,12 @@ function environmental_selection!(population, parameters::SPEA2)
     N = parameters.N
 
     next = fitness .< 1
-    if sum(next) < N
+    K = count(next)
+    if K < N
         rank = sortperm(fitness)
         next[rank[1:N]] .= true
-    elseif sum(next) > N
-        del  = truncation(population[next],sum(next)-N)
+    elseif K > N
+        del  = truncation(population[next], K-N)
         temp = findall(next)
         next[temp[del]] .= false
     end
@@ -134,6 +135,7 @@ function environmental_selection!(population, parameters::SPEA2)
     deleteat!(fitness, .!next)
     parameters.fitness = fitness
 
+    return
 end
 
 function compute_distances(population)    
@@ -152,31 +154,26 @@ function compute_distances(population)
 end
 
 function truncation(population,K)
-    #% Select part of the solutions by truncation
-    Distance = compute_distances(population)
-    Del = zeros(Bool, length(population))
-    while sum(Del) < K
-        Remain   = findall(.!Del)
-        Temp     = sort(Distance[Remain,Remain], dims = 2)
-        Rank     = sortslicesperm(Temp, dims=1)
-        Del[Remain[Rank[1]]] = true
+    distance = compute_distances(population)
+    del = zeros(Bool, length(population))
+    while count(del) < K
+        remain   = findall(.!del)
+        temp     = sort(distance[remain,remain], dims = 2)
+        rank     = sortslicesperm(temp, dims=1)
+        del[remain[rank[1]]] = true
     end
 
-    return Del
+    return del
 end
 
 function compute_fitness(population)
     N = length(population)
     dominate = zeros(Bool,N, N)
-    for i in 1:N-1
-        for j in i+1 : N
-            # k = any(PopObj(i,:)<PopObj(j,:)) - any(PopObj(i,:)>PopObj(j,:))
+    for i in 1:N
+        for j in i+1:N
             k = compare(population[i], population[j])
-            if k == 1
-                dominate[i,j] = true
-            elseif k == 2
-                dominate[j,i] = true
-            end
+            dominate[i,j] = k == 1
+            dominate[j,i] = k == 2
         end
     end
 
