@@ -117,7 +117,8 @@ end
 
 
 function environmental_selection!(population, parameters::SPEA2)
-    fitness = compute_fitness(population)
+    Distance = compute_distances(population)
+    fitness = compute_fitness(population, Distance)
     N = parameters.N
 
     next = fitness .< 1
@@ -126,7 +127,7 @@ function environmental_selection!(population, parameters::SPEA2)
         rank = sortperm(fitness)
         next[rank[1:N]] .= true
     elseif K > N
-        del  = truncation(population[next], K-N)
+        del  = truncation(population[next], K-N, Distance[next,next])
         temp = findall(next)
         next[temp[del]] .= false
     end
@@ -153,20 +154,20 @@ function compute_distances(population)
     return distances 
 end
 
-function truncation(population,K)
-    distance = compute_distances(population)
+function truncation(population, K, distance = compute_distances(population))
     del = zeros(Bool, length(population))
     while count(del) < K
         remain   = findall(.!del)
-        temp     = sort(distance[remain,remain], dims = 2)
-        rank     = sortslicesperm(temp, dims=1)
-        del[remain[rank[1]]] = true
+        #temp     = sortperm(distance[remain,remain], dims = 2)
+        # rank     = sortslicesperm(temp, dims=1)
+        nn = argmin(distance[remain,remain])
+        del[remain[nn.I[1]]] = true
     end
 
     return del
 end
 
-function compute_fitness(population)
+function compute_fitness(population, Distance = compute_distances(population))
     N = length(population)
     dominate = zeros(Bool,N, N)
     for i in 1:N
@@ -180,7 +181,7 @@ function compute_fitness(population)
     S = sum(dominate,dims=2)[:,1]
     R = [ sum(S[dominate[:,i]]) for i in 1:N]
 
-    distance = sort(compute_distances(population),dims=2)
+    distance = sort(Distance,dims=2)
 
 
     D = 1 ./ (distance[:,floor(Int,sqrt(N))] .+ 2)
