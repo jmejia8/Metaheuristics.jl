@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Visualization · Metaheuristics.jl</title><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-184071594-1', 'auto');
+ga('send', 'pageview', {'page': location.pathname + location.search + location.hash});
+</script><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img class="docs-light-only" src="../assets/logo.png" alt="Metaheuristics.jl logo"/><img class="docs-dark-only" src="../assets/logo-dark.png" alt="Metaheuristics.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Metaheuristics.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Index</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../tutorials/simple-tutorial/">Tutorial for Beginners</a></li><li><a class="tocitem" href="../tutorials/create-metaheuristic/">Create Your Own Metaheuristic</a></li></ul></li><li><a class="tocitem" href="../examples/">Examples</a></li><li><a class="tocitem" href="../algorithms/">Algorithms</a></li><li><a class="tocitem" href="../problems/">Problems</a></li><li><a class="tocitem" href="../indicators/">Performance Indicators</a></li><li class="is-active"><a class="tocitem" href>Visualization</a><ul class="internal"><li><a class="tocitem" href="#Population-Distribution"><span>Population Distribution</span></a></li><li><a class="tocitem" href="#Convergence"><span>Convergence</span></a></li><li><a class="tocitem" href="#Animate-convergence"><span>Animate convergence</span></a></li><li><a class="tocitem" href="#Pareto-Front"><span>Pareto Front</span></a></li><li><a class="tocitem" href="#Live-Plotting"><span>Live Plotting</span></a></li></ul></li><li><a class="tocitem" href="../api/">API References</a></li><li><a class="tocitem" href="../contributing/">Contributing</a></li><li><a class="tocitem" href="../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Visualization</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Visualization</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/Metaheuristics.jl/blob/master/docs/src/visualization.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Visualization"><a class="docs-heading-anchor" href="#Visualization">Visualization</a><a id="Visualization-1"></a><a class="docs-heading-anchor-permalink" href="#Visualization" title="Permalink"></a></h1><p><img src="../figs/ZDT6.gif" alt="Soving ZDT6 using SMS-EMOA in Julia"/></p><p>Present the results using fancy plots is an important part of solving optimization problems. In this part, we use the <a href="http://docs.juliaplots.org/latest/">Plots.jl</a> package which can be installed via de Pkg prompt within Julia:</p><p>Type <code>]</code> and then:</p><pre><code class="language-none">pkg&gt; add Plots</code></pre><p>Or:</p><pre><code class="language-none">julia&gt; import Pkg; Pkg.add(&quot;Plots&quot;)</code></pre><p>Once Plots is installed on your Julia distribution, you will be able to reproduce the  following examples.</p><p>Assume you want to solve the following minimization problem.</p><p><img src="../figs/rastrigin.png" alt="Rastrigin Surface"/></p><p>Minimize:</p><p class="math-container">\[f(x) = 10D + \sum_{i=1}^{D}  x_i^2 - 10\cos(2\pi x_i)\]</p><p>where <span>$x\in[-5, 5]^{D}$</span>, i.e., <span>$-5 \leq x_i \leq 5$</span> for <span>$i=1,\ldots,D$</span>. <span>$D$</span> is the dimension number, assume <span>$D=10$</span>.</p><h2 id="Population-Distribution"><a class="docs-heading-anchor" href="#Population-Distribution">Population Distribution</a><a id="Population-Distribution-1"></a><a class="docs-heading-anchor-permalink" href="#Population-Distribution" title="Permalink"></a></h2><p>Let&#39;s solve the above optimization problem and plot the resulting population (projecting two specific dimensions).</p><pre><code class="language-julia">using Metaheuristics
+using Plots
+gr()
+
+
+# objective function
+f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
+
+# number of variables (dimension)
+D = 10
+
+# bounds
+bounds = [-5ones(D) 5ones(D)]&#39;
+
+# Common options
+options = Options(seed=1)
+
+# Optimizing
+result = optimize(f, bounds, ECA(options=options))
+
+# positions in matrix NxD 
+X = positions(result)
+
+scatter(X[:,1], X[:,2], label=&quot;Population&quot;)
+
+x = minimizer(result)
+scatter!(x[1:1], x[2:2], label=&quot;Best solution&quot;)
+
+
+# (optional) save figure
+savefig(&quot;final-population.png&quot;)
+</code></pre><p><img src="../figs/final-population.png" alt="Final Population"/></p><p>If your optimization problem is scalable, then you also can plot level curves. In this case, let&#39;s assume that <span>$D=2$</span>.</p><pre><code class="language-julia">using Metaheuristics
+using Plots
+gr()
+
+
+# objective function
+f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
+
+# number of variables (dimension)
+D = 2
+
+# bounds
+bounds = [-5ones(D) 5ones(D)]&#39;
+
+# Common options
+options = Options(seed=1)
+
+# Optimizing
+result = optimize(f, bounds, ECA(options=options))
+
+# positions in matrix NxD 
+X = positions(result)
+
+xy = range(-5, 5, length=100)
+contour(xy, xy, (a,b) -&gt; f([a, b]))
+
+scatter!(X[:,1], X[:,2], label=&quot;Population&quot;)
+
+x = minimizer(result)
+scatter!(x[1:1], x[2:2], label=&quot;Best solution&quot;)
+
+
+# (optional) save figure
+savefig(&quot;final-population-contour.png&quot;)</code></pre><p><img src="../figs/final-population-contour.png" alt="Final Population"/></p><h3 id="Objective-Function-Values"><a class="docs-heading-anchor" href="#Objective-Function-Values">Objective Function Values</a><a id="Objective-Function-Values-1"></a><a class="docs-heading-anchor-permalink" href="#Objective-Function-Values" title="Permalink"></a></h3><p>Metaheuristics implements some methods to obtain the objective function values (fitness) from the solutions in resulting population. One of the most useful method is <a href="../api/#Metaheuristics.fvals"><code>fvals</code></a>. In this case, let&#39;s use <a href="../algorithms/#Metaheuristics.PSO"><code>PSO</code></a>.</p><pre><code class="language-julia">using Metaheuristics
+using Plots
+gr()
+
+
+# objective function
+f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
+
+# number of variables (dimension)
+D = 10
+
+# bounds
+bounds = [-5ones(D) 5ones(D)]&#39;
+
+# Common options
+options = Options(seed=1)
+
+# Optimizing
+result = optimize(f, bounds, PSO(options=options))
+
+f_values = fvals(result)
+plot(f_values)
+
+# (optional) save figure
+savefig(&quot;fvals.png&quot;)</code></pre><p><img src="../figs/fvals.png" alt="Final Population"/></p><h2 id="Convergence"><a class="docs-heading-anchor" href="#Convergence">Convergence</a><a id="Convergence-1"></a><a class="docs-heading-anchor-permalink" href="#Convergence" title="Permalink"></a></h2><p>Sometimes, it is useful to plot the convergence plot at the end of the optimization process. To do that, it is necessary to set <code>store_convergence = true</code> in <a href="../api/#Metaheuristics.Options"><code>Options</code></a>. Metaheuristics implements a method called <a href="../api/#Metaheuristics.convergence"><code>convergence</code></a>.</p><pre><code class="language-julia">using Metaheuristics
+using Plots
+gr()
+
+
+# objective function
+f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
+
+# number of variables (dimension)
+D = 10
+
+# bounds
+bounds = [-5ones(D) 5ones(D)]&#39;
+
+# Common options
+options = Options(seed=1, store_convergence = true)
+
+# Optimizing
+result = optimize(f, bounds, ECA(options=options))
+
+f_calls, best_f_value = convergence(result)
+
+plot(xlabel=&quot;f calls&quot;, ylabel=&quot;fitness&quot;, title=&quot;Convergence&quot;)
+plot!(f_calls, best_f_value, label=&quot;ECA&quot;)
+
+# (optional) save figure
+savefig(&quot;convergence.png&quot;)</code></pre><p><img src="../figs/convergence.png" alt="Convergence"/></p><h2 id="Animate-convergence"><a class="docs-heading-anchor" href="#Animate-convergence">Animate convergence</a><a id="Animate-convergence-1"></a><a class="docs-heading-anchor-permalink" href="#Animate-convergence" title="Permalink"></a></h2><p>Also, you can plot the population and convergence in the same figure.</p><h3 id="Single-Objective-Problem"><a class="docs-heading-anchor" href="#Single-Objective-Problem">Single-Objective Problem</a><a id="Single-Objective-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Single-Objective-Problem" title="Permalink"></a></h3><pre><code class="language-julia">using Metaheuristics
+using Plots
+gr()
+
+
+# objective function
+f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
+
+# number of variables (dimension)
+D = 10
+
+# bounds
+bounds = [-5ones(D) 5ones(D)]&#39;
+
+# Common options
+options = Options(seed=1, store_convergence = true)
+
+# Optimizing
+result = optimize(f, bounds, ECA(options=options))
+
+f_calls, best_f_value = convergence(result)
+
+animation = @animate for i in 1:length(result.convergence)
+    l = @layout [a b]
+    p = plot( layout=l)
+
+    X = positions(result.convergence[i])
+    scatter!(p[1], X[:,1], X[:,2], label=&quot;&quot;, xlim=(-5, 5), ylim=(-5,5), title=&quot;Population&quot;)
+    x = minimizer(result.convergence[i])
+    scatter!(p[1], x[1:1], x[2:2], label=&quot;&quot;)
+
+    # convergence
+    plot!(p[2], xlabel=&quot;Generation&quot;, ylabel=&quot;fitness&quot;, title=&quot;Gen: $i&quot;)
+    plot!(p[2], 1:length(best_f_value), best_f_value, label=false)
+    plot!(p[2], 1:i, best_f_value[1:i], lw=3, label=false)
+    x = minimizer(result.convergence[i])
+    scatter!(p[2], [i], [minimum(result.convergence[i])], label=false)
+end
+
+# save in different formats
+# gif(animation, &quot;anim-convergence.gif&quot;, fps=30)
+mp4(animation, &quot;anim-convergence.mp4&quot;, fps=30)
+</code></pre><p><video src="../figs/anim-convergence.mp4" controls="true" title><a href="../figs/anim-convergence.mp4"></a></video></p><h3 id="Multi-Objective-Problem"><a class="docs-heading-anchor" href="#Multi-Objective-Problem">Multi-Objective Problem</a><a id="Multi-Objective-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Multi-Objective-Problem" title="Permalink"></a></h3><pre><code class="language-julia">import Metaheuristics: optimize, SMS_EMOA, TestProblems, pareto_front, Options
+import Metaheuristics.PerformanceIndicators: Δₚ
+using Plots; gr()
+
+# get test function
+f, bounds, pf = TestProblems.ZDT6();
+
+# optimize using SMS-EMOA
+result = optimize(f, bounds, SMS_EMOA(N=70,options=Options(iterations=500,seed=0, store_convergence=true)))
+
+# true pareto front
+B = pareto_front(pf)
+# error to the true front
+err = [ Δₚ(r.population, pf) for r in result.convergence]
+# generate plots
+a = @animate for i in 1:5:length(result.convergence)
+    A = pareto_front(result.convergence[i])
+
+    p = plot(B[:, 1], B[:,2], label=&quot;True Pareto Front&quot;, lw=2,layout=(1,2), size=(850, 400))
+    scatter!(p[1], A[:, 1], A[:,2], label=&quot;SMS-EMOA&quot;, markersize=4, color=:black, title=&quot;ZDT6&quot;)
+    plot!(p[2], eachindex(err), err, ylabel=&quot;Δₚ&quot;, legend=false)
+    plot!(p[2], 1:i, err[1:i], title=&quot;Generation $i&quot;)
+    scatter!(p[2], [i], err[i:i])
+end
+
+# save animation
+gif(a, &quot;ZDT6.gif&quot;, fps=20)</code></pre><p><img src="../figs/ZDT6.gif" alt="Soving ZDT6 using SMS-EMOA in Julia"/></p><h2 id="Pareto-Front"><a class="docs-heading-anchor" href="#Pareto-Front">Pareto Front</a><a id="Pareto-Front-1"></a><a class="docs-heading-anchor-permalink" href="#Pareto-Front" title="Permalink"></a></h2><pre><code class="language-julia">import Metaheuristics: optimize, NSGA2, TestProblems, pareto_front, Options
+using Plots; gr()
+
+f, bounds, solutions = TestProblems.ZDT3();
+
+result = optimize(f, bounds, NSGA2(options=Options(seed=0)))
+
+A = pareto_front(result)
+B = pareto_front(solutions)
+
+scatter(A[:, 1], A[:,2], label=&quot;NSGA-II&quot;)
+plot!(B[:, 1], B[:,2], label=&quot;Parento Front&quot;, lw=2)
+savefig(&quot;pareto.png&quot;)</code></pre><p><img src="../figs/pareto.png" alt="Final Population"/></p><h2 id="Live-Plotting"><a class="docs-heading-anchor" href="#Live-Plotting">Live Plotting</a><a id="Live-Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Live-Plotting" title="Permalink"></a></h2><p>The <a href="../api/#Metaheuristics.optimize"><code>optimize</code></a> function has a keyword parameter named <code>logger</code> that contains a function pointer. Such function will receive the <a href="../api/#Metaheuristics.State"><code>State</code></a> at the end of each iteration in the main optimization loop.</p><pre><code class="language-julia">import Metaheuristics: optimize, NSGA2, TestProblems, pareto_front, Options, fvals
+using Plots; gr()
+
+f, bounds, solutions = TestProblems.ZDT3();
+pf = pareto_front(solutions)
+
+logger(st) = begin
+    A = fvals(st)
+    scatter(A[:, 1], A[:,2], label=&quot;NSGA-II&quot;, title=&quot;Gen: $(st.iteration)&quot;)
+    plot!(pf[:, 1], pf[:,2], label=&quot;Parento Front&quot;, lw=2)
+    gui()
+    sleep(0.1)
+end
+
+result = optimize(f, bounds, NSGA2(options=Options(seed=0)), logger=logger)
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../indicators/">« Performance Indicators</a><a class="docs-footer-nextpage" href="../api/">API References »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 16 November 2021 21:41">Tuesday 16 November 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
