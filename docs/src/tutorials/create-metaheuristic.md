@@ -305,4 +305,4 @@ See [`optimize`](@ref) for more information.
 
 1. Test your algorithm on a multi-objective optimization problem. Suggestion: change `rastrigin`
    by `ZDT1`.
-2. Implement an interest metaheuristic and make a PR to the [Metaheuristics.jl](https://github.com/jmejia8/Metaheuristics.jl) on github.
+2. Implement an interest metaheuristic and make a PR to the [Metaheuristics.jl](https://github.com/jmejia8/Metaheuristics.jl) repo on github.

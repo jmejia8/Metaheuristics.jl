@@ -1,4 +1,4 @@
-# Tutorial for Beginners
+# Getting Started
 
 After reading this tutorial you'll become an expert using `Metaheuristics` module.
 

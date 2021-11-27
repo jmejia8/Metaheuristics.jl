@@ -103,9 +103,9 @@ optimize(f, bounds, ECA(N=30, K=3))
 
 ## Multiobjective Optimization
 
-To implement a multiobjective optimization and solve it, you can proceed as usual. Here,
+To implement a multiobjective optimization problem and solve it, you can proceed as usual. Here,
 you need to provide constraints if they exist, otherwise put `gx = [0.0]; hx = [0.0];`
-to indicate an unconstrained multiobjective problem
+to indicate an unconstrained multiobjective problem.
 
 ```@repl
 using Metaheuristics
