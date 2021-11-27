@@ -32,6 +32,9 @@ function compute_crowding_distance(pop)
 end
 
 function update_crowding_distance!(pop)
+    # at leat 3 items to compute crowding distance
+    length(pop) < 3 && (return) 
+    
     crowding = compute_crowding_distance(pop)
     for (i, sol) in enumerate(pop)
         sol.crowding = crowding[i]
@@ -48,12 +51,12 @@ function truncate_population!(population, N)
     let f::Int = 1
         ind = 0
         indnext = findlast(x -> x.rank == f, population)
-        while 0 < indnext <= N
+        while !isnothing(indnext) && 0 < indnext <= N
             ind = indnext
             f += 1
             indnext = findlast(x -> x.rank == f, population)
         end
-        indnext == 0 && (indnext = length(population))
+        isnothing(indnext) && (indnext = length(population)) 
         update_crowding_distance!(view(population, ind+1:indnext))
         sort!(view(population, ind+1:indnext), by = x -> x.crowding, rev = true, alg = PartialQuickSort(N-ind))
     end
