@@ -6,7 +6,7 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 
 ga('create', 'UA-184071594-1', 'auto');
 ga('send', 'pageview', {'page': location.pathname + location.search + location.hash});
-</script><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img class="docs-light-only" src="../assets/logo.png" alt="Metaheuristics.jl logo"/><img class="docs-dark-only" src="../assets/logo-dark.png" alt="Metaheuristics.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Metaheuristics.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Index</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../tutorials/simple-tutorial/">Tutorial for Beginners</a></li><li><a class="tocitem" href="../tutorials/create-metaheuristic/">Create Your Own Metaheuristic</a></li></ul></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Single-Objective-Optimization"><span>Single-Objective Optimization</span></a></li><li><a class="tocitem" href="#Providing-Initial-Solutions"><span>Providing Initial Solutions</span></a></li><li><a class="tocitem" href="#Constrained-Optimization"><span>Constrained Optimization</span></a></li><li><a class="tocitem" href="#Multiobjective-Optimization"><span>Multiobjective Optimization</span></a></li><li><a class="tocitem" href="#Modifying-an-Existing-Metaheuristic"><span>Modifying an Existing Metaheuristic</span></a></li></ul></li><li><a class="tocitem" href="../algorithms/">Algorithms</a></li><li><a class="tocitem" href="../problems/">Problems</a></li><li><a class="tocitem" href="../indicators/">Performance Indicators</a></li><li><a class="tocitem" href="../visualization/">Visualization</a></li><li><a class="tocitem" href="../api/">API References</a></li><li><a class="tocitem" href="../contributing/">Contributing</a></li><li><a class="tocitem" href="../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/Metaheuristics.jl/blob/master/docs/src/examples.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><p>This package provides different tools for optimization. Hence, this section gives different examples for using the implemented <code>Metaheuristics</code>.</p><h2 id="Single-Objective-Optimization"><a class="docs-heading-anchor" href="#Single-Objective-Optimization">Single-Objective Optimization</a><a id="Single-Objective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Single-Objective-Optimization" title="Permalink"></a></h2><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
+</script><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img class="docs-light-only" src="../assets/logo.png" alt="Metaheuristics.jl logo"/><img class="docs-dark-only" src="../assets/logo-dark.png" alt="Metaheuristics.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Metaheuristics.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Index</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../tutorials/simple-tutorial/">Getting Started</a></li><li><a class="tocitem" href="../tutorials/create-metaheuristic/">Create Your Own Metaheuristic</a></li></ul></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Single-Objective-Optimization"><span>Single-Objective Optimization</span></a></li><li><a class="tocitem" href="#Providing-Initial-Solutions"><span>Providing Initial Solutions</span></a></li><li><a class="tocitem" href="#Constrained-Optimization"><span>Constrained Optimization</span></a></li><li><a class="tocitem" href="#Multiobjective-Optimization"><span>Multiobjective Optimization</span></a></li><li><a class="tocitem" href="#Modifying-an-Existing-Metaheuristic"><span>Modifying an Existing Metaheuristic</span></a></li></ul></li><li><a class="tocitem" href="../algorithms/">Algorithms</a></li><li><a class="tocitem" href="../problems/">Problems</a></li><li><a class="tocitem" href="../indicators/">Performance Indicators</a></li><li><a class="tocitem" href="../visualization/">Visualization</a></li><li><a class="tocitem" href="../api/">API References</a></li><li><a class="tocitem" href="../contributing/">Contributing</a></li><li><a class="tocitem" href="../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/Metaheuristics.jl/blob/master/docs/src/examples.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><p>This package provides different tools for optimization. Hence, this section gives different examples for using the implemented <code>Metaheuristics</code>.</p><h2 id="Single-Objective-Optimization"><a class="docs-heading-anchor" href="#Single-Objective-Optimization">Single-Objective Optimization</a><a id="Single-Objective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Single-Objective-Optimization" title="Permalink"></a></h2><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x) ) # objective function
 f (generic function with 1 method)
@@ -27,34 +27,34 @@ julia&gt; result = optimize(f, bounds, algorithm) # start the minimization procc
 +=========== RESULT ==========+
   iteration: 1286
     minimum: 1.98992
-  minimizer: [0.9949586381584208, 1.3934351378718047e-9, 2.983577458609283e-9, 3.185993592061301e-9, -4.324574034545155e-9, 4.0436508483085365e-9, 5.704593587163455e-9, 1.4004778658065458e-10, 0.9949586408754618, -6.116920676570365e-10]
+  minimizer: [9.776184156889834e-10, 3.0246520263158985e-9, -0.9949586377913353, -1.875303912978172e-9, 9.303007645102838e-10, 0.9949586349677406, -4.518732760212633e-9, -1.3640523155718516e-9, 2.339914416632209e-10, 4.884958981517431e-10]
     f calls: 89951
- total time: 2.4954 s
+ total time: 2.0392 s
 +============================+
 
 julia&gt; minimum(result)
-1.9899181141865938
+1.9899181141865796
 
 julia&gt; minimizer(result)
 10-element Array{Float64,1}:
-  0.9949586381584208
-  1.3934351378718047e-9
-  2.983577458609283e-9
-  3.185993592061301e-9
- -4.324574034545155e-9
-  4.0436508483085365e-9
-  5.704593587163455e-9
-  1.4004778658065458e-10
-  0.9949586408754618
- -6.116920676570365e-10
+  9.776184156889834e-10
+  3.0246520263158985e-9
+ -0.9949586377913353
+ -1.875303912978172e-9
+  9.303007645102838e-10
+  0.9949586349677406
+ -4.518732760212633e-9
+ -1.3640523155718516e-9
+  2.339914416632209e-10
+  4.884958981517431e-10
 
 julia&gt; result = optimize(f, bounds, algorithm) # note that second run is faster
 +=========== RESULT ==========+
   iteration: 1286
     minimum: 1.98992
-  minimizer: [0.9949586381584208, 1.3934351378718047e-9, 2.983577458609283e-9, 3.185993592061301e-9, -4.324574034545155e-9, 4.0436508483085365e-9, 5.704593587163455e-9, 1.4004778658065458e-10, 0.9949586408754618, -6.116920676570365e-10]
+  minimizer: [9.776184156889834e-10, 3.0246520263158985e-9, -0.9949586377913353, -1.875303912978172e-9, 9.303007645102838e-10, 0.9949586349677406, -4.518732760212633e-9, -1.3640523155718516e-9, 2.339914416632209e-10, 4.884958981517431e-10]
     f calls: 89881
- total time: 0.4506 s
+ total time: 0.4181 s
 +============================+</code></pre><h2 id="Providing-Initial-Solutions"><a class="docs-heading-anchor" href="#Providing-Initial-Solutions">Providing Initial Solutions</a><a id="Providing-Initial-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Providing-Initial-Solutions" title="Permalink"></a></h2><p>Sometimes you may need to use the starter solutions you need before the optimization process begins, well, this example illustrates how to do it.</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere);
@@ -90,10 +90,10 @@ julia&gt; method.status = prev_status; # say to ECA that you have generated a po
 julia&gt; optimize(f, bounds, method) # optimize
 +=========== RESULT ==========+
   iteration: 5001
-    minimum: 1.98663e-130
-  minimizer: [1.935440992536122e-67, -6.982919326732596e-66, 3.3112127379751397e-66, 4.34866334237417e-66, -5.023617184412387e-66, -3.092450530274494e-66, -3.400198104385143e-66, -1.6102595418512122e-66, -8.161427016626199e-66, -2.1038135555317273e-66]
+    minimum: 3.36004e-117
+  minimizer: [8.400284900611763e-60, -1.1771017351237605e-59, 5.657379293247312e-60, 1.4205615175672756e-60, 1.5564887294043446e-59, -3.7183406151615076e-59, -1.1580032342105817e-59, -7.829808815045568e-60, -2.6963893142703113e-59, -2.3865724073385396e-59]
     f calls: 99981
- total time: 0.3810 s
+ total time: 0.3051 s
 +============================+</code></pre><h2 id="Constrained-Optimization"><a class="docs-heading-anchor" href="#Constrained-Optimization">Constrained Optimization</a><a id="Constrained-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Constrained-Optimization" title="Permalink"></a></h2><p>It is common that optimization models include constraints that must be satisfied for example: <a href="https://en.wikipedia.org/wiki/Test_functions_for_optimization">The Rosenbrock function constrained to a disk</a></p><p>Minimize:</p><p class="math-container">\[{\displaystyle f(x,y)=(1-x)^{2}+100(y-x^{2})^{2}}\]</p><p>subject to:</p><p class="math-container">\[{\displaystyle x^{2}+y^{2}\leq 2}\]</p><p>where <span>$-2 \leq x,y \leq 2$</span>.</p><p>In <code>Metaheuristics.jl</code>, a feasible solution is such that <span>$g(x) \leq 0$</span> and <span>$h(x) \approx 0$</span>. Hence, in this example the constraint is given by <span>$g(x) = x^2 + y^2 - 2 \leq 0$</span>. Moreover, the equality and inequality constraints must be saved into  <code>Array</code>s.</p><div class="admonition is-compat"><header class="admonition-header">Constriants handling</header><div class="admonition-body"><p>In this package, if the algorithm was not designed for constrained optimization, then solutions with lower constraint violation sum will be preferred.</p></div></div><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; function f(x)
@@ -116,12 +116,12 @@ julia&gt; bounds = [-2.0 -2; 2 2]
 julia&gt; optimize(f, bounds, ECA(N=30, K=3))
 +=========== RESULT ==========+
   iteration: 667
-    minimum: 0.0402249
-  minimizer: [0.7998293697309841, 0.6384756874588697]
+    minimum: 0.00579469
+  minimizer: [0.9239883632975797, 0.8533431719322985]
     f calls: 20010
   feasibles: 30 / 30 in final population
- total time: 1.5774 s
-+============================+</code></pre><h2 id="Multiobjective-Optimization"><a class="docs-heading-anchor" href="#Multiobjective-Optimization">Multiobjective Optimization</a><a id="Multiobjective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multiobjective-Optimization" title="Permalink"></a></h2><p>To implement a multiobjective optimization and solve it, you can proceed as usual. Here, you need to provide constraints if they exist, otherwise put <code>gx = [0.0]; hx = [0.0];</code> to indicate an unconstrained multiobjective problem</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
+ total time: 1.2945 s
++============================+</code></pre><h2 id="Multiobjective-Optimization"><a class="docs-heading-anchor" href="#Multiobjective-Optimization">Multiobjective Optimization</a><a id="Multiobjective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multiobjective-Optimization" title="Permalink"></a></h2><p>To implement a multiobjective optimization problem and solve it, you can proceed as usual. Here, you need to provide constraints if they exist, otherwise put <code>gx = [0.0]; hx = [0.0];</code> to indicate an unconstrained multiobjective problem.</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; function f(x)
            # objective functions
@@ -147,48 +147,48 @@ julia&gt; optimize(f, bounds, NSGA2())
   iteration: 500
  population:                         F space
         ┌────────────────────────────────────────┐
-      1 │⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⢈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      1 │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⡅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠐⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠸⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
    f₂   │⠀⠀⠀⠈⢆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         │⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠙⠢⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠢⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠂⢠⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠑⠢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠓⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠢⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠂⠄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠠⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⢄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         └────────────────────────────────────────┘
         0                                        3
                            f₁
 non-dominated solution(s):
                          F space
         ┌────────────────────────────────────────┐
-      1 │⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⢈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      1 │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⡅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠐⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠸⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
    f₂   │⠀⠀⠀⠈⢆⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         │⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠙⠢⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠢⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠂⢠⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠑⠢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠓⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠢⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠂⠄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠠⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⢄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         └────────────────────────────────────────┘
         0                                        3
                            f₁
     f calls: 50000
   feasibles: 100 / 100 in final population
- total time: 5.4472 s
+ total time: 4.3044 s
 +============================+</code></pre><h2 id="Modifying-an-Existing-Metaheuristic"><a class="docs-heading-anchor" href="#Modifying-an-Existing-Metaheuristic">Modifying an Existing Metaheuristic</a><a id="Modifying-an-Existing-Metaheuristic-1"></a><a class="docs-heading-anchor-permalink" href="#Modifying-an-Existing-Metaheuristic" title="Permalink"></a></h2><p>You may need to modify one of the implemented metaheuristic to improve the algorithm performance or test new mechanisms. This example illustrate how to do it.</p><div class="admonition is-warning"><header class="admonition-header">Modifying algorithms could break stuff</header><div class="admonition-body"><p>It is recommended to put the new methods in <code>module</code>s rather than in global scope in order to avoid errors.</p></div></div><p>Let&#39;s assume that we want to modify the stop criteria for <code>ECA</code>. See <a href="../contributing/#Contributing">Contributing</a>  for more details.</p><pre><code class="language-julia-repl">julia&gt; using Metaheuristics
 
 julia&gt; import LinearAlgebra: norm
@@ -239,11 +239,11 @@ julia&gt; f, bounds, opt = Metaheuristics.TestProblems.get_problem(:sphere);
 
 julia&gt; optimize(f, bounds, ECA())
 [ Info: Diversity-based stop criteria
-distances_mean = 0.0009967443405550537
+distances_mean = 0.0009984870092631304
 +=========== RESULT ==========+
-  iteration: 200
-    minimum: 1.89147e-07
-  minimizer: [0.00015026740474023104, -7.431728394633232e-5, 0.00014412443167639646, 2.8549679031951328e-5, 0.0002772553677464549, 0.0001183355472418841, -6.040801067743838e-5, -7.327011976923713e-5, -9.187383844753595e-5, 0.0001764210182578573]
-    f calls: 13998
- total time: 1.3151 s
-+============================+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/create-metaheuristic/">« Create Your Own Metaheuristic</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 12 November 2021 15:49">Friday 12 November 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  iteration: 184
+    minimum: 3.63175e-07
+  minimizer: [0.00035921774792834686, 1.4720725431105724e-5, -7.754699884560183e-5, 0.00018625288032314655, -8.142808542585234e-5, -7.603558616823029e-5, -0.0001705620280196938, -0.00011605797709465306, 0.0002812410398090561, -0.00024320405965644188]
+    f calls: 12880
+ total time: 1.0751 s
++============================+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/create-metaheuristic/">« Create Your Own Metaheuristic</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 27 November 2021 18:41">Saturday 27 November 2021</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
