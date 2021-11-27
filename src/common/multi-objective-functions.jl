@@ -40,7 +40,7 @@ in a `Matrix`.
 """
 function ideal(points::Array{Vector{T}}) where T <: Real 
 
-    isempty(points) && isempty(points[1]) && return zeros(0)
+    (isempty(points) || isempty(points[1])) && return zeros(0)
     
     ideal = points[1]
 
@@ -59,10 +59,8 @@ end
 Computes the nadir point from a provided array of `Vector`s or a population or row vectors
 in a `Matrix`.
 """
-function nadir(points::Array{Vector{T}})  where T <: Real
- 
-    isempty(points) && isempty(points[1]) && return zeros(0)
-    
+function nadir(points::Array{Vector{T}})  where T <: Real 
+    (isempty(points) || isempty(points[1])) && return zeros(0)
     nadir = points[1]
 
     for point in points
@@ -74,14 +72,27 @@ end
 
 
 function ideal(population::Array{xFgh_indiv})
+    isempty(population) && (return zeros(0))
+
     mask = sum_violations.(population) .== 0
+    if count(mask) == 0
+        @warn "Ideal point was computed using infeasible solutions. Use `ideal(fvals(population))` to ignore feasibility."
+        return ideal(fval.(population))
+    end
+    
 
     ideal(fval.(population[mask]))
 end
 ideal(A::Matrix) = ideal([A[i,:]  for i in 1:size(A,1)])
 
 function nadir(population::Array{xFgh_indiv})
+    isempty(population) && (return zeros(0))
     mask = sum_violations.(population) .== 0
+
+    if count(mask) == 0
+        @warn "Nadir point was computed using infeasible solutions. Use `nadir(fvals(population))` to ignore feasibility."
+        return nadir(fval.(population))
+    end
 
     nadir(fval.(population[mask]))
 end

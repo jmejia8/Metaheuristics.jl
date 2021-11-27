@@ -140,10 +140,20 @@ import Random: seed!
         # testing nadir and ideal pint
         @test ideal(front) == ideal(Array(hcat(front...)')) == zeros(3)
         @test nadir(front) == nadir(Array(hcat(front...)')) == [2.0, 3, 2]
+        @test isempty(nadir(empty(front))) && isempty(ideal(empty(front)))
 
         f, bounds, front2 = Metaheuristics.TestProblems.get_problem(:DTLZ2);
         @test Metaheuristics.PerformanceIndicators.hypervolume(front2, nadir(front2)) > 0
         @test ideal(front2) != nadir(front2) 
+        @test isempty(nadir(empty(front2))) && isempty(ideal(empty(front2)))
+
+        for  s in front2
+            s.sum_violations = 1
+        end
+
+        # ideal and nadir points on an infeasible front
+        @test  Metaheuristics.compare(ideal(front2), nadir(front2)) == 1
+        
     end
 
     function test_prev_pop()
