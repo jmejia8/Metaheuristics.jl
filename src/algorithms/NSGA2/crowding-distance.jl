@@ -4,7 +4,7 @@ function compute_crowding_distance(pop)
 
     if length(pop[1].f) == 2
         sort!(pop, by = x -> x.f[1])
-        pop[1].f[1] == pop[end].f[1] && return #Don't waste time if all indivs are the same
+        pop[1].f[1] == pop[end].f[1] && (return crowding) #Don't waste time if all indivs are the same
         crowding[1] = crowding[end] = Inf
 
         width_y1 = (pop[end].f[1] - pop[1].f[1])
@@ -33,7 +33,7 @@ end
 
 function update_crowding_distance!(pop)
     # at leat 3 items to compute crowding distance
-    length(pop) < 3 && (return) 
+    length(pop) < 3 && (return pop) 
     
     crowding = compute_crowding_distance(pop)
     for (i, sol) in enumerate(pop)
