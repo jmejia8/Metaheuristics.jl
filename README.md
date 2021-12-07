@@ -47,7 +47,7 @@ considered in most of the implemented algorithms.
 - **SA**:  Simulated Annealing
 - **WOA**: Whale Optimization Algorithm
 
-### Muli-Objective Optimization
+### Multi-Objective Optimization
 
 [![SMS-EMOA in Metaheuristics.jl](https://jmejia8.github.io/Metaheuristics.jl/dev/figs/ZDT6.gif)](https://jmejia8.github.io/Metaheuristics.jl/stable/visualization/)
 
