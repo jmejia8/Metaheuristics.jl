@@ -138,8 +138,8 @@ algorithm performance or test new mechanisms. This example illustrate how to do 
 
 
 !!! warning "Modifying algorithms could break stuff"
-    It is recommended to put the new methods in `module`s rather than in global scope in
-    order to avoid errors.
+    Be cautious when modify a metaheuristic due to those changes will overwrite the default
+    method for that metaheuristic.
 
 
 Let's assume that we want to modify the stop criteria for `ECA`. See [Contributing](@ref) 
