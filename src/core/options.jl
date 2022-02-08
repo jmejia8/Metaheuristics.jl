@@ -19,6 +19,7 @@ mutable struct Options
     debug::Bool
     search_type::Symbol
     seed::UInt
+    parallel_evaluation::Bool
 end
 
 """
@@ -34,7 +35,8 @@ end
         iterations::Int = 1,
         store_convergence::Bool = false,
         debug::Bool = false,
-        seed = rand(UInt)
+        seed = rand(UInt),
+        parallel_evaluation = false,
     )
 
 
@@ -92,33 +94,34 @@ julia> state = optimize(f, bounds, ECA(options=options))
 
 """
 function Options(;
-    x_tol = 0.0,
-    f_tol = 0.0,
-    g_tol = 0.0,
-    h_tol = 0.0,
-    f_calls_limit = 0.0,
-    g_calls_limit = 0.0,
-    h_calls_limit = 0.0,
-    iterations::Int = 0,
-    time_limit::Float64 = Inf,
-    store_convergence = false,
-    show_results = true,
-    debug = false,
-    search_type = :minimize,
-    seed = rand(UInt)
-)
+        x_tol = 0.0,
+        f_tol = 0.0,
+        g_tol = 0.0,
+        h_tol = 0.0,
+        f_calls_limit = 0.0,
+        g_calls_limit = 0.0,
+        h_calls_limit = 0.0,
+        iterations::Int = 0,
+        time_limit::Float64 = Inf,
+        store_convergence = false,
+        show_results = true,
+        debug = false,
+        search_type = :minimize,
+        parallel_evaluation = false,
+        seed = rand(UInt)
+    )
 
 
     Options(
-        promote(x_tol, f_tol, g_tol, h_tol)...,
-        promote(f_calls_limit, g_calls_limit, h_calls_limit, time_limit)...,
-        promote(iterations)...,
-
-        # Results options
-        promote(store_convergence, show_results, debug)...,
-        Symbol(search_type),
-        UInt(seed)
-    )
+            promote(x_tol, f_tol, g_tol, h_tol)...,
+            promote(f_calls_limit, g_calls_limit, h_calls_limit, time_limit)...,
+            promote(iterations)...,
+            # Results options
+            promote(store_convergence, show_results, debug)...,
+            Symbol(search_type),
+            UInt(seed),
+            Bool(parallel_evaluation)
+           )
 
 end
 

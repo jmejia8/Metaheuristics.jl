@@ -51,7 +51,7 @@ function optimize(
     parameters = method.parameters
     ###################################
 
-    problem = Problem(f, Array(bounds))
+    problem = Problem(f, Array(bounds); parallel_evaluation=options.parallel_evaluation)
     seed!(options.seed)
 
     ###################################

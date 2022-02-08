@@ -72,11 +72,13 @@ const Population = Array{Solution, 1}
 # output
 #############################################################
 
-function generateChild(x::Vector{Float64}, fResult::Float64;ε=0.0)
+# single objective
+function create_child(x::Vector{Float64}, fResult::Float64;ε=0.0)
     return xf_indiv(x, fResult)
 end
 
-function generateChild(x::Vector{Float64},
+# constrained single objective
+function create_child(x::Vector{Float64},
         fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}};
         ε=0.0
     )
@@ -86,7 +88,8 @@ function generateChild(x::Vector{Float64},
     return xfgh_indiv(x, f, g, h; ε=ε)
 end
 
-function generateChild(x::Vector{Float64},
+# constrained multi-objective
+function create_child(x::Vector{Float64},
         fResult::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}};
         ε = 0.0
     )
@@ -94,15 +97,79 @@ function generateChild(x::Vector{Float64},
     return xFgh_indiv(x, f, g, h;ε=ε)
 end
 
+##########################################################3
+# parallel evaluation
+##########################################################3
+# single objective
+function create_child(X::AbstractMatrix, fResult::AbstractVector;ε=0.0)
+    size(X,1) != length(fResult) && error("Error in parallel evaluation: size(X,2) != length(f(X))")
+    return [xf_indiv(X[i,:], fResult[i]) for i in 1:size(X,1)]
+end
+
+# constrained single objective
+function create_child(X::AbstractMatrix,
+        fResult::Tuple{AbstractVector, T, T};
+        ε=0.0
+    ) where T <: AbstractMatrix{Float64}
+
+    F, G, H = fResult
+
+    size_ok = size(X,1) == length(F) #&& size(X,1) == size(G,1) && size(X,1) == size(H,1)
+    !size_ok && error("Error in parallel evaluation: Size of X, F(X),G(X) or H(X) differs.")
+
+    @assert isempty(G) || !isempty(G) && size(X,1) == size(G,1)
+    @assert isempty(H) || !isempty(H) && size(X,1) == size(H,1)
+
+    population = xfgh_indiv[]
+
+    for i in 1:size(X,1)
+        g = isempty(G) ? zeros(0) : G[i,:]
+        h = isempty(H) ? zeros(0) : H[i,:]
+        push!(population, xfgh_indiv(X[i,:], F[i], g, h;ε=ε))
+    end
+    population
+end
+
+# constrained multi-objective
+function create_child(X::AbstractMatrix,
+        fResult::Tuple{T, T, T};
+        ε=0.0
+    ) where T <: AbstractMatrix{Float64}
+
+    F, G, H = fResult
+
+    @assert size(X,1) == size(F,1)
+    @assert isempty(G) || !isempty(G) && size(X,1) == size(G,1)
+    @assert isempty(H) || !isempty(H) && size(X,1) == size(H,1)
+    # !size_ok && error("Error in parallel evaluation: size(X,1) != size(F(X),1).")
+    #&& error("Error in parallel evaluation: size(X,1) != size(G(X),1).")
+    #&& error("Error in parallel evaluation: size(X,1) != size(H(X),1).")
+
+    population = xFgh_indiv[]
+
+    for i in 1:size(X,1)
+        g = isempty(G) ? zeros(0) : G[i,:]
+        h = isempty(H) ? zeros(0) : H[i,:]
+        push!(population, xFgh_indiv(X[i,:], F[i,:], g, h;ε=ε))
+    end
+    population
+end
+
+##########################################################3
 
 
-function generate_population(N::Int, problem;ε=0.0)
+
+function generate_population(N::Int, problem;ε=0.0, parallel_evaluation = false)
     a = view(problem.bounds, 1, :)'
     b = view(problem.bounds, 2, :)'
     D = length(a)
 
     X = a .+ (b - a) .* rand(N, D)
 
+    if problem.parallel_evaluation
+        return create_solutions(X, problem; ε=ε)
+    end
+    
     population = [ create_solution(X[i,:], problem; ε=ε) for i in 1:N]
 
     return population
@@ -159,14 +226,21 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 ```
 
 """
-create_child(x, fx) = generateChild(x, fx)
+generateChild(x, fx) = create_child(x, fx)
 
-function create_solution(x, problem::Problem; ε=0.0)
+function create_solution(x::AbstractVector, problem::Problem; ε=0.0)
     problem.f_calls += 1
-    return generateChild(x, problem.f(x), ε=ε)
+    return create_child(x, problem.f(x), ε=ε)
 end
 
 
+function create_solutions(X::AbstractMatrix, problem::Problem; ε=0.0)
+    problem.f_calls += size(X,1)
+    if problem.parallel_evaluation
+        return create_child(X, problem.f(X), ε=ε)
+    end
+    [create_child(X[i,:], problem.f(X[i,:]), ε=ε) for i in 1:size(X,1)]
+end
 
 # getters for the above structures
 

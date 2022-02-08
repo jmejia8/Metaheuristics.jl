@@ -27,15 +27,16 @@ mutable struct Problem <: AbstractProblem
     f::Function
     bounds::Array{Float64,2}
     f_calls::Int
+    parallel_evaluation::Bool
 end
 
-function Problem(f::Function, bounds::Array)
+function Problem(f::Function, bounds::Array; parallel_evaluation=false)
 
     if size(bounds,1) > 2 && size(bounds,2) == 2
         bounds = Array(bounds')
     end
 
-    Problem(f, bounds, 0)
+    Problem(f, bounds, 0, parallel_evaluation)
 end
 
 function evaluate(x, problem::Problem)
