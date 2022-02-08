@@ -85,7 +85,6 @@ function update_state!(
         kargs...
 )
     population = status.population
-    current_pop = copy(population)
 
     F = parameters.F
     CR = parameters.CR
@@ -106,36 +105,29 @@ function update_state!(
 
     xBest = get_position(status.best_sol)
     best_ind = 1
+    new_vectors = zeros(N, size(problem.bounds, 2))
 
     for i in 1:N
-        x = get_position(current_pop[i])
-
-        u = DE_mutation(current_pop, F, strategy, best_ind)
+        x = get_position(population[i])
+        u = DE_mutation(population, F, strategy, best_ind)
         v = DE_crossover(x, u, CR)
+        evo_boundary_repairer!(v, xBest, problem.bounds)
+        new_vectors[i,:] = v
+    end
 
-        # instance child
-        v = evo_boundary_repairer!(v, xBest, problem.bounds)
-        h = create_solution(v, problem,ε=options.h_tol)
-
-        # select survivals
-        if is_better(h, current_pop[i])
+    # evaluate solutions
+    new_solutions = create_solutions(new_vectors, problem,ε=options.h_tol)
+    # select survival
+    for (i, h) in enumerate(new_solutions)
+        if is_better(h, population[i])
             population[i] = h
-
             if is_better(h, status.best_sol)
                 status.best_sol = h
                 best_ind = i
             end
         end
-
-        stop_criteria!(status, parameters, problem, information, options)
-        if status.stop
-            break
-        end
     end
-
-
-
-
+    stop_criteria!(status, parameters, problem, information, options)
 end
 
 function initialize!(
