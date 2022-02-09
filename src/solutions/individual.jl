@@ -106,6 +106,16 @@ function create_child(X::AbstractMatrix, fResult::AbstractVector;ε=0.0)
     return [xf_indiv(X[i,:], fResult[i]) for i in 1:size(X,1)]
 end
 
+
+# unconstrained multi objective
+function create_child(X::AbstractMatrix, fResult::AbstractMatrix;ε=0.0)
+    size(fResult,2) > 1 && (return create_child(X, (fResult, zeros(0,0), zeros(0,0))))
+
+    size(X,1) != size(fResult,1) && error("Error in parallel evaluation: size(X,2) != length(f(X))") 
+
+    return [xf_indiv(X[i,:], fResult[i]) for i in 1:size(X,1)]
+end
+
 # constrained single objective
 function create_child(X::AbstractMatrix,
         fResult::Tuple{AbstractVector, T, T};

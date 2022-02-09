@@ -70,7 +70,7 @@ using Test
         f_calls = 0
         f(X) = begin
             f_calls += size(X,1)
-            sum(X.^2,dims=2)[:,1]
+            sum(X.^2,dims=2)
         end
         bounds = [-ones(5)'; ones(5)']
         options = Options(f_tol = desired_accuracy,

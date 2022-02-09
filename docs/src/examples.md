@@ -134,20 +134,20 @@ optimize(f, bounds, NSGA2())
 
 ## Parallel Evaluations
 
-Evaluate multiple solutions at the same time can reduce computational time. Define
-your function on a `N x D` matrix and a matrix in output with values in rows for each `N` 
-solutions. Also, you need to put `parallel_evaluation=true` in the [Options](@ref)
+Evaluating multiple solutions at the same time can reduce computational time. To do that,
+define your function on an input `N x D` matrix and function values into matrices with outcomes
+in rows for all `N` solutions. Also, you need to put `parallel_evaluation=true` in the [Options](@ref)
 to indicate that your `f` is prepared for parallel evaluations.
 
 ```julia
 f(X) = begin
     fx = sum(X.^2, dims=2)       # objective function ∑x²
-    gx = sum(X.^2,dims=2) .- 0.5 # inequality constraints ∑x² ≤ 0.5
+    gx = sum(X.^2, dims=2) .-0.5 # inequality constraints ∑x² ≤ 0.5
     hx = zeros(0,0)              # equality constraints
     fx, gx, hx
 end
 
-options = Options(parallel_evaluation=true,h_tol=1e-3)
+options = Options(parallel_evaluation=true)
 
 res = optimize(f, [-10ones(5) 10ones(5)], ECA(options=options))
 ```
