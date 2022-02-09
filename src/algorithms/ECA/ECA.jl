@@ -110,7 +110,6 @@ function update_state!(
     K = parameters.K
     I = randperm(parameters.N)
     D = size(problem.bounds, 2)
-    is_multiobjective = typeof(status.population[1]) == xFgh_indiv
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
@@ -118,14 +117,13 @@ function update_state!(
     a = problem.bounds[1, :]
     b = problem.bounds[2, :]
 
-    if is_multiobjective
-        shuffle!(status.population)
+    if options.parallel_evaluation
+        X_next = zeros(parameters.N, length(a))
     end
 
     # For each elements in Population
     for i = 1:parameters.N
         p = status.f_calls / options.f_calls_limit
-
 
         # current
         x = status.population[i].x
@@ -146,23 +144,22 @@ function update_state!(
         if p < parameters.p_exploit
             # u: worst element in U
             u = U[u_worst].x
-
             # current-to-center/bin
             y = x .+ η .* (c .- u)
-        elseif parameters.p_exploit < 0
-            y =
-                x .+ (1 - p^5) * η * (c .- u) .+
-                (p^5) * η * (status.best_sol.x .- c)
         else
             # current-to-best/bin
-            y = x .+ η .* (status.best_sol.x .- c)
+            y = x .+ η .* (minimizer(status) .- c)
         end
 
         # binary crossover
         y, M_current = crossover(U[u_best].x, y, parameters.p_cr)
-
         evo_boundary_repairer!(y, c, problem.bounds)
 
+        if options.parallel_evaluation
+            X_next[i,:] = y
+            continue
+        end
+        
         sol = create_solution(y, problem)
 
         # replace worst element
@@ -173,14 +170,29 @@ function update_state!(
                 status.best_sol = sol
             end
         else
-            if is_multiobjective && !is_better(status.population[i], sol)
-                push!(status.population, sol)
-            end
             parameters.adaptive && (Mcr_fail += M_current)
         end
 
         stop_criteria!(status, parameters, problem, information, options)
         status.stop && break
+    end
+
+
+    if options.parallel_evaluation
+        for (i, sol) in enumerate(create_solutions(X_next, problem))
+            if is_better(sol, status.population[i])
+                wi = argworst(status.population)
+                status.population[wi] = sol
+                if is_better(sol, status.best_sol)
+                    status.best_sol = sol
+                end
+            else
+                parameters.adaptive && (Mcr_fail += M_current)
+            end
+
+            stop_criteria!(status, parameters, problem, information, options)
+            status.stop && break
+        end
     end
 
     status.f_calls = problem.f_calls
@@ -192,10 +204,6 @@ function update_state!(
     if parameters.adaptive
         parameters.p_cr =
             adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N)
-    end
-
-    if is_multiobjective && length(status.population) > parameters.N
-        status.population = truncate_population!(status.population, parameters.N, (w,z) -> is_better(w, z))
     end
 
     p = status.f_calls / options.f_calls_limit

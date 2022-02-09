@@ -80,20 +80,21 @@ function update_state!(
     )
     xGBest = get_position(status.best_sol)
 
+    X_new = zeros(parameters.N, size(problem.bounds, 2))
+
     # For each elements in population
     for i in 1:parameters.N
         x = get_position(parameters.flock[i])
         xPBest = get_position(status.population[i])
-
         parameters.v[i, :] = velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
         x += parameters.v[i, :]
         reset_to_violated_bounds!(x, problem.bounds)
+        X_new[i,:] = x
+    end
 
-        sol = create_solution(x, problem, ε = options.h_tol)
-
+    for (i, sol) in enumerate(create_solutions(X_new, problem;ε = options.h_tol))
         if is_better(sol, status.population[i])
             status.population[i] = sol
-
             if is_better(sol, status.best_sol)
                 status.best_sol = sol
                 xGBest = get_position(status.best_sol)

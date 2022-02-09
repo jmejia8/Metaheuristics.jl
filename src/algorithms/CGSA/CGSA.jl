@@ -218,20 +218,17 @@ function update_state!(
     for i = 1:N
         x = reset_to_violated_bounds!(X[i,:], problem.bounds)
         X[i,:] = x
-        P[i] = create_solution(x, problem)
-        fitness[i] = P[i].f
     end
-    status.f_calls = problem.f_calls
+
+    status.population = create_solutions(X, problem)
 
     parameters.X = X
-    parameters.fitness = fitness
+    parameters.fitness = fvals(status.population)
     parameters.V = V
-    status.population = P
 
     #Evaluation of agents. 
-    currentBest = get_best(P)
+    currentBest = get_best(status.population)
 
-    # fix this
     if is_better(currentBest, theBest)
         status.best_sol = currentBest
     end

@@ -78,7 +78,10 @@ function initialize!(
         args...;
         kargs...
     )
-    
+
+    options.parallel_evaluation &&
+        error("ABC is not supporting parallel evaluation. Put `options.parallel_evaluation=false`")
+
     D = size(problem.bounds, 2)
 
     if options.f_calls_limit == 0

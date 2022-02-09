@@ -56,10 +56,10 @@ function WOA(;N = 30, information = Information(), options = Options())
 
 
   Algorithm(
-    parameters,
-    information = information,
-    options = options,
-  )
+            parameters,
+            information = information,
+            options = options,
+           )
 
 end
 
@@ -71,28 +71,28 @@ function initialize!(
     options::Options,
     args...;
     kargs...
-   )
+  )
 
-    lb, ub= problem.bounds[1,:], problem.bounds[2,:]
+  lb, ub= problem.bounds[1,:], problem.bounds[2,:]
 
-    #Initialize the positions of search agents
-	max_it = 500
-	options.iterations = options.iterations == 0 ? max_it : options.iterations
-    options.f_calls_limit = options.f_calls_limit == 0 ?
-                            options.iterations * parameters.N : options.f_calls_limit
+  #Initialize the positions of search agents
+  max_it = 500
+  options.iterations = options.iterations == 0 ? max_it : options.iterations
+  options.f_calls_limit = options.f_calls_limit == 0 ?
+  options.iterations * parameters.N : options.f_calls_limit
 
 
-    P = generate_population(parameters.N, problem)
-    best_sol = deepcopy(get_best(P))
-    status = State(best_sol, P)
-    #=
-	status.population = P
-    status.best_sol = deepcopy(get_best(status.population))
-    =#
-    status.f_calls = parameters.N
+  P = generate_population(parameters.N, problem)
+  best_sol = deepcopy(get_best(P))
+  status = State(best_sol, P)
+  #=
+  status.population = P
+  status.best_sol = deepcopy(get_best(status.population))
+  =#
+  status.f_calls = parameters.N
 
-    status
-	
+  status
+
 end
 
 function update_state!(
@@ -103,7 +103,7 @@ function update_state!(
     options::Options,
     args...;
     kargs...
-   )
+  )
 
 
   # Return back the search agents that go beyond the boundaries of the search space
@@ -119,6 +119,8 @@ function update_state!(
 
   # a2 linearly dicreases from -1 to -2 to calculate t in Eq. (3.12)
   a2=-1+t*((-1)/Max_iter)
+
+  X_new = zeros(N,D)
 
   # Update the Position of search agents 
   for i=1:N
@@ -158,16 +160,16 @@ function update_state!(
 
     end # for j
 
-    x = reset_to_violated_bounds!(x, problem.bounds)
-    status.population[i] = create_solution(x, problem)
-    status.f_calls += 1
-
-    if is_better(status.population[i], status.best_sol)
-      status.best_sol = deepcopy(status.population[i])
-    end
+    reset_to_violated_bounds!(x, problem.bounds)
+    X_new[i,:] = x
   end # for i
 
-  stop_criteria!(status, parameters, problem, information, options)
+
+  status.population = create_solutions(X_new, problem)
+  sol = get_best(status.population)
+  if is_better(sol, status.best_sol)
+    status.best_sol = deepcopy(sol)
+  end
 
 end
 
@@ -180,7 +182,7 @@ function final_stage!(
     args...;
     kargs...
   )
-    status.final_time = time()
+  status.final_time = time()
 end
 
 
