@@ -62,10 +62,55 @@ end
     end
 
 
+    function run_methods_parallel_eval(problem)
+        ff, bounds, pf = Metaheuristics.TestProblems.get_problem(problem)
+        D = size(bounds, 2)
+
+        # number of function evaluations
+        f_calls = 0
+
+        f(X) = begin
+            f_calls += size(X,1)
+            fx, gx, hx = ff(X[1,:])
+            F = zeros(size(X,1), length(fx)); F[1,:] = fx;
+            G = zeros(size(X,1), length(gx)); G[1,:] = gx;
+            H = zeros(size(X,1), length(hx)); H[1,:] = hx;
+
+            for i = 2:size(X,1)
+                fx, gx, hx = ff(X[i,:])
+                F[i,:] = fx               
+                G[i,:] = gx
+                H[i,:] = hx
+            end
+            F, G, H
+        end
+
+        options = Options( seed = 1, iterations=10000, f_calls_limit = 5000, parallel_evaluation=true)
+
+        methods = [
+                NSGA3(options=options),
+                SMS_EMOA(N = 50, n_samples=500, options=options),
+                NSGA2(options=options),
+                SPEA2(options=options),
+              ]
+
+        for method in methods
+            f_calls = 0
+            result = optimize(f, bounds, method)
+            # number of function evaluations should be reported correctly
+            @test f_calls == result.f_calls
+        end
+    end
+
+
     for problem in [:ZDT3, :DTLZ2, :MTP]
         run_methods(problem)
     end
 
+    for problem in [:ZDT1, :MTP]
+        # run_methods(problem)
+        run_methods_parallel_eval(problem)
+    end
 
 
 

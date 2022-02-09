@@ -62,12 +62,45 @@ using Test
         end
     end
 
+
+    function run_methods_parallel_eval(problem)
+
+        desired_accuracy = 1e-4
+
+        f_calls = 0
+        f(X) = begin
+            f_calls += size(X,1)
+            sum(X.^2,dims=2)[:,1]
+        end
+        bounds = [-ones(5)'; ones(5)']
+        options = Options(f_tol = desired_accuracy,
+                          f_calls_limit=1000,
+                          seed = 1,
+                          parallel_evaluation=true
+                         )
+
+        methods = [
+                   CGSA(options = options),
+                   DE(options = options),
+                   ECA(options = options),
+                   PSO(options = options),
+                   WOA(options = options),
+                  ]
+    
+        for method in methods
+            f_calls = 0
+            res = optimize(f, bounds, method)
+            @test f_calls == nfes(res)
+        end
+    end
+
     function test_result(fitness, tol)
         @test ≈(fitness, 0.0, atol=tol)
     end
 
     for problem in [:sphere]
         run_methods(problem)
+        run_methods_parallel_eval(problem)
     end
 
 end
