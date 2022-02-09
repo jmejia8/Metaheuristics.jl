@@ -95,19 +95,24 @@ function update_state!(
         parameters.fitness = compute_fitness(status.population)
     end
 
-    Q = empty(status.population)
+    Q = zeros(parameters.N, size(problem.bounds, 2))
     for i = 1:2:parameters.N
 
         pa = binary_tournament(status.population, parameters.fitness)
         pb = binary_tournament(status.population, parameters.fitness)
 
-        offspring1, offspring2 = reproduction(pa, pb, parameters, problem)
-       
-        # save offsprings
-        push!(Q, offspring1, offspring2)
+        c1, c2 = GA_reproduction(get_position(pa),
+                                 get_position(pb),
+                                 problem.bounds;
+                                 η_cr = parameters.η_cr,
+                                 p_cr = parameters.p_cr,
+                                 η_m = parameters.η_m,
+                                 p_m = parameters.p_m)
+        Q[i,:] = c1
+        Q[i+1,:] = c2
     end
 
-    status.population = vcat(status.population, Q)
+    append!(status.population, create_solutions(Q, problem))
 
     # non-dominated sort, crowding distance, elitist removing
     environmental_selection!(status.population, parameters)

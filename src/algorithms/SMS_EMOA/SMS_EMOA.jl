@@ -101,8 +101,11 @@ function update_state!(
     I = randperm(parameters.N)
     J = randperm(parameters.N)
 
-    for i = 1:parameters.N
+    if options.parallel_evaluation
+        Q = zeros(parameters.N, size(problem.bounds, 2))
+    end 
 
+    for i = 1:parameters.N
         pa = tournament_selection(status.population, I[i])
         pb = tournament_selection(status.population, J[i])
 
@@ -119,9 +122,24 @@ function update_state!(
         # repair solutions if necesary
         reset_to_violated_bounds!(c, problem.bounds)
 
+        if options.parallel_evaluation
+            Q[i,:] = c
+            continue
+        end
+
         # evaluate offspring
         offspring = create_solution(c, problem)
        
+        # Reduce: save offspring in population and reduce population according to
+        # front contribution
+        update_population!(status.population, offspring, parameters.n_samples)
+    end
+
+    if !options.parallel_evaluation
+        return
+    end
+
+    for (i, offspring) in enumerate(create_solutions(Q, problem))
         # Reduce: save offspring in population and reduce population according to
         # front contribution
         update_population!(status.population, offspring, parameters.n_samples)

@@ -96,33 +96,25 @@ function update_state!(
 
 
     I = randperm(parameters.N)
+    Q = zeros(parameters.N, size(problem.bounds, 2))
     for i = 1:parameters.N ÷ 2
 
         pa = status.population[I[2i-1]]
         pb = status.population[I[2i]]
 
-        # crossover
-        c1, c2 = SBX_crossover( get_position(pa), get_position(pb), problem.bounds,
-                              parameters.η_cr, parameters.p_cr)
+        c1, c2 = GA_reproduction(get_position(pa),
+                                 get_position(pb),
+                                 problem.bounds;
+                                 η_cr = parameters.η_cr,
+                                 p_cr = parameters.p_cr,
+                                 η_m = parameters.η_m,
+                                 p_m = parameters.p_m)
+        Q[i,:] = c1
+        Q[i+1,:] = c2
        
-        # mutation
-        polynomial_mutation!(c1,problem.bounds,parameters.η_m, parameters.p_m)
-        polynomial_mutation!(c2,problem.bounds,parameters.η_m, parameters.p_m)
-       
-        # rapair solutions if necesary
-        reset_to_violated_bounds!(c1, problem.bounds)
-        reset_to_violated_bounds!(c2, problem.bounds)
-
-        # evaluate children
-        child1 = create_solution(c1, problem)
-
-        child2 = create_solution(c2, problem) 
-        status.f_calls += 2
-       
-        # save children
-        push!(status.population, child1)
-        push!(status.population, child2)
     end
+
+    append!(status.population, create_solutions(Q, problem))
     
     # non-dominated sort, elitist removing via niching
     truncate_population_nsga3!(status.population,parameters.reference_points,parameters.N)
