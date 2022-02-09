@@ -1,47 +1,33 @@
 function update_state!(
-    status::State{xfgh_indiv},
-    parameters::ECA,
-    problem::AbstractProblem,
-    information::Information,
-    options::Options,
-    args...;
-    kargs...
-)
-    K = parameters.K
+        status::State{xfgh_indiv},
+        parameters::ECA,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
+
     I = randperm(parameters.N)
     N = parameters.N
     population = status.population
-    D = size(problem.bounds, 2)
-
-
-    a = problem.bounds[1, :]
-    b = problem.bounds[2, :]
 
     ε = 0.0
 
-    p = status.f_calls / options.f_calls_limit
-
     if parameters.ε > 0.0
-        ε = parameters.ε * (p - 1.0)^4
+        p = status.f_calls / options.f_calls_limit
+        ε = parameters.ε * (1-p)^4
     end
 
+    feasible_solutions = findall( s->s.is_feasible, population )
+    weights = compute_weights(population)
 
-
-    feasible_solutions = findall( s->s.is_feasible, status.population )
-
-    fs = fvals(status)
-    fx_max = maximum( abs.(fs) )
-
-    vios = map(sum_violations, population)
-    fs += 2.0*fx_max*vios
-    γ = maximum( abs.(fs) )
-    weights = 2.0γ .- fs
+    X_next = zeros(parameters.N, size(problem.bounds, 2))
 
     # For each elements in Population
     for i = 1:parameters.N
-
         # current
-        x = status.population[i].x
+        x = population[i].x
 
         # generate U masses
         U_ids = getU_ids(parameters.K, I, i, parameters.N, feasible_solutions)
@@ -65,23 +51,17 @@ function update_state!(
         
         mask = rand(length(y)) .< 1.0 / length(y)
         y[mask] = v[mask]
-        
-        
 
         evo_boundary_repairer!(y, c, problem.bounds)
+        X_next[i,:] = y
+    end
 
-        sol = create_solution(y, problem, ε=ε)
-        status.f_calls += 1
-
-
+    for sol in create_solutions(X_next, problem, ε=ε)
         if is_better(sol, status.best_sol)
             status.best_sol = sol
         end
-
-
         # stored but not used until replacement step
         push!(status.population, sol)
-
         status.stop = stop_check(status, information, options)
         status.stop && break
     end
@@ -92,23 +72,28 @@ function update_state!(
     end
 
     # replacement step
-    sort!(status.population, lt = is_better)
+    sort!(status.population, lt = is_better, alg=QuickSort)
     deleteat!(status.population, N+1:length(status.population))
-    
-
-
 end
 
+function compute_weights(population)
+    fs = fvals(population)
+    fx_max = maximum( abs.(fs) )
+    vios = map(sum_violations, population)
+    fs += 2.0*fx_max*vios
+    γ = maximum( abs.(fs) )
+    2.0γ .- fs
+end
 
 function final_stage!(
-    status::State{xfgh_indiv},
-    parameters::ECA,
-    problem::AbstractProblem,
-    information::Information,
-    options::Options,
-    args...;
-    kargs...
-)
+        status::State{xfgh_indiv},
+        parameters::ECA,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
     status.final_time = time()
 
 end

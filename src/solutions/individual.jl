@@ -138,6 +138,9 @@ function create_child(X::AbstractMatrix,
 
     F, G, H = fResult
 
+    # single-objective
+    size(F,2) == 1 && (return create_child(X, (F[:,1], G, H)))
+
     @assert size(X,1) == size(F,1)
     @assert isempty(G) || !isempty(G) && size(X,1) == size(G,1)
     @assert isempty(H) || !isempty(H) && size(X,1) == size(H,1)
