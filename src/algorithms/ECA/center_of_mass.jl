@@ -145,7 +145,7 @@ function ECA_operator(
         return y
     end
 
-    evo_boundary_repairer!(y, c, bounds)
+    !isempty(bounds) && evo_boundary_repairer!(y, c, bounds)
 
     return y
 end

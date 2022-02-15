@@ -98,6 +98,7 @@ include("algorithms/SMS_EMOA/SMS_EMOA.jl")
 include("algorithms/SPEA2/SPEA2.jl")
 
 
+include("common/reproduction.jl")
 
 #######################################################
 #                                                     #

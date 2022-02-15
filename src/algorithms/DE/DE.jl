@@ -100,20 +100,7 @@ function update_state!(
             parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand()
     end
 
-    N = parameters.N
-    strategy = parameters.strategy
-
-    xBest = get_position(status.best_sol)
-    best_ind = 1
-    new_vectors = zeros(N, size(problem.bounds, 2))
-
-    for i in 1:N
-        x = get_position(population[i])
-        u = DE_mutation(population, F, strategy, best_ind)
-        v = DE_crossover(x, u, CR)
-        evo_boundary_repairer!(v, xBest, problem.bounds)
-        new_vectors[i,:] = v
-    end
+    new_vectors = reproduction(status, parameters, problem)
 
     # evaluate solutions
     new_solutions = create_solutions(new_vectors, problem,ε=options.h_tol)
