@@ -48,109 +48,8 @@ function reproduction(status, parameters::ECA, problem)
     X 
 end
 
-###########################################
-## PSO
-###########################################
-function reproduction(status, parameters::PSO, problem)
-    @assert !isempty(status.population)
-
-    if isempty(parameters.flock)
-        parameters.flock = status.population
-    end
-
-    N = parameters.N
-    D = length(get_position(status.population[1]))
-
-    if isempty(parameters.v)
-        parameters.v = zeros(parameters.N, D)
-    end
-
-    X = zeros(N,D)
-    xGBest = get_position(status.best_sol)
-
-    for i in 1:N
-        x = get_position(parameters.flock[i])
-        xPBest = get_position(status.population[i])
-        parameters.v[i, :] = velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
-        x += parameters.v[i, :]
-        reset_to_violated_bounds!(x, problem.bounds)
-        X[i,:] = x
-    end
-    # set parameters.flock = status.population, out-side this function
-
-    X 
-end
 
 
-###########################################
-## CGSA reproduction
-###########################################
-function reproduction(status, parameters::CGSA, problem,options=nothing)
-    @assert !isempty(status.population)
-    if isnothing(options)
-        @warn "Reproduction require options: reproduction(status,parameters,problem,options)"
-        max_it = 500
-    else
-        max_it = options.iterations
-    end
- 
-    # main parameters
-    wMax = parameters.wMax
-    N = parameters.N
-    wMin = parameters.wMin
-    iteration = status.iteration
-    searchType = :minimize
-    chaosIndex = parameters.chaosIndex	
-    Rnorm = parameters.Rnorm
-    Rpower = parameters.Rpower
-    ElitistCheck = parameters.ElitistCheck
-
-    # Velocity
-    parameters.V = isempty(parameters.V) ? zeros(N,D) : parameters.V
-    # Positions
-    parameters.X = isempty(parameters.X) ? positions(status) : parameters.X
-    # function values
-    if isempty(parameters.fitness)
-        parameters.fitness = fvals(status.population)
-    end
-
-    X = parameters.X
-    V = parameters.V
-    fitness = parameters.fitness
-
-    P = status.population
-    theBest = status.best_sol
-
-    # iteration
-    chValue = wMax-iteration*((wMax-wMin)/max_it)
-
-    #Calculation of M. eq.14-20
-    M = massCalculation(fitness,searchType)
-
-    #Calculation of Gravitational constant. eq.13.
-    G = Gconstant(iteration, max_it)
-
-    if 1 <= chaosIndex <= 10
-        G += chaos(chaosIndex,iteration,max_it,chValue)
-    end
-
-
-    #Calculation of accelaration in gravitational field. eq.7-10,21.
-    a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
-
-    #Agent movement. eq.11-12
-    X, V = move(X,a,V)
-
-    for i = 1:N
-        x = reset_to_violated_bounds!(X[i,:], problem.bounds)
-        X[i,:] = x
-    end
-
-    parameters.X = X
-    parameters.V = V
-
-    X
-end
 
 ###########################################
 ## generic GA reproduction
@@ -180,7 +79,6 @@ function reproduction(status, parameters::AbstractNSGA, problem)
     Q
 end
 
-
 ###########################################
 ## NSGA3 reproduction
 ###########################################
@@ -207,3 +105,4 @@ function reproduction(status, parameters::NSGA3, problem)
 
     Q
 end
+
