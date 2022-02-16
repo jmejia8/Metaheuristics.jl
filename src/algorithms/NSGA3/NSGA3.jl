@@ -99,8 +99,12 @@ function update_state!(
     append!(status.population, create_solutions(Q, problem))
     
     # non-dominated sort, elitist removing via niching
-    truncate_population_nsga3!(status.population,parameters.reference_points,parameters.N)
+    environmental_selection!(status.population, parameters)
+end
 
+
+function environmental_selection!(population, parameters::NSGA3)
+    truncate_population_nsga3!(population,parameters.reference_points,parameters.N)
 end
 
 function truncate_population_nsga3!(population, reference_points, N)

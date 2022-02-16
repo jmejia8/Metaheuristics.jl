@@ -106,8 +106,8 @@ function update_state!(
     new_solutions = create_solutions(new_vectors, problem,ε=options.h_tol)
     append!(status.population, new_solutions)
 
-    environmental_selection!(status, parameters)
-    stop_criteria!(status, parameters, problem, information, options)
+    environmental_selection!(status.population, parameters)
+    status.best_sol = get_best(status.population)
 end
 
 
@@ -131,10 +131,11 @@ function environmental_selection(population, parameters::DE)
 end
 
 
-function environmental_selection!(status, parameters::DE)
-    mask = environmental_selection(status.population, parameters)
-    status.population = status.population[mask]
-    status.best_sol = get_best(status.population)
+function environmental_selection!(population, parameters::DE)
+    mask = environmental_selection(population, parameters)
+    ignored = ones(Bool, length(population))
+    ignored[mask] .= false
+    deleteat!(population, ignored)
     
     return
 end

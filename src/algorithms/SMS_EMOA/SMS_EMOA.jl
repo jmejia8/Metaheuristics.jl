@@ -1,4 +1,4 @@
-mutable struct SMS_EMOA <: AbstractParameters
+mutable struct SMS_EMOA <: AbstractNSGA
     N::Int
     η_cr::Float64
     p_cr::Float64
@@ -138,15 +138,25 @@ function update_state!(
     if !options.parallel_evaluation
         return
     end
-
-    for (i, offspring) in enumerate(create_solutions(Q, problem))
-        # Reduce: save offspring in population and reduce population according to
-        # front contribution
-        update_population!(status.population, offspring, parameters.n_samples)
-    end
-
+    append!(status.population, create_solutions(Q, problem))
+    environmental_selection!(status.population, parameters)
 end
 
+
+function environmental_selection!(population, parameters::SMS_EMOA)
+    if length(population) <= parameters.N
+        return
+    end
+
+    new_solutions = population[parameters.N+1:end]
+    population = population[1:parameters.N]
+
+    for (i, offspring) in enumerate(new_solutions)
+        # Reduce: save offspring in population and reduce population according to
+        # front contribution
+        update_population!(population, offspring, parameters.n_samples)
+    end
+end
 
 function initialize!(
     status,

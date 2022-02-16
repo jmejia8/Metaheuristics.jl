@@ -177,55 +177,76 @@ function update_state!(
         status.stop && break
     end
 
-
-    if options.parallel_evaluation
-        for (i, sol) in enumerate(create_solutions(X_next, problem))
-            if is_better(sol, status.population[i])
-                wi = argworst(status.population)
-                status.population[wi] = sol
-                if is_better(sol, status.best_sol)
-                    status.best_sol = sol
-                end
-            else
-                parameters.adaptive && (Mcr_fail += M_current)
-            end
-
-            stop_criteria!(status, parameters, problem, information, options)
-            status.stop && break
-        end
-    end
-
-    status.f_calls = problem.f_calls
-
     if status.stop
         return
     end
+
+
+    if options.parallel_evaluation
+        new_solutions = create_solutions(X_next, problem)
+        append!(status.population, new_solutions)
+        environmental_selection!(status.population, parameters)
+        status.best_sol = get_best(status.population)
+    end
+
+    status.f_calls = problem.f_calls
 
     if parameters.adaptive
         parameters.p_cr =
             adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N)
     end
 
-    p = status.f_calls / options.f_calls_limit
+    resize_population!(status, parameters, options)
 
-    if parameters.resize_population
-        K = parameters.K
-
-        # new size
-        parameters.N = 2K .+ round(Int, (1 - p) * (parameters.N_init .- 2K))
-
-        if parameters.N < 2K
-            parameters.N = 2K
-        end
-
-        status.population = resizePop!(
-            status.population,
-            parameters.N,
-            K
-        )
-    end
 end
 
+function resize_population!(status, parameters::ECA, options)
+    if !parameters.resize_population
+        return
+    end
+
+    p = status.f_calls / options.f_calls_limit
+
+    K = parameters.K
+
+    # new size
+    parameters.N = 2K .+ round(Int, (1 - p) * (parameters.N_init .- 2K))
+
+    if parameters.N < 2K
+        parameters.N = 2K
+    end
+
+    status.population = resizePop!(status.population, parameters.N, K)
+end
+
+
+
+function environmental_selection(population, parameters::ECA)
+    @assert length(population) == 2*parameters.N
+
+    new_solutions = population[parameters.N+1:end]
+    population = population[1:parameters.N]
+
+    survivals = collect(1:length(population))
+
+    for (i, sol) in enumerate(new_solutions)
+        if !is_better(sol, population[i])
+            continue
+        end
+        wi = argworst(population)
+        survivals[wi] = parameters.N + i
+        population[wi] = sol
+    end
+    return survivals
+end
+
+
+function environmental_selection!(population, parameters::ECA)
+    I = environmental_selection(population, parameters)
+    ignored = ones(Bool, length(population))
+    ignored[I] .= false
+    deleteat!(population, ignored)
+end
 
 function initialize!(
         status,
@@ -279,11 +300,5 @@ function final_stage!(
     kargs...
     )
     status.final_time = time()
-
-    # compute Pareto front if it is a multiobjective problem
-    if typeof(status.population[1].f) <: Array
-        options.debug && @info "Computing Pareto front..."
-        status.best_sol = get_pareto_front(status.population, is_better)
-    end
 end
 
