@@ -104,17 +104,39 @@ function update_state!(
 
     # evaluate solutions
     new_solutions = create_solutions(new_vectors, problem,ε=options.h_tol)
+    append!(status.population, new_solutions)
+
+    environmental_selection!(status, parameters)
+    stop_criteria!(status, parameters, problem, information, options)
+end
+
+
+function environmental_selection(population, parameters::DE)
+    @assert length(population) == 2*parameters.N
+    
+    new_solutions = population[parameters.N+1:end]
+    population = population[1:parameters.N]
+
+    survivals = Int[]
+
     # select survival
     for (i, h) in enumerate(new_solutions)
         if is_better(h, population[i])
-            population[i] = h
-            if is_better(h, status.best_sol)
-                status.best_sol = h
-                best_ind = i
-            end
+            push!(survivals, parameters.N + i)
+        else
+            push!(survivals, i)
         end
     end
-    stop_criteria!(status, parameters, problem, information, options)
+    return survivals
+end
+
+
+function environmental_selection!(status, parameters::DE)
+    mask = environmental_selection(status.population, parameters)
+    status.population = status.population[mask]
+    status.best_sol = get_best(status.population)
+    
+    return
 end
 
 function initialize!(
