@@ -38,7 +38,7 @@ function reproduction(status, parameters::ECA, problem)
     X = zeros(N,D)
 
     for i in 1:N
-        X[i,:] = ECA_operator(population,
+        X[i,:] = ECA_operator(status.population,
                               parameters.K,
                               parameters.η_max;
                               i=i,
