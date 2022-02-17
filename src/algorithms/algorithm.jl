@@ -9,14 +9,12 @@ gen_initial_state(problem,parameters,information,options,status::State{Any}) = g
 
 
 function gen_initial_state(problem,parameters,information,options, status)
-    if parameters.N != length(status.population)
+    parameters.N != length(status.population) &&
         error("Population size in provided State differs from that in parameters")
-    end
 
 
-    if size(problem.bounds,2) != length(get_position(status.best_sol))
+    size(problem.bounds,2) != length(get_position(status.best_sol)) &&
         error("Invalid population (dimension does not match with bounds)")
-    end
 
     return State(status.best_sol, status.population)
 

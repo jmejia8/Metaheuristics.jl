@@ -44,9 +44,7 @@ end
 
 
 function accuracy_stop_check(status::State{xfgh_indiv}, information, options)
-    if isnan(information.f_optimum)
-        return false
-    end
+    isnan(information.f_optimum) && (return false)
     
     vio = violationsSum(status.best_sol.g, status.best_sol.h, ε=options.h_tol)
     cond =  vio ≈ 0.0 && abs(status.best_sol.f - information.f_optimum) < options.f_tol
@@ -74,9 +72,7 @@ function var_stop_check(status, information, options)
 end
 
 function diversity_stop_check(status, information, options)
-    if typeof(status.best_sol.f) <: Array
-        return false
-    end
+    typeof(status.best_sol.f) <: Array && (return false)
 
     cond =  var(map( s->s.f, status.population )) ≈ 0.0
     options.debug && cond && @info("Stopped since varF was met.")

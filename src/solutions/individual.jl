@@ -297,9 +297,7 @@ hval(solution::T) where T <: AbstractConstrainedSolution = solution.h
 
 
 function fvals(population::AbstractArray{T}) where T <: AbstractMultiObjectiveSolution
-    if isempty(population)
-        return zeros(0, 0)
-    end
+    isempty(population) && (return zeros(0, 0))
     
     M = length(fval(population[1]))
     [ fval(sol)[i] for sol in population, i in 1:M]

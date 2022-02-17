@@ -10,6 +10,7 @@ export MOEAD_DE
 
 # v2.1 items
 export convergence, minimizer, minimum, positions, fvals, nfes, get_position, fval, NSGA2
+export hval, gval, hvals, gvals
 
 export NSGA3, gen_ref_dirs
 
