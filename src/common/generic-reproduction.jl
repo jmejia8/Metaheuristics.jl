@@ -57,7 +57,7 @@ function GA_reproduction_half(pa::AbstractVector{T},
 
 
     # crossover
-    _, c2 = SBX_crossover(pa, pb, bounds, η_cr, p_cr)
+    _, c = SBX_crossover(pa, pb, bounds, η_cr, p_cr)
 
     # mutation
     polynomial_mutation!(c, bounds,η_m, p_m)

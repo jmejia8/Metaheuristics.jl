@@ -18,16 +18,11 @@ end
     get the mass in a vector `m[i] = f[i] + 2*max_fitness*sum_vio[i] `, tolerance
     in equality constraints are given by `epsilon`
 """
-function getMass(U::Array{xf_indiv,1})
-    n, d = length(U), length(U[1].x)
+getMass(U::Array{xf_indiv,1}) = fitnessToMass(fvals(U))
 
-    fitness = zeros(Float64, n)
-
-    for i = 1:n
-        fitness[i] = U[i].f
-    end
-
-    return fitnessToMass(fitness)
+function getMass(U::Array{xfgh_indiv,1})
+    fitness = fvals(U)
+    fitnessToMass(fitness + 2maximum(abs.(fitness))*sum_violations.(U))
 end
 
 
@@ -123,7 +118,8 @@ Compute a solution using ECA variation operator, `K` is the number of solutions 
 calculate the center of mass and `η_max` is the maximum stepsize.
 """
 function ECA_operator(
-        population::AbstractArray{xf_indiv}, K, η_max;
+        # population::AbstractArray{xf_indiv}, K, η_max;
+        population, K, η_max;
         i = rand(1:length(population)),
         U = rand(population, K),
         bounds = nothing

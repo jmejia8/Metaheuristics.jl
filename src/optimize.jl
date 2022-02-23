@@ -63,12 +63,7 @@ function optimize(
     status = initialize!(status,parameters, problem, information, options)
     method.status = status
 
-    if options.debug
-        status.final_time = time()
-        msg = "Current Status of " * string(typeof(parameters))
-        @info msg
-        display(status)
-    end
+    show_status(status, parameters, options)
 
     status.iteration = 1
 
@@ -97,12 +92,7 @@ function optimize(
         # store the number of fuction evaluations
         status.f_calls = problem.f_calls
 
-        if options.debug
-            status.final_time = time()
-            msg = "Current Status of " * string(typeof(parameters))
-            @info msg
-            display(status)
-        end
+        show_status(status, parameters, options)
 
         if options.store_convergence
             update_convergence!(convergence, status)
@@ -138,3 +128,11 @@ function optimize(
 
 end
 
+
+function show_status(status, parameters, options)
+    !options.debug && (return)
+    status.final_time = time()
+    msg = "Current Status of " * string(typeof(parameters))
+    @info msg
+    display(status)
+end

@@ -179,9 +179,29 @@ import Random: seed!
         
         @test optimum < 1e-5
     end
-    
-    
 
+    function test_reproduction()
+        D = 4
+        N = 10
+        # Parallel Evaluations of solutions
+        pop1 = Metaheuristics.create_child(rand(N,D), rand(N)) 
+        pop2 = Metaheuristics.create_child(rand(N,D), (rand(N), -ones(N,2), zeros(N,2))) 
+
+        problem = Metaheuristics.Problem(x -> rand(), [zeros(D)'; ones(D)'])
+        for pop in [pop1, pop2]
+            status = State(pop[1], pop)
+            X = Metaheuristics.reproduction(status, ECA(N=N,K=3).parameters, problem)
+            @test size(X) == (N, D)
+            @test length(pop) == N
+        end
+
+        v = Metaheuristics.GA_reproduction_half(rand(D), rand(D), problem.bounds)
+        @test length(v) == D
+
+
+    end
+
+    test_reproduction()
     simple_test()
     test_problems()
     test_prev_pop()
