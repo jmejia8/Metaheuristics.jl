@@ -132,6 +132,55 @@ optimize(f, bounds, NSGA2())
 ```
 
 
+## Bilevel Optimization
+
+Bilevel optimization problems can be solved by using the package
+[BilevelHeuristics.jl](https://github.com/jmejia8/BilevelHeuristics.jl) which extends
+ `Metaheuristics.jl` for handling those hierarchical problems.
+
+Defining objective functions corresponding to the BO problem.
+
+**Upper level (leader problem):**
+
+```julia
+using BilevelHeuristics
+
+F(x, y) = sum(x.^2) + sum(y.^2)
+bounds_ul = [-ones(5) ones(5)] 
+```
+
+**Lower level (follower problem):**
+
+```julia
+f(x, y) = sum((x - y).^2) + y[1]^2
+bounds_ll = [-ones(5) ones(5)];
+```
+**Approximate solution:**
+
+```julia
+res = optimize(F, f, bounds_ul, bounds_ll, BCA())
+```
+
+**Output:**
+```
++=========== RESULT ==========+
+  iteration: 108
+    minimum: 
+          F: 4.03387e-10
+          f: 2.94824e-10
+  minimizer: 
+          x: [-1.1460768817533927e-5, 7.231706879604178e-6, 3.818596951258517e-6, 2.294324313691869e-6, 1.8770952450067828e-6]
+          y: [1.998748659975197e-6, 9.479307908087866e-6, 6.180041276047425e-6, -7.642051857319683e-6, 2.434166021682429e-6]
+    F calls: 2503
+    f calls: 5062617
+    Message: Stopped due UL function evaluations limitations. 
+ total time: 26.8142 s
++============================+
+```
+
+See [BilevelHeuristics](https://jmejia8.github.io/BilevelHeuristics.jl/dev/) documentation
+for more information.
+
 ## Parallel Evaluations
 
 Evaluating multiple solutions at the same time can reduce computational time. To do that,
