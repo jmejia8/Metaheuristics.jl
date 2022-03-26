@@ -181,6 +181,7 @@ res = optimize(F, f, bounds_ul, bounds_ll, BCA())
 See [BilevelHeuristics](https://jmejia8.github.io/BilevelHeuristics.jl/dev/) documentation
 for more information.
 
+
 ## Parallel Evaluations
 
 Evaluating multiple solutions at the same time can reduce computational time. To do that,

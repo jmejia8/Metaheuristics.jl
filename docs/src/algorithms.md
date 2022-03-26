@@ -3,6 +3,27 @@
 List of implemented metaheuristics. The algorithms were implemented based on the
 contributor's understanding of the algorithms detailed in the published paper.
 
+| Algorithm | Objectives | Constraints | Large Scale | Structure Name |
+|-----------|:----------:|:-----------:|:-----------:|----------------|
+| ECA       |  Single    |      ✅     |   ➖        | `ECA`          |
+| DE        |  Single    |      ✅     |   ➖        | `DE`           |
+| PSO       |  Single    |      ✅     |   ➖        | `PSO`          |
+| ABC       |  Single    |      ❌     |   ➖        | `ABC`          |
+| MOEA/D-DE |  Multi     |      ➖     |   ➖        | `MOEAD_DE`     |
+| GSA       |  Single    |      ❌     |   ❌        | `GSA`          |
+| SA        |  Single    |      ✅     |   ➖        | `SA`           |
+| WOA       |  Single    |      ✅     |   ➖        | `WOA`          |
+| NSGA-II   |  Multi     |      ✅     |   ➖        | `NSGA2`        |
+| NSGA-III  |  Many      |      ✅     |   ➖        | `NSGA3`        |
+| SMS-EMOA  |  Multi     |      ✅     |   ➖        | `SMS_EMOA`     |
+| SPEA2     |  Multi     |      ✅     |   ➖        | `SPEA2`        |
+| BCA       |  Bilevel   |      ✅     |   ➖        | [`BilevelHeuristics.BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) |
+
+
+✅ = supported,
+❌ = not supported,
+➖ = can be supported by changing default parameters.
+
 ## Evolutionary Centers Algorithm
 
 ECA was proposed for solving global optimization problems. See [MejiaMezura2019](@cite) for more information.
@@ -100,3 +121,9 @@ Improved strength Pareto evolutionary algorithm [Zitzler2001](@cite).
 ```@docs
 SPEA2
 ```
+
+## BCA
+
+Bilevel Centers Algorithm has been proposed to solve bilevel optimization problems.
+See [`BilevelHeuristics.BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) for 
+details.
