@@ -3,21 +3,22 @@
 List of implemented metaheuristics. The algorithms were implemented based on the
 contributor's understanding of the algorithms detailed in the published paper.
 
-| Algorithm | Objectives | Constraints | Large Scale | Structure Name |
-|-----------|:----------:|:-----------:|:-----------:|----------------|
-| ECA       |  Single    |      ✅     |   ➖        | `ECA`          |
-| DE        |  Single    |      ✅     |   ➖        | `DE`           |
-| PSO       |  Single    |      ✅     |   ➖        | `PSO`          |
-| ABC       |  Single    |      ❌     |   ➖        | `ABC`          |
-| MOEA/D-DE |  Multi     |      ➖     |   ➖        | `MOEAD_DE`     |
-| GSA       |  Single    |      ❌     |   ❌        | `GSA`          |
-| SA        |  Single    |      ✅     |   ➖        | `SA`           |
-| WOA       |  Single    |      ✅     |   ➖        | `WOA`          |
-| NSGA-II   |  Multi     |      ✅     |   ➖        | `NSGA2`        |
-| NSGA-III  |  Many      |      ✅     |   ➖        | `NSGA3`        |
-| SMS-EMOA  |  Multi     |      ✅     |   ➖        | `SMS_EMOA`     |
-| SPEA2     |  Multi     |      ✅     |   ➖        | `SPEA2`        |
+| Algorithm | Objectives | Constraints | Large Scale | Structure Name         |
+|-----------|:----------:|:-----------:|:-----------:|------------------------|
+| ECA       |  Single    |      ✅     |   ➖        | [`ECA`](@ref)          |
+| DE        |  Single    |      ✅     |   ➖        | [`DE`](@ref)           |
+| PSO       |  Single    |      ✅     |   ➖        | [`PSO`](@ref)          |
+| ABC       |  Single    |      ❌     |   ➖        | [`ABC`](@ref)          |
+| MOEA/D-DE |  Multi     |      ➖     |   ➖        | [`MOEAD_DE`](@ref)     |
+| GSA       |  Single    |      ❌     |   ❌        | [`CGSA`](@ref)          |
+| SA        |  Single    |      ✅     |   ➖        | [`SA`](@ref)           |
+| WOA       |  Single    |      ✅     |   ➖        | [`WOA`](@ref)          |
+| NSGA-II   |  Multi     |      ✅     |   ➖        | [`NSGA2`](@ref)        |
+| NSGA-III  |  Many      |      ✅     |   ➖        | [`NSGA3`](@ref)        |
+| SMS-EMOA  |  Multi     |      ✅     |   ➖        | [`SMS_EMOA`](@ref)     |
+| SPEA2     |  Multi     |      ✅     |   ➖        | [`SPEA2`](@ref)        |
 | BCA       |  Bilevel   |      ✅     |   ➖        | [`BilevelHeuristics.BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) |
+| MCCGA     |  Single    |      ❌     |   ❌        | [`MCCGA`](@ref)        |
 
 
 ✅ = supported,
@@ -127,3 +128,11 @@ SPEA2
 Bilevel Centers Algorithm has been proposed to solve bilevel optimization problems.
 See [`BilevelHeuristics.BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) for 
 details.
+
+
+## MCCGA
+
+Improved strength Pareto evolutionary algorithm [Zitzler2001](@cite).
+```@docs
+MCCGA
+```
