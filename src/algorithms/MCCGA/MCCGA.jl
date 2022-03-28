@@ -8,7 +8,8 @@ mutable struct MCCGA <: AbstractParameters
     N::Int # population size
     maxsamples::Int
     mutation::Float64
-    probvector
+    probvector::Vector{Float64}
+    use_local_search::Bool
 end
 
 """
@@ -24,11 +25,12 @@ function MCCGA(;
         N = 100,
         maxsamples =10_000,
         mutation = 1 / N,
+        use_local_search = true,
         information = Information(),
         options = Options()
     )
 
-    parameters = MCCGA(N, maxsamples, mutation, [])
+    parameters = MCCGA(N, maxsamples, mutation, [], use_local_search)
 
     Algorithm(
         parameters,
@@ -48,7 +50,7 @@ function initialize!(
     )
 
     if options.iterations == 0
-        options.iterations = 500
+        options.iterations = 100_000_000
     end
 
     if options.f_calls_limit == 0
@@ -60,9 +62,7 @@ function initialize!(
 
     parameters.probvector = initialprobs(lower, upper, maxsamples = parameters.maxsamples)
 
-
-    # FIXME: Metaheuristics needs an initial solution to create a State
-    # is this affecting the algorithm performance?
+    # sample a vector to create an initial State
     x = sample(parameters.probvector) |> floats
     initial_sol = create_solution(x, problem)
     return State(initial_sol, [initial_sol for i in 1:parameters.N])
@@ -90,19 +90,23 @@ function update_state!(
     sol1 = create_solution(floats(ch1), problem)
     sol2 = create_solution(floats(ch2), problem)
 
+    sol_winner = sol1
     winner = ch1
     loser  = ch2
 
-    # check if ch1 (sol1) is better that ch2 (sol2)
-    if is_better(sol1, sol2)
+    # check if ch2 (sol2) is better that ch1 (sol1)
+    if is_better(sol2, sol1)
+        sol_winner = sol2
         winner = ch2
         loser = ch1
     end
 
+    # save in population the winner (informative only)
+    # this is not used in the algorithm
+    status.population[1 + status.iteration % parameters.N] = sol_winner
+
     # save best solution found so far
-    # FIXME: Performance improvement here (only compare to the winner).
-    is_better(sol1, status.best_sol) &&  (status.best_sol = sol1)
-    is_better(sol2, status.best_sol) &&  (status.best_sol = sol2)
+    is_better(sol_winner, status.best_sol) &&  (status.best_sol = sol_winner)
 
     for i = 1:chsize
         if winner[i] != loser[i]
@@ -131,6 +135,11 @@ function final_stage!(
         kargs...
     )
 
+    if !parameters.use_local_search
+        status.final_time = time()
+        return
+    end
+
     costfunction(x) = evaluate(x, problem)
 
     probvector = parameters.probvector
@@ -146,7 +155,14 @@ function final_stage!(
     options.debug && @info "NelderMead done!"
 
     # save best solution found so far!
-    status.best_sol = create_child(local_result.minimizer, local_result.minimum)
+    sol = create_child(local_result.minimizer, local_result.minimum)
+
+    status.final_time = time()
+    status.f_calls = problem.f_calls
+
+    if is_better(sol, status.best_sol)
+        status.best_sol = sol
+    end
 
     return
 end
@@ -161,18 +177,20 @@ function final_stage!(
         kargs...
     )
 
+    status.final_time = time()
     # nothing to do for constrained or multi-objective
+    @warn "MCCGA has been designed for unconstrained problems (local search not performed)."
 end
 
-function stop_criteria!(status, parameters, problem, information, options)
+function stop_criteria!(status, parameters::MCCGA, problem, information, options)
     # check budget limitation
     if status.stop
         return
     end
 
     mutation = parameters.mutation
-    status.stop = !(all(x -> (x <= mutation) || (x >= 1.0 - mutation), probvector))
+    status.stop = all(x -> (x <= mutation) || (x >= 1.0 - mutation), parameters.probvector)
 
-     
+    status.stop && options.debug && @info "MCCGA stopping criteria is met."
 end
 

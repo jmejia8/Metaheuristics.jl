@@ -3,7 +3,6 @@
 # Credits to corresponding author.
 ##################################################################
 
-
 function initialprobs(
     lower::Array{T,1},
     upper::Array{T,1};
@@ -91,18 +90,10 @@ Satman, Mehmet Hakan, and Emre Akadal. "Makine Kodlu Hibrit Kompakt Genetik Algo
 Optimizasyon Yöntemi", TR Patent 2018-GE-510,239    
 """
 function bits(f::T)::Array{Int8,1} where {T<:Number}
-    #strbits = Float32(f) |> bitstring |> x -> split(x, "")
-    #return map(x -> parse(Int8, x), strbits)
     newf = Float32(f)
     casted = reinterpret(Int32, newf)
     return reverse(map(i-> casted >> i & 1, 0:31))
 end
-
-
-
-
-
-
 
 """
         bits(values)
@@ -136,9 +127,6 @@ Optimizasyon Yöntemi", TR Patent 2018-GE-510,239
 function bits(fs::Array{T,1})::Array{Int8,1} where {T<:Number}
     return map(x -> bits(x), fs) |> x -> vcat(x...)
 end
-
-
-
 
 
 """
