@@ -1,5 +1,6 @@
 using Metaheuristics
 using Test
+import Optim
 
 
 
@@ -23,6 +24,7 @@ using Test
         information = Information(f_optimum = 0.0)
         options = Options(f_tol = desired_accuracy, seed = 1)
         options_2 = Options(f_tol = desired_accuracy, seed = 1, store_convergence=true)
+        options_3 = Options(f_tol = desired_accuracy, seed = 1)
 
         methods = [
                    ABC(options = options, information = information), 
@@ -40,6 +42,7 @@ using Test
                    PSO(options = options, information = information),
                    SA(options = options, information = information),
                    WOA(options = options, information = information),
+                   MCCGA(options = options_3, information = information),
                   ]
 
         # CGSA
