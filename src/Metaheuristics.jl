@@ -98,6 +98,9 @@ include("algorithms/NSGA3/NSGA3.jl")
 include("algorithms/SMS_EMOA/SMS_EMOA.jl")
 include("algorithms/SPEA2/SPEA2.jl")
 
+# genetic algorithm
+include("algorithms/MCCGA/MCCGA.jl")
+
 
 include("common/reproduction.jl")
 
