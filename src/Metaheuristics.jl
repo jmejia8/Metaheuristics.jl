@@ -14,7 +14,7 @@ export hval, gval, hvals, gvals
 
 export NSGA3, gen_ref_dirs
 
-export SMS_EMOA, SPEA2
+export SMS_EMOA, SPEA2, MCCGA
 
 export PerformanceIndicators, pareto_front, nadir, ideal
 
