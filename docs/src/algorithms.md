@@ -132,7 +132,7 @@ details.
 
 ## MCCGA
 
-Machine-coded Compact Genetic Algorithms for real-valued optimization problems[satman2020machine](@cite).
+Machine-coded Compact Genetic Algorithms for real-valued optimization problems [SatmanAkadal2020mcga](@cite).
 ```@docs
 MCCGA
 ```
