@@ -20,6 +20,24 @@ end
 - `N` population size
 - `maxsamples` maximum number of samples. 
 
+### Example
+
+```jldoctest
+
+julia> import Optim 
+
+julia> f, bounds, solutions = Metaheuristics.TestProblems.rastrigin();
+
+julia> result = optimize(f, bounds, MCCGA())
+
++=========== RESULT ==========+
+  iteration: 42833
+    minimum: 0
+  minimizer: [-5.677669786379456e-17, 2.7942451898022582e-39, -3.60925916059986e-33, -6.609510861086017e-34, 2.998586759675011e-32, -1.8825832500775007e-38, -3.0729484147585938e-31, 1.7675578057632446e-38, 5.127944874215823e-16, 1.9623770480857484e-19]
+    f calls: 86404
+ total time: 3.2839 s
++============================+
+```
 """
 function MCCGA(;
         N = 100,
