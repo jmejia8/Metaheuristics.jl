@@ -132,7 +132,7 @@ details.
 
 ## MCCGA
 
-Improved strength Pareto evolutionary algorithm [Zitzler2001](@cite).
+Machine-coded Compact Genetic Algorithms for real-valued optimization problems[satman2020machine](@cite).
 ```@docs
 MCCGA
 ```
