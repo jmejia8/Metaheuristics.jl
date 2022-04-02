@@ -3,27 +3,31 @@
 List of implemented metaheuristics. The algorithms were implemented based on the
 contributor's understanding of the algorithms detailed in the published paper.
 
-| Algorithm | Objectives | Constraints | Large Scale | Structure Name         |
-|-----------|:----------:|:-----------:|:-----------:|------------------------|
-| ECA       |  Single    |      ✅     |   ➖        | [`ECA`](@ref)          |
-| DE        |  Single    |      ✅     |   ➖        | [`DE`](@ref)           |
-| PSO       |  Single    |      ✅     |   ➖        | [`PSO`](@ref)          |
-| ABC       |  Single    |      ❌     |   ➖        | [`ABC`](@ref)          |
-| MOEA/D-DE |  Multi     |      ➖     |   ➖        | [`MOEAD_DE`](@ref)     |
-| GSA       |  Single    |      ❌     |   ❌        | [`CGSA`](@ref)          |
-| SA        |  Single    |      ✅     |   ➖        | [`SA`](@ref)           |
-| WOA       |  Single    |      ✅     |   ➖        | [`WOA`](@ref)          |
-| NSGA-II   |  Multi     |      ✅     |   ➖        | [`NSGA2`](@ref)        |
-| NSGA-III  |  Many      |      ✅     |   ➖        | [`NSGA3`](@ref)        |
-| SMS-EMOA  |  Multi     |      ✅     |   ➖        | [`SMS_EMOA`](@ref)     |
-| SPEA2     |  Multi     |      ✅     |   ➖        | [`SPEA2`](@ref)        |
-| BCA       |  Bilevel   |      ✅     |   ➖        | [`BilevelHeuristics.BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) |
-| MCCGA     |  Single    |      ❌     |   ❌        | [`MCCGA`](@ref)        |
+| Algorithm | Objective | Constraints | Large Scale | Batch Evaluation| Structure Name         |
+|-----------|:-----------|:-----------:|:-----------:| :----------:|------------------------|
+| ECA       |  Single    |      ✅     |   ➖        |   ✅        | [`ECA`](@ref)          |
+| DE        |  Single    |      ✅     |   ➖        |   ✅        | [`DE`](@ref)           |
+| PSO       |  Single    |      ✅     |   ➖        |   ✅        | [`PSO`](@ref)          |
+| ABC       |  Single    |      ❌     |   ➖        |   ❌        | [`ABC`](@ref)          |
+| MOEA/D-DE |  Multi     |      ➖     |   ➖        |   ❌        | [`MOEAD_DE`](@ref)     |
+| GSA       |  Single    |      ❌     |   ❌        |   ✅        | [`CGSA`](@ref)         |
+| SA        |  Single    |      ✅     |   ➖        |   ❌        | [`SA`](@ref)           |
+| WOA       |  Single    |      ✅     |   ➖        |   ✅        | [`WOA`](@ref)          |
+| NSGA-II   |  Multi     |      ✅     |   ➖        |   ✅        | [`NSGA2`](@ref)        |
+| NSGA-III  |  Many      |      ✅     |   ➖        |   ✅        | [`NSGA3`](@ref)        |
+| SMS-EMOA  |  Multi     |      ✅     |   ➖        |   ✅        | [`SMS_EMOA`](@ref)     |
+| SPEA2     |  Multi     |      ✅     |   ➖        |   ✅        | [`SPEA2`](@ref)        |
+| BCA       |  Bilevel   |      ✅     |   ❌        |   ❌        | [`BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) |
+| MCCGA     |  Single    |      ❌     |   ❌        |   ❌        | [`MCCGA`](@ref)        |
 
 
 ✅ = supported,
 ❌ = not supported,
 ➖ = can be supported by changing default parameters.
+
+- **Batch Evaluation** = Simultaneous evaluation of multiple solutions (batch) see "[Batch Evaluation](@ref)".
+- **Constraints** = Equality and inequality constraints.
+- **Large Scale** = High dimensional problems (variables space).
 
 ## Evolutionary Centers Algorithm
 
@@ -78,7 +82,7 @@ CGSA
 
 ## Simulated Annealing
 
-Physics inspired algorithm for optimization [Van1987](@cite).
+Physics inspired algorithm for optimization by [Van1987](@cite).
 
 ```@docs
 SA
@@ -86,7 +90,7 @@ SA
 
 ## Whale Optimization Algorithm
 
-The Whale Optimization Algorithm inspired by humpback whales [MirjaliliLewis2016](@cite).
+The Whale Optimization Algorithm inspired by humpback whales ([MirjaliliLewis2016](@cite)).
 
 ```@docs
 WOA
@@ -95,7 +99,7 @@ WOA
 
 ## NSGA-II
 
-A fast and elitist multiobjective genetic algorithm: NSGA-II[Deb2002](@cite).
+A fast and elitist multiobjective genetic algorithm: NSGA-II by [Deb2002](@cite).
 
 ```@docs
 NSGA2
@@ -103,14 +107,16 @@ NSGA2
 
 
 ## NSGA-III
-An Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based Nondominated Sorting Approach, Part I: Solving Problems With Box Constraints [DebJain2014](@cite).
+
+An Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
+Nondominated Sorting Approach, Part I: Solving Problems With Box Constraints by [DebJain2014](@cite).
 ```@docs
 NSGA3
 ```
 
 ## SMS-EMOA
 
-An EMO algorithm using the hypervolume measure as selection criterion [Emmerich2005](@cite).
+An EMO algorithm using the hypervolume measure as selection criterion by [Emmerich2005](@cite).
 ```@docs
 SMS_EMOA
 ```
@@ -118,7 +124,7 @@ SMS_EMOA
 
 ## SPEA2
 
-Improved strength Pareto evolutionary algorithm [Zitzler2001](@cite).
+Improved strength Pareto evolutionary algorithm by [Zitzler2001](@cite).
 ```@docs
 SPEA2
 ```
@@ -132,7 +138,7 @@ details.
 
 ## MCCGA
 
-Machine-coded Compact Genetic Algorithms for real-valued optimization problems [SatmanAkadal2020mcga](@cite).
+Machine-coded Compact Genetic Algorithms for real-valued optimization problems by [SatmanAkadal2020mcga](@cite).
 ```@docs
 MCCGA
 ```

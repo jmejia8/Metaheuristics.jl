@@ -182,7 +182,7 @@ See [BilevelHeuristics](https://jmejia8.github.io/BilevelHeuristics.jl/dev/) doc
 for more information.
 
 
-## Parallel Evaluations
+## Batch Evaluation
 
 Evaluating multiple solutions at the same time can reduce computational time. To do that,
 define your function on an input `N x D` matrix and function values into matrices with outcomes
