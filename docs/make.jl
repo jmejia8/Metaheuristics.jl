@@ -7,7 +7,7 @@ makedocs(
          bib,
          format = Documenter.HTML(
                                   prettyurls = get(ENV, "CI", nothing) == "true",
-                                  assets = ["assets/favicon.ico"],
+                                  assets = ["assets/favicon.ico", "assets/extra_styles.css"],
                                   analytics = "UA-184071594-1",
                                   collapselevel = 1,
                                  ),

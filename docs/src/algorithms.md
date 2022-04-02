@@ -47,7 +47,7 @@ DE
 
 ## Particle Swarm Optimization
 
-PSO is a population-based optimization technique inspired by the motion of bird flocks and schooling fish ([KennedyEberhart1995](@cite)).
+PSO is a population-based optimization technique inspired by the motion of bird flocks and schooling fish by [KennedyEberhart1995](@cite).
 
 ```@docs
 PSO
@@ -90,7 +90,7 @@ SA
 
 ## Whale Optimization Algorithm
 
-The Whale Optimization Algorithm inspired by humpback whales ([MirjaliliLewis2016](@cite)).
+The Whale Optimization Algorithm inspired by humpback whales proposed in [MirjaliliLewis2016](@cite).
 
 ```@docs
 WOA
