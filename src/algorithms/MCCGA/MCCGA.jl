@@ -17,8 +17,28 @@ end
 
 ### Parameters:
 
-- `N` population size
-- `maxsamples` maximum number of samples. 
+- `N` population size. Default is 100.
+- `maxsamples` maximum number of samples. Default is 10000.
+
+### Description 
+
+MCCGA method implements the Machine-coded genetic algorithms for real valued optimization problems. 
+The algorithm is based on the concept of a compact genetic algorithm but with a machine-coded representation 
+using IEEE-754 floating point encoding standard. In the first stage of the algorithm, `maxsamples` number 
+of samples are generated within the range of function domain. This process is required to obtain a vector
+of probabilities for each single bit of the IEEE-754 representation. In classical CGAs, the initial vector 
+of probabilities is generated using the constant probability of 0.5 whereas in MCCGA, the probability of ith bit having
+a value of 1 depends on the function domain. The second step performs a CGA search but with IEEE-754 bits again. Since 
+CGA does not use a population of solutions but a single vector of probabilities, the parameter `N` does not really mean 
+number of solutions. Instead, it means the amount of mutation in each iteration, e.g. 1/N. 
+In the last stage, a local search is performed for fine-tuning. In this implementation, `Optim` package is required.
+
+
+### References 
+
+- Harik, G. R., Lobo, F. G., & Goldberg, D. E. (1999). The compact genetic algorithm. IEEE transactions on evolutionary computation, 3(4), 287-297.
+- Satman, M. H. & Akadal, E. (2020). Machine Coded Compact Genetic Algorithms for Real Parameter Optimization Problems . Alphanumeric Journal , 8 (1) , 43-58 . DOI: 10.17093/alphanumeric.576919
+- Mehmet Hakan Satman, Emre Akadal, Makine Kodlu Hibrit Kompakt Genetik Algoritmalar Optimizasyon Yöntemi, Patent, TR, 2022/01, 2018-GE-510239
 
 ### Example
 

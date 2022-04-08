@@ -46,6 +46,7 @@ considered in most of the implemented algorithms.
 - **GSA**: Gravitational Search Algorithm
 - **SA**:  Simulated Annealing
 - **WOA**: Whale Optimization Algorithm
+- **MCCGA**: Machine-coded Compact Genetic Algorithm
 
 ### Multi-Objective Optimization
 
