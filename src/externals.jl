@@ -11,6 +11,6 @@ end
 using Requires
 
 function __init__()
-	@require Optim ="429524aa-4258-5aef-a3af-852621145aeb" @eval import Optim
+	@require Optim ="429524aa-4258-5aef-a3af-852621145aeb" include("algorithms/MCCGA/local_search.jl")
 end
 
