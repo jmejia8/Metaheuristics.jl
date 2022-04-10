@@ -32,6 +32,15 @@ minimizer
 minimum(state::State)
 ```
 
+```@docs
+Metaheuristics.TerminationStatusCode
+```
+
+
+```@docs
+termination_status_message
+```
+
 ## Methods for Solutions/Individuals
 
 ```@docs

@@ -62,6 +62,7 @@ import Optim
 
             # also count the mumber of function evaluations
             @test f_calls == nfes(res)
+            @test termination_status_message(res) == termination_status_message(method)
         end
     end
 
@@ -79,7 +80,8 @@ import Optim
         options = Options(f_tol = desired_accuracy,
                           f_calls_limit=1000,
                           seed = 1,
-                          parallel_evaluation=true
+                          parallel_evaluation=true,
+                          iterations = 1000,
                          )
 
         methods = [
@@ -94,6 +96,7 @@ import Optim
             f_calls = 0
             res = optimize(f, bounds, method)
             @test f_calls == nfes(res)
+            @test res.termination_status_code == Metaheuristics.EVALUATIONS_LIMIT
         end
     end
 
