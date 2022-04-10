@@ -1,0 +1,6 @@
+dl dd div:target {
+    border: 0.2em solid yellow;
+    padding: 1em;
+    border-radius: 10px;
+}
+
