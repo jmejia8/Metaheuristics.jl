@@ -23,6 +23,8 @@ function Base.show(io::IO, alg::Algorithm)
     Base.show(io, alg.parameters)
 end
 
+termination_status_message(alg::Algorithm) = termination_status_message(alg.status)
+
 mutable struct Problem <: AbstractProblem
     f::Function
     bounds::Array{Float64,2}

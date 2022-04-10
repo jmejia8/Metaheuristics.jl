@@ -17,11 +17,13 @@ export NSGA3, gen_ref_dirs
 export SMS_EMOA, SPEA2, MCCGA
 
 export PerformanceIndicators, pareto_front, nadir, ideal
+export termination_status_message
 
 include("externals.jl")
 
 
 include("core/abstracts.jl")
+include("core/stop_status_codes.jl")
 include("core/information.jl")
 include("core/options.jl")
 include("core/state.jl")

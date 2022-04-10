@@ -148,26 +148,9 @@ end
 
 is_better_abc(bee1, bee2) = is_better(bee1.sol, bee2.sol)
 
-
-function stop_criteria!(
-        status,#::State{Bee},
-        parameters::ABC,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
-    cond_budget = call_limit_stop_check(status, information, options) ||
-                  iteration_stop_check(status, information, options)
-
-    if cond_budget
-        return true
-    end
-
-    cond = !isnan(information.f_optimum) &&
-           abs(status.best_sol.sol.f - information.f_optimum) < options.f_tol
-
-    options.debug && cond && @info("Stopped since accuracy was met.")
+function accuracy_stop_check(status::State{Bee}, information, options)
+    cond =  !isnan(information.f_optimum) && abs(fval(status.best_sol) - information.f_optimum) < options.f_tol
+    cond && (status.termination_status_code = ACCURACY_LIMIT)
     cond
 end
+

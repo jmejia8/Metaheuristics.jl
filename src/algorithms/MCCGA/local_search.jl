@@ -8,8 +8,9 @@ function final_stage!(
         kargs...
     )
 
-    if !parameters.use_local_search
-        status.final_time = time()
+    status.final_time = time()
+    !parameters.use_local_search &&  (return)
+    if status.stop && status.termination_status_code ∈ [EVALUATIONS_LIMIT, TIME_LIMIT, ACCURACY_LIMIT]
         return
     end
 

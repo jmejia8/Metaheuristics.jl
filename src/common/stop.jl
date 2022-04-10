@@ -6,7 +6,7 @@ return `status.f_calls >= options.f_calls_limit`.
 """
 function call_limit_stop_check(status, information, options)
     cond =  status.f_calls >= options.f_calls_limit
-    options.debug && cond && @info("Stopped since call_limit was met.")
+    cond && (status.termination_status_code = EVALUATIONS_LIMIT)
     cond
 end
 
@@ -16,7 +16,7 @@ Used to limit the number of iterations.
 """
 function iteration_stop_check(status, information, options)
     cond =  status.iteration >= options.iterations
-    options.debug && cond && @info("Stopped since iteration limit was met.")
+    cond && (status.termination_status_code = ITERATION_LIMIT)
     cond
 end
 
@@ -26,7 +26,7 @@ Used to limit the time (in seconds), i.e., `status.overall_time >= options.time_
 """
 function time_stop_check(status, information, options)
     cond =  status.overall_time >= options.time_limit
-    options.debug && cond && @info("Stopped since time limit was met.")
+    cond && (status.termination_status_code = TIME_LIMIT)
     cond
 end
 
@@ -37,8 +37,8 @@ If the optimum is provided, then check if the accuracy is met via
 `abs(status.best_sol.f - information.f_optimum) < options.f_tol`.
 """
 function accuracy_stop_check(status::State{xf_indiv}, information, options)
-    cond =  !isnan(information.f_optimum) && abs(status.best_sol.f - information.f_optimum) < options.f_tol
-    options.debug && cond && @info("Stopped since accuracy was met.")
+    cond =  !isnan(information.f_optimum) && abs(fval(status.best_sol) - information.f_optimum) < options.f_tol
+    cond && (status.termination_status_code = ACCURACY_LIMIT)
     cond
 end
 
@@ -48,12 +48,11 @@ function accuracy_stop_check(status::State{xfgh_indiv}, information, options)
     
     vio = violationsSum(status.best_sol.g, status.best_sol.h, ε=options.h_tol)
     cond =  vio ≈ 0.0 && abs(status.best_sol.f - information.f_optimum) < options.f_tol
-
-    options.debug && cond && @info("Stopped since accuracy and feasibility was met.")
+    cond && (status.termination_status_code = ACCURACY_LIMIT)
     cond
 end
 
-function accuracy_stop_check(status::State{xFgh_indiv}, information, options)
+function accuracy_stop_check(status, information, options)
     return false
 end
 
@@ -67,7 +66,7 @@ function var_stop_check(status, information, options)
         return false
     end
     cond =  var(map( s->s.f, status.population )) ≈ 0.0
-    options.debug && cond && @info("Stopped since varF was met.")
+    cond && (status.termination_status_code = OBJECTIVE_VARIANCE_LIMIT)
     cond
 end
 
@@ -75,7 +74,7 @@ function diversity_stop_check(status, information, options)
     typeof(status.best_sol.f) <: Array && (return false)
 
     cond =  var(map( s->s.f, status.population )) ≈ 0.0
-    options.debug && cond && @info("Stopped since varF was met.")
+    cond && (status.termination_status_code = OBJECTIVE_VARIANCE_LIMIT)
     cond
 end
 
@@ -109,6 +108,16 @@ function diff_check(status, information, options; d = options.f_tol, p = 0.3)
     fmin = minimum(s -> fval(s), status.population[mask])
     fmax = maximum(s -> fval(s), status.population[mask])
 
-    fmax - fmin <= d
+    cond = fmax - fmin <= d
+    cond && (status.termination_status_code = OBJECTIVE_DIFFERENCE_LIMIT)
+    cond
 end
 
+
+
+function default_stop_check(status, information, options)
+        call_limit_stop_check(status, information, options) ||
+        iteration_stop_check(status, information, options)  ||
+        time_stop_check(status, information, options) ||
+        accuracy_stop_check(status, information, options)
+end

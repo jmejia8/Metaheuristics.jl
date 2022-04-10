@@ -173,6 +173,10 @@ function final_stage!(
     )
 
     status.final_time = time()
+
+    if status.stop
+        return
+    end
     @warn "MCCGA needs `Optim` module to perform the local search."
 end
 
@@ -184,7 +188,7 @@ function stop_criteria!(status, parameters::MCCGA, problem, information, options
 
     mutation = parameters.mutation
     status.stop = all(x -> (x <= mutation) || (x >= 1.0 - mutation), parameters.probvector)
-
-    status.stop && options.debug && @info "MCCGA stopping criteria is met."
+    
+    status.stop && (status.termination_status_code = OTHER_LIMIT)
 end
 

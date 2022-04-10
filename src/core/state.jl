@@ -62,25 +62,27 @@ mutable struct State{T}
     final_time::Float64
     overall_time::Float64
     stop::Bool
+    termination_status_code::TerminationStatusCode
 
 end
 
 function State(
-    best_sol,
-    population;
+        best_sol,
+        population;
 
-    # upper level parameters
-    f_calls = 0,
-    g_calls = 0,
-    h_calls = 0,
-    iteration = 1,
-    success_rate = 0,
-    convergence = State[],
-    start_time = 0.0,
-    final_time = 0.0,
-    stop = false,
-)
+        # upper level parameters
+        f_calls = 0,
+        g_calls = 0,
+        h_calls = 0,
+        iteration = 1,
+        success_rate = 0,
+        convergence = State[],
+        start_time = 0.0,
+        final_time = 0.0,
+        stop = false,
+    )
 
+    termination_status_code = UNKNOWN_STOP_REASON
     State(#
         best_sol,
         Array(population),
@@ -93,6 +95,7 @@ function State(
         final_time,
         final_time - start_time,
         stop,
+        termination_status_code
     )
 
 end
@@ -167,3 +170,6 @@ end
 function update_convergence!(convergence, status)
     push!(convergence, deepcopy(status))
 end
+
+
+termination_status_message(status::State) = termination_status_message(status.termination_status_code)

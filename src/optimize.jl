@@ -61,6 +61,7 @@ function optimize(
     status = method.status
     options.debug && @info("Initializing population...")
     status = initialize!(status,parameters, problem, information, options)
+    status.start_time = start_time
     method.status = status
 
     show_status(status, parameters, options)
@@ -68,7 +69,6 @@ function optimize(
     status.iteration = 1
 
 
-    status.start_time = start_time
     convergence = State{typeof(status.best_sol)}[]
 
 
@@ -84,6 +84,7 @@ function optimize(
 
     logger(status)
 
+    status.stop = status.stop || default_stop_check(status, information, options)
     while !status.stop
         status.iteration += 1
 
@@ -102,10 +103,7 @@ function optimize(
         logger(status)
 
         # common stop criteria
-        status.stop = status.stop ||
-        call_limit_stop_check(status, information, options) ||
-        iteration_stop_check(status, information, options)  ||
-        time_stop_check(status, information, options)
+        status.stop = status.stop || default_stop_check(status, information, options)
 
         # user defined stop criteria
         stop_criteria!(status, parameters, problem, information, options)
@@ -122,6 +120,7 @@ function optimize(
                  options
                 )
 
+    options.debug && @info "Termination reason: " * termination_status_message(status)
     status.convergence = convergence
 
     return status
