@@ -3,13 +3,15 @@ abstract type AbstractConstrainedSolution   <: AbstractSolution end
 # multi-objective solution are constrained by default
 abstract type AbstractMultiObjectiveSolution <: AbstractConstrainedSolution end
 
-mutable struct xf_indiv <: AbstractUnconstrainedSolution # Single Objective
-    x::Vector{Float64}
+mutable struct xf_solution{T} <: AbstractUnconstrainedSolution # Single Objective
+    x::Vector{T}
     f::Float64
 end
 
-mutable struct xfgh_indiv <: AbstractConstrainedSolution # Single Objective Constraied
-    x::Vector{Float64}
+const xf_indiv = xf_solution{Float64}
+
+mutable struct xfgh_solution{T} <: AbstractConstrainedSolution # Single Objective Constrained
+    x::Vector{T}
     f::Float64
     g::Vector{Float64}
     h::Vector{Float64}
@@ -17,6 +19,8 @@ mutable struct xfgh_indiv <: AbstractConstrainedSolution # Single Objective Cons
     is_feasible::Bool
 
 end
+
+const xfgh_indiv = xfgh_solution{Float64}
 
 function xfgh_indiv(
     x::Vector{Float64},
@@ -33,8 +37,8 @@ function xfgh_indiv(
     xfgh_indiv(x, f, g, h, sum_violations, sum_violations == 0.0)
 end
 
-mutable struct xFgh_indiv <: AbstractMultiObjectiveSolution# Single Objective Constraied
-    x::Vector{Float64}
+mutable struct xFgh_solution{T} <: AbstractMultiObjectiveSolution# Single Objective Constrained
+    x::Vector{T}
     f::Vector{Float64}
     g::Vector{Float64}
     h::Vector{Float64}
@@ -43,6 +47,8 @@ mutable struct xFgh_indiv <: AbstractMultiObjectiveSolution# Single Objective Co
     sum_violations::Float64 # ∑ max(0,g) + ∑|h|
     is_feasible::Bool
 end
+
+const xFgh_indiv = xFgh_solution{Float64}
 
 function xFgh_indiv(
     x::Vector{Float64},
