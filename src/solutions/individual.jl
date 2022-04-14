@@ -3,15 +3,16 @@ abstract type AbstractConstrainedSolution   <: AbstractSolution end
 # multi-objective solution are constrained by default
 abstract type AbstractMultiObjectiveSolution <: AbstractConstrainedSolution end
 
-mutable struct xf_solution{T} <: AbstractUnconstrainedSolution # Single Objective
-    x::Vector{T}
+mutable struct xf_solution{X} <: AbstractUnconstrainedSolution # Single Objective
+    x::X
     f::Float64
 end
 
-const xf_indiv = xf_solution{Float64}
+const xf_indiv = xf_solution{Vector{Float64}}
 
-mutable struct xfgh_solution{T} <: AbstractConstrainedSolution # Single Objective Constrained
-    x::Vector{T}
+# Single Objective Constrained
+mutable struct xfgh_solution{X} <: AbstractConstrainedSolution 
+    x::X
     f::Float64
     g::Vector{Float64}
     h::Vector{Float64}
@@ -20,13 +21,13 @@ mutable struct xfgh_solution{T} <: AbstractConstrainedSolution # Single Objectiv
 
 end
 
-const xfgh_indiv = xfgh_solution{Float64}
+const xfgh_indiv = xfgh_solution{Vector{Float64}}
 
 function xfgh_indiv(
-    x::Vector{Float64},
-    f::Float64,
-    g::Vector{Float64},
-    h::Vector{Float64};
+    x,
+    f::Real,
+    g::Vector,
+    h::Vector;
     sum_violations = 0.0,
     ε = 0.0
 )
@@ -34,11 +35,11 @@ function xfgh_indiv(
         sum_violations = violationsSum(g, h; ε=ε)
     end
 
-    xfgh_indiv(x, f, g, h, sum_violations, sum_violations == 0.0)
+    xfgh_solution(x, f, g, h, sum_violations, sum_violations == 0.0)
 end
 
-mutable struct xFgh_solution{T} <: AbstractMultiObjectiveSolution# Single Objective Constrained
-    x::Vector{T}
+mutable struct xFgh_solution{X} <: AbstractMultiObjectiveSolution
+    x::X
     f::Vector{Float64}
     g::Vector{Float64}
     h::Vector{Float64}
@@ -48,13 +49,13 @@ mutable struct xFgh_solution{T} <: AbstractMultiObjectiveSolution# Single Object
     is_feasible::Bool
 end
 
-const xFgh_indiv = xFgh_solution{Float64}
+const xFgh_indiv = xFgh_solution{Vector{Float64}}
 
 function xFgh_indiv(
-    x::Vector{Float64},
-    f::Vector{Float64},
-    g::Vector{Float64},
-    h::Vector{Float64};
+    x,
+    f::Vector,
+    g::Vector,
+    h::Vector;
     rank = 0,
     crowding = 0.0,
     sum_violations = 0.0,
@@ -64,7 +65,7 @@ function xFgh_indiv(
     if sum_violations <= 0
         sum_violations = violationsSum(g, h;ε=ε)
     end
-    xFgh_indiv(x, f, g, h, Int(rank), crowding, sum_violations, sum_violations == 0.0)
+    xFgh_solution(x, f, g, h, Int(rank), crowding, sum_violations, sum_violations == 0.0)
 end
 
 
@@ -129,12 +130,12 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 ```
 
 """
-function create_child(x::Vector{Float64}, fResult::Float64;ε=0.0)
-    return xf_indiv(x, fResult)
+function create_child(x, fResult::Float64;ε=0.0)
+    return xf_solution(x, fResult)
 end
 
 # constrained single objective
-function create_child(x::Vector{Float64},
+function create_child(x,
         fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}};
         ε=0.0
     )
@@ -145,7 +146,7 @@ function create_child(x::Vector{Float64},
 end
 
 # constrained multi-objective
-function create_child(x::Vector{Float64},
+function create_child(x,
         fResult::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}};
         ε = 0.0
     )
