@@ -140,7 +140,7 @@ function create_child(x,
         ε=0.0
     )
     f, g, h = fResult
-    isempty(g) && isempty(h) && (return xf_indiv(x, f))
+    isempty(g) && isempty(h) && (return xf_solution(x, f))
 
     return xfgh_indiv(x, f, g, h; ε=ε)
 end
@@ -319,7 +319,7 @@ end
 
 Get the position vector.
 """
-get_position(solution::Solution) = solution.x
+get_position(solution::AbstractSolution) = solution.x
 
 function positions(population::AbstractArray)
     if isempty(population)
@@ -334,7 +334,7 @@ end
 
 Get the objective function value (fitness) of a solution.
 """
-fval(solution::Solution) = solution.f
+fval(solution::AbstractSolution) = solution.f
 sum_violations(solution::T) where T <: AbstractConstrainedSolution = solution.sum_violations
 
 """

@@ -55,7 +55,7 @@ function Base.show(io::IO, solution::xFgh_indiv)
 end
 
 
-function Base.show(io::IO, ::MIME"text/plain", population::Array{xf_indiv})
+function Base.show(io::IO, ::MIME"text/plain", population::Array{T}) where T <: xf_solution
     isempty(population) && show(io, population) && return
     
     if get(io, :compact, false)
@@ -80,14 +80,14 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xf_indiv})
 end
 
 
-function Base.show(io::IO, ::MIME"text/html", population::Array{xf_indiv})
+function Base.show(io::IO, ::MIME"text/html", population::Array{T}) where T <: xf_solution
     println(io, "<pre>")
     show(io, "text/plain", population)
     println(io, "</pre>")
 end
 
 
-function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
+function Base.show(io::IO, ::MIME"text/plain", population::Array{T}) where T <: xfgh_solution
     isempty(population) && show(io, population) && return
 
     if get(io, :compact, false)
@@ -108,13 +108,13 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xfgh_indiv})
 end
 
 
-function Base.show(io::IO, ::MIME"text/html", population::Array{xfgh_indiv})
+function Base.show(io::IO, ::MIME"text/html", population::Array{T}) where T <: xfgh_solution
     println(io, "<pre>")
     show(io, "text/plain", population)
     println(io, "</pre>")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
+function Base.show(io::IO, ::MIME"text/plain", population::Array{T}) where T <: xFgh_solution
     isempty(population) && show(io, population) && return
 
     if get(io, :compact, true)
@@ -131,47 +131,47 @@ function Base.show(io::IO, ::MIME"text/plain", population::Array{xFgh_indiv})
 end
 
 
-function Base.show(io::IO, ::MIME"text/html", population::Array{xFgh_indiv})
+function Base.show(io::IO, ::MIME"text/html", population::Array{T}) where T <: xFgh_solution
     println(io, "<pre>")
     show(io, "text/plain", population)
     println(io, "</pre>")
 end
 
 
+function describe_result(io, status::State{T}) where T <: xFgh_solution
+    @printf(io, "%12s", "population:")
+    show(io, "text/plain", Array(status.population))
+
+    # non-dominated
+    pf = get_non_dominated_solutions(status.population)
+    println(io, "\nnon-dominated solution(s):")
+    show(io, "text/plain", pf)
+    print(io, "\n")
+end
+
+function describe_result(io, status::State)
+    @printf(io,"%12s %g\n", "minimum:", minimum(status))
+    @printf(io,"%12s ", "minimizer:")
+    show(io, minimizer(status))
+    println(io, "")
+end
+
 
 function Base.show(io::IO, status::State)
-
-    # if typeof(status.best_sol) != xf_indiv
-    #     return println(status)
-    # end
-
     println(io, "+=========== RESULT ==========+")
     @printf(io,"%12s %.0f\n", "iteration:", status.iteration)
 
-    if typeof(Array(status.population)) <: Array{xFgh_indiv}
-        @printf(io, "%12s", "population:")
-        show(io, "text/plain", Array(status.population))
-
-        # non-dominated
-        pf = get_non_dominated_solutions(status.population)
-        println(io, "\nnon-dominated solution(s):")
-        show(io, "text/plain", pf)
-        print(io, "\n")
-    else
-        @printf(io,"%12s %g\n", "minimum:", minimum(status))
-        @printf(io,"%12s ", "minimizer:")
-        show(io, minimizer(status))
-        println(io, "")
-    end
-
-
-
+    describe_result(io, status)
     @printf(io,"%12s %.0f\n", "f calls:", status.f_calls)
-    if !isempty(status.population) &&  typeof(status.population[1]) <: Union{xfgh_indiv, xFgh_indiv}
-        n = sum(map(s -> s.sum_violations ≈ 0, status.population))
+
+    if eltype(status.population) <: AbstractConstrainedSolution
+        n = count(is_feasible, status.population)
         @printf(io,"%12s %d / %d in final population\n", "feasibles:", n, length(status.population))
     end
     @printf(io,"%12s %.4f s\n", "total time:", status.final_time - status.start_time)
+
+    txt = status.stop ? termination_status_message(status) : ""
+    @printf(io,"%12s %s\n", "stop reason:", txt)
     println(io, "+============================+")
 end
 

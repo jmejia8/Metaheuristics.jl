@@ -57,7 +57,7 @@ function termination_status_message(status_code::TerminationStatusCode)
     elseif status_code == OBJECTIVE_VARIANCE_LIMIT
         return "Small variance of the objective function."
     elseif status_code == OBJECTIVE_DIFFERENCE_LIMIT
-        return "Small Difference of the max and min value of the objective."
+        return "Small difference of objective function values."
     elseif status_code == OTHER_LIMIT
         return "Other stopping criteria."
     elseif status_code == UNKNOWN_STOP_REASON

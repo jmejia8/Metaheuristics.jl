@@ -96,7 +96,7 @@ import Optim
             f_calls = 0
             res = optimize(f, bounds, method)
             @test f_calls == nfes(res)
-            @test res.termination_status_code == Metaheuristics.EVALUATIONS_LIMIT
+            @test res.termination_status_code isa Metaheuristics.TerminationStatusCode
         end
     end
 

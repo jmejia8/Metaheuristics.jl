@@ -3,12 +3,12 @@
     return true if A is better than B in a minimization problem.
     Feasibility rules and dominated criteria are used in comparison.
 """
-function is_better(A::xf_indiv, B::xf_indiv)
+function is_better(A::T, B::T) where T <: xf_solution
     return A.f < B.f
 end
 
 # feasibility rules
-function is_better(A::xfgh_indiv, B::xfgh_indiv)
+function is_better(A::T, B::T) where T <: xfgh_solution
 
     A_vio = A.sum_violations
     B_vio = B.sum_violations
@@ -25,11 +25,7 @@ function is_better(A::xfgh_indiv, B::xfgh_indiv)
 end
 
 # is B dominated by A?
-function is_better(
-    A::xFgh_indiv,
-    B::xFgh_indiv
-)
-
+function is_better(A::T, B::T) where T <: xFgh_solution
     A_vio = A.sum_violations
     B_vio = B.sum_violations
 
@@ -48,7 +44,7 @@ end
 """
     does A dominate B?
 """
-dominates( A::xFgh_indiv, B::xFgh_indiv) = is_better(A, B)
+dominates( A::T, B::T) where T <: xFgh_solution = is_better(A, B)
 
 
 """
@@ -115,7 +111,7 @@ function compare(a::Vector, b::Vector)
 end
 
 
-function compare(a::xFgh_indiv, b::xFgh_indiv)
+function compare(a::T, b::T) where T <: xFgh_solution
 
     A_vio = a.sum_violations
     B_vio = b.sum_violations

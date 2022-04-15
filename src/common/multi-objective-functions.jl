@@ -71,7 +71,7 @@ function nadir(points::Array{Vector{T}})  where T <: Real
 end
 
 
-function ideal(population::Array{xFgh_indiv})
+function ideal(population::Array{T}) where T <: xFgh_solution
     isempty(population) && (return zeros(0))
 
     mask = sum_violations.(population) .== 0
@@ -85,7 +85,7 @@ function ideal(population::Array{xFgh_indiv})
 end
 ideal(A::Matrix) = ideal([A[i,:]  for i in 1:size(A,1)])
 
-function nadir(population::Array{xFgh_indiv})
+function nadir(population::Array{T}) where T <: xFgh_solution
     isempty(population) && (return zeros(0))
     mask = sum_violations.(population) .== 0
 

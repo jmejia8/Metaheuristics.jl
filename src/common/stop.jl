@@ -99,6 +99,8 @@ is `<= d`, otherwise return `false`.
 > 111–138. doi:10.1007/978-3-540-68830-3_4 (https://doi.org/10.1007/978-3-540-68830-3_4)
 """
 function diff_check(status, information, options; d = options.f_tol, p = 0.3)
+    !isnan(information.f_optimum) && (return false)
+
     mask = is_feasible.(status.population)
     p_feasibles = mean(mask)
 

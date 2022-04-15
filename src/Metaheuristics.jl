@@ -106,6 +106,7 @@ include("algorithms/MCCGA/MCCGA.jl")
 
 include("common/reproduction.jl")
 
+include("algorithms/stop_criteria.jl")
 #######################################################
 #                                                     #
 #           D E P R E C A T E D                       #
