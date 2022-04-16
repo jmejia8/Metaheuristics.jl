@@ -227,14 +227,31 @@ end
 
 ##########################################################3
 
+function _gen_X(N, bounds::AbstractMatrix{T}) where T <: AbstractFloat 
+    a = view(bounds, 1, :)'
+    b = view(bounds, 2, :)'
+    D = length(a)
+    a .+ (b - a) .* rand(eltype(bounds), N, D)
+end
 
-
-function generate_population(N::Int, problem;ε=0.0, parallel_evaluation = false)
-    a = view(problem.bounds, 1, :)'
-    b = view(problem.bounds, 2, :)'
+function _gen_X(N, bounds::AbstractMatrix{T}) where T <: Integer
+    a = view(bounds, 1, :)'
+    b = view(bounds, 2, :)'
     D = length(a)
 
-    X = a .+ (b - a) .* rand(N, D)
+    X = zeros(eltype(bounds), N, D)
+    for i in 1:D
+        X[:,i] = rand(a[i]:b[i], N)
+    end
+    return X
+end
+
+function _gen_X(N, bounds::AbstractMatrix{T}) where T <: Bool
+    rand(eltype(bounds), N, size(bounds, 2))
+end
+
+function generate_population(N::Int, problem;ε=0.0, parallel_evaluation = false)
+    X = _gen_X(N, problem.bounds)
 
     if problem.parallel_evaluation
         return create_solutions(X, problem; ε=ε)

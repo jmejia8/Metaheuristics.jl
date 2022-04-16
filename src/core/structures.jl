@@ -25,9 +25,9 @@ end
 
 termination_status_message(alg::Algorithm) = termination_status_message(alg.status)
 
-mutable struct Problem <: AbstractProblem
+mutable struct Problem{T} <: AbstractProblem
     f::Function
-    bounds::Array{Float64,2}
+    bounds::Array{T,2}
     f_calls::Int
     parallel_evaluation::Bool
 end
