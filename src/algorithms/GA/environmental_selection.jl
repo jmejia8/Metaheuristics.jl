@@ -18,6 +18,9 @@ function environmental_selection!(
         parameters::ElitistReplacement;
         is_better = is_better
     )
+
+    N = length(population)
     append!(population, offsprings)
     sort!(population, lt=is_better)
+    deleteat!(population, N+1:length(population))
 end

@@ -19,6 +19,12 @@ export SMS_EMOA, SPEA2, MCCGA
 export PerformanceIndicators, pareto_front, nadir, ideal
 export termination_status_message
 
+export GA, RandomInBounds, RandomBinary, RandomPermutation
+export TournamentSelection, RouletteWheelSelection
+export UniformCrossover, OrderCrossover
+export BitFlipMutation, SlightMutation
+export GenerationalReplacement, ElitistReplacement
+
 include("externals.jl")
 
 
@@ -62,6 +68,8 @@ include("optimize.jl")
 
 # template file
 include("algorithms/template.jl")
+
+include("algorithms/GA/GA.jl")
 
 # ECA algorithm
 include("algorithms/ECA/ECA.jl")
