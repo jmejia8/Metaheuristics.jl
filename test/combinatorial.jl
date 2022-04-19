@@ -7,7 +7,7 @@
         show(IOBuffer(), result.population[1])
     end
 
-    function binary_problem(method, bounds = [zeros(Bool,10) ones(Bool, 10)])
+    function simple_problem(method, bounds = [zeros(Bool,10) ones(Bool, 10)])
         ff(x) = sum( abs.(x .- 1.0) )
 
         # number of function evaluations
@@ -53,13 +53,25 @@
         test_results(result)
     end
  
+    #### Permutation
+    TSP_problem()
+ 
+    #### Binary
     options = Options(seed = 1, f_tol = 1e-16)
     information = Information(f_optimum = 0.0)
 
     ga_binary = GA(;options, information)
-    binary_problem(ga_binary)
+    simple_problem(ga_binary)
 
-    TSP_problem()
+    #### Integer
+    bounds = repeat([0, 10], 1, 10)
+    ga_integer = GA(;mutation =PolynomialMutation(;bounds),
+                    crossover=SBX(;bounds),
+                    environmental_selection=GenerationalReplacement(),
+                    options, information
+                   )
+
+    simple_problem(ga_integer, bounds)
 end
 
 
