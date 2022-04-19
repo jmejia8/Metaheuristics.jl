@@ -98,6 +98,7 @@ end
 
 """
     SBX(;η, p, bounds)
+
 Simulated Binomial Crossover.
 """
 mutable struct SBX

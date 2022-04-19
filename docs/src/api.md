@@ -101,7 +101,8 @@ Metaheuristics.compare
 Metaheuristics.gen_initial_state
 ```
 
-## Variation Operators
+## Variation 
+
 
 ```@docs
 Metaheuristics.SBX_crossover
@@ -140,6 +141,48 @@ Metaheuristics.GA_reproduction
 
 ```@docs
 Metaheuristics.GA_reproduction_half
+```
+
+```@doc
+RandomInBounds
+```
+
+```@doc
+RandomBinary
+```
+
+```@doc
+RandomPermutation
+```
+
+```@doc
+TournamentSelection
+```
+```@doc
+RouletteWheelSelection
+```
+
+```@doc
+UniformCrossover
+```
+```@doc
+OrderCrossover
+```
+
+```@doc
+BitFlipMutation
+```
+
+```@doc
+SlightMutation
+```
+
+```@doc
+GenerationalReplacement
+```
+
+```@doc
+ElitistReplacement
 ```
 
 ## Population

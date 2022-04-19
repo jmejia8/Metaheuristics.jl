@@ -1,3 +1,8 @@
+"""
+    GenerationalReplacement()
+
+Generational replacement.
+"""
 struct GenerationalReplacement end
 
 function environmental_selection!(population, offsprings, parameters::GenerationalReplacement)

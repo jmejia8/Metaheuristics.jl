@@ -142,3 +142,10 @@ Machine-coded Compact Genetic Algorithms for real-valued optimization problems b
 ```@docs
 MCCGA
 ```
+
+## GA
+
+
+```@doc
+GA
+```
