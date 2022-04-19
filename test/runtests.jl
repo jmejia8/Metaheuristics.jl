@@ -10,10 +10,11 @@ else
 end
 
 for tests in [
-            "common-methods.jl",
-            "box-constrained.jl",
-            "constrained.jl",
-            "multi-objective.jl",
-]
+              "common-methods.jl",
+              "box-constrained.jl",
+              "constrained.jl",
+              "multi-objective.jl",
+              "combinatorial.jl",
+             ]
     include(tests)
 end
