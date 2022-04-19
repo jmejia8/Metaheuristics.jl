@@ -1,0 +1,6 @@
+include("utils.jl")
+include("initializer.jl")
+include("selection.jl")
+include("crossover.jl")
+include("mutation.jl")
+include("environmental_selection.jl")

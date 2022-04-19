@@ -1,3 +1,46 @@
+"""
+    UniformCrossover(;p = 0.5)
+
+Uniform crossover aka Binomial crossover suitable for binary representation.
+"""
+struct UniformCrossover
+    p::Float64
+    UniformCrossover(;p=0.5) = new(p)
+end
+
+function crossover(population, parameters::UniformCrossover)
+    n = length(population) ÷ 2
+    offspring_A = positions(population[1:n])
+    offspring_B = positions(population[n+1:2n])
+    mask = rand(size(offspring_A)...) .<= parameters.p
+    tmp = copy(offspring_A[mask])
+    offspring_A[mask] = offspring_B[mask]
+    offspring_B[mask] = tmp
+    [offspring_A; offspring_B]
+end
+
+"""
+    OrderCrossover()
+Order crossover for representation where order is important. Suitable for permutation
+representation.
+"""
+struct OrderCrossover end
+
+function crossover(population, parameters::OrderCrossover)
+    O = positions(population)
+    N, D = size(O)
+    s = rand(1:D, N) # slash points
+    for i = 1:2:N
+        PA = O[i, :]   # parent A
+        PB = O[i+1, :] # parent B
+        O[i,  s[i]+1:D] = setdiff(PB, PA[1:s[i]]);
+        O[i+1,s[i]+1:D] = setdiff(PA, PB[1:s[i]]);
+    end
+    O
+end
+
+##########################################################################
+
 function gen_β(β, η, D, R)
     α = 2.0 .- β .^ (-  η - 1.0 )
     mask = R .<= 1.0 ./ α
@@ -52,6 +95,32 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
 
     return cc1, cc2
 end
+
+"""
+    SBX(;η, p, bounds)
+Simulated Binomial Crossover.
+"""
+mutable struct SBX
+    η::Float64
+    p::Float64
+    bounds::Matrix{Float64}
+    SBX(;η = 50, p = 0.9, bounds = zeros(0,0)) = new(η, p, bounds)
+end
+
+function crossover(population, parameters::SBX)
+    isempty(population) && return zeros(0,0)
+    Q = positions(population)
+    for i in 1:2:length(population)
+        p1 = get_position(population[i])
+        p2 = get_position(population[i+1])
+        c1, c2 = SBX_crossover(p1, p2, bounds, η=parameters.η, p_variable = parameters.p)
+        Q[i,:] = c1
+        Q[i+1,:] = c2
+    end
+    Q
+end
+
+
 
 """
     DE_crossover(x, u, CR)

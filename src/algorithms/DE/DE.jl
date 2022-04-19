@@ -187,3 +187,29 @@ function final_stage!(
     )
     status.final_time = time()
 end
+
+
+function reproduction(status, parameters::DE, problem)
+    @assert !isempty(status.population)
+
+    N = parameters.N
+    D = length(get_position(status.population[1]))
+
+    strategy = parameters.strategy
+    xBest = get_position(status.best_sol)
+    population = status.population
+    F = parameters.F
+    CR = parameters.CR
+
+    X = zeros(N,D)
+
+    for i in 1:N
+        x = get_position(population[i])
+        u = DE_mutation(population, F, strategy, 1)
+        v = DE_crossover(x, u, CR)
+        evo_boundary_repairer!(v, xBest, problem.bounds)
+        X[i,:] = v
+    end
+
+    X 
+end

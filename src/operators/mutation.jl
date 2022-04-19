@@ -1,4 +1,47 @@
 """
+    BitFlipMutation(;p = 1e-2)
+
+Flip each bit with probability `p`.
+"""
+struct BitFlipMutation
+    p::Float64
+    BitFlipMutation(;p = 1e-2) = new(p)
+end
+
+function mutation!(Q, parameters::BitFlipMutation)
+    mask = rand(size(Q)...) .< parameters.p
+    Q[mask] = .!Q[mask]
+    Q
+end
+
+"""
+    SlightMutation
+
+> Fogel, D. B. (1988). An evolutionary approach to the traveling salesman problem.
+> Biological Cybernetics, 60(2), 139-144.
+"""
+struct SlightMutation end
+
+function mutation!(Q, parameters::SlightMutation)
+    N, D = size(Q)
+    k = rand(1:D, N)
+    s = rand(1:D, N)
+    for i in 1:N
+        s[i] == k[i] && continue
+        if s[i] < k[i]
+            c = vcat(1:s[i]-1, k[i], s[i]:k[i]-1, k[i]+1:D)
+        else s[i] > k[i]
+            c = vcat(1:k[i]-1, k[i]+1:s[i]-1, k[i], s[i]:D)
+        end
+        Q[i,:] = Q[i, c]
+    end
+    Q
+end
+
+
+######################
+
+"""
     polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
 
 Polynomial Mutation applied to a vector of real numbers.
@@ -31,6 +74,19 @@ function polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
 
 end
 
+struct PolynomialMutation
+    η::Float64
+    p::Float64
+    bounds::Matrix{Float64}
+    Polynomial(;η = 20.0, p = 1e-2, bounds = zeros(0,0)) = new(η, p, bounds)
+end
+
+function mutation!(Q, parameters::PolynomialMutation)
+    for i in 1:size(Q,1)
+        polynomial_mutation!(view(Q, i,:), parameters.bounds, η=parameters.η, prob=parameters.p)
+    end
+    Q
+end
 
 """
     DE_mutation(population, F = 1.0, strategy = :rand1)
@@ -117,45 +173,5 @@ function DE_mutation(population,
     end
 
     return u
-end
-
-
-"""
-    MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds) 
-
-Perform Differential Evolution operators and polynomial mutation using three vectors
-`a, b, c` and parameters `F, CR, p_m, η`, i.e., stepsize, crossover and
-mutation probability.
-"""
-function MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds)
-    D = length(a)
-    # binomial crossover
-    v = zeros(length(a))
-
-    la = view(bounds, 1, :)
-    lb = view(bounds, 2, :)
-
-    # binomial crossover
-    for j in 1:D
-        # binomial crossover
-        if rand() < CR
-            v[j] = a[j] + F * (b[j] - c[j])
-        else
-            v[j] = a[j]
-        end
-        # polynomial mutation
-
-        if rand() < p_m
-            r = rand()
-            if r < 0.5
-                σ_k = (2.0 * r)^(1.0 / (η + 1)) - 1
-            else
-                σ_k = 1 - (2.0 - 2.0 * r)^(1.0 / (η + 1))
-            end
-            v[j] = v[j] + σ_k * (lb[j] - la[j])
-        end
-    end
-
-    v
 end
 

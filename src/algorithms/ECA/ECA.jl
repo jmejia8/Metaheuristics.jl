@@ -302,3 +302,25 @@ function final_stage!(
     status.final_time = time()
 end
 
+
+###########################################
+## ECA
+###########################################
+function reproduction(status, parameters::ECA, problem)
+    @assert !isempty(status.population)
+
+    N = parameters.N
+    D = length(get_position(status.population[1]))
+
+    X = zeros(N,D)
+
+    for i in 1:N
+        X[i,:] = ECA_operator(status.population,
+                              parameters.K,
+                              parameters.η_max;
+                              i=i,
+                             bounds = problem.bounds)
+    end
+
+    X 
+end

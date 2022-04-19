@@ -1,12 +1,5 @@
 abstract type AbstractGA <: AbstractParameters end
 
-include("utils.jl")
-include("initializer.jl")
-include("selection.jl")
-include("crossover.jl")
-include("mutation.jl")
-include("environmental_selection.jl")
-
 mutable struct GA{T1, T2, T3, T4, T5} <: AbstractGA
     initializer::T1
     selection::T2

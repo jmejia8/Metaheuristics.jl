@@ -316,3 +316,30 @@ function final_stage!(
 
 end
 
+
+###########################################
+## NSGA3 reproduction
+###########################################
+function reproduction(status, parameters::NSGA3, problem)
+    @assert !isempty(status.population)
+
+    I = randperm(parameters.N)
+    Q = zeros(parameters.N, size(problem.bounds, 2))
+    for i = 1:parameters.N ÷ 2
+
+        pa = status.population[I[2i-1]]
+        pb = status.population[I[2i]]
+
+        c1, c2 = GA_reproduction(get_position(pa),
+                                 get_position(pb),
+                                 problem.bounds;
+                                 η_cr = parameters.η_cr,
+                                 p_cr = parameters.p_cr,
+                                 η_m = parameters.η_m,
+                                 p_m = parameters.p_m)
+        Q[i,:] = c1
+        Q[i+1,:] = c2       
+    end
+
+    Q
+end

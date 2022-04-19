@@ -244,6 +244,47 @@ function update_state!(
 
 end
 
+
+"""
+    MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds) 
+
+Perform Differential Evolution operators and polynomial mutation using three vectors
+`a, b, c` and parameters `F, CR, p_m, η`, i.e., stepsize, crossover and
+mutation probability.
+"""
+function MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds)
+    D = length(a)
+    # binomial crossover
+    v = zeros(length(a))
+
+    la = view(bounds, 1, :)
+    lb = view(bounds, 2, :)
+
+    # binomial crossover
+    for j in 1:D
+        # binomial crossover
+        if rand() < CR
+            v[j] = a[j] + F * (b[j] - c[j])
+        else
+            v[j] = a[j]
+        end
+        # polynomial mutation
+
+        if rand() < p_m
+            r = rand()
+            if r < 0.5
+                σ_k = (2.0 * r)^(1.0 / (η + 1)) - 1
+            else
+                σ_k = 1 - (2.0 - 2.0 * r)^(1.0 / (η + 1))
+            end
+            v[j] = v[j] + σ_k * (lb[j] - la[j])
+        end
+    end
+
+    v
+end
+
+
 function MOEAD_DE_reproduction(i, P_idx, population, parameters::MOEAD_DE, problem)
     # select participats
     r1 = i 

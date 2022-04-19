@@ -40,15 +40,13 @@ include("solutions/individual.jl")
 include("solutions/constrained.jl")
 include("solutions/display.jl")
 
+include("operators/operators.jl")
+
 include("common/multi-objective-functions.jl")
 include("common/repair.jl")
 
 include("common/stop.jl")
 include("common/compare.jl")
-include("common/crossover.jl")
-include("common/mutation.jl")
-include("common/selection.jl")
-include("common/generic-reproduction.jl")
 include("common/non-dominated-sorting.jl")
 
 
@@ -111,8 +109,6 @@ include("algorithms/SPEA2/SPEA2.jl")
 # genetic algorithm
 include("algorithms/MCCGA/MCCGA.jl")
 
-
-include("common/reproduction.jl")
 
 include("algorithms/stop_criteria.jl")
 #######################################################
