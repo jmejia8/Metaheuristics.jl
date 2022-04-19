@@ -19,7 +19,7 @@
         end
 
         result = optimize(f, bounds, method)
-        @test minimum(result) ≈ 0
+        @test isapprox(minimum(result), 0, atol=1e-3)
         test_results(result)
         result
     end
@@ -57,7 +57,7 @@
     TSP_problem()
  
     #### Binary
-    options = Options(seed = 1, f_tol = 1e-16)
+    options = Options(seed = 1, f_tol = 1e-16, iterations=1000)
     information = Information(f_optimum = 0.0)
 
     ga_binary = GA(;options, information)
@@ -72,6 +72,16 @@
                    )
 
     simple_problem(ga_integer, bounds)
+
+    #### Real
+    bounds = repeat([0.0, 10], 1, 10)
+    ga_real = GA(;mutation =PolynomialMutation(;bounds),
+                    crossover=SBX(;bounds),
+                    environmental_selection=GenerationalReplacement(),
+                    options, information
+                   )
+
+    simple_problem(ga_real, bounds)
 end
 
 
