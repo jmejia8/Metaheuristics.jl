@@ -36,14 +36,14 @@ end
 If the optimum is provided, then check if the accuracy is met via
 `abs(status.best_sol.f - information.f_optimum) < options.f_tol`.
 """
-function accuracy_stop_check(status::State{xf_indiv}, information, options)
+function accuracy_stop_check(status::State{<:xf_solution}, information, options)
     cond =  !isnan(information.f_optimum) && abs(fval(status.best_sol) - information.f_optimum) < options.f_tol
     cond && (status.termination_status_code = ACCURACY_LIMIT)
     cond
 end
 
 
-function accuracy_stop_check(status::State{xfgh_indiv}, information, options)
+function accuracy_stop_check(status::State{<:xfgh_solution}, information, options)
     isnan(information.f_optimum) && (return false)
     
     vio = violationsSum(status.best_sol.g, status.best_sol.h, ε=options.h_tol)
