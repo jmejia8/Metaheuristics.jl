@@ -85,9 +85,9 @@ function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
     c2[mask] = cc[mask]
 
     cc1 = copy(vector1)
-    cc1[do_crossover] = c1[do_crossover]
+    cc1[do_crossover] = _to_int_if_necessary(eltype(cc1), c1[do_crossover] )
     cc2 = copy(vector2)
-    cc2[do_crossover] = c2[do_crossover]
+    cc2[do_crossover] = _to_int_if_necessary(eltype(cc2), c2[do_crossover] )
 
 
     reset_to_violated_bounds!(cc1, bounds)
@@ -105,16 +105,17 @@ mutable struct SBX
     η::Float64
     p::Float64
     bounds::Matrix{Float64}
-    SBX(;η = 50, p = 0.9, bounds = zeros(0,0)) = new(η, p, bounds)
+    SBX(;η = 15, p = 0.9, bounds = zeros(0,0)) = new(η, p, bounds)
 end
 
 function crossover(population, parameters::SBX)
     isempty(population) && return zeros(0,0)
     Q = positions(population)
-    for i in 1:2:length(population)
+    bounds = parameters.bounds
+    for i in 1:2:length(population)-1
         p1 = get_position(population[i])
         p2 = get_position(population[i+1])
-        c1, c2 = SBX_crossover(p1, p2, bounds, η=parameters.η, p_variable = parameters.p)
+        c1, c2 = SBX_crossover(p1, p2, bounds, parameters.η, parameters.p)
         Q[i,:] = c1
         Q[i+1,:] = c2
     end

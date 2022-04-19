@@ -67,23 +67,25 @@ function polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
             for i in 1:D
         ]
 
-    vector[do_mutation] = x + δq .* ( xu - xl)
-    # correct using reset to bound
-    #
+    vector[do_mutation] = _to_int_if_necessary(eltype(vector), x + δq .* ( xu - xl))
     vector
-
 end
 
+"""
+    PolynomialMutation(;η, p, bounds)
+
+Polynomial mutation.
+"""
 struct PolynomialMutation
     η::Float64
     p::Float64
     bounds::Matrix{Float64}
-    Polynomial(;η = 20.0, p = 1e-2, bounds = zeros(0,0)) = new(η, p, bounds)
+    PolynomialMutation(;η = 20.0, p = 1e-2, bounds = zeros(0,0)) = new(η, p, bounds)
 end
 
 function mutation!(Q, parameters::PolynomialMutation)
     for i in 1:size(Q,1)
-        polynomial_mutation!(view(Q, i,:), parameters.bounds, η=parameters.η, prob=parameters.p)
+        polynomial_mutation!(view(Q, i,:), parameters.bounds, parameters.η, parameters.p)
     end
     Q
 end
