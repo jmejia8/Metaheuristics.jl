@@ -103,6 +103,9 @@ Metaheuristics.gen_initial_state
 
 ## Variation 
 
+```@docs
+Metaheuristics.SBX
+```
 
 ```@docs
 Metaheuristics.SBX_crossover
@@ -175,6 +178,11 @@ BitFlipMutation
 
 ```@doc
 SlightMutation
+```
+
+
+```@doc
+PolynomialMutation
 ```
 
 ```@doc
