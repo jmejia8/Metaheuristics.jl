@@ -119,8 +119,12 @@ function initialize!(
 
     if options.iterations == 0
         options.iterations = 500
+    end
+
+    if options.f_calls_limit == 0
         options.f_calls_limit = 2options.iterations * parameters.initializer.N
     end
+    
 
     initialize!(status,parameters.initializer,problem,information,options,args...;kargs...)
 end

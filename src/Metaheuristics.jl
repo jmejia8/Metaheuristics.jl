@@ -21,8 +21,8 @@ export termination_status_message
 
 export GA, RandomInBounds, RandomBinary, RandomPermutation
 export TournamentSelection, RouletteWheelSelection
-export UniformCrossover, OrderCrossover
-export BitFlipMutation, SlightMutation
+export UniformCrossover, OrderCrossover, SBX
+export BitFlipMutation, SlightMutation, PolynomialMutation
 export GenerationalReplacement, ElitistReplacement
 
 include("externals.jl")
