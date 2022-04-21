@@ -160,7 +160,7 @@ end
 # single objective
 function create_child(X::AbstractMatrix, fResult::AbstractVector;ε=0.0)
     size(X,1) != length(fResult) && error("Error in parallel evaluation: size(X,2) != length(f(X))")
-    return [xf_indiv(X[i,:], fResult[i]) for i in 1:size(X,1)]
+    return [xf_solution(X[i,:], fResult[i]) for i in 1:size(X,1)]
 end
 
 
@@ -170,7 +170,7 @@ function create_child(X::AbstractMatrix, fResult::AbstractMatrix;ε=0.0)
 
     size(X,1) != size(fResult,1) && error("Error in parallel evaluation: size(X,2) != length(f(X))") 
 
-    return [xf_indiv(X[i,:], fResult[i]) for i in 1:size(X,1)]
+    return [xf_solution(X[i,:], fResult[i]) for i in 1:size(X,1)]
 end
 
 # constrained single objective

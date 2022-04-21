@@ -44,10 +44,11 @@ function gen_initial_state(problem,parameters::RandomPermutation,information,opt
     end
 
     if problem.parallel_evaluation
-        return create_solutions(X, problem; ε=options.h_tol)
+        population = create_solutions(X, problem; ε=options.h_tol)
+    else
+        population = [ create_solution(X[i,:], problem; ε=options.h_tol) for i in 1:N]
     end 
 
-    population = [ create_solution(X[i,:], problem; ε=options.h_tol) for i in 1:N]
     best_solution = get_best(population)
 
     State(best_solution, population; f_calls = length(population), iteration=1)
