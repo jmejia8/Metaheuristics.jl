@@ -19,6 +19,7 @@ contributor's understanding of the algorithms detailed in the published paper.
 | SPEA2     |  Multi     |      ✅     |   ➖        |   ✅        | [`SPEA2`](@ref)        |
 | BCA       |  Bilevel   |      ✅     |   ❌        |   ❌        | [`BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) |
 | MCCGA     |  Single    |      ❌     |   ❌        |   ❌        | [`MCCGA`](@ref)        |
+| GA        |  Single    |      ✅     |   ➖        |   ✅        | [`GA`](@ref)        |
 
 
 ✅ = supported,
