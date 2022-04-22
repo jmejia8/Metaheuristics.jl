@@ -76,6 +76,38 @@ stop reason: Maximum number of iterations exceeded.
 ### Example: Integer Encoding
 
 ```jldoctest
+julia> c = randn(10);
+
+julia> A = randn(10, 10);
+
+julia> f(x) = c'*x, A*x, [0.0]
+f (generic function with 1 method)
+
+julia> bounds = repeat([0,100], 1, 10)
+2×10 Matrix{Int64}:
+   0    0    0    0    0    0    0    0    0    0
+ 100  100  100  100  100  100  100  100  100  100
+
+julia> ga = GA(;crossover=SBX(;bounds),
+                mutation=PolynomialMutation(;bounds),
+                environmental_selection=GenerationalReplacement()
+            );
+
+julia> result = optimize(f, bounds, ga)
++=========== RESULT ==========+
+  iteration: 500
+    minimum: -76.9031
+  minimizer: [0, 10, 49, 100, 24, 0, 0, 0, 67, 76]
+    f calls: 50000
+  feasibles: 95 / 100 in final population
+ total time: 0.6028 s
+stop reason: Maximum number of iterations exceeded.
++============================+
+```
+
+### Example: Real Encoding
+
+```jldoctest
 julia> f, bounds, solutions = Metaheuristics.TestProblems.rastrigin();
 
 julia> ga = GA(;mutation=PolynomialMutation(;bounds),

@@ -65,7 +65,7 @@
 
     #### Integer
     bounds = repeat([0, 10], 1, 10)
-    ga_integer = GA(;mutation =PolynomialMutation(;bounds),
+    ga_integer = GA(;mutation =PolynomialMutation(;bounds,p=1e-2),
                     crossover=SBX(;bounds),
                     environmental_selection=GenerationalReplacement(),
                     options, information
@@ -75,7 +75,7 @@
 
     #### Real
     bounds = repeat([0.0, 10], 1, 10)
-    ga_real = GA(;mutation =PolynomialMutation(;bounds),
+    ga_real = GA(;mutation =PolynomialMutation(;bounds, p = 1e-2),
                     crossover=SBX(;bounds),
                     environmental_selection=GenerationalReplacement(),
                     options, information

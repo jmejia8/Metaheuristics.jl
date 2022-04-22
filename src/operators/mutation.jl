@@ -80,7 +80,9 @@ struct PolynomialMutation
     η::Float64
     p::Float64
     bounds::Matrix{Float64}
-    PolynomialMutation(;η = 20.0, p = 1e-2, bounds = zeros(0,0)) = new(η, p, bounds)
+    PolynomialMutation(;η = 15.0, bounds = zeros(0,0), p=1/size(bounds,2)) = begin
+        new(η, isfinite(p) ? p : 1e-2, bounds)
+    end
 end
 
 function mutation!(Q, parameters::PolynomialMutation)
