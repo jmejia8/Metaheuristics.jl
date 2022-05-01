@@ -33,7 +33,7 @@ Just another Genetic Algorithm Framework.
 - `mutation` parameters for the mutation operator.
 - `environmental_selection` parameters for the replacement method.
 
-### Example: Binary Encoding
+### Example: Binary Encoding (default)
 
 ```jldoctest
 julia> f(x) = sum(x) / length(x)
