@@ -47,6 +47,7 @@ considered in most of the implemented algorithms.
 - **SA**:  Simulated Annealing
 - **WOA**: Whale Optimization Algorithm
 - **MCCGA**: Machine-coded Compact Genetic Algorithm
+- **GA**: Genetic Algorithm
 
 ### Multi-Objective Optimization
 
