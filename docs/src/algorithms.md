@@ -147,6 +147,6 @@ MCCGA
 ## GA
 
 
-```@doc
+```@docs
 GA
 ```
