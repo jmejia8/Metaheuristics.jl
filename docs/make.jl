@@ -20,6 +20,7 @@ makedocs(
                   "Algorithms" => "algorithms.md",
                   "Problems" => "problems.md",
                   "Performance Indicators" => "indicators.md",
+                  "Multi-Criteria Decision Making" => "mcdm.md",
                   "Visualization" => "visualization.md",
                   "API References" => "api.md",
                   "Contributing" => "contributing.md",
