@@ -123,7 +123,30 @@ function JMcDM.summary(st::State,args...)
     summary(st.population, args...)
 end
 
-# const decisionmaking = mcdm
+
+function decisionmaking(
+    f::AbstractMatrix{<:AbstractFloat}, # objective functions by col
+    w::AbstractVector{<:AbstractFloat},
+    method::T
+    ) where T <: JMcDM.MCDMMethod
+
+    result = mcdm(f, w, method)
+
+    if result.bestIndex isa Tuple
+        return [result.bestIndex...]
+    end
+
+    result.bestIndex
+end
+
+function decisionmaking(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
+    decisionmaking(fvals(population), args...)
+end
+
+
+function decisionmaking(st::State, args...)
+    decisionmaking(st.population, args...)
+end
 
 
 """
@@ -147,13 +170,11 @@ function best_alternative(
     w::AbstractVector{<:AbstractFloat},
     method::T
     ) where T <: JMcDM.MCDMMethod
-    result = mcdm(population, w, method)
 
-    if result.bestIndex isa Tuple
-        return population[[result.bestIndex...]]
-    end
-    
-    population[result.bestIndex]
+    idx = decisionmaking(population, w, method)
+    isempty(idx) && error("Unable finding an alternative using provided method.")
+ 
+    population[idx]
 end
 
 function best_alternative(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
@@ -166,4 +187,7 @@ function best_alternative(st::State, args...)
 end
 
 best_alternative(status::State, args...) = best_alternative(status.population,args...)
+
+
+
 
