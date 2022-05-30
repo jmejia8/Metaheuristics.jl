@@ -2,18 +2,26 @@
 
 A set of Multi-Criteria Decision Making (MCDM) methods are available in `Metaheuristics.jl`.
 
-Many methods have been implemented in [JMcDM](https://github.com/jbytecode/JMcDM) which
-has been interfaced here.
-
-
 !!! compat "Maximization or Minimization"
     Here, minimization is always assumed.   
 
+Firstly, it is recommended to read the following two functions.
+
+```docs
+decisionmaking
+```
+
+
+```docs
+best_alternative
+```
+
 ## JMcDM
 
-JMcDM is a package for MCDM.
 
-Main method to perform MCDM.
+[JMcDM](https://github.com/jbytecode/JMcDM) is a package for MCDM developed by [Satman2021JMcDM](@cite). Many methods have been implemented there, and many of them have been interfaced here.
+
+The Main method to use JMcDM in Metaheuristics is described as follows.
 
 ```julia
 mcdm(fs, w, method)
@@ -94,4 +102,17 @@ julia> res = optimize(f, bounds, NSGA2());
 
 julia> best_sol = best_alternative(res, [0.5, 0.5], TopsisMethod())
 (f = [0.32301132058506055, 0.43208538139854685], g = [0.0], h = [0.0], x = [3.230e-01, 1.919e-04, …, 1.353e-04])
+```
+
+
+##  Region of Interest Archiving
+
+```@docs
+ROIArchiving
+```
+
+## Compromise Programming
+
+```docs
+CompromiseProgramming
 ```
