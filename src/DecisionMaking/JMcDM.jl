@@ -1,4 +1,9 @@
-import JMcDM: mcdm, MCDMSetting, summary, makeminmax,DataFrame, MCDMMethod
+# import JMcDM: mcdm, MCDMSetting, summary, makeminmax,DataFrame, MCDMMethod
+
+const mcdm = JMcDM.mcdm
+const MCDMSetting = JMcDM.MCDMSetting
+const summary = JMcDM.summary
+
 
 export mcdm
 export MCDMSetting
@@ -6,14 +11,76 @@ export summary
 
 export best_alternative
 
+
+"""
+    mcdm(fs, w, method)
+
+Perform selected `method` for a given `fs` and weight vector.
+Here, `fs` can be a set of non-dominated solutions (population), a `State`
+or a decision matrix.
+
+Also, `method` can be selected from `JMcDM` package.
+
+Supported McDM methods:
+
+* `ArasMethod`
+* `CocosoMethod`
+* `CodasMethod`
+* `CoprasMethod`
+* `CriticMethod`
+* `EdasMethod`
+* `ElectreMethod`
+* `GreyMethod`
+* `MabacMethod`
+* `MaircaMethod`
+* `MooraMethod`
+* `SawMethod`
+* `TopsisMethod`
+* `VikorMethod`
+* `WPMMethod`
+* `WaspasMethod`
+* `MarcosMethod`
+
+### Example 1:
+
+Performing McDM using a population.
+
+```julia-repl
+julia> using JMcDM
+
+julia> _, _, population = Metaheuristics.TestProblems.ZDT1();
+
+julia> dm = mcdm(population, [0.5, 0.5], TopsisMethod());
+
+julia> population[dm.bestIndex]
+(f = [0.5353535353535354, 0.2683214262030523], g = [0.0], h = [0.0], x = [5.354e-01, 0.000e+00, …, 0.000e+00])
+```
+
+### Example 2:
+
+Performing McDM using results from metaheuristic.
+
+```julia-repl
+julia> using JMcDM
+
+julia> f, bounds, _ = Metaheuristics.TestProblems.ZDT1();
+
+julia> res = optimize(f, bounds, NSGA2());
+
+julia> dm = mcdm(res, [0.5, 0.5], TopsisMethod());
+
+julia> res.population[dm.bestIndex]
+(f = [0.32301132058506055, 0.43208538139854685], g = [0.0], h = [0.0], x = [3.230e-01, 1.919e-04, …, 1.353e-04])
+```
+"""
 function JMcDM.mcdm(
     f::AbstractMatrix{<:AbstractFloat}, # objective functions by col
     w::AbstractVector{<:AbstractFloat},
     method::T
-    ) where T <: MCDMMethod
+    ) where T <: JMcDM.MCDMMethod
 
-    fns = makeminmax([minimum for i in 1:size(f, 1)])
-    mcdm(DataFrame(f, :auto), w, fns, method)
+    fns = JMcDM.makeminmax([minimum for i in 1:size(f, 1)])
+    JMcDM.mcdm(JMcDM.DataFrame(f, :auto), w, fns, method)
 end
 
 function JMcDM.mcdm(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
@@ -26,8 +93,8 @@ function JMcDM.mcdm(st::State,args...)
 end
 
 function JMcDM.MCDMSetting(f::AbstractMatrix{<: AbstractFloat}, weights)
-    fns = makeminmax([minimum for i in 1:size(f, 1)])
-    MCDMSetting(DataFrame(f, :auto), weights, fns)
+    fns = JMcDM.makeminmax([minimum for i in 1:size(f, 1)])
+    JMcDM.MCDMSetting(JMcDM.DataFrame(f, :auto), weights, fns)
 end
 
 
@@ -45,8 +112,8 @@ function JMcDM.summary(
     methods::Array{Symbol,1}
     )
 
-    fns = makeminmax([minimum for i in 1:size(f, 1)]) 
-    summary(DataFrame(f, :auto), w, fns, methods)
+    fns = JMcDM.makeminmax([minimum for i in 1:size(f, 1)]) 
+    JMcDM.summary(JMcDM.DataFrame(f, :auto), w, fns, methods)
 end
 
 
@@ -61,15 +128,31 @@ end
 
 # const decisionmaking = mcdm
 
+
+"""
+    best_alternative(res, w, method)
+
+Perform McDM using results from metaheuristic and return best alternative in `res.population`.
+
+### Example
+
+```julia-repl
+julia> f, bounds, _ = Metaheuristics.TestProblems.ZDT1();
+
+julia> res = optimize(f, bounds, NSGA2());
+
+julia> best_sol = best_alternative(res, [0.5, 0.5], TopsisMethod())
+(f = [0.32301132058506055, 0.43208538139854685], g = [0.0], h = [0.0], x = [3.230e-01, 1.919e-04, …, 1.353e-04])
+```
+"""
 function best_alternative(
     population::AbstractArray{<: AbstractMultiObjectiveSolution},
     w::AbstractVector{<:AbstractFloat},
     method::T
-    ) where T <: MCDMMethod
+    ) where T <: JMcDM.MCDMMethod
     result = mcdm(population, w, method)
     population[result.bestIndex]
 end
-
 
 function best_alternative(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
     best_alternative(fvals(population), args...)
