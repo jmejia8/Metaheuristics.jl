@@ -1,5 +1,28 @@
 using JMcDM
 
+
+@testset "DecisionMaking: Compromise Programming" begin
+    function test_cp()
+        _, _, pf = Metaheuristics.TestProblems.ZDT1();
+        res = State(pf[1], pf)
+
+        w = [0.1, 0.9]
+
+        scalarizing_funcs = [WeightedSum(), Tchebysheff(), AchievementScalarization() ]
+
+        for fn in scalarizing_funcs
+            method = CompromiseProgramming(fn)
+            idx = decisionmaking(res, w, method)
+
+            @test idx isa Int
+            sol = best_alternative(res, w, method)
+            @test Metaheuristics.compare(fval(sol), fval(res.population[idx])) == 0
+        end
+    end
+    
+    test_cp() 
+end
+
 @testset "DecisionMaking: ROI" begin
     function test_roi()
         _, _, pf = Metaheuristics.TestProblems.ZDT1();
