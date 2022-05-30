@@ -5,25 +5,32 @@ using JMcDM
         _, _, pf = Metaheuristics.TestProblems.ZDT1();
         res = State(pf[1], pf)
 
-        w = fill(0.5, 2);
+        w = [0.5, 0.5]
 
         # PrometheeMethod
         # PSIMethod, MoosraMethod --err
         methods = [
-                   ArasMethod ,CocosoMethod ,CodasMethod ,CoprasMethod ,CriticMethod,
-                   EdasMethod ,ElectreMethod ,GreyMethod ,MabacMethod ,MaircaMethod ,MooraMethod,
-                   SawMethod ,TopsisMethod ,VikorMethod ,WPMMethod ,WaspasMethod,
-                   MarcosMethod
+                   ArasMethod, CocosoMethod, CodasMethod, CoprasMethod, 
+                   EdasMethod, ElectreMethod, GreyMethod, MabacMethod, MaircaMethod,
+                   MooraMethod, SawMethod, TopsisMethod, VikorMethod, WPMMethod,
+                   WaspasMethod, MarcosMethod
                   ]
 
         for method in methods
             res_dm = mcdm(res, w, method())
             res_dm2 = mcdm(MCDMSetting(res, w), method())
             @test res_dm.bestIndex == res_dm2.bestIndex
+            
+            # bestIndex can be touple and needs to be handled...
+            idx = res_dm.bestIndex isa Tuple ? res_dm.bestIndex[1] : res_dm.bestIndex
+            ref_sol = res.population[idx]
+            best_sol_ = best_alternative(res, w, method())
+            best_sol = best_sol_ isa Array ? best_sol_[1] : best_sol_
+            @test Metaheuristics.compare(fval(best_sol), fval(ref_sol)) == 0
         end
 
+        @test JMcDM.summary(res, w, [:topsis, :electre, :vikor]) isa DataFrame
 
-        # JMcDM.summary(res, w, methods)
     end
 
     test_jmcdm()
