@@ -1,5 +1,3 @@
-# import JMcDM: mcdm, MCDMSetting, summary, makeminmax,DataFrame, MCDMMethod
-
 const mcdm = JMcDM.mcdm
 const MCDMSetting = JMcDM.MCDMSetting
 const summary = JMcDM.summary
@@ -150,6 +148,11 @@ function best_alternative(
     method::T
     ) where T <: JMcDM.MCDMMethod
     result = mcdm(population, w, method)
+
+    if result.bestIndex isa Tuple
+        return population[[result.bestIndex...]]
+    end
+    
     population[result.bestIndex]
 end
 
