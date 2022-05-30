@@ -1,5 +1,22 @@
 using JMcDM
 
+@testset "DecisionMaking: ROI" begin
+    function test_roi()
+        _, _, pf = Metaheuristics.TestProblems.ZDT1();
+        res = State(pf[1], pf)
+
+        w = [0.1 0.9; 0.9 0.1]
+        δ = [0.1,0.1]
+        method = ROIArchiving(δ)
+        idx = decisionmaking(res, w, method)
+        @test !isempty(idx)
+        sols = best_alternative(res, w, method)
+        @test length(sols) == length(idx)
+    end
+    
+    test_roi() 
+end
+
 @testset "DecisionMaking: JMcDM" begin
     function test_jmcdm()
         _, _, pf = Metaheuristics.TestProblems.ZDT1();
@@ -36,5 +53,4 @@ using JMcDM
     test_jmcdm()
 
 end
-
 

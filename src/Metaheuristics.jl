@@ -111,6 +111,9 @@ include("algorithms/MCCGA/MCCGA.jl")
 
 
 include("algorithms/stop_criteria.jl")
+
+include("DecisionMaking/DecisionMaking.jl")
+
 #######################################################
 #                                                     #
 #           D E P R E C A T E D                       #
