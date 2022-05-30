@@ -1,9 +1,10 @@
 abstract type AbstractDecisionMakingMethod end
 
 include("ROI.jl")
+include("CompromiseProgramming.jl")
 
-export decisionmaking, dm, best_alternative, ROIArchiving
-
+export decisionmaking, dm, best_alternative, ROIArchiving, CompromiseProgramming
+export WeightedSum, Tchebysheff, AchievementScalarization
 
 """
     decisionmaking(fs, w, method)
@@ -11,7 +12,6 @@ export decisionmaking, dm, best_alternative, ROIArchiving
 Perform selected `method` for a given `fs` and weight vector(s) and return the indices
 indicating the best alternative(s).
 Here, `fs` can be a set of non-dominated solutions (population) or a `State`.
-
 """
 function decisionmaking(population::AbstractArray{<: AbstractMultiObjectiveSolution},
         w,
