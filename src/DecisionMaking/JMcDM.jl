@@ -27,7 +27,6 @@ Supported McDM methods:
 * `CocosoMethod`
 * `CodasMethod`
 * `CoprasMethod`
-* `CriticMethod`
 * `EdasMethod`
 * `ElectreMethod`
 * `GreyMethod`
