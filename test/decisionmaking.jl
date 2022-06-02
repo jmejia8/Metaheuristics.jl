@@ -71,6 +71,9 @@ end
 
         @test JMcDM.summary(res, w, [:topsis, :electre, :vikor]) isa DataFrame
 
+        # check default method TopsisMethod
+        @test mcdm(MCDMSetting(res, w)).bestIndex == mcdm(res, w, TopsisMethod()).bestIndex
+
     end
 
     test_jmcdm()

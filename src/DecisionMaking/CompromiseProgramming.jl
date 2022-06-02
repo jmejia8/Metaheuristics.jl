@@ -19,7 +19,11 @@ end
     CompromiseProgramming(scalarizing)
 
 Perform compromise programming by using the `scalarizing` function provided.
-Current implemented scalarizing function are `WeightedSum, Tchebysheff, AchievementScalarization`.
+Current implemented scalarizing function are
+
+* `WeightedSum`
+* `Tchebysheff`
+* `AchievementScalarization`.
 
 ### Example
 
