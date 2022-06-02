@@ -6,4 +6,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Optim = ">= 1.6.2"
-JMcDM = ">= v0.3.4"
+JMcDM = ">= v0.4.2"
