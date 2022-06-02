@@ -32,7 +32,7 @@ Supported McDM methods:
 * `MaircaMethod`
 * `MooraMethod`
 * `SawMethod`
-* `TopsisMethod`
+* `TopsisMethod` **(default method)**
 * `VikorMethod`
 * `WPMMethod`
 * `WaspasMethod`
@@ -72,12 +72,12 @@ julia> res.population[dm.bestIndex]
 """
 function JMcDM.mcdm(
     f::AbstractMatrix{<:AbstractFloat}, # objective functions by col
-    w::AbstractVector{<:AbstractFloat},
-    method::T
-    ) where T <: JMcDM.MCDMMethod
+    w,
+    args...
+    )
 
     fns = JMcDM.makeminmax([minimum for i in 1:size(f, 1)])
-    JMcDM.mcdm(JMcDM.DataFrame(f, :auto), w, fns, method)
+    JMcDM.mcdm(JMcDM.DataFrame(f, :auto), w, fns, args...)
 end
 
 function JMcDM.mcdm(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
