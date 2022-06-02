@@ -5,14 +5,14 @@ A set of Multi-Criteria Decision Making (MCDM) methods are available in `Metaheu
 !!! compat "Maximization or Minimization"
     Here, minimization is always assumed.   
 
-Firstly, it is recommended to read the following two functions.
+Firstly, it is recommended to read the details of the following two Julia methods.
 
-```docs
+```@docs
 decisionmaking
 ```
 
 
-```docs
+```@docs
 best_alternative
 ```
 
@@ -21,15 +21,14 @@ best_alternative
 
 [JMcDM](https://github.com/jbytecode/JMcDM) is a package for MCDM developed by [Satman2021JMcDM](@cite). Many methods have been implemented there, and many of them have been interfaced here.
 
-The Main method to use JMcDM in Metaheuristics is described as follows.
+The main method to use JMcDM within Metaheuristics is described as follows.
 
 ```julia
-mcdm(fs, w, method)
+mcdm(data, w, method)
 ```
 
-Perform selected `method` for a given `fs` and weight vector `w`.
-Here, `fs` can be a set of non-dominated solutions (population), a `State`
-or a decision matrix.
+Perform selected `method` for a given `data` and weight vector `w`.
+Here, `data` can be a set of non-dominated solutions (population), a [`State`](@ref) or a decision [`Matrix`](@ref).
 
 Also, `method` can be selected from [JMcDM](https://github.com/jbytecode/JMcDM) package.
 
@@ -46,7 +45,7 @@ Supported MCDM methods:
 * `MaircaMethod`
 * `MooraMethod`
 * `SawMethod`
-* `TopsisMethod`
+* `TopsisMethod` **(default method)**
 * `VikorMethod`
 * `WPMMethod`
 * `WaspasMethod`
@@ -113,6 +112,6 @@ ROIArchiving
 
 ## Compromise Programming
 
-```docs
+```@docs
 CompromiseProgramming
 ```
