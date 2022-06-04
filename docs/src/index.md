@@ -88,7 +88,7 @@ For instance, you may use mainly two functions to obtain such approximation.
 ## Contents
 
 ```@contents
-Pages = ["tutorial.md", "examples.md", "algorithms.md", "problems.md", "indicators.md", "visualization.md", "api.md"]
+Pages = ["tutorial.md", "examples.md", "algorithms.md", "problems.md", "indicators.md", "mcdm.md", "visualization.md", "api.md"]
 Depth = 2
 ```
 

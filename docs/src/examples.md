@@ -30,33 +30,6 @@ result = optimize(f, bounds, algorithm) # note that second run is faster
 
 ```
 
-## Providing Initial Solutions
-
-Sometimes you may need to use the starter solutions you need before the optimization
-process begins, well, this example illustrates how to do it.
-
-```@repl
-using Metaheuristics
-f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere);
-D = size(bounds,2);
-
-x_known = 0.6ones(D) # known solution
-
-X = [ bounds[1,:] + rand(D).* ( bounds[2,:] -  bounds[1,:]) for i in 1:19  ]; # random solutions (uniform distribution)
-
-push!(X, x_known); # save an interest solution
-
-population = [ Metaheuristics.create_child(x, f(x)) for x in X ]; # generate the population with 19+1 solutions
-
-prev_status = State(Metaheuristics.get_best(population), population); # prior state
-
-method = ECA(N = length(population))
-method.status = prev_status; # say to ECA that you have generated a population
-
-optimize(f, bounds, method) # optimize
-```
-
-
 ## Constrained Optimization
 
 It is common that optimization models include constraints that must be satisfied for example:
@@ -78,7 +51,7 @@ In `Metaheuristics.jl`, a feasible solution is such that $g(x) \leq 0$ and $h(x)
 Hence, in this example the constraint is given by $g(x) = x^2 + y^2 - 2 \leq 0$.
 Moreover, the equality and inequality constraints must be saved into  `Array`s.
 
-!!! compat "Constriants handling"
+!!! compat "Constraints handling"
     In this package, if the algorithm was not designed for constrained optimization,
     then solutions with lower constraint violation sum will be preferred.
 
@@ -180,6 +153,58 @@ res = optimize(F, f, bounds_ul, bounds_ll, BCA())
 
 See [BilevelHeuristics](https://jmejia8.github.io/BilevelHeuristics.jl/dev/) documentation
 for more information.
+
+
+## Decision-Making
+
+Although Metaheuristics is focused on the optimization part, some decision-making algorithms
+are available in this package (see [Multi-Criteria Decision-Making](@ref)).
+
+The following example shows how to perform *a posteriori* decision-making.
+
+```julia-repl
+julia> # load the problem
+julia> f, bounds, pf = Metaheuristics.TestProblems.ZDT1();
+
+julia> # perform multi-objective optimization
+julia> res = optimize(f, bounds, NSGA2());
+
+julia> # user preferences
+julia> w = [0.5, 0.5];
+
+julia> # set the decision-making algorithm
+julia> dm_method = CompromiseProgramming(Tchebysheff())
+
+julia> # find the best decision
+julia> sol = best_alternative(res, w, dm_method)
+(f = [0.38493217206706115, 0.38037042164979956], g = [0.0], h = [0.0], x = [3.849e-01, 7.731e-06, …, 2.362e-07])
+```
+
+## Providing Initial Solutions
+
+Sometimes you may need to use the starter solutions you need before the optimization
+process begins, well, this example illustrates how to do it.
+
+```@repl
+using Metaheuristics
+f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere);
+D = size(bounds,2);
+
+x_known = 0.6ones(D) # known solution
+
+X = [ bounds[1,:] + rand(D).* ( bounds[2,:] -  bounds[1,:]) for i in 1:19  ]; # random solutions (uniform distribution)
+
+push!(X, x_known); # save an interest solution
+
+population = [ Metaheuristics.create_child(x, f(x)) for x in X ]; # generate the population with 19+1 solutions
+
+prev_status = State(Metaheuristics.get_best(population), population); # prior state
+
+method = ECA(N = length(population))
+method.status = prev_status; # say to ECA that you have generated a population
+
+optimize(f, bounds, method) # optimize
+```
 
 
 ## Batch Evaluation

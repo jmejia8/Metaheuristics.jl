@@ -1,4 +1,4 @@
-# Multi-Criteria Decision Making 
+# Multi-Criteria Decision-Making 
 
 A set of Multi-Criteria Decision Making (MCDM) methods are available in `Metaheuristics.jl`.
 
