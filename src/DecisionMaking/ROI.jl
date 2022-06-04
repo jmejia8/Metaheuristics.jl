@@ -5,7 +5,7 @@ It can be used as a posteriori decision-making criteria applied to the Pareto fr
 found by a metaheuristic when solved a constrained multi-objective problem.
 
 `ROIArchiving` can handle multiple weight points and corresponding thresholds `δ_w`.
-Note `1 <= δ_w[i] <= 1` indicates the size of region of interest, e.g.,
+Note `0 <= δ_w[i] <= 1` indicates the size of region of interest, e.g.,
 `δ_w[i] = 0.51` means that  you want 51% of the Pareto front solutions close to `w[i]`.
 
 

@@ -5,7 +5,7 @@ A set of Multi-Criteria Decision Making (MCDM) methods are available in `Metaheu
 !!! compat "Maximization or Minimization"
     Here, minimization is always assumed.   
 
-Firstly, it is recommended to read the details of the following two Julia methods.
+Firstly, it is recommended to read the details of the following two functions.
 
 ```@docs
 decisionmaking
@@ -16,10 +16,39 @@ decisionmaking
 best_alternative
 ```
 
+Current available methods are listed in the following table.
+
+|     Method      | Strategies | Preferences | Dependency    | 
+|-----------------|------------|-------------|---------------|
+| [`CompromiseProgramming`](@ref) | S  | W/D         |               |
+| [`ROIArchiving`](@ref)  |      M     | D           |               |
+| `ArasMethod`    |      S     | W           | [JMcDM](@ref) |
+| `CocosoMethod`  |      S     | W           | [JMcDM](@ref) |
+| `CodasMethod`   |      S     | W           | [JMcDM](@ref) |
+| `CoprasMethod`  |      S     | W           | [JMcDM](@ref) |
+| `EdasMethod`    |      S     | W           | [JMcDM](@ref) |
+| `ElectreMethod` |      M     | W           | [JMcDM](@ref) |
+| `GreyMethod`    |      S     | W           | [JMcDM](@ref) |
+| `MabacMethod`   |      S     | W           | [JMcDM](@ref) |
+| `MaircaMethod`  |      S     | W           | [JMcDM](@ref) |
+| `MooraMethod`   |      S     | W           | [JMcDM](@ref) |
+| `SawMethod`     |      S     | W           | [JMcDM](@ref) |
+| `TopsisMethod`  |      S     | W           | [JMcDM](@ref) |
+| `VikorMethod`   |      S     | W           | [JMcDM](@ref) |
+| `WPMMethod`     |      S     | W           | [JMcDM](@ref) |
+| `WaspasMethod`  |      S     | W           | [JMcDM](@ref) |
+| `MarcosMethod`  |      S     | W           | [JMcDM](@ref) |
+
+A **Method** can suggest Single (S) or Multiple (M) **Strategies**.
+Also, Methods can represent **Preferences** by using weight vectors (W),
+reference directions (D) or reference points (P).
+
+
 ## JMcDM
 
 
-[JMcDM](https://github.com/jbytecode/JMcDM) is a package for MCDM developed by [Satman2021JMcDM](@cite). Many methods have been implemented there, and many of them have been interfaced here.
+[JMcDM](https://github.com/jbytecode/JMcDM) is a package for MCDM developed by [Satman2021JMcDM](@cite).
+Many methods have been implemented there, and many of them have been interfaced here.
 
 The main method to use JMcDM within Metaheuristics is described as follows.
 
@@ -28,7 +57,7 @@ mcdm(data, w, method)
 ```
 
 Perform selected `method` for a given `data` and weight vector `w`.
-Here, `data` can be a set of non-dominated solutions (population), a [`State`](@ref) or a decision [`Matrix`](@ref).
+Here, `data` can be a set of non-dominated solutions (population), a [`State`](@ref) or a decision `Matrix`.
 
 Also, `method` can be selected from [JMcDM](https://github.com/jbytecode/JMcDM) package.
 
@@ -106,11 +135,21 @@ julia> best_sol = best_alternative(res, [0.5, 0.5], TopsisMethod())
 
 ##  Region of Interest Archiving
 
+[`ROIArchiving`](@ref) uses a set of reference directions to determine the areas of interest of the Pareto
+Front and a set of thresholds associated with each component from the reference directions,
+which determine the boundaries from the area of interest being covered. See 
+[sebastian2022efficient](@cite).
+
+![Parameters for the Region of Interest Archiving method](figs/ROIArchiving-parameters.png)
+
 ```@docs
 ROIArchiving
 ```
 
 ## Compromise Programming
+
+More information about Compromise Programming
+can be found in [Ringuest1992](@cite)
 
 ```@docs
 CompromiseProgramming
