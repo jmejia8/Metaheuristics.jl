@@ -18,25 +18,6 @@ mutable struct Node
     volume::Vector{Float64}
 end
 
-#=
-function Base.show(io::IO, node::Node)
-    print(io, "Node( ")
-    print(io, "cargo = ", node.cargo)
-    print(io, ", ")
-    for n in node.next
-        if isnothing(n)
-            print(io, n, " -> ")
-            continue
-        end
-
-        print(io, n.cargo, " -> ")
-    end
-    print(io, ")")
-
-end
-=#
-
-
 function Node(numberLists, cargo = zeros(0);
         next   = fill(nothing, numberLists),
         prev   = fill(nothing, numberLists),
