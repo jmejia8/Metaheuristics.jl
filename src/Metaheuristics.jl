@@ -1,4 +1,3 @@
-__precompile__()
 module Metaheuristics
 
 export WOA, GOA, GSA, CGSA, SA, CMAES_AEP
@@ -24,6 +23,7 @@ export TournamentSelection, RouletteWheelSelection
 export UniformCrossover, OrderCrossover, SBX
 export BitFlipMutation, SlightMutation, PolynomialMutation
 export GenerationalReplacement, ElitistReplacement
+export sample, LatinHypercubeSampling, Grid 
 
 include("externals.jl")
 
