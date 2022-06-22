@@ -34,6 +34,25 @@ struct RandomPermutation <: AbstractInitializer
     RandomPermutation(;N = 0) = new(N)
 end
 
+
+"""
+    LatinHypercubeSampling(nsamples, dim; iterations)
+
+Initialize `N` solutions within a Latin Hypercube sample in bounds with dim.
+"""
+struct LatinHypercubeSampling <: AbstractInitializer
+    N::Int
+    dim::Int
+    iterations::Int
+    LatinHypercubeSampling(nsamples, dim;iterations=25) = new(nsamples,dim,iterations)
+end
+
+
+struct Grid <: AbstractInitializer
+    N::Int
+    dim::Int
+end
+
 function gen_initial_state(problem,parameters::RandomPermutation,information,options)
 
     D = size(problem.bounds, 2)
@@ -66,3 +85,6 @@ function initialize!(
 
     gen_initial_state(problem,parameters,information,options, status)
 end
+
+include("sample.jl")
+

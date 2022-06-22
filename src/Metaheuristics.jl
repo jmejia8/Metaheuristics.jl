@@ -42,6 +42,7 @@ include("solutions/display.jl")
 
 include("operators/operators.jl")
 
+include("common/utils.jl")
 include("common/multi-objective-functions.jl")
 include("common/repair.jl")
 

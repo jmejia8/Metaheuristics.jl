@@ -107,7 +107,7 @@ end
 
 
 function environmental_selection!(population, parameters::SPEA2)
-    Distance = compute_distances(population)
+    Distance = pairwise_distances(population)
     fitness = compute_fitness(population, Distance)
     N = parameters.N
 
@@ -129,22 +129,7 @@ function environmental_selection!(population, parameters::SPEA2)
     return
 end
 
-function compute_distances(population)    
-    N = length(population)
-
-    distances = zeros(N,N)
-    for i in 1:N
-        distances[i,i] = Inf
-        for j in i+1:N
-            distances[i,j] = norm(fval(population[i]) - fval(population[j]))
-            distances[j,i] = distances[i,j]
-        end
-    end
-
-    return distances 
-end
-
-function truncation(population, K, distance = compute_distances(population))
+function truncation(population, K, distance = pairwise_distances(population))
     del = zeros(Bool, length(population))
     while count(del) < K
         remain   = findall(.!del)
@@ -157,7 +142,7 @@ function truncation(population, K, distance = compute_distances(population))
     return del
 end
 
-function compute_fitness(population, Distance = compute_distances(population))
+function compute_fitness(population, Distance = pairwise_distances(population))
     N = length(population)
     dominate = zeros(Bool,N, N)
     for i in 1:N
