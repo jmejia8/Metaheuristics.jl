@@ -111,8 +111,7 @@ import Random: seed!
             ## Δₚ (delta p)
             @test PerformanceIndicators.deltap(pf, optimums) == PerformanceIndicators.Δₚ(pf, optimums)
         end
-
-	
+        	
     end
 
 
@@ -197,8 +196,29 @@ import Random: seed!
 
         v = Metaheuristics.GA_reproduction_half(rand(D), rand(D), problem.bounds)
         @test length(v) == D
+    end
 
+    function test_sampling_methods()
+        seed!(1)
+        # current methods implemented for sampling
+        methods = [LatinHypercubeSampling(100, 2), Grid(10, 2), RandomInBounds(100)]
 
+        # bounds
+        a = [-10 -10.]
+        b = [10 10.0]
+        bounds = [a; b]
+        # perform tests
+        for (i, method) in enumerate(methods)
+            if !(method isa RandomInBounds) # RandomInBounds required bounds
+                # test if values are in [0,1]
+                @test !any( .!(0 .<= sample(method) .<= 1))
+            end
+            X = sample(method, bounds)
+            # check the minimum pairwise distance
+            @test Metaheuristics._score_lhs(X) > 0
+            # checking if points are out of bounds
+            @test !any( .!(a .<= X .<= b) )
+        end
     end
 
     test_reproduction()
@@ -206,5 +226,6 @@ import Random: seed!
     test_problems()
     test_prev_pop()
     test_hypervolume()
+    test_sampling_methods()
 
 end
