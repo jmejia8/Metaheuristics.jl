@@ -267,3 +267,23 @@ Metaheuristics.accuracy_stop_check
 Metaheuristics.var_stop_check
 ```
 
+## Sampling
+
+```@docs
+Metaheuristics.sample
+```
+
+```@docs
+Metaheuristics.RandomInBounds
+```
+
+
+```@docs
+Metaheuristics.LatinHypercubeSampling
+```
+
+
+```@docs
+Metaheuristics.Grid
+```
+
