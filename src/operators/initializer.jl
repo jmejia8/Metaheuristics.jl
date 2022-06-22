@@ -69,7 +69,7 @@ julia> sample(LatinHypercubeSampling(10,2), [-10 -10;10 10.0])
  -1.3162    -4.50273
   9.45114   -7.13632
  -4.71696    5.0381
-
+```
 """
 struct LatinHypercubeSampling <: AbstractInitializer
     N::Int
