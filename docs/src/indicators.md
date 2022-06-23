@@ -119,3 +119,10 @@ hv = hypervolume(approx_front, reference_point)
  Metaheuristics.PerformanceIndicators.deltap
 ```
 
+## $\varepsilon$-Indicator
+
+Unary and binary $\varepsilon$-indicator (epsilon-indicator). Details in [Zitzler2003](@cite)
+
+```@docs
+Metaheuristics.PerformanceIndicators.epsilon_indicator
+```

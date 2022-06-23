@@ -73,6 +73,7 @@ include("spacing.jl")
 include("covering.jl")
 include("hypervolume.jl")
 include("deltap.jl")
+include("epsilon_indicator.jl")
 
 
 

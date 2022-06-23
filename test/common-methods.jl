@@ -221,11 +221,29 @@ import Random: seed!
         end
     end
 
+    function test_performance_indicators()
+        A1 = [4 7;5 6;7 5; 8 4.0; 9 2]
+        A2 = [4 7;5 6;7 5; 8 4.0]
+        A3 = [6 8; 7 7;8 6; 9 5;10 4. ]
+
+        @test PerformanceIndicators.epsilon_indicator(A1, A2) == 1
+        @test PerformanceIndicators.epsilon_indicator(A1, A3) == 9/10
+        @test PerformanceIndicators.epsilon_indicator(A3, A2) == 3/2
+
+        # check for translated fronts
+        @test PerformanceIndicators.epsilon_indicator(A1 .- 10, A1 .- 10) == 1
+
+        _, _, pf = Metaheuristics.TestProblems.ZDT3()
+        @test PerformanceIndicators.epsilon_indicator(pf, pf) == 1
+    end
+    
+
     test_reproduction()
     simple_test()
     test_problems()
     test_prev_pop()
     test_hypervolume()
     test_sampling_methods()
+    test_performance_indicators()
 
 end
