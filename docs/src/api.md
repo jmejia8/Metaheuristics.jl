@@ -146,50 +146,50 @@ Metaheuristics.GA_reproduction
 Metaheuristics.GA_reproduction_half
 ```
 
-```@doc
+```@docs
 RandomInBounds
 ```
 
-```@doc
+```@docs
 RandomBinary
 ```
 
-```@doc
+```@docs
 RandomPermutation
 ```
 
-```@doc
+```@docs
 TournamentSelection
 ```
-```@doc
+```@docs
 RouletteWheelSelection
 ```
 
-```@doc
+```@docs
 UniformCrossover
 ```
-```@doc
+```@docs
 OrderCrossover
 ```
 
-```@doc
+```@docs
 BitFlipMutation
 ```
 
-```@doc
+```@docs
 SlightMutation
 ```
 
 
-```@doc
+```@docs
 PolynomialMutation
 ```
 
-```@doc
+```@docs
 GenerationalReplacement
 ```
 
-```@doc
+```@docs
 ElitistReplacement
 ```
 

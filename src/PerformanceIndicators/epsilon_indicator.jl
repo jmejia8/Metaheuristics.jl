@@ -3,7 +3,7 @@ _epsilon(A, B, j) = [maximum(A[i,:] ./ (B[j,:])) for i in 1:size(A, 1)]
 """
     epsilon_indicator(A, B)
 
-Computes the ε-indicator for `A` and `B` (be can be the Pareto-optimal front).
+Computes the ε-indicator for non-dominated sets `A` and `B`.
 It is assumed that all values in `A` and `B` are positive. If negative,
 the sets are translated to positive values.
 
@@ -15,7 +15,7 @@ the sets are translated to positive values.
 - `epsilon_indicator(A, B) > 1` means that B is better than A.
 - Values closer to 1 are preferable.
 
-### Example
+### Examples
 
 ```julia-repl
 julia> A1 = [4 7;5 6;7 5; 8 4.0; 9 2];
