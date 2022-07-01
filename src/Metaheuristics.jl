@@ -13,7 +13,7 @@ export hval, gval, hvals, gvals
 
 export NSGA3, gen_ref_dirs
 
-export SMS_EMOA, SPEA2, MCCGA
+export SMS_EMOA, SPEA2, MCCGA, CCMO
 
 export PerformanceIndicators, pareto_front, nadir, ideal
 export termination_status_message
@@ -106,6 +106,9 @@ include("algorithms/NSGA2/NSGA2.jl")
 include("algorithms/NSGA3/NSGA3.jl")
 include("algorithms/SMS_EMOA/SMS_EMOA.jl")
 include("algorithms/SPEA2/SPEA2.jl")
+
+include("algorithms/CCMO/CCMO.jl")
+
 
 # genetic algorithm
 include("algorithms/MCCGA/MCCGA.jl")
