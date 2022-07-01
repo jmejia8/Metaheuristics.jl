@@ -102,6 +102,31 @@ end
         end
     end
 
+    function run_constrained_mop()
+        ff, bounds, pf = Metaheuristics.TestProblems.get_problem(:MTP)
+        D = size(bounds, 2)
+
+        # number of function evaluations
+        f_calls = 0
+
+        f(x) = begin
+            f_calls += 1
+            ff(x)
+        end
+
+        options = Options( seed = 1, iterations=10000, f_calls_limit = 25000)
+
+        methods = [CCMO(NSGA2(N=50,p_cr = 0.9, p_m = 1/D))]
+
+        for method in methods
+            f_calls = 0
+            result = optimize(f, bounds, method)
+            @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
+            # number of function evaluations should be reported correctly
+            @test f_calls == result.f_calls
+        end
+    end
+    
 
     for problem in [:ZDT3, :DTLZ2, :MTP]
         run_methods(problem)
@@ -113,5 +138,6 @@ end
     end
 
 
+    run_constrained_mop()
 
 end
