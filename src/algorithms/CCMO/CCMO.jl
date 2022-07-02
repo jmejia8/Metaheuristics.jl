@@ -63,10 +63,11 @@ function update_state!(
     Off2 = create_solutions(Q_b, problem)
 
     # Weak cooperation
-    status.population = vcat(status.population, Off1, Off2)
+    append!(status.population, deepcopy(Off1))
+    append!(status.population, deepcopy(Off2))
     # copy Off1 and Off2 (copy objects not pointers)
-    # parameters.phelper = vcat(parameters.phelper, deepcopy(Off1), deepcopy(Off2))
-    append!(parameters.phelper, deepcopy(Off1), deepcopy(Off2))
+    append!(parameters.phelper, deepcopy(Off1))
+    append!(parameters.phelper, deepcopy(Off2))
     
     # reduce population
     environmental_selection!(status.population, parameters)
