@@ -59,6 +59,7 @@ considered in most of the implemented algorithms.
   Nondominated Sorting Approach
 - **SMS-EMOA**: An EMO algorithm using the hypervolume measure as selection criterion
 - **SPEA2**: Improved Strength Pareto Evolutionary Algorithm
+- **CCMO**: Coevolutionary Framework for Constrained Multiobjective Optimization
 
 ## Performance Indicators
 

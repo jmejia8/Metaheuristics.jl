@@ -20,6 +20,7 @@ contributor's understanding of the algorithms detailed in the published paper.
 | BCA       |  Bilevel   |      ✅     |   ❌        |   ❌        | [`BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) |
 | MCCGA     |  Single    |      ❌     |   ❌        |   ❌        | [`MCCGA`](@ref)        |
 | GA        |  Single    |      ✅     |   ➖        |   ✅        | [`GA`](@ref)        |
+| CCMO      |  Multi     |      ✅     |   ➖        |   ✅        | [`CCMO`](@ref)        |
 
 
 ✅ = supported,
@@ -140,6 +141,7 @@ details.
 ## MCCGA
 
 Machine-coded Compact Genetic Algorithms for real-valued optimization problems by [SatmanAkadal2020mcga](@cite).
+
 ```@docs
 MCCGA
 ```
@@ -149,4 +151,13 @@ MCCGA
 
 ```@docs
 GA
+```
+
+## CCMO
+
+A Coevolutionary Framework for Constrained Multiobjective Optimization Problems
+proposed by [Tian2020](@cite).
+
+```@docs
+CCMO
 ```
