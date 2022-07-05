@@ -97,63 +97,55 @@ function ECA(;
 
 end
 
+function eca_solution(status, parameters, options, problem, I, i)
+    p = status.f_calls / options.f_calls_limit
+    # generate U masses
+    U = getU(status.population, parameters.K, I, i, parameters.N)
+    # generate center of mass
+    c, u_worst, u_best = center(U)
+    # stepsize
+    η = parameters.η_max * rand()
+    # u: worst element in U
+    u = U[u_worst] |> get_position
+    # current-to-center/bin
+    if p < parameters.p_exploit
+        # u: worst element in U
+        u = U[u_worst] |> get_position
+        # current-to-center/bin
+        y = get_position(status.population[i]) .+ η .* (c .- u)
+    else
+        # current-to-best/bin
+        y = get_position(status.population[i]) .+ η .*(minimizer(status) .- c)
+    end
+    # binary crossover
+    y, M_current = crossover(U[u_best].x, y, parameters.p_cr)
+    evo_boundary_repairer!(y, c, problem.bounds)
+    y, M_current
+end
+
 
 function update_state!(
-    status,
-    parameters::ECA,
-    problem::AbstractProblem,
-    information::Information,
-    options::Options,
-    args...;
-    kargs...
-)
-    K = parameters.K
+        status,
+        parameters::ECA,
+        problem::AbstractProblem,
+        information::Information,
+        options::Options,
+        args...;
+        kargs...
+    )
+
     I = randperm(parameters.N)
     D = size(problem.bounds, 2)
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
-    stop = false
-    a = problem.bounds[1, :]
-    b = problem.bounds[2, :]
-
     if options.parallel_evaluation
-        X_next = zeros(parameters.N, length(a))
+        X_next = zeros(parameters.N, D)
     end
 
     # For each elements in Population
-    for i = 1:parameters.N
-        p = status.f_calls / options.f_calls_limit
-
-        # current
-        x = status.population[i].x
-
-        # generate U masses
-        U = getU(status.population, parameters.K, I, i, parameters.N)
-
-        # generate center of mass
-        c, u_worst, u_best = center(U)
-
-        # stepsize
-        η = parameters.η_max * rand()
-
-        # u: worst element in U
-        u = U[u_worst].x
-
-        # current-to-center/bin
-        if p < parameters.p_exploit
-            # u: worst element in U
-            u = U[u_worst].x
-            # current-to-center/bin
-            y = x .+ η .* (c .- u)
-        else
-            # current-to-best/bin
-            y = x .+ η .* (minimizer(status) .- c)
-        end
-
-        # binary crossover
-        y, M_current = crossover(U[u_best].x, y, parameters.p_cr)
-        evo_boundary_repairer!(y, c, problem.bounds)
+    for i in 1:parameters.N
+        y, M_current = eca_solution(status, parameters, options,problem,I,i)
 
         if options.parallel_evaluation
             X_next[i,:] = y
@@ -172,24 +164,13 @@ function update_state!(
         else
             parameters.adaptive && (Mcr_fail += M_current)
         end
-
-        stop_criteria!(status, parameters, problem, information, options)
-        status.stop && break
     end
-
-    if status.stop
-        return
-    end
-
 
     if options.parallel_evaluation
-        new_solutions = create_solutions(X_next, problem)
-        append!(status.population, new_solutions)
+        append!(status.population, create_solutions(X_next, problem))
         environmental_selection!(status.population, parameters)
         status.best_sol = get_best(status.population)
     end
-
-    status.f_calls = problem.f_calls
 
     if parameters.adaptive
         parameters.p_cr =
@@ -197,7 +178,6 @@ function update_state!(
     end
 
     resize_population!(status, parameters, options)
-
 end
 
 function resize_population!(status, parameters::ECA, options)
