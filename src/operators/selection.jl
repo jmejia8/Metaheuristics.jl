@@ -1,3 +1,8 @@
+"""
+    TournamentSelection(;K=2, N=0)
+
+Perform the K-tournament selection and return N elements.
+"""
 struct TournamentSelection
     K::Int # K-tournament
     N::Int # N solutions
@@ -15,6 +20,11 @@ function selection(
 end
 
 
+"""
+    RouletteWheelSelection(;N=0)
+
+Perform Roulette Wheel Selection and return N elements.
+"""
 struct RouletteWheelSelection
     N::Int # solutions required
     RouletteWheelSelection(;N=0) = new(N)

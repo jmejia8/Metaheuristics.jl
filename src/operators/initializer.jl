@@ -1,15 +1,15 @@
 abstract type AbstractInitializer end
 
-"""
-    RandomInBounds(;N)
-
-Initialize `N` solutions with random values in bounds. Suitable for
-integer and real coded problems.
-"""
 struct RandomInBounds <: AbstractInitializer
     N::Int
 end
 
+"""
+    RandomInBounds
+
+Initialize `N` solutions with random values in bounds. Suitable for
+integer and real coded problems.
+"""
 RandomInBounds(;N = 0) = RandomInBounds(N)
 
 """
