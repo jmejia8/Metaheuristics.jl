@@ -211,7 +211,7 @@ optimize(f, bounds, method) # optimize
 
 Evaluating multiple solutions at the same time can reduce computational time. To do that,
 define your function on an input `N x D` matrix and function values into matrices with outcomes
-in rows for all `N` solutions. Also, you need to put `parallel_evaluation=true` in the [Options](@ref)
+in rows for all `N` solutions. Also, you need to put `parallel_evaluation=true` in the [`Options`](@ref)
 to indicate that your `f` is prepared for parallel evaluations.
 
 ```julia
@@ -226,6 +226,8 @@ options = Options(parallel_evaluation=true)
 
 res = optimize(f, [-10ones(5) 10ones(5)], ECA(options=options))
 ```
+
+See [Parallelization](@ref) tutorial for more details.
 
 ## Modifying an Existing Metaheuristic
 

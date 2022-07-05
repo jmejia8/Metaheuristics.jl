@@ -88,7 +88,7 @@ For instance, you may use mainly two functions to obtain such approximation.
 ## Contents
 
 ```@contents
-Pages = ["tutorial.md", "examples.md", "algorithms.md", "problems.md", "indicators.md", "mcdm.md", "visualization.md", "api.md"]
+Pages = ["examples.md", "algorithms.md", "problems.md", "indicators.md", "mcdm.md", "visualization.md", "api.md"]
 Depth = 2
 ```
 
@@ -99,4 +99,9 @@ Depth = 2
 - [BlackBoxOptim.jl](https://github.com/robertfeldt/BlackBoxOptim.jl): Optimizers for black-box optimization (no information about the objective function).
 - [NODAL.jl](https://github.com/phrb/NODAL.jl): Stochastic Local Search methods, such as Simulated Annealing and Tabu Search.
 - [Other Packages.](https://www.juliaopt.org/packages/)
+
+## Acknowledgments
+
+Jesús Mejía acknowledges support from the Mexican Council for Science and Technology (CONACyT) through a scholarship to pursue graduate studies at the University of Veracruz, MEXICO.
+This allowed the development of `Metaheuristics.jl` from August 2018 to July 2022.
 

@@ -166,8 +166,8 @@ end
 
 Initialize population, parameters and settings before the optimization process begins.
 The most common initialization method is generating uniformly distribution random 
-number in provided bounds. Here, [`gen_initial_state`](@ref) for that purpose. Note
-that [`gen_initial_state`](@ref) require that `parameters.N` is defined.
+number in provided bounds. Here, [`Metaheuristics.gen_initial_state`](@ref) for that purpose. Note
+that [`Metaheuristics.gen_initial_state`](@ref) require that `parameters.N` is defined.
 
 ```julia
 function initialize!(
