@@ -147,10 +147,6 @@ Metaheuristics.GA_reproduction_half
 ```
 
 ```@docs
-RandomInBounds
-```
-
-```@docs
 RandomBinary
 ```
 

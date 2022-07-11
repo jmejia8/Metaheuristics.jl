@@ -35,7 +35,7 @@ julia> import Pkg; Pkg.add("Metaheuristics")
 
 Some representative metaheuristics are developed here, including those for single- and
 multi-objective optimization. Moreover, some constraint handling techniques have been
-considered in most of the implemented algorithms.
+considered in most of the [implemented algorithms](https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/).
 
 ### Single-Objective Optimization
 
@@ -73,6 +73,13 @@ considered in most of the implemented algorithms.
 - [and more...](https://jmejia8.github.io/Metaheuristics.jl/stable/indicators/)
 
 
+## Multi-Criteria Decision-Making
+
+Multi-Criteria Decision Making methods are available, including:
+
+- [Compromise Programming](https://jmejia8.github.io/Metaheuristics.jl/stable/mcdm/#Compromise-Programming)
+- [Region of Interest Archiving](https://jmejia8.github.io/Metaheuristics.jl/stable/mcdm/#Region-of-Interest-Archiving)
+- Interface for [JMcDM](https://jmejia8.github.io/Metaheuristics.jl/stable/mcdm/#JMcDM) (a package for Multiple-criteria decision-making)
 
 ## Quick Start
 
@@ -82,10 +89,9 @@ Assume you want to solve the following minimization problem.
 
 Minimize:
 
-![Eq](https://latex.codecogs.com/gif.latex?f(x)%20=%2010D%20+%20\sum_{i=1}^{D}%20%20x_i^2%20-%2010\cos(2\pi%20x_i))
+$f(x) = 10D + \sum_{i=1}^D x_i^2 - 10cos(2\pi x_i)$
 
-where ![Eq](https://latex.codecogs.com/gif.latex?x\in[-5,%205]^{D}), i.e., ![Eq](https://latex.codecogs.com/gif.latex?-5%20\leq%20x_i%20\leq%205) for ![Eq](https://latex.codecogs.com/gif.latex?i=1,\ldots,D). D is the
-dimension number, assume D=10.
+where $x\in [-5, 5]^D$, that is, each coordinate in $x$ is between -5 and 5. Use $D=10$.
 
 ### Solution
 
