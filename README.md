@@ -89,7 +89,7 @@ Assume you want to solve the following minimization problem.
 
 Minimize:
 
-$f(x) = 10D + \sum_{i=1}^D x_i^2 - 10cos(2\pi x_i)$
+$$f(x) = 10D + \sum_{i=1}^D x_i^2 - 10\cos(2\pi x_i)$$
 
 where $x\in [-5, 5]^D$, that is, each coordinate in $x$ is between -5 and 5. Use $D=10$.
 
