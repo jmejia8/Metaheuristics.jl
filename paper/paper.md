@@ -8,11 +8,11 @@ tags:
   - evolutionary algorithms
 authors:
   - name: Jesús-Adolfo Mejía-de-Dios
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0367-2967
     corresponding: true
     affiliation: 1
   - name: Efrén Mezura-Montes
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-1565-5267 
     affiliation: 1
 affiliations:
  - name: Artificial Intelligence Research Institute, University of Veracruz, MEXICO
@@ -25,10 +25,10 @@ bibliography: paper.bib
 
 # Summary
 
-`Metaheuristics` is a `Julia` package that implements metaheuristic algorithms for global optimization problems that can contain constraints, and either single or multiple objectives.
-Besides, it provides challenging test problems, and performance indicators to assess the performance of the algorithms as usual in Evolutionary Computing.
-`Metaheuristics` implements an easy-to-use API that let testing among the implemented algorithm to an interest problem without extra configurations.
-The main features and some usage examples are presented in this paper.
+`Metaheuristics` is a `Julia` package that implements metaheuristic algorithms for solving global optimization problems that can contain constraints, and either single or multiple objectives.
+The package implements an easy-to-use API that let testing without extra configurations among the implemented optimizers, i.e., to `optimize` an objective function $f(x)$ with $x$ in corresponding `bounds` using optimizer `ECA`, the user can write `optimize(f, bounds, ECA())` to approximate an optimal solution.
+Moreover, `Metaheuristics` provides common features required by the Evolutionary Computing community such as challenging test problems, performance indicators, and other interest utility functions devoted for performance improvement.
+This paper presents the main features and some usage examples to illustrate the usage of this package for optimization.
 
 
 # Statement of need
@@ -38,13 +38,15 @@ The main features and some usage examples are presented in this paper.
 Real-world problems require sophisticated methodologies to provide feasible and efficient solutions of hard problems.
 Metaheuristics are algorithms proposed to approximate optimal solutions in a short time to optimization problems unknown mathematical properties. Metaheuristics package implements  state-of-the-art algorithms for constrained, multi-, and many-objective optimization.
 Besides, many other utility function have implemented in the package, e.g., performance indicators for performance assessment, scalable benchmark problems, constraint handling techniques, and multi-criteria decision-making methodologies.
-To the best knowledge of the authors, `Metaheuristics` is first package in `Julia` containing those ready-to-use features with uniform API.
+To the best knowledge of the authors, `Metaheuristics` is first package in `Julia` containing those ready-to-use features with an uniform API. The package can be used for both academic and industrial purposes due to it is distributed through flexible licence.
+
 
 
 # Main Features
 
-`Metaheuristics` implements a consistent and intuitive API to perform the approximation of
-an objective function bounded in a region which can contains equality or inequality constraints.
+This part aims to describe the most important features included in the package.
+First, `Metaheuristics` implements a consistent and intuitive API to perform the approximation to optimal solutions of
+an objective function defined as follows.
 
 $$\min_{x\in X} f(x)$$
 subject to
@@ -54,22 +56,67 @@ $$
 $$
 h_l(x)  = 0,\ l = 1,2,\ldots,L;
 $$
-with $x_{i,\min} \leq x_i \leq x_{i,\max}$, i.e., $X = \prod_{i=1}^D [x_{i,\min},x_{i,\max}]$.
+with $x_{i,\min} \leq x_i \leq x_{i,\max}$, i.e., $x \in X = \prod_{i=1}^D [x_{i,\min},x_{i,\max}]$.
+Moreover, $f$ can be either single- or multi-objective.
 
-Note that $f$ can be either single- or multi-objective. The main features are listed below:
+## Implemented Metaheuristics
 
-- A lot of optimization `methods` are implemented.
-- Include constraint handling strategies.
-- Support for single-, multi-, many-objective optimization. 
-- Contain scalable benchmark problems for testing metaheuristics.
-- Visualization in console via [UnicodePlots](https://github.com/JuliaPlots/UnicodePlots.jl).
-- Performance Indicators for performance assessment.
-- Multi-criteria decision-making.
+List of implemented metaheuristics is detailed in **Table 1**.
+Algorithms for single-objective optimization: Evolutionary Centers Algorithms (ECA) [@MejiaMezura2019], Differential evolutionary (DE) [@Price2013], Particle Swarm Optimization (PSO) [@KennedyEberhart1995], Artificial Bee Colony (ABC) [@KarabogaBasturk2007], Gravitational Search Algorithm (GSA) [@MirjaliliGandomi2017], Simulated Annealing (SA) [@Van1987], Whale Optimization Algorithm (WOA) [@MirjaliliLewis2016], generic and compact genetic algorithms [@SatmanAkadal2020mcga].
+Besides, `Metaheuristics` includes multi-objective optimization algorithms such as Multi-objective Evolutionary Algorithm based on decomposition (MOEA/D-DE) [@LiZhang2008], Non-dominated Sorting Genetic Algorithms (NSGA-II,-III)[@Deb2002; @DebJain2014], $S$-Metric Selection Evolutionary Multi-objective Algorithm  (SMS-EMOA) [@Emmerich2005], Improved Strength Pareto Evolutionary Algorithm  (SPEA2) [@Zitzler2001], and Coevolutionary Framework for Constrained Multiobjective Optimization (CCMO) [@Tian2020].
+
+| Algorithm | Objective  | Constraint Handling |  Batch Evaluation     | Authors         |
+|---------------|:--------|:----------:|:------------:|:---------------------------|
+| ECA       |  Single | $\checkmark$ | $\checkmark$ |  @MejiaMezura2019  |
+| DE        |  Single | $\checkmark$ | $\checkmark$ |  @Price2013  |
+| PSO       |  Single | $\checkmark$ | $\checkmark$ |  @KennedyEberhart1995  |
+| ABC       |  Single | $\times$     | $\times$     |  @KarabogaBasturk2007  |
+| GSA       |  Single | $\times$     | $\checkmark$ |  @MirjaliliGandomi2017   |
+| SA        |  Single | $\checkmark$ | $\times$     |  @Van1987   |
+| WOA       |  Single | $\checkmark$ | $\checkmark$ |  @MirjaliliGandomi2017   |
+| MCCGA     |  Single | $\times$     | $\times$     |  @SatmanAkadal2020mcga   |
+| GA        |  Single | $\checkmark$ | $\checkmark$ |  @goldberg2002design   |
+| MOEA/D-DE |  Multi  | $-$          | $\times$     |  @LiZhang2008   |
+| NSGA-II   |  Multi  | $\checkmark$ | $\checkmark$ |  @Deb2002   |
+| SMS-EMOA  |  Multi  | $\checkmark$ | $\checkmark$ |  @Emmerich2005   |
+| SPEA2     |  Multi  | $\checkmark$ | $\checkmark$ |  @Zitzler2001   |
+| CCMO      |  Multi  | $\checkmark$ | $\checkmark$ |  @Tian2020   |
+| NSGA-III  |  Many   | $\checkmark$ | $\checkmark$ |  @DebJain2014   |
+
+Table: Implemented optimizers so far. Here, "$\checkmark$", "$\times$" and "$-$", mean that
+feature in corresponding column is available, unavailable or can be enabled by changing default parameters.
 
 
-## Example: Single-Objective Optimization
+## Performance Indicators
 
-Assume you want to optimize the following minimization problem.
+Performance Indicators are used to assess algorithms regarding the quality corresponding outcomes [@Zitzler2003].
+`Metaheuristics` implements the following indicators:
+Generational Distance (GD), Inverted Generational Distance (IGD), IGD+, Covering Indicator (C-metric),
+Hypervolume (HV), Averaged Hausdorff distance (also known as $\Delta_p$), Spacing Indicator,
+and the $\varepsilon$-indicator.
+
+## Multi-Criteria Decision-Making
+
+Multi-Criteria Decision-Making (MCDM) has to be performed after an optimizer reported a set of non-dominated solutions. The implemented MCDM techniques include Compromise Programming [@Ringuest1992] and Region of Interest Archiving [@sebastian2022efficient].
+Moreover, an interface for `JMcDM` [@Satman2021JMcDM] which is a package for MCDM that implements many MCDM techniques interfaced within `Metaheuristics`.
+
+
+
+# Installation and Usage
+
+`Metaheuristics` can be installed through the Julia package manager by using the add command in the Pkg prompt:
+
+```julia
+pkg> add Metaheuristics
+```
+Or, equivalently, via the `Pkg` API:
+```julia
+julia> import Pkg
+julia> Pkg.add("Metaheuristics")
+```
+
+Now, let us consider the following minimization problem.
+
 Minimize:
 $$ f(x) = 10D + \sum_{i=1}^D x_i^2 - 10\cos(2\pi x_i)$$
 where the box-constraints (`bounds`) are $x\in [-10, 10]^5$.
@@ -93,29 +140,11 @@ stop reason: Small difference of objective function values.
 +============================+
 ```
 
-It is worth mentioning that `optimize(f, bounds, OPTIMIZER)` where `OPTIMIZER` can be selected from the implemented metaheuristics described in following section.
+Note that `optimize(f, bounds, OPTIMIZER)` is used to approximate and optimal solution, where `OPTIMIZER` can be selected from the implemented metaheuristics (see **Table 1**).
+
+Finally, It is encouraged to read the  [documentation](https://jmejia8.github.io/Metaheuristics.jl/stable/) for more details, options and examples about the package.
 
 
-
-## Implemented Metaheuristics
-
-List of implemented metaheuristics. The algorithms were implemented based on the
-contributor's understanding of the algorithms detailed in the published paper.
-
-Algorithms for single-objective optimization: Evolutionary Centers Algorithms (ECA) [@MejiaMezura2019], Differential evolutionary (DE) [@Price2013], Particle Swarm Optimization (PSO) [@KennedyEberhart1995], Artificial Bee Colony (ABC) [@KarabogaBasturk2007], Gravitational Search Algorithm (GSA) [@MirjaliliGandomi2017], Simulated Annealing (SA) [@Van1987], Whale Optimization Algorithm (WOA) [@MirjaliliLewis2016], generic and compact genetic algorithms [@SatmanAkadal2020mcga].
-Besides, multi-objective optimization algorithms such as Multi-objective Evolutionary Algorithm (MOEA/D-DE) [@LiZhang2008], Non-dominated Sorting Genetic Algorithm (NSGA-II and III)[@Deb2002; @DebJain2014], $S$-Metric Selection Evolutionary Multi-objective Algorithm  (SMS-EMOA) [@Emmerich2005], Improved Strength Pareto Evolutionary Algorithm  (SPEA2) [@Zitzler2001],  Coevolutionary Framework for Constrained Multiobjective Optimization (CCMO) [@Tian2020].
-
-## Performance Indicators
-
-Performance Indicators are used to assess algorithms regarding the quality corresponding outcomes as detailed in [@Zitzler2003].
-Generational Distance (GD), Inverted Generational Distance (IGD), IGD+, Covering Indicator (C-metric)
-Hypervolume (HV), Averaged Hausdorff distance (also known as $\Delta_p$), Spacing Indicator,
-and the $\varepsilon$-indicator.
-
-## Multi-Criteria Decision-Making
-
-Multi-Criteria Decision-Making (MCDM) has to be performed after an optimizer reported a set of non-dominated solutions. The implemented MCDM techniques include Compromise Programming [@Ringuest1992] and Region of Interest Archiving [@sebastian2022efficient].
-Moreover, an interface for `JMcDM` [@Satman2021JMcDM] which is a package for MCDM that implements many MCDM techniques interfaced within `Metaheuristics`.
 
 
 # Acknowledgements
