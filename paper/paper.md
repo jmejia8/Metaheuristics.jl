@@ -28,7 +28,7 @@ bibliography: paper.bib
 `Metaheuristics` is a `Julia` package that implements metaheuristic algorithms for solving global optimization problems that can contain constraints, and either single or multiple objectives.
 The package implements an easy-to-use API that let testing without extra configurations among the implemented optimizers, i.e., to `optimize` an objective function $f(x)$ with $x$ in the corresponding `bounds` using optimizer `ECA`, the user can write `optimize(f, bounds, ECA())` to approximate an optimal solution.
 Moreover, `Metaheuristics` provides common features required by the Evolutionary Computing community such as challenging test problems, performance indicators, and other interest utility functions devoted to performance improvement.
-This paper presents the main features and some usage examples to illustrate the usage of this package for optimization.
+This paper presents the main features and some examples to illustrate the usage of this package for optimization.
 
 
 # Statement of need
@@ -36,7 +36,7 @@ This paper presents the main features and some usage examples to illustrate the 
 
 
 Real-world problems require sophisticated methodologies to provide feasible and efficient solutions to hard problems.
-Metaheuristics are algorithms proposed to approximate optimal solutions in a short time to optimize problems with unknown mathematical properties. Metaheuristics package implements state-of-the-art algorithms for constrained, multi-, and many-objective optimization.
+Metaheuristics are algorithms proposed to approximate optimal solutions in a short time to optimization problems with unknown mathematical properties. The package implements state-of-the-art algorithms for constrained, multi-, and many-objective optimization.
 Besides, many other utility functions have been implemented in the package, e.g., performance indicators for performance assessment, scalable benchmark problems, constraint handling techniques, and multi-criteria decision-making methodologies.
 To the best knowledge of the authors, `Metaheuristics` is the first package in `Julia` containing those ready-to-use features with a uniform API. The package can be used for both academic and industrial purposes due to it is distributed through a flexible license.
 
@@ -45,8 +45,7 @@ To the best knowledge of the authors, `Metaheuristics` is the first package in `
 # Main Features
 
 This part aims to describe the most important features included in the package.
-First, `Metaheuristics` implements a consistent and intuitive API to perform the approximation to optimal solutions of
-an objective function defined as follows.
+First, `Metaheuristics` implements a consistent and intuitive API to perform the approximation to optimal solutions of a minimization problem defined as follows.
 
 $$\min_{x\in X} f(x)$$
 subject to
@@ -97,8 +96,8 @@ and the $\varepsilon$-indicator.
 
 ## Multi-Criteria Decision-Making
 
-Multi-Criteria Decision-Making (MCDM) has to be performed after an optimizer reported a set of non-dominated solutions. The implemented MCDM techniques include Compromise Programming [@Ringuest1992] and Region of Interest Archiving [@sebastian2022efficient].
-Moreover, an interface for `JMcDM` [@Satman2021JMcDM] is a package for MCDM that implements many MCDM techniques interfaced within `Metaheuristics`.
+When Multi-Criteria Decision-Making (MCDM) has to be performed after an optimizer reported a set of non-dominated solutions. The implemented MCDM techniques are: Compromise Programming [@Ringuest1992] and Region of Interest Archiving [@sebastian2022efficient].
+Moreover, an interface for `JMcDM` [@Satman2021JMcDM] has been integrated due to `JMcDM` is a package for MCDM that implements many MCDM techniques.
 
 
 
