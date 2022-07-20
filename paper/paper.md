@@ -61,8 +61,10 @@ Moreover, $f$ can be either single- or multi-objective.
 ## Implemented Metaheuristics
 
 The list of implemented metaheuristics is detailed in **Table 1**.
-Algorithms for single-objective optimization: Evolutionary Centers Algorithms (ECA) [@MejiaMezura2019], Differential evolutionary (DE) [@Price2013], Particle Swarm Optimization (PSO) [@KennedyEberhart1995], Artificial Bee Colony (ABC) [@KarabogaBasturk2007], Gravitational Search Algorithm (GSA) [@MirjaliliGandomi2017], Simulated Annealing (SA) [@Van1987], Whale Optimization Algorithm (WOA) [@MirjaliliLewis2016], generic and compact genetic algorithms [@SatmanAkadal2020mcga].
+Algorithms for single-objective optimization: Evolutionary Centers Algorithms (ECA) [@MejiaMezura2019], Differential evolutionary (DE) [@Price2013], Particle Swarm Optimization (PSO) [@KennedyEberhart1995], Artificial Bee Colony (ABC) [@KarabogaBasturk2007], Gravitational Search Algorithm (GSA) [@MirjaliliGandomi2017], Simulated Annealing (SA) [@Van1987], Whale Optimization Algorithm (WOA) [@MirjaliliLewis2016], Machine Coded Compact Genetic Algorithms (MCCGA) [@SatmanAkadal2020mcga].
 Besides, `Metaheuristics` includes multi-objective optimization algorithms such as Multi-objective Evolutionary algorithm based on decomposition (MOEA/D-DE) [@LiZhang2008], Non-dominated Sorting Genetic Algorithms (NSGA-II,-III)[@Deb2002; @DebJain2014], $S$-Metric Selection Evolutionary Multi-objective Algorithm  (SMS-EMOA) [@Emmerich2005], Improved Strength Pareto Evolutionary Algorithm  (SPEA2) [@Zitzler2001], and Coevolutionary Framework for Constrained Multiobjective Optimization (CCMO) [@Tian2020].
+
+
 
 | Algorithm | Objective  | Constraint Handling |  Batch Evaluation     | Authors         |
 |---------------|:--------|:----------:|:------------:|:---------------------------|
@@ -82,8 +84,8 @@ Besides, `Metaheuristics` includes multi-objective optimization algorithms such 
 | CCMO      |  Multi  | $\checkmark$ | $\checkmark$ |  @Tian2020   |
 | NSGA-III  |  Many   | $\checkmark$ | $\checkmark$ |  @DebJain2014   |
 
-Table: Implemented optimizers so far. Here, "$\checkmark$", "$\times$" and "$-$", mean that
-feature in the corresponding column is available, unavailable, or can be enabled by changing default parameters.
+Table: Implemented optimizers so far. Here, "$\checkmark$", "$\times$" and "$-$", respectively mean that
+the feature in the corresponding column is available, unavailable, or can be enabled by changing default parameters.
 
 
 ## Performance Indicators
