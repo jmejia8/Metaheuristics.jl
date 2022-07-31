@@ -1,6 +1,6 @@
 # Multi-Criteria Decision-Making 
 
-A set of Multi-Criteria Decision Making (MCDM) methods are available in `Metaheuristics.jl`.
+A set of Multi-Criteria Decision Making (MCDM) methods is available in `Metaheuristics.jl`.
 
 !!! compat "Maximization or Minimization"
     Here, minimization is always assumed.   
@@ -16,7 +16,7 @@ decisionmaking
 best_alternative
 ```
 
-Current available methods are listed in the following table.
+Currently available methods are listed in the following table.
 
 |     Method      | Strategies | Preferences | Dependency    | 
 |-----------------|------------|-------------|---------------|
@@ -120,7 +120,7 @@ julia> res.population[dm.bestIndex]
 ```julia
 best_alternative(res, w, method)
 ```
-Perform McDM using results from metaheuristic and return best alternative in `res.population`.
+Perform McDM using results from metaheuristic and return the best alternative in `res.population`.
 
 
 ```julia-repl
@@ -137,7 +137,7 @@ julia> best_sol = best_alternative(res, [0.5, 0.5], TopsisMethod())
 
 [`ROIArchiving`](@ref) uses a set of reference directions to determine the areas of interest of the Pareto
 Front and a set of thresholds associated with each component from the reference directions,
-which determine the boundaries from the area of interest being covered. See 
+which determine the boundaries of the area of interest being covered. See 
 [sebastian2022efficient](@cite).
 
 ![Parameters for the Region of Interest Archiving method](figs/ROIArchiving-parameters.png)
