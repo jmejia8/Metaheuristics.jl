@@ -20,7 +20,7 @@ end
     )
 
 Parameters for Differential Evolution (DE) algorithm: step-size `F`,`CR` controlls the binomial
-crossover, `N` is the population size. The parameter `trategy` is related to the variation
+crossover, `N` is the population size. The parameter `strategy` is related to the variation
 operator (`:rand1`, `:rand2`, `:best1`, `:best2`, `:randToBest1`).
 
 # Example
