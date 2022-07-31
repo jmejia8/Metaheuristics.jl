@@ -22,7 +22,7 @@ Firstly, you need to know what occurs when the [`optimize`](@ref) function is ca
 
 ```julia
 function initialize!(
-                status, # an initiliazed State (if apply)
+                status, # an initialized State (if applicable)
                 parameters::AbstractParameters,
                 problem,
                 information,
@@ -49,13 +49,13 @@ function update_state!(
         args...;
         kargs...
 )
-    # update any element in State 
+    # update any element in the State 
     return
 end
 ```
 
-**Stopping Criteria:** By default, the metaheuristics will stop in when either the
-number of function evaluations or iteration is exceeded. Also, you can stablish a
+**Stopping Criteria:** By default, the metaheuristics will stop when either the
+number of function evaluations or the number of iterations are exceeded. Also, you can establish
 different criteria via:
 
 ```julia
@@ -110,7 +110,7 @@ end
 
 If you want to implement an algorithm outside of the `Metaheuristics` module, then
 include explicitly the methods you require (or use the `Metaheuristics.` prefix)
-as in Step 0, otherwise go to Step 1.
+as in Step 0, otherwise, go to Step 1.
 
 
 ## Implementing a Simple Genetic Algorithm
@@ -133,7 +133,7 @@ import Metaheuristics: reset_to_violated_bounds!
 
 ### Step 1: The Parameters
 
-Due to we are creating a simple Genetic Algorithm (GA), let's define the parameters for the GA.
+Since we are creating a simple Genetic Algorithm (GA), let's define the parameters for the GA.
 
 ```julia
 # structure with algorithm parameters
@@ -165,8 +165,8 @@ end
 ### Step 2: Initialization
 
 Initialize population, parameters and settings before the optimization process begins.
-The most common initialization method is generating uniformly distribution random 
-number in provided bounds. Here, [`Metaheuristics.gen_initial_state`](@ref) for that purpose. Note
+The most common initialization method is generating a uniformly distributed random 
+number within the provided bounds. Here, [`Metaheuristics.gen_initial_state`](@ref) for that purpose. Note
 that [`Metaheuristics.gen_initial_state`](@ref) require that `parameters.N` is defined.
 
 ```julia
@@ -255,7 +255,7 @@ function final_stage!(
         kargs...
     )
 
-    # first solution is the best one since population is ordered in previous step
+    # the first solution is the best one since the population is ordered in the previous step
     status.best_sol = status.population[1]
     status.final_time=time()
     return
@@ -264,11 +264,11 @@ end
 
 ### Step 5: Time to Optimize
 
-Now, we are able to solve and optimization problem using our genetic algorithm.
+Now, we are able to solve the optimization problem using our genetic algorithm.
 
 
 !!! compat "Optimization Problems"
-    As you can see, `MyGeneticAlgorithm` was not restricted to any kind of optization problems,
+    As you can see, `MyGeneticAlgorithm` was not restricted to any kind of optimization problems,
     however works for constrained, unconstrained single- and multi-objective problems; why?
     The method `gen_initial_state` creates a [`State`](@ref) according to the output
     of the objective function `f`, whilst `is_better` is comparing solutions according
@@ -305,4 +305,4 @@ See [`optimize`](@ref) for more information.
 
 1. Test your algorithm on a multi-objective optimization problem. Suggestion: change `rastrigin`
    by `ZDT1`.
-2. Implement an interest metaheuristic and make a PR to the [Metaheuristics.jl](https://github.com/jmejia8/Metaheuristics.jl) repo on github.
+2. Implement an interest metaheuristic and make a PR to the [Metaheuristics.jl](https://github.com/jmejia8/Metaheuristics.jl) repo on the Github.
