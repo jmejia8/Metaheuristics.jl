@@ -1,6 +1,6 @@
 # Getting Started
 
-After reading this tutorial you'll become an expert using `Metaheuristics` module.
+After reading this tutorial you'll become an expert in using the `Metaheuristics` module.
 
 ## Minimization Problem
 
@@ -36,7 +36,7 @@ information = Information(f_optimum = 0.0)
 
 ## Common Settings
 
-Usually users could require to limit the number of generation/iteration or the number
+Usually, users could require to limit the number of generations/iterations or the number
 of function evaluations. To do that, let's assume that the metaheuristic should evaluate at most
 $9000D$ times the objective function. Moreover, since `information` is provided, then we
 can set the desired accuracy ($|f(x) - f(x^*)| $) to $10^{-5}$.
@@ -49,7 +49,7 @@ options = Options(f_calls_limit = 9000*10, f_tol = 1e-5)
 
 `Metaheuristics.jl` provides different metaheuristics for optimization such as
 Evolutionary Centers Algorithm (ECA), Differential Evolution (DE), Particle Swarm
-Optimization (PSO), etc. In this tutorial we will use `ECA`, but you can use another
+Optimization (PSO), etc. In this tutorial, we will use `ECA`, but you can use another
 algorithm following the same steps.
 
 The metaheuristics accept their parameters but share two common and **optional** settings
@@ -73,7 +73,7 @@ result = optimize(f, bounds, algorithm)
 
 ## Get the Results
 
-Once `optimize` stopped, then we can get the approximate solutions.
+Once `optimize` stops, we can get the approximate solutions.
 
 Approximated minimum:
 
@@ -95,7 +95,7 @@ get their positions.
 
 ## Bonus
 
-We recommend you to save  your program in a function for performance purposes:
+We recommend you wrap your program in a function for performance purposes:
 
 ```julia
 using Metaheuristics
@@ -116,7 +116,7 @@ function main()
     # metaheuristic used to optimize
     algorithm = ECA(information = information, options = options)
 
-    # start the minimization proccess
+    # start the minimization process
     result = optimize(f, bounds, algorithm)
 
     
