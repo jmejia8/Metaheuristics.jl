@@ -92,7 +92,7 @@ reference_point = [11, 11]
 hv = hypervolume(front, reference_point)
 ```
 
-Now, let's compute the hypervolume implementation in Julia from result of  `NSGA3`
+Now, let's compute the hypervolume implementation in Julia from the result of  `NSGA3`
 when solving DTLZ2 test problem.
 
 
