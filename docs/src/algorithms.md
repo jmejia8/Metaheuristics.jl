@@ -84,7 +84,7 @@ CGSA
 
 ## Simulated Annealing
 
-Physics inspired algorithm for optimization by [Van1987](@cite).
+Physics-inspired algorithm for optimization by [Van1987](@cite).
 
 ```@docs
 SA
@@ -118,7 +118,7 @@ NSGA3
 
 ## SMS-EMOA
 
-An EMO algorithm using the hypervolume measure as selection criterion by [Emmerich2005](@cite).
+An EMO algorithm using the hypervolume measure as a selection criterion by [Emmerich2005](@cite).
 ```@docs
 SMS_EMOA
 ```

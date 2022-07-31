@@ -2,7 +2,7 @@
 
 **Author: Jesus Mejía (@jmejia8)**
 
-High performance algorithms for optimization purely coded in a high performance language.
+High-performance algorithms for optimization coded purely in a high-performance language.
 
 [![Source](https://img.shields.io/badge/GitHub-source-green.svg)](https://github.com/jmejia8/Metaheuristics.jl)
 [![Build Status](https://travis-ci.com/jmejia8/Metaheuristics.jl.svg?branch=master)](https://travis-ci.com/jmejia8/Metaheuristics.jl)
@@ -11,14 +11,14 @@ High performance algorithms for optimization purely coded in a high performance 
 
 ## Introduction
 
-Optimization is one of the most common task in the scientific and industry field but
+Optimization is one of the most common tasks in the scientific and industrial field but
 real-world problems require high-performance algorithms to optimize non-differentiable,
-non-convex, dicontinuous functions. Different metaheuristics algorithms have been
+non-convex, discontinuous functions. Different metaheuristics algorithms have been
 proposed to solve optimization problems but without strong assumptions about the objective
 function.
 
 This package implements state-of-the-art metaheuristics algorithms for global optimization.
-The aim of this package is to provide easy to use (and fast) metaheuristics for numerical
+The package aims to provide easy-to-use (and fast) metaheuristics for numerical
 global optimization.
 
 ## Installation
@@ -77,7 +77,7 @@ result = optimize(f, bounds)
 ```
 
 Optimize returns a `State` datatype which contains some information about the approximation.
-For instance, you may use mainly two functions to obtain such approximation.
+For instance, you may use mainly two functions to obtain such an approximation.
 
 ```julia
 @show minimum(result)

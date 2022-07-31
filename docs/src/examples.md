@@ -32,7 +32,7 @@ result = optimize(f, bounds, algorithm) # note that second run is faster
 
 ## Constrained Optimization
 
-It is common that optimization models include constraints that must be satisfied for example:
+It is common that optimization models include constraints that must be satisfied. For example:
 [The Rosenbrock function constrained to a disk](https://en.wikipedia.org/wiki/Test_functions_for_optimization)
 
 Minimize:
@@ -53,7 +53,7 @@ Moreover, the equality and inequality constraints must be saved into  `Array`s.
 
 !!! compat "Constraints handling"
     In this package, if the algorithm was not designed for constrained optimization,
-    then solutions with lower constraint violation sum will be preferred.
+    then solutions with the lower constraint violation sum will be preferred.
 
 ```@repl
 using Metaheuristics
@@ -231,12 +231,12 @@ See [Parallelization](@ref) tutorial for more details.
 
 ## Modifying an Existing Metaheuristic
 
-You may need to modify one of the implemented metaheuristic to improve the
-algorithm performance or test new mechanisms. This example illustrate how to do it.
+You may need to modify one of the implemented metaheuristics to improve the
+algorithm performance or test new mechanisms. This example illustrates how to do it.
 
 
 !!! warning "Modifying algorithms could break stuff"
-    Be cautious when modify a metaheuristic due to those changes will overwrite the default
+    Be cautious when modifying a metaheuristic due to those changes will overwrite the default
     method for that metaheuristic.
 
 
@@ -250,7 +250,7 @@ import LinearAlgebra: norm
 # overwrite method
 function Metaheuristics.stop_criteria!(
         status,
-        parameters::ECA, # It is important indicate the modified Metaheuristic 
+        parameters::ECA, # It is important to indicate the modified Metaheuristic 
         problem,
         information,
         options,
@@ -279,9 +279,9 @@ function Metaheuristics.stop_criteria!(
 
     status.stop = new_stop_condition
 
-    # (optional and not recommended) print when this critaria is met
+    # (optional and not recommended) print when this criterium is met
     if status.stop
-        @info "Diversity-based stop criteria"
+        @info "Diversity-based stop criterium"
         @show distances_mean
     end
 

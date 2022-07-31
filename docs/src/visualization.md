@@ -3,7 +3,7 @@
 
 ![Soving ZDT6 using SMS-EMOA in Julia](figs/ZDT6.gif)
 
-Present the results using fancy plots is an important part of solving optimization problems.
+Presenting the results using fancy plots is an important part of solving optimization problems.
 In this part, we use the [Plots.jl](http://docs.juliaplots.org/latest/) package which can be installed via de Pkg prompt within
 Julia:
 
@@ -123,8 +123,8 @@ savefig("final-population-contour.png")
 
 ### Objective Function Values
 
-Metaheuristics implements some methods to obtain the objective function values (fitness)
-from the solutions in resulting population. One of the most useful method is [`fvals`](@ref).
+Metaheuristics.jl implements some methods to obtain the objective function values (fitness)
+from the solutions in the resulting population. One of the most useful methods is [`fvals`](@ref).
 In this case, let's use [`PSO`](@ref).
 
 ```julia

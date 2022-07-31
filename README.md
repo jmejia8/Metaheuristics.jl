@@ -3,7 +3,7 @@
 
 ![Metaheuristics logo](docs/src/assets/logo-big.png)
 
-High performance metaheuristics for global optimization.
+High-performance metaheuristics for global optimization.
 
 
 
@@ -57,7 +57,7 @@ considered in most of the [implemented algorithms](https://jmejia8.github.io/Met
 - **NSGA-II**:  A fast and elitist multi-objective genetic algorithm: NSGA-II
 - **NSGA-III**: Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based
   Nondominated Sorting Approach
-- **SMS-EMOA**: An EMO algorithm using the hypervolume measure as selection criterion
+- **SMS-EMOA**: An EMO algorithm using the hypervolume measure as the selection criterion
 - **SPEA2**: Improved Strength Pareto Evolutionary Algorithm
 - **CCMO**: Coevolutionary Framework for Constrained Multiobjective Optimization
 
@@ -122,7 +122,7 @@ result = optimize(f, bounds)
 ```
 
 Optimize returns a `State` datatype which contains some information about the approximation.
-For instance, you may use mainly two functions to obtain such approximation.
+For instance, you may use mainly two functions to obtain such an approximation.
 
 ```julia
 @show minimum(result)
