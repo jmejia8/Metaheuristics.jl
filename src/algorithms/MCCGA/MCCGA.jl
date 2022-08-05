@@ -174,10 +174,12 @@ function final_stage!(
 
     status.final_time = time()
 
+    @warn "The package `Optim` must be installed to perform the local search."
+    
     if status.stop
         return
     end
-    @warn "MCCGA needs `Optim` module to perform the local search."
+    
 end
 
 function stop_criteria!(status, parameters::MCCGA, problem, information, options)
