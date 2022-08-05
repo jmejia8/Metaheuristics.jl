@@ -255,13 +255,12 @@ end
 function reproduction(status, parameters::AbstractNSGA, problem)
     @assert !isempty(status.population)
 
-    I = randperm(parameters.N)
-    J = randperm(parameters.N)
-    Q = zeros(parameters.N, size(problem.bounds, 2))
-    for i = 1:2:parameters.N
+    N_half = parameters.N
+    Q = zeros(2N_half, size(problem.bounds, 2))
 
-        pa = tournament_selection(status.population, I[i])
-        pb = tournament_selection(status.population, J[i])
+    for i in 1:N_half
+        pa = tournament_selection(status.population)
+        pb = tournament_selection(status.population)
 
         c1, c2 = GA_reproduction(get_position(pa),
                                  get_position(pb),
@@ -270,8 +269,8 @@ function reproduction(status, parameters::AbstractNSGA, problem)
                                  p_cr = parameters.p_cr,
                                  η_m = parameters.η_m,
                                  p_m = parameters.p_m)
-        Q[i,:] = c1
-        Q[i+1,:] = c2
+        Q[2i-1,:] = c1
+        Q[2i,:] = c2
     end
 
     Q
