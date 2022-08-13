@@ -174,7 +174,7 @@ function final_stage!(
 
     status.final_time = time()
 
-    @warn "The package `Optim` must be installed to perform the local search."
+    parameters.use_local_search && @warn "The package `Optim` must be installed to perform the local search."
     
     if status.stop
         return
