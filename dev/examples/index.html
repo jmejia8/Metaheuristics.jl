@@ -8,26 +8,26 @@
   5.0   5.0   5.0   5.0   5.0   5.0   5.0   5.0   5.0   5.0</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; information = Information(f_optimum = 0.0); # information on the minimization problem</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; options = Options(f_calls_limit = 9000*10, f_tol = 1e-5); # generic settings</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; algorithm = ECA(information = information, options = options) # metaheuristic used to optimize</code><code class="nohighlight hljs ansi" style="display:block;">ECA(η_max=2.0, K=7, N=0, N_init=0, p_exploit=0.95, p_bin=0.02, p_cr=Float64[], ε=0.0, adaptive=false, resize_population=false)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; result = optimize(f, bounds, algorithm) # start the minimization proccess</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
   iteration: 1286
     minimum: 2.98488
-  minimizer: [2.729156550696088e-10, 4.357548162473174e-9, -2.8986367376144303e-10, -0.9949586360374597, 2.6687892060487516e-10, -4.45355579490052e-9, -1.7359013279240795e-9, 0.9949586378591663, 0.9949586384291678, -6.172745039542819e-9]
+  minimizer: [-0.9949586388712672, -1.5161465343785106e-9, -2.1762683343465187e-9, -1.1833894698172145e-9, -9.11426503804253e-10, 2.7503188895879026e-9, 0.9949586392779808, 0.9949586369556265, -2.0089599020829794e-9, 1.6602515081404066e-9]
     f calls: 90020
- total time: 1.9860 s
+ total time: 1.8993 s
 stop reason: Maximum objective function calls exceeded.
-+============================+</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimum(result)</code><code class="nohighlight hljs ansi" style="display:block;">2.9848771712798907</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimizer(result)</code><code class="nohighlight hljs ansi" style="display:block;">10-element Array{Float64,1}:
-  2.729156550696088e-10
-  4.357548162473174e-9
- -2.8986367376144303e-10
- -0.9949586360374597
-  2.6687892060487516e-10
- -4.45355579490052e-9
- -1.7359013279240795e-9
-  0.9949586378591663
-  0.9949586384291678
- -6.172745039542819e-9</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; result = optimize(f, bounds, algorithm) # note that second run is faster</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
++============================+</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimum(result)</code><code class="nohighlight hljs ansi" style="display:block;">2.9848771712798623</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimizer(result)</code><code class="nohighlight hljs ansi" style="display:block;">10-element Array{Float64,1}:
+ -0.9949586388712672
+ -1.5161465343785106e-9
+ -2.1762683343465187e-9
+ -1.1833894698172145e-9
+ -9.11426503804253e-10
+  2.7503188895879026e-9
+  0.9949586392779808
+  0.9949586369556265
+ -2.0089599020829794e-9
+  1.6602515081404066e-9</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; result = optimize(f, bounds, algorithm) # note that second run is faster</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
   iteration: 1286
     minimum: 2.98488
-  minimizer: [2.729156550696088e-10, 4.357548162473174e-9, -2.8986367376144303e-10, -0.9949586360374597, 2.6687892060487516e-10, -4.45355579490052e-9, -1.7359013279240795e-9, 0.9949586378591663, 0.9949586384291678, -6.172745039542819e-9]
+  minimizer: [-0.9949586388712672, -1.5161465343785106e-9, -2.1762683343465187e-9, -1.1833894698172145e-9, -9.11426503804253e-10, 2.7503188895879026e-9, 0.9949586392779808, 0.9949586369556265, -2.0089599020829794e-9, 1.6602515081404066e-9]
     f calls: 89950
- total time: 0.4289 s
+ total time: 0.2978 s
 stop reason: Maximum number of iterations exceeded.
 +============================+</code></pre><h2 id="Constrained-Optimization"><a class="docs-heading-anchor" href="#Constrained-Optimization">Constrained Optimization</a><a id="Constrained-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Constrained-Optimization" title="Permalink"></a></h2><p>It is common that optimization models include constraints that must be satisfied. For example: <a href="https://en.wikipedia.org/wiki/Test_functions_for_optimization">The Rosenbrock function constrained to a disk</a></p><p>Minimize:</p><p class="math-container">\[{\displaystyle f(x,y)=(1-x)^{2}+100(y-x^{2})^{2}}\]</p><p>subject to:</p><p class="math-container">\[{\displaystyle x^{2}+y^{2}\leq 2}\]</p><p>where <span>$-2 \leq x,y \leq 2$</span>.</p><p>In <code>Metaheuristics.jl</code>, a feasible solution is such that <span>$g(x) \leq 0$</span> and <span>$h(x) \approx 0$</span>. Hence, in this example the constraint is given by <span>$g(x) = x^2 + y^2 - 2 \leq 0$</span>. Moreover, the equality and inequality constraints must be saved into  <code>Array</code>s.</p><div class="admonition is-compat"><header class="admonition-header">Constraints handling</header><div class="admonition-body"><p>In this package, if the algorithm was not designed for constrained optimization, then solutions with the lower constraint violation sum will be preferred.</p></div></div><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Metaheuristics</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; function f(x)
            x,y = x[1], x[2]
@@ -41,13 +41,13 @@ stop reason: Maximum number of iterations exceeded.
        end</code><code class="nohighlight hljs ansi" style="display:block;">f (generic function with 1 method)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; bounds = [-2.0 -2; 2 2]</code><code class="nohighlight hljs ansi" style="display:block;">2×2 Array{Float64,2}:
  -2.0  -2.0
   2.0   2.0</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; optimize(f, bounds, ECA(N=30, K=3))</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
-  iteration: 667
-    minimum: 7.66608e-08
-  minimizer: [0.9997231231597054, 0.9994463229787179]
-    f calls: 20010
+  iteration: 284
+    minimum: 0.168596
+  minimizer: [0.5908584307742878, 0.3456514216498318]
+    f calls: 8520
   feasibles: 30 / 30 in final population
- total time: 1.6806 s
-stop reason: Maximum objective function calls exceeded.
+ total time: 1.6498 s
+stop reason: Small difference of objective function values.
 +============================+</code></pre><h2 id="Multiobjective-Optimization"><a class="docs-heading-anchor" href="#Multiobjective-Optimization">Multiobjective Optimization</a><a id="Multiobjective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multiobjective-Optimization" title="Permalink"></a></h2><p>To implement a multiobjective optimization problem and solve it, you can proceed as usual. Here, you need to provide constraints if they exist, otherwise put <code>gx = [0.0]; hx = [0.0];</code> to indicate an unconstrained multiobjective problem.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Metaheuristics</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; function f(x)
            # objective functions
            v = 1.0 + sum(x .^ 2)
@@ -66,48 +66,48 @@ stop reason: Maximum objective function calls exceeded.
   iteration: 251
  population:        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ┌────────────────────────────────────────┐
-      1 │⡅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      2 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+   f₂   │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠘⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠱⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-   f₂   │⠀⠀⠀⠀⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠁⢤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠘⠢⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠢⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠢⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠰⠄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠢⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠢⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠘⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠈⠢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠈⠓⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠈⠁⠂⠤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠒⠠⢄⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠐⠒⠠⠄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         └────────────────────────────────────────┘
         ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀3⠀
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 non-dominated solution(s):
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ┌────────────────────────────────────────┐
-      1 │⡅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      2 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+   f₂   │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠘⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠱⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-   f₂   │⠀⠀⠀⠀⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠁⢤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠘⠢⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠢⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠢⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠰⠄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠢⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
-      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠢⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠘⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠈⠢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠈⠓⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠈⠁⠂⠤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠒⠠⢄⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠐⠒⠠⠄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
         └────────────────────────────────────────┘
         ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀3⠀
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     f calls: 50100
   feasibles: 100 / 100 in final population
- total time: 4.4018 s
+ total time: 4.7131 s
 stop reason: Maximum objective function calls exceeded.
 +============================+</code></pre><h2 id="Bilevel-Optimization"><a class="docs-heading-anchor" href="#Bilevel-Optimization">Bilevel Optimization</a><a id="Bilevel-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Bilevel-Optimization" title="Permalink"></a></h2><p>Bilevel optimization problems can be solved by using the package <a href="https://github.com/jmejia8/BilevelHeuristics.jl">BilevelHeuristics.jl</a> which extends  <code>Metaheuristics.jl</code> for handling those hierarchical problems.</p><p>Defining objective functions corresponding to the BO problem.</p><p><strong>Upper level (leader problem):</strong></p><pre><code class="language-julia hljs">using BilevelHeuristics
 
@@ -151,10 +151,10 @@ julia&gt; sol = best_alternative(res, w, dm_method)
  0.6
  0.6</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; X = [ bounds[1,:] + rand(D).* ( bounds[2,:] -  bounds[1,:]) for i in 1:19  ]; # random solutions (uniform distribution)</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; push!(X, x_known); # save an interest solution</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; population = [ Metaheuristics.create_child(x, f(x)) for x in X ]; # generate the population with 19+1 solutions</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; prev_status = State(Metaheuristics.get_best(population), population); # prior state</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; method = ECA(N = length(population))</code><code class="nohighlight hljs ansi" style="display:block;">ECA(η_max=2.0, K=7, N=20, N_init=20, p_exploit=0.95, p_bin=0.02, p_cr=Float64[], ε=0.0, adaptive=false, resize_population=false)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; method.status = prev_status; # say to ECA that you have generated a population</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; optimize(f, bounds, method) # optimize</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
   iteration: 5001
-    minimum: 2.24675e-120
-  minimizer: [-2.6334998235906856e-61, 7.243671296295479e-63, -1.5378525115731204e-62, -1.9463682037811418e-61, -1.609333187390061e-61, -2.8532468202543585e-61, -1.0792128901245328e-60, 1.4717535849869598e-61, -6.222874808903052e-61, 6.76986858202765e-61]
+    minimum: 8.1078e-129
+  minimizer: [-2.4437188805410895e-65, 1.793173809273994e-65, -6.452221254508796e-66, 2.6470389892250976e-65, 6.199003049455211e-65, 3.506865642778135e-65, -1.884418760161386e-65, 9.424882118488025e-66, -1.5269338229923106e-65, 2.640274942997683e-65]
     f calls: 100000
- total time: 0.6841 s
+ total time: 0.6967 s
 stop reason: Maximum objective function calls exceeded.
 +============================+</code></pre><h2 id="Batch-Evaluation"><a class="docs-heading-anchor" href="#Batch-Evaluation">Batch Evaluation</a><a id="Batch-Evaluation-1"></a><a class="docs-heading-anchor-permalink" href="#Batch-Evaluation" title="Permalink"></a></h2><p>Evaluating multiple solutions at the same time can reduce computational time. To do that, define your function on an input <code>N x D</code> matrix and function values into matrices with outcomes in rows for all <code>N</code> solutions. Also, you need to put <code>parallel_evaluation=true</code> in the <a href="../api/#Metaheuristics.Options"><code>Options</code></a> to indicate that your <code>f</code> is prepared for parallel evaluations.</p><pre><code class="language-julia hljs">f(X) = begin
     fx = sum(X.^2, dims=2)       # objective function ∑x²
@@ -206,12 +206,12 @@ res = optimize(f, [-10ones(5) 10ones(5)], ECA(options=options))</code></pre><p>S
        
            return
        end</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; f, bounds, opt = Metaheuristics.TestProblems.get_problem(:sphere);</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; optimize(f, bounds, ECA())</code><code class="nohighlight hljs ansi" style="display:block;">[ Info: Diversity-based stop criterium
-distances_mean = 0.0009245973493584332
+distances_mean = 0.0008961207415102138
 +=========== RESULT ==========+
-  iteration: 179
-    minimum: 3.48827e-07
-  minimizer: [0.000143787384984202, -0.00031024449827055426, -4.985563740667128e-5, 0.00017178609955123542, -0.0003089309385829084, -0.0002211329658186524, 0.00021506186070177085, -3.730991656386688e-5, 8.838785476044314e-5, -1.0483492347004835e-5]
-    f calls: 12530
- total time: 0.2994 s
+  iteration: 191
+    minimum: 5.53445e-07
+  minimizer: [5.3521249539872115e-5, 0.00035553215136082127, -9.601469855867863e-5, 0.00035512676549913884, 0.00036346064525297423, 0.0002868800315151425, 8.32536093648414e-5, 6.973175686554719e-5, 0.0002494988296242811, -1.9901161356594655e-5]
+    f calls: 13370
+ total time: 0.3140 s
 stop reason: Unknown stop reason.
-+============================+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/parallelization/">« Parallelization</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.22 on <span class="colophon-date" title="Monday 8 August 2022 14:42">Monday 8 August 2022</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
++============================+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/parallelization/">« Parallelization</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.22 on <span class="colophon-date" title="Saturday 13 August 2022 21:44">Saturday 13 August 2022</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
