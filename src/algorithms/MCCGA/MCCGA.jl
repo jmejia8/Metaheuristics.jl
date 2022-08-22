@@ -58,6 +58,32 @@ julia> result = optimize(f, bounds, MCCGA())
  total time: 3.2839 s
 +============================+
 ```
+
+### Explicit Example 
+
+```jldoctest
+
+julia> using Metaheuristics                                          
+julia> using Optim                                                   
+                                                              
+julia> function f(x::Vector{Float64})::Float64                       
+          return (x[1]-pi)^2 + (x[2]-exp(1))^2                      
+       end                                                           
+                                                              
+julia> bounds = [ -500.0  -500.0;                                    
+                   500.0  500.0]                                      
+                                                              
+result = optimize(f, bounds, MCCGA())
+
++=========== RESULT ==========+
+  iteration: 2974
+    minimum: 1.80997e-09
+  minimizer: [3.1416284249228976, 2.7183048585824263]
+    f calls: 6012
+ total time: 1.5233 s
+stop reason: Other stopping criteria.
++============================+
+```
 """
 function MCCGA(;
         N = 100,
