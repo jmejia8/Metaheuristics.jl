@@ -66,14 +66,13 @@ julia> result = optimize(f, bounds, MCCGA())
 julia> using Metaheuristics                                          
 julia> using Optim                                                   
                                                               
-julia> function f(x::Vector{Float64})::Float64                       
-          return (x[1]-pi)^2 + (x[2]-exp(1))^2                      
-       end                                                           
+julia> function f(x::Vector{Float64})::Float64 = (x[1]-pi)^2 + (x[2]-exp(1))^2                                                                                
                                                               
 julia> bounds = [ -500.0  -500.0;                                    
                    500.0  500.0]                                      
-                                                              
-result = optimize(f, bounds, MCCGA())
+
+julia> # Both Metaheuristics and Optim includes optimize() function
+julia> result = Metaheuristics.optimize(f, bounds, MCCGA())
 
 +=========== RESULT ==========+
   iteration: 2974
