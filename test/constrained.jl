@@ -25,7 +25,7 @@ using Test
 
         methods = [
                    ECA(ε=0.5, options = options, information = information),
-                   #DE(options = options, information = information),
+                   εDE(options = options, information = information),
                   ]
 
         for method in methods
