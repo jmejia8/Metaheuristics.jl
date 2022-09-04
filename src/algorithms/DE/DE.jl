@@ -1,4 +1,6 @@
-mutable struct DE <: AbstractParameters
+abstract type AbstractDifferentialEvolution <: AbstractParameters end
+
+mutable struct DE <: AbstractDifferentialEvolution
     N::Int
     F::Float64
     CR::Float64
@@ -8,6 +10,10 @@ mutable struct DE <: AbstractParameters
     F_max::Float64
     strategy::Symbol
 end
+
+include("epsilonDE.jl")
+
+
 
 """
     DE(;
@@ -50,40 +56,40 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], DE(N=50, F=1.5, CR=0.8))
 
 """
 function DE(;
-    N::Int = 0,
-    F = 1.0,
-    CR = 0.9,
-    CR_min = CR,
-    CR_max = CR,
-    F_min = F,
-    F_max = F,
-    strategy::Symbol = :rand1,
-    information = Information(),
-    options = Options(),
-)
+        N::Int = 0,
+        F = 1.0,
+        CR = 0.9,
+        CR_min = CR,
+        CR_max = CR,
+        F_min = F,
+        F_max = F,
+        strategy::Symbol = :rand1,
+        information = Information(),
+        options = Options(),
+    )
 
 
     parameters =
-        DE(N, promote(F, CR, CR_min, CR_max, F_min, F_max)..., strategy)
+    DE(N, promote(F, CR, CR_min, CR_max, F_min, F_max)..., strategy)
 
     Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+              parameters,
+              information = information,
+              options = options,
+             )
 
 end
 
 
 function update_state!(
         status,
-        parameters::DE,
+        parameters::AbstractDifferentialEvolution,
         problem::AbstractProblem,
         information::Information,
         options::Options,
         args...;
         kargs...
-)
+    )
     population = status.population
 
     F = parameters.F
@@ -97,7 +103,7 @@ function update_state!(
 
     if parameters.CR_min < parameters.CR_max
         CR =
-            parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand()
+        parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand()
     end
 
     new_vectors = reproduction(status, parameters, problem)
@@ -111,9 +117,9 @@ function update_state!(
 end
 
 
-function environmental_selection(population, parameters::DE)
+function environmental_selection(population, parameters::AbstractDifferentialEvolution)
     @assert length(population) == 2*parameters.N
-    
+
     new_solutions = population[parameters.N+1:end]
     population = population[1:parameters.N]
 
@@ -121,7 +127,7 @@ function environmental_selection(population, parameters::DE)
 
     # select survival
     for (i, h) in enumerate(new_solutions)
-        if is_better(h, population[i])
+        if is_better(h, population[i], parameters)
             push!(survivals, parameters.N + i)
         else
             push!(survivals, i)
@@ -131,24 +137,24 @@ function environmental_selection(population, parameters::DE)
 end
 
 
-function environmental_selection!(population, parameters::DE)
+function environmental_selection!(population, parameters::AbstractDifferentialEvolution)
     mask = environmental_selection(population, parameters)
     ignored = ones(Bool, length(population))
     ignored[mask] .= false
     deleteat!(population, ignored)
-    
+
     return
 end
 
 function initialize!(
         status,
-        parameters::DE,
+        parameters::AbstractDifferentialEvolution,
         problem::AbstractProblem,
         information::Information,
         options::Options,
         args...;
         kargs...
-)
+    )
     D = size(problem.bounds, 2)
 
 
@@ -160,13 +166,13 @@ function initialize!(
     if parameters.CR < 0 || parameters.CR > 1
         parameters.CR = 0.5
         options.debug &&
-            @warn("CR should be from interval [0,1]; set to default value 0.5")
+        @warn("CR should be from interval [0,1]; set to default value 0.5")
     end
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
         options.debug &&
-            @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        @warn( "f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
@@ -178,7 +184,7 @@ end
 
 function final_stage!(
         status,
-        parameters::DE,
+        parameters::AbstractDifferentialEvolution,
         problem::AbstractProblem,
         information::Information,
         options::Options,
@@ -189,7 +195,7 @@ function final_stage!(
 end
 
 
-function reproduction(status, parameters::DE, problem)
+function reproduction(status, parameters::AbstractDifferentialEvolution, problem)
     @assert !isempty(status.population)
 
     N = parameters.N
@@ -213,3 +219,5 @@ function reproduction(status, parameters::DE, problem)
 
     X 
 end
+
+is_better(a, b, parameters::AbstractDifferentialEvolution) = is_better(a, b)
