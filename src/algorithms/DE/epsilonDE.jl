@@ -7,6 +7,15 @@ mutable struct εDE <: AbstractDifferentialEvolution
     cp::Int
 end
 
+"""
+    εDE(cp = 5, DE_kargs...)
+
+Parameters for ε Differential Evolution for constrained optimization.
+
+See [DE](@docs) for more details about DE parameters (`DE_kargs`).
+
+This implementation is not implementing the gradient-based repair method.
+"""
 function εDE(;cp = 5, kargs...)
     # get default Differential Evolution parameters
     de = DE(;kargs...)

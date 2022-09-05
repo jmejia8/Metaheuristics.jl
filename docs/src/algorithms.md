@@ -161,3 +161,11 @@ proposed by [Tian2020](@cite).
 ```@docs
 CCMO
 ```
+
+## $\varepsilon$DE
+
+$\varepsilon$ Constrained Differential Evolution with Gradient-Based Mutation and Feasible Elites by [Takahama2006Constrained](@cite).
+
+```@docs
+εDE
+```
