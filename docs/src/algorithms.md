@@ -19,8 +19,9 @@ contributor's understanding of the algorithms detailed in the published paper.
 | SPEA2     |  Multi     |      ✅     |   ➖        |   ✅        | [`SPEA2`](@ref)        |
 | BCA       |  Bilevel   |      ✅     |   ❌        |   ❌        | [`BCA`](https://jmejia8.github.io/BilevelHeuristics.jl/dev/algorithms/#BCA) |
 | MCCGA     |  Single    |      ❌     |   ❌        |   ❌        | [`MCCGA`](@ref)        |
-| GA        |  Single    |      ✅     |   ➖        |   ✅        | [`GA`](@ref)        |
-| CCMO      |  Multi     |      ✅     |   ➖        |   ✅        | [`CCMO`](@ref)        |
+| GA        |  Single    |      ✅     |   ➖        |   ✅        | [`GA`](@ref)           |
+| CCMO      |  Multi     |      ✅     |   ➖        |   ✅        | [`CCMO`](@ref)         |
+| $\varepsilon$DE |  Single   | ✅     |   ➖        |   ✅        | [`εDE`](@ref)          |
 
 
 ✅ = supported,
@@ -164,7 +165,11 @@ CCMO
 
 ## $\varepsilon$DE
 
-$\varepsilon$ Constrained Differential Evolution with Gradient-Based Mutation and Feasible Elites by [Takahama2006Constrained](@cite).
+``\varepsilon`` Constrained Differential Evolution with Gradient-Based Mutation and Feasible Elites by [Takahama2006Constrained](@cite).
+
+!!! warning "Gradient mutation"
+    Gradient mutation is not impelemented here.
+
 
 ```@docs
 εDE

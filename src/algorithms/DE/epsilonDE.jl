@@ -9,10 +9,11 @@ end
 
 """
     εDE(cp = 5, DE_kargs...)
+    epsilonDE(cp = 5, DE_kargs...)
 
 Parameters for ε Differential Evolution for constrained optimization.
 
-See [DE](@docs) for more details about DE parameters (`DE_kargs`).
+See [DE](@ref) for more details about DE parameters (`DE_kargs`).
 
 This implementation is not implementing the gradient-based repair method.
 """
@@ -25,6 +26,8 @@ function εDE(;cp = 5, kargs...)
 
     Algorithm(parameters, information=info, options=opts)
 end
+
+const epsilonDE = εDE
 
 function is_better(a, b, parameters::εDE)
     ϕ_a = sum_violations(a)
