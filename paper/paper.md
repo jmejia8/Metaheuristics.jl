@@ -34,11 +34,13 @@ This paper presents the main features followed by some examples to illustrate th
 # Statement of need
 
 Real-world problems often require sophisticated methods to solve.
-Metaheuristics are algorithms that approximate optimal solutions quickly where not all of the mathematical properties of the problem are known.
+Metaheuristics are stochastic algorithms that approximate optimal solutions quickly where not all of the mathematical properties of the problem are known.
 Our package implements state-of-the-art algorithms for constrained, multi-, and many-objective optimization.
 It also includes many other utility functions such as performance indicators, scalable benchmark problems, constraint handling techniques, and multi-criteria decision-making methodologies.
-To the best knowledge of the authors, Metaheuristics is the first package in Julia containing those ready-to-use metahuristic algorithms with a uniform API.
-The package can be used for both academic and industrial purposes due to its flexible license.
+Although similar software has been proposed in different programming languages such that Python (@pymoo), MATLAB (@PlatEMO), C/C++ (@Biscani2020), and Java (@jmetal), among others (@nlopt);
+Metaheuristics is the first package in Julia containing ready-to-use metaheuristic algorithms and utility functions with a uniform API.
+
+Moreover, there are some packages implemented in Julia for global optimization, e.g., `Optim.jl` (@mogensen2018optim) implements global optimizers such as Particle Swarm Optimization, `BlackBoxOptim.jl` (@RobertFeldtBBO) implements a couple of stochastic heuristics for black-box optimization, `Evolutionary.jl` (@artewilde2021) is a framework for evolutionary computing, and `CMAEvolutionStrategy.jl` (@CMAEvolutionStrategy) implements a CMA Evolution Strategy. Unlike the packages mentioned above, Metaheuristics can handle equality and inequality constraints and supports multi-objective problems.
 
 # Main Features
 
@@ -120,20 +122,20 @@ julia> f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x) )
 
 julia> bounds = [-10ones(5) 10ones(5)]
 
-julia> result = optimize(f, bounds)
+julia> result = optimize(f, bounds, DE(CR=0.5))
 +=========== RESULT ==========+
-  iteration: 543
+  iteration: 550
     minimum: 0
-  minimizer: [1.9910474007386918e-10,... , 4.058906169667879e-9]
-    f calls: 19005
- total time: 0.1169 s
+  minimizer: [-1.5469066028117595e-9,..., 3.797322900567224e-9]
+    f calls: 27500
+ total time: 0.0388 s
 stop reason: Small difference of objective function values.
 +============================+
 ```
 
-`optimize(f, bounds, OPTIMIZER)` is used to approximate an optimal solution, where `OPTIMIZER` can be selected from the implemented metaheuristics (see **Table 1**).
+`optimize(f, bounds, OPTIMIZER)` is used to approximate an optimal solution, where `OPTIMIZER` can be selected from the implemented metaheuristics (see **Table 1**). Note that `OPTIMIZER` is a stochastic procedure and therefore each run may show different outputs. 
 
-Finally, It is encouraged to read the  [documentation](https://jmejia8.github.io/Metaheuristics.jl/stable/) for more details, options, and examples.
+Finally, it is encouraged to read the [documentation](https://jmejia8.github.io/Metaheuristics.jl/stable/) for more details, options, and examples.
 
 # Acknowledgements
 
