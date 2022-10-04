@@ -26,7 +26,7 @@ bibliography: paper.bib
 # Summary
 
 Metaheuristics is a Julia package that implements metaheuristic algorithms for solving global optimization problems that can contain constraints, and either single or multiple objectives.
-The package exposes an easy-to-use API to enable testing without requiring length configuration for choosing among the implemented optimizers. For example, to optimize an objective function $f(x)$ where solution $x$ is within the corresponding bounds using the Evolutionary Centers Algorithm optimizer, the user can call `optimize(f, bounds, ECA())`.
+The package exposes an easy-to-use API to enable testing without requiring lengthy configuration for choosing among the implemented optimizers. For example, to optimize an objective function $f(x)$ where solution $x$ is within the corresponding bounds using the Evolutionary Centers Algorithm optimizer, the user can call `optimize(f, bounds, ECA())`.
 Moreover, Metaheuristics provides common features required by the evolutionary computing community such as challenging test problems, performance indicators, and other notable utility functions.
 This paper presents the main features followed by some examples to illustrate the usage of this package for optimization.
 
@@ -93,7 +93,7 @@ Hypervolume (HV), Averaged Hausdorff distance (also known as $\Delta_p$), Spacin
 
 ## Multi-Criteria Decision-Making
 
-When Multi-Criteria Decision-Making (MCDM) has to be performed after an optimizer has reported a set of non-dominated solutions. The implemented MCDM techniques include Compromise Programming [@Ringuest1992] and Region of Interest Archiving [@sebastian2022efficient].
+Metaheuristics also provides algorithms for when Multi-Criteria Decision-Making (MCDM) has to be performed after an optimizer has reported a set of non-dominated solutions. The implemented MCDM techniques include Compromise Programming [@Ringuest1992] and Region of Interest Archiving [@sebastian2022efficient].
 Metaheuristics also includes an interface to the JMcDM package [@Satman2021JMcDM], which implements many further MCDM techniques.
 
 # Installation and Usage
