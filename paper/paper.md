@@ -37,10 +37,10 @@ Real-world problems often require sophisticated methods to solve.
 Metaheuristics are stochastic algorithms that approximate optimal solutions quickly where not all of the mathematical properties of the problem are known.
 Our package implements state-of-the-art algorithms for constrained, multi-, and many-objective optimization.
 It also includes many other utility functions such as performance indicators, scalable benchmark problems, constraint handling techniques, and multi-criteria decision-making methodologies.
-Although similar software has been proposed in different programming languages such that Python (@pymoo), MATLAB (@PlatEMO), C/C++ (@Biscani2020), and Java (@jmetal), among others (@nlopt);
+Although similar software has been proposed in different programming languages such that Python [@pymoo], MATLAB [@PlatEMO], C/C++ [@Biscani2020], and Java [@jmetal], among others [@nlopt];
 Metaheuristics is the first package in Julia containing ready-to-use metaheuristic algorithms and utility functions with a uniform API.
 
-Moreover, there are some packages implemented in Julia for global optimization, e.g., `Optim.jl` (@mogensen2018optim) implements global optimizers such as Particle Swarm Optimization, `BlackBoxOptim.jl` (@RobertFeldtBBO) implements a couple of stochastic heuristics for black-box optimization, `Evolutionary.jl` (@artewilde2021) is a framework for evolutionary computing, and `CMAEvolutionStrategy.jl` (@CMAEvolutionStrategy) implements a CMA Evolution Strategy. Unlike the packages mentioned above, Metaheuristics can handle equality and inequality constraints and supports multi-objective problems.
+Moreover, there are some packages implemented in Julia for global optimization, e.g., `Optim.jl` [@mogensen2018optim] implements global optimizers such as Particle Swarm Optimization, `BlackBoxOptim.jl` [@RobertFeldtBBO] implements a couple of stochastic heuristics for black-box optimization, `Evolutionary.jl` [@artewilde2021] is a framework for evolutionary computing, and `CMAEvolutionStrategy.jl` [@CMAEvolutionStrategy] implements a CMA Evolution Strategy. Unlike the packages mentioned above, Metaheuristics can handle equality and inequality constraints and supports multi-objective problems.
 
 # Main Features
 
