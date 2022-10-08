@@ -24,7 +24,7 @@ export UniformCrossover, OrderCrossover, SBX
 export BitFlipMutation, SlightMutation, PolynomialMutation
 export GenerationalReplacement, ElitistReplacement
 export sample, LatinHypercubeSampling, Grid 
-export εDE
+export εDE, Restart
 
 include("externals.jl")
 
@@ -109,6 +109,7 @@ include("algorithms/SMS_EMOA/SMS_EMOA.jl")
 include("algorithms/SPEA2/SPEA2.jl")
 
 include("algorithms/CCMO/CCMO.jl")
+include("algorithms/Restart/Restart.jl")
 
 
 # genetic algorithm
