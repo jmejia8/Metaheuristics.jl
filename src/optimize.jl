@@ -135,3 +135,75 @@ function show_status(status, parameters, options)
     @info msg
     display(status)
 end
+
+function optimize!(
+        f::Function, # objective function
+        bounds::AbstractMatrix,
+        method::AbstractAlgorithm;
+        logger::Function = (status) -> nothing,
+    )
+
+    #####################################
+    # common settings
+    #####################################
+    information = method.information
+    options = method.options
+    parameters = method.parameters
+    problem = Problem(f, Array(bounds); parallel_evaluation=options.parallel_evaluation)
+    ###################################
+
+    status = method.status
+    problem.f_calls = status.f_calls
+
+    # initialization
+    if status.iteration == 0 || isnothing(status.best_sol)
+        options.debug && @info("Initializing population...")
+        seed!(options.seed)
+        start_time = time()
+        status = initialize!(status,parameters, problem, information, options)
+        status.start_time = start_time
+        method.status = status
+        status.final_time = time()
+        show_status(status, parameters, options)
+        return method
+    end
+    
+    convergence = State{typeof(status.best_sol)}[]
+
+    status.iteration += 1
+
+    update_state!(status, parameters, problem, information, options)
+    # store the number of fuction evaluations
+    status.f_calls = problem.f_calls
+    status.overall_time = time() - status.start_time
+    status.final_time = time()
+
+    if options.store_convergence
+        update_convergence!(convergence, status)
+    end
+
+    show_status(status, parameters, options)
+    logger(status)
+
+    # common stop criteria
+    status.stop = status.stop || default_stop_check(status, information, options)
+    # user defined stop criteria
+    stop_criteria!(status, parameters, problem, information, options)
+
+
+    if status.stop
+        options.debug && @info "Performing final stage due to stop criteria."
+        final_stage!(
+                     status,
+                     parameters,
+                     problem,
+                     information,
+                     options
+                    )
+    end
+    
+
+    options.debug && status.stop && @info "Should stop because: " * termination_status_message(status)
+
+    return method
+end

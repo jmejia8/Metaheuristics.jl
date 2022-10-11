@@ -12,6 +12,7 @@ end
 for tests in [
               "common-methods.jl",
               "box-constrained.jl",
+              "optimize_api.jl",
               "constrained.jl",
               "multi-objective.jl",
               "combinatorial.jl",

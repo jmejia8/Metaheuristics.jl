@@ -25,6 +25,7 @@ export BitFlipMutation, SlightMutation, PolynomialMutation
 export GenerationalReplacement, ElitistReplacement
 export sample, LatinHypercubeSampling, Grid 
 export εDE, Restart
+export optimize!
 
 include("externals.jl")
 
