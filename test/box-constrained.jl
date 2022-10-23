@@ -1,6 +1,5 @@
 using Metaheuristics
 using Test
-import Optim
 
 
 

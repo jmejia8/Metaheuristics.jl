@@ -1,9 +1,7 @@
 [deps]
 JMcDM = "358108f5-d052-4d0a-8344-d5384e00c0e5"
-Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-Optim = ">= 1.6.2"
 JMcDM = "^0.4.2,<0.5.5"
