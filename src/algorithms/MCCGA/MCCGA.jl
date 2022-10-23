@@ -213,7 +213,7 @@ function final_stage!(
 
     options.debug && @info "Running Hooke & Jeeve..."
     local_result = hj(costfunction, initial_solution)
-    # display Nelder-Mead result
+    # display Hooke-Jeeves result
     options.debug && display(local_result)
     options.debug && @info "Hooke & Jeeve done!"
 
