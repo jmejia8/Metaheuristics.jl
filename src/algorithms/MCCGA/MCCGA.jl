@@ -4,6 +4,8 @@
 ##################################################################
 include("utils.jl")
 
+
+
 mutable struct MCCGA <: AbstractParameters
     N::Int # population size
     maxsamples::Int
@@ -31,11 +33,13 @@ of probabilities is generated using the constant probability of 0.5 whereas in M
 a value of 1 depends on the function domain. The second step performs a CGA search but with IEEE-754 bits again. Since 
 CGA does not use a population of solutions but a single vector of probabilities, the parameter `N` does not really mean 
 number of solutions. Instead, it means the amount of mutation in each iteration, e.g. 1/N. 
-In the last stage, a local search is performed for fine-tuning. In this implementation, `Optim` package is required.
+In the last stage, a local search is performed for fine-tuning. In this implementation, Hooke & Jeeves 
+direct search algorithm is used.
 
 
 ### References 
 
+- Moser, Irene. "Hooke-Jeeves Revisited." 2009 IEEE Congress on Evolutionary Computation. IEEE, 2009.
 - Harik, G. R., Lobo, F. G., & Goldberg, D. E. (1999). The compact genetic algorithm. IEEE transactions on evolutionary computation, 3(4), 287-297.
 - Satman, M. H. & Akadal, E. (2020). Machine Coded Compact Genetic Algorithms for Real Parameter Optimization Problems . Alphanumeric Journal , 8 (1) , 43-58 . DOI: 10.17093/alphanumeric.576919
 - Mehmet Hakan Satman, Emre Akadal, Makine Kodlu Hibrit Kompakt Genetik Algoritmalar Optimizasyon Yöntemi, Patent, TR, 2022/01, 2018-GE-510239
@@ -43,8 +47,6 @@ In the last stage, a local search is performed for fine-tuning. In this implemen
 ### Example
 
 ```jldoctest
-
-julia> import Optim 
 
 julia> f, bounds, solutions = Metaheuristics.TestProblems.rastrigin();
 
@@ -63,15 +65,13 @@ julia> result = optimize(f, bounds, MCCGA())
 
 ```jldoctest
 
-julia> using Metaheuristics                                          
-julia> using Optim                                                   
+julia> using Metaheuristics                                                                                         
                                                               
 julia> function f(x::Vector{Float64})::Float64 = (x[1]-pi)^2 + (x[2]-exp(1))^2                                                                                
                                                               
 julia> bounds = [ -500.0  -500.0;                                    
                    500.0  500.0]                                      
 
-julia> # Both Metaheuristics and Optim includes optimize() function
 julia> result = Metaheuristics.optimize(f, bounds, MCCGA())
 
 +=========== RESULT ==========+
@@ -86,7 +86,7 @@ stop reason: Other stopping criteria.
 """
 function MCCGA(;
         N = 100,
-        maxsamples =10_000,
+        maxsamples = 10_000,
         mutation = 1 / N,
         use_local_search = true,
         information = Information(),
@@ -188,7 +188,7 @@ function update_state!(
 end
 
 function final_stage!(
-        status,
+        status::State{xf_indiv}, # unconstrained case
         parameters::MCCGA,
         problem,
         information,
@@ -198,14 +198,39 @@ function final_stage!(
     )
 
     status.final_time = time()
-
-    parameters.use_local_search && @warn "The package `Optim` must be installed to perform the local search."
-    
-    if status.stop
+    !parameters.use_local_search &&  (return)
+    if status.stop && status.termination_status_code ∈ [EVALUATIONS_LIMIT, TIME_LIMIT, ACCURACY_LIMIT]
         return
     end
-    
+
+    costfunction(x) = evaluate(x, problem)
+
+    probvector = parameters.probvector
+    sampledvector = sample(probvector)
+
+    # initial solution for the local search
+    initial_solution = floats(sampledvector)
+
+    options.debug && @info "Running Hooke & Jeeve..."
+    local_result = hj(costfunction, initial_solution)
+    # display Nelder-Mead result
+    options.debug && display(local_result)
+    options.debug && @info "Hooke & Jeeve done!"
+
+    # save best solution found so far!
+    bestpar = local_result["par"]
+    sol = create_child(bestpar, costfunction(bestpar))
+
+    status.final_time = time()
+    status.f_calls = problem.f_calls
+
+    if is_better(sol, status.best_sol)
+        status.best_sol = sol
+    end
+
+    return
 end
+
 
 function stop_criteria!(status, parameters::MCCGA, problem, information, options)
     # check budget limitation
