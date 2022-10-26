@@ -25,7 +25,7 @@ bibliography: paper.bib
 
 # Summary
 
-Metaheuristics is a Julia package that implements metaheuristic algorithms for solving global optimization problems that can contain constraints, and either single or multiple objectives.
+Metaheuristics is a Julia package that implements metaheuristic algorithms for solving global optimization problems that can contain constraints and either single or multiple objectives.
 The package exposes an easy-to-use API to enable testing without requiring lengthy configuration for choosing among the implemented optimizers. For example, to optimize an objective function $f(x)$ where solution $x$ is within the corresponding bounds using the Evolutionary Centers Algorithm optimizer, the user can call `optimize(f, bounds, ECA())`.
 Moreover, Metaheuristics provides common features required by the evolutionary computing community such as challenging test problems, performance indicators, and other notable utility functions.
 This paper presents the main features followed by some examples to illustrate the usage of this package for optimization.
@@ -37,14 +37,14 @@ Real-world problems often require sophisticated methods to solve.
 Metaheuristics are stochastic algorithms that approximate optimal solutions quickly where not all of the mathematical properties of the problem are known.
 Our package implements state-of-the-art algorithms for constrained, multi-, and many-objective optimization.
 It also includes many other utility functions such as performance indicators, scalable benchmark problems, constraint handling techniques, and multi-criteria decision-making methodologies.
-Although similar software has been proposed in different programming languages such that Python [@pymoo], MATLAB [@PlatEMO], C/C++ [@Biscani2020], and Java [@jmetal], among others [@nlopt];
+Although similar software has been proposed in different programming languages such as Python [@pymoo], MATLAB [@PlatEMO], C/C++ [@Biscani2020], and Java [@jmetal], among others [@nlopt],
 Metaheuristics is the first package in Julia containing ready-to-use metaheuristic algorithms and utility functions with a uniform API.
 
-Moreover, there are some packages implemented in Julia for global optimization, e.g., `Optim.jl` [@mogensen2018optim] implements global optimizers such as Particle Swarm Optimization, `BlackBoxOptim.jl` [@RobertFeldtBBO] implements a couple of stochastic heuristics for black-box optimization, `Evolutionary.jl` [@artewilde2021] is a framework for evolutionary computing, and `CMAEvolutionStrategy.jl` [@CMAEvolutionStrategy] implements a CMA Evolution Strategy. Unlike the packages mentioned above, Metaheuristics can handle equality and inequality constraints and supports multi-objective problems.
+There are also some packages implemented in Julia for global optimization. For example, `Optim.jl` [@mogensen2018optim] implements global optimizers such as Particle Swarm Optimization, `BlackBoxOptim.jl` [@RobertFeldtBBO] implements a couple of stochastic heuristics for black-box optimization, `Evolutionary.jl` [@artewilde2021] is a framework for evolutionary computing, and `CMAEvolutionStrategy.jl` [@CMAEvolutionStrategy] implements a CMA Evolution Strategy. Unlike these packages, Metaheuristics can handle equality and inequality constraints and supports multi-objective problems.
 
 # Main Features
 
-This part describes the primary features included of Metaheuristics.
+This section describes the primary features of Metaheuristics.
 First, Metaheuristics implements a consistent and intuitive API to approximate the optimal solutions of the following minimization problem:
 
 $$\min_{x\in X} f(x)$$
@@ -60,9 +60,9 @@ $f$ can be either single- or multi-objective.
 
 ## Implemented Metaheuristics
 
-The list of implemented metaheuristic algorithms is detailed in **Table 1**.
-Algorithms for single-objective optimization include Evolutionary Centers Algorithm (ECA) [@MejiaMezura2019], Differential Evolution (DE) [@Price2013], Particle Swarm Optimization (PSO) [@KennedyEberhart1995], Artificial Bee Colony (ABC) [@KarabogaBasturk2007], Gravitational Search Algorithm (GSA) [@MirjaliliGandomi2017], Simulated Annealing (SA) [@Van1987], Whale Optimization Algorithm (WOA) [@MirjaliliLewis2016] and Machine Coded Compact Genetic Algorithms (MCCGA) [@SatmanAkadal2020mcga].
-Metaheuristics also includes multi-objective optimization algorithms such as a Multi-Objective Evolutionary Algorithm Based on Decomposition (MOEA/D-DE) [@LiZhang2008], Non-dominated Sorting Genetic Algorithms (NSGA-II,-III)[@Deb2002; @DebJain2014], $S$-Metric Selection Evolutionary Multi-objective Algorithm  (SMS-EMOA) [@Emmerich2005], Improved Strength Pareto Evolutionary Algorithm (SPEA2) [@Zitzler2001] and Coevolutionary Framework for Constrained Multiobjective Optimization (CCMO) [@Tian2020].
+Implemented metaheuristic algorithms are detailed in **Table 1**.
+Algorithms for single-objective optimization include Evolutionary Centers Algorithm (ECA) [@MejiaMezura2019], Differential Evolution (DE) [@Price2013], Particle Swarm Optimization (PSO) [@KennedyEberhart1995], Artificial Bee Colony (ABC) [@KarabogaBasturk2007], Gravitational Search Algorithm (GSA) [@MirjaliliGandomi2017], Simulated Annealing (SA) [@Van1987], Whale Optimization Algorithm (WOA) [@MirjaliliLewis2016], and Machine Coded Compact Genetic Algorithms (MCCGA) [@SatmanAkadal2020mcga].
+Metaheuristics also includes multi-objective optimization algorithms such as a Multi-Objective Evolutionary Algorithm Based on Decomposition (MOEA/D-DE) [@LiZhang2008], Non-dominated Sorting Genetic Algorithms (NSGA-II,-III)[@Deb2002; @DebJain2014], $S$-Metric Selection Evolutionary Multi-objective Algorithm  (SMS-EMOA) [@Emmerich2005], Improved Strength Pareto Evolutionary Algorithm (SPEA2) [@Zitzler2001]m and Coevolutionary Framework for Constrained Multiobjective Optimization (CCMO) [@Tian2020].
 
 | Algorithm | Objective  | Constraint Handling |  Batch Evaluation     | Authors         |
 |---------------|:--------|:----------:|:------------:|:---------------------------|
@@ -135,7 +135,7 @@ stop reason: Small difference of objective function values.
 
 `optimize(f, bounds, OPTIMIZER)` is used to approximate an optimal solution, where `OPTIMIZER` can be selected from the implemented metaheuristics (see **Table 1**). Note that `OPTIMIZER` is a stochastic procedure and therefore each run may show different outputs. 
 
-Finally, it is encouraged to read the [documentation](https://jmejia8.github.io/Metaheuristics.jl/stable/) for more details, options, and examples.
+Finally, potential users are encouraged to read the [documentation](https://jmejia8.github.io/Metaheuristics.jl/stable/) for more details, options, and examples.
 
 # Acknowledgements
 
