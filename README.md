@@ -12,7 +12,7 @@ High-performance metaheuristics for global optimization.
 [![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/stable/)
 [![Doc](https://img.shields.io/badge/docs-dev-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/dev/)
 [![DOI](https://zenodo.org/badge/108706706.svg)](https://zenodo.org/badge/latestdoi/108706706)
-
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04723/status.svg)](https://doi.org/10.21105/joss.04723)
 
 
 ## Installation
@@ -133,6 +133,22 @@ For instance, you may use mainly two functions to obtain such an approximation.
 ## Documentation
 
 See the [documentation](https://jmejia8.github.io/Metaheuristics.jl/stable/) for more details, examples and options.
+
+
+## How to cite?
+
+Please cite the package using the bibtex entry 
+
+```latex
+@article{Mejía-de-Dios2022, doi = {10.21105/joss.04723}, url = {https://doi.org/10.21105/joss.04723}, year = {2022}, publisher = {The Open Journal}, volume = {7}, number = {78}, pages = {4723}, author = {Jesús-Adolfo Mejía-de-Dios and Efrén Mezura-Montes}, title = {Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization}, journal = {Journal of Open Source Software} }
+```
+
+or the citation string 
+
+Mejía-de-Dios et al., (2022). Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization. Journal of Open Source Software, 7(78), 4723, https://doi.org/10.21105/joss.04723
+
+in your scientific paper if you use `Metaherustics.jl`. 
+
 
 ## Contributing
 
