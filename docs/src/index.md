@@ -8,6 +8,8 @@ High-performance algorithms for optimization coded purely in a high-performance 
 [![Build Status](https://travis-ci.com/jmejia8/Metaheuristics.jl.svg?branch=master)](https://travis-ci.com/jmejia8/Metaheuristics.jl)
 [![codecov](https://codecov.io/gh/jmejia8/Metaheuristics.jl/branch/master/graph/badge.svg?token=5B5KhU17or)](https://codecov.io/gh/jmejia8/Metaheuristics.jl)
 [![DOI](https://zenodo.org/badge/108706706.svg)](https://zenodo.org/badge/latestdoi/108706706)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04723/status.svg)](https://doi.org/10.21105/joss.04723)
+
 
 ## Introduction
 
@@ -99,6 +101,32 @@ Depth = 2
 - [BlackBoxOptim.jl](https://github.com/robertfeldt/BlackBoxOptim.jl): Optimizers for black-box optimization (no information about the objective function).
 - [NODAL.jl](https://github.com/phrb/NODAL.jl): Stochastic Local Search methods, such as Simulated Annealing and Tabu Search.
 - [Other Packages.](https://www.juliaopt.org/packages/)
+
+
+## How to cite?
+
+Please cite the package using the bibtex entry 
+
+```bibtex
+@article{metaheuristics2022, 
+  doi = {10.21105/joss.04723}, 
+  url = {https://doi.org/10.21105/joss.04723}, 
+  year = {2022}, 
+  publisher = {The Open Journal}, 
+  volume = {7}, 
+  number = {78}, 
+  pages = {4723}, 
+  author = {Jesús-Adolfo Mejía-de-Dios and Efrén Mezura-Montes}, 
+  title = {Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization}, 
+ journal = {Journal of Open Source Software} }
+```
+
+or the citation string 
+
+Mejía-de-Dios et al., (2022). Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization. Journal of Open Source Software, 7(78), 4723, https://doi.org/10.21105/joss.04723
+
+in your scientific paper if you use `Metaherustics.jl`. 
+
 
 ## Acknowledgments
 
