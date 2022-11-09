@@ -7,17 +7,16 @@ High-performance metaheuristics for global optimization.
 
 
 
-[![Build Status](https://travis-ci.com/jmejia8/Metaheuristics.jl.svg?branch=master)](https://app.travis-ci.com/jmejia8/Metaheuristics.jl)
+[![Build Status](https://github.com/jmejia8/Metaheuristics.jl/workflows/CI/badge.svg)](https://github.com/jmejia8/Metaheuristics.jl/actions)
 [![codecov](https://codecov.io/gh/jmejia8/Metaheuristics.jl/branch/master/graph/badge.svg?token=5B5KhU17or)](https://codecov.io/gh/jmejia8/Metaheuristics.jl)
 [![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/stable/)
 [![Doc](https://img.shields.io/badge/docs-dev-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/dev/)
-[![DOI](https://zenodo.org/badge/108706706.svg)](https://zenodo.org/badge/latestdoi/108706706)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04723/status.svg)](https://doi.org/10.21105/joss.04723)
 
 
 ## Installation
 
-Open the Julia (Julia 1.1 or later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia REPL (v1.1 or later) and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 ```
 pkg> add Metaheuristics
@@ -155,9 +154,9 @@ Please cite the package using the bibtex entry
 
 or the citation string 
 
-Mejía-de-Dios et al., (2022). Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization. Journal of Open Source Software, 7(78), 4723, https://doi.org/10.21105/joss.04723
+> Mejía-de-Dios et al., (2022). Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization. Journal of Open Source Software, 7(78), 4723, https://doi.org/10.21105/joss.04723
 
-in your scientific paper if you use `Metaherustics.jl`. 
+in your scientific paper if you use `Metaheristics.jl`. 
 
 
 ## Contributing

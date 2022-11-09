@@ -229,6 +229,7 @@ res = optimize(f, [-10ones(5) 10ones(5)], ECA(options=options))
 
 See [Parallelization](@ref) tutorial for more details.
 
+
 ## Modifying an Existing Metaheuristic
 
 You may need to modify one of the implemented metaheuristics to improve the
@@ -292,4 +293,11 @@ end
 f, bounds, opt = Metaheuristics.TestProblems.get_problem(:sphere);
 optimize(f, bounds, ECA())
 
+```
+
+
+## Restarting search
+
+```@docs
+Restart
 ```
