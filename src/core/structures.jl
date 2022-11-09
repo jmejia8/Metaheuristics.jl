@@ -24,6 +24,14 @@ function Base.show(io::IO, alg::Algorithm)
 end
 
 termination_status_message(alg::Algorithm) = termination_status_message(alg.status)
+should_stop(algorithm::AbstractAlgorithm) = algorithm.status.stop
+function get_result(algorithm::AbstractAlgorithm)
+    if isnothing(algorithm.status.best_sol)
+        error("First optimize a function: `optimize!(f, bounds, method)`")
+    end
+    
+    algorithm.status
+end
 
 mutable struct Problem{T} <: AbstractProblem
     f::Function

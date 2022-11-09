@@ -42,6 +42,7 @@ using Test
                    SA(options = options, information = information),
                    WOA(options = options, information = information),
                    MCCGA(options = options_3, information = information),
+                   Restart(WOA(;options, information)),
                   ]
 
         # CGSA
