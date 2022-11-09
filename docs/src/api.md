@@ -5,6 +5,11 @@
 optimize
 ```
 
+
+```@docs
+optimize!
+```
+
 ```@docs
 State
 ```
