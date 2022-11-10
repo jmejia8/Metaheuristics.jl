@@ -16,7 +16,7 @@ for tests in [
               "constrained.jl",
               "multi-objective.jl",
               "combinatorial.jl",
-              "decisionmaking.jl",
+              "decisionmaking.jl"
              ]
     include(tests)
 end
