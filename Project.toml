@@ -16,6 +16,6 @@ UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [compat]
 Distances = "^0.10.7"
-JMcDM = "0.5"
+JMcDM = "0.6.0"
 UnicodePlots = "2.6, 3"
 julia = "^1.5"
