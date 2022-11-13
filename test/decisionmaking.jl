@@ -1,11 +1,3 @@
-import Metaheuristics.JMcDM
-import Metaheuristics.JMcDM: ArasMethod, CocosoMethod, CodasMethod, CoprasMethod 
-import Metaheuristics.JMcDM: EdasMethod, ElectreMethod, GreyMethod, MabacMethod, MaircaMethod
-import Metaheuristics.JMcDM: MooraMethod, SawMethod, TopsisMethod, VikorMethod, WPMMethod
-import Metaheuristics.JMcDM: WaspasMethod, MarcosMethod
-import Metaheuristics.JMcDM: DataFrame
-
-
 @testset "DecisionMaking: Compromise Programming" begin
     function test_cp()
         _, _, pf = Metaheuristics.TestProblems.ZDT1();
@@ -52,8 +44,6 @@ end
 
         w = [0.5, 0.5]
 
-        # PrometheeMethod
-        # PSIMethod, MoosraMethod --err
         methods = [
                    ArasMethod, CocosoMethod, CodasMethod, CoprasMethod, 
                    EdasMethod, ElectreMethod, GreyMethod, MabacMethod, MaircaMethod,
@@ -62,8 +52,8 @@ end
                   ]
 
         for method in methods
-            res_dm = JMcDM.mcdm(res, w, method())
-            res_dm2 = JMcDM.mcdm(MCDMSetting(res, w), method())
+            res_dm = mcdm(res, w, method())
+            res_dm2 = mcdm(MCDMSetting(res, w), method())
             @test res_dm.bestIndex == res_dm2.bestIndex
             
             # bestIndex can be touple and needs to be handled...
@@ -74,7 +64,7 @@ end
             @test Metaheuristics.compare(fval(best_sol), fval(ref_sol)) == 0
         end
 
-        @test JMcDM.summary(res, w, [:topsis, :electre, :vikor]) isa DataFrame
+        @test Metaheuristics.summary(res, w, [:topsis, :electre, :vikor]) isa DataFrame
 
         # check default method TopsisMethod
         @test mcdm(MCDMSetting(res, w)).bestIndex == mcdm(res, w, TopsisMethod()).bestIndex

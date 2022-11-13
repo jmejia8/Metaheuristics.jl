@@ -10,6 +10,13 @@ export summary
 export best_alternative
 
 
+export ArasMethod, CocosoMethod, CodasMethod, CoprasMethod 
+export EdasMethod, ElectreMethod, GreyMethod, MabacMethod, MaircaMethod
+export MooraMethod, SawMethod, TopsisMethod, VikorMethod, WPMMethod
+export WaspasMethod, MarcosMethod
+export DataFrame
+
+
 """
     mcdm(fs, w, method)
 

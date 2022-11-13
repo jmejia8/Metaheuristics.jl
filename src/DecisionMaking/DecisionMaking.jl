@@ -5,7 +5,7 @@ include("ROI.jl")
 include("CompromiseProgramming.jl")
 
 export decisionmaking, dm, best_alternative, ROIArchiving, CompromiseProgramming
-export WeightedSum, Tchebysheff, AchievementScalarization
+export WeightedSum, Tchebysheff, AchievementScalarization, summary
 
 """
     decisionmaking(fs, w, method)
