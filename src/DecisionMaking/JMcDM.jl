@@ -76,7 +76,7 @@ function JMcDM.mcdm(
     args...
     )
 
-    fns = JMcDM.makeminmax([minimum for i in 1:size(f, 1)])
+    fns = [minimum for i in 1:size(f, 1)]
     JMcDM.mcdm(JMcDM.DataFrame(f, :auto), w, fns, args...)
 end
 
@@ -90,7 +90,7 @@ function JMcDM.mcdm(st::State,args...)
 end
 
 function JMcDM.MCDMSetting(f::AbstractMatrix{<: AbstractFloat}, weights)
-    fns = JMcDM.makeminmax([minimum for i in 1:size(f, 1)])
+    fns = [minimum for i in 1:size(f, 1)]
     JMcDM.MCDMSetting(JMcDM.DataFrame(f, :auto), weights, fns)
 end
 
@@ -109,7 +109,7 @@ function JMcDM.summary(
     methods::Array{Symbol,1}
     )
 
-    fns = JMcDM.makeminmax([minimum for i in 1:size(f, 1)]) 
+    fns = [minimum for i in 1:size(f, 1)]
     JMcDM.summary(JMcDM.DataFrame(f, :auto), w, fns, methods)
 end
 

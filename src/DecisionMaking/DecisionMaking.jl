@@ -1,5 +1,6 @@
 abstract type AbstractDecisionMakingMethod end
 
+include("JMcDM.jl")
 include("ROI.jl")
 include("CompromiseProgramming.jl")
 

@@ -1,4 +1,9 @@
-using JMcDM
+import Metaheuristics.JMcDM
+import Metaheuristics.JMcDM: ArasMethod, CocosoMethod, CodasMethod, CoprasMethod 
+import Metaheuristics.JMcDM: EdasMethod, ElectreMethod, GreyMethod, MabacMethod, MaircaMethod
+import Metaheuristics.JMcDM: MooraMethod, SawMethod, TopsisMethod, VikorMethod, WPMMethod
+import Metaheuristics.JMcDM: WaspasMethod, MarcosMethod
+import Metaheuristics.JMcDM: DataFrame
 
 
 @testset "DecisionMaking: Compromise Programming" begin
@@ -57,8 +62,8 @@ end
                   ]
 
         for method in methods
-            res_dm = mcdm(res, w, method())
-            res_dm2 = mcdm(MCDMSetting(res, w), method())
+            res_dm = JMcDM.mcdm(res, w, method())
+            res_dm2 = JMcDM.mcdm(MCDMSetting(res, w), method())
             @test res_dm.bestIndex == res_dm2.bestIndex
             
             # bestIndex can be touple and needs to be handled...
