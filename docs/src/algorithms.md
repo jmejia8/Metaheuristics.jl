@@ -168,7 +168,7 @@ CCMO
 ``\varepsilon`` Constrained Differential Evolution with Gradient-Based Mutation and Feasible Elites by [Takahama2006Constrained](@cite).
 
 !!! warning "Gradient mutation"
-    Gradient mutation is not impelemented here.
+    Gradient mutation is not implemented here.
 
 
 ```@docs

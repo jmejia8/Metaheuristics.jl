@@ -1,7 +1,7 @@
 # Visualization
 
 
-![Soving ZDT6 using SMS-EMOA in Julia](figs/ZDT6.gif)
+![Solving ZDT6 using SMS-EMOA in Julia](figs/ZDT6.gif)
 
 Presenting the results using fancy plots is an important part of solving optimization problems.
 In this part, we use the [Plots.jl](http://docs.juliaplots.org/latest/) package which can be installed via de Pkg prompt within

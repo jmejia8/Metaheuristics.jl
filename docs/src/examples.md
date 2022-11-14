@@ -19,7 +19,7 @@ options = Options(f_calls_limit = 9000*10, f_tol = 1e-5); # generic settings
 
 algorithm = ECA(information = information, options = options) # metaheuristic used to optimize
 
-result = optimize(f, bounds, algorithm) # start the minimization proccess
+result = optimize(f, bounds, algorithm) # start the minimization process
 
 
 minimum(result)
