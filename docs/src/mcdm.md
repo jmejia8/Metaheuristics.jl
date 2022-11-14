@@ -88,8 +88,6 @@ more details about the methods.
 Performing MCDM using a population.
 
 ```julia-repl
-julia> using JMcDM
-
 julia> _, _, population = Metaheuristics.TestProblems.ZDT1();
 
 julia> dm = mcdm(population, [0.5, 0.5], TopsisMethod());
@@ -103,8 +101,6 @@ julia> population[dm.bestIndex]
 Performing MCDM using results from metaheuristic.
 
 ```julia-repl
-julia> using JMcDM
-
 julia> f, bounds, _ = Metaheuristics.TestProblems.ZDT1();
 
 julia> res = optimize(f, bounds, NSGA2());

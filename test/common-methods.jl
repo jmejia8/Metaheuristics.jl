@@ -129,7 +129,7 @@ import Random: seed!
                  [1.1       ,0.        ,0.        ]]
 
         referencePoint = [2.0, 2, 2]
-        hyperVolume = Metaheuristics.PerformanceIndicators.hypervolume(front, referencePoint)
+        hyperVolume = Metaheuristics.PerformanceIndicators.hypervolume(front, referencePoint, verbose=false)
         @test hyperVolume ≈ 6.793879034744429
 
         front_ = Array(hcat(front...)')

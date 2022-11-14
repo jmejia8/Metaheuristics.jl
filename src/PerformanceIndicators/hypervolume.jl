@@ -164,7 +164,7 @@ is a non-dominated set.
 If `front::State` and `reference_point::Vector`, then computes `hypervolume(front.population, reference_point)` after
 ignoring solutions in `front` that do not dominate `reference_point`.
 """
-function hypervolume(front::Array{Vector{T}}, reference_point::Vector) where T <: Real
+function hypervolume(front::Array{Vector{T}}, reference_point::Vector; verbose=true) where T <: Real
 
 	weaklyDominates(point, other) = begin
 		for i in 1:length(point)
@@ -187,16 +187,16 @@ function hypervolume(front::Array{Vector{T}}, reference_point::Vector) where T <
 	if length(relevantPoints) != length(front)
 		ign = length(front) - length(relevantPoints)
 		rel = length(relevantPoints)
-		@warn "Ignoring $ign points dominated by the reference point ($rel points are used)."
+		verbose && @warn "Ignoring $ign points dominated by the reference point ($rel points are used)."
 	end
 
 	return HyperVolume.hv(relevantPoints, reference_point)
 end
 
-hypervolume(front::Vector{T}, reference_point::Vector{T}) where T <: AbstractMultiObjectiveSolution = hypervolume(fval.(front), fval(reference_point))
-hypervolume(front::Vector{T}, reference_point::Vector) where T <: AbstractMultiObjectiveSolution = hypervolume(fval.(front), reference_point)
+hypervolume(front::Vector{T}, reference_point::Vector{T}; verbose=true) where T <: AbstractMultiObjectiveSolution = hypervolume(fval.(front), fval(reference_point); verbose)
+hypervolume(front::Vector{T}, reference_point::Vector; verbose=true) where T <: AbstractMultiObjectiveSolution = hypervolume(fval.(front), reference_point;verbose)
 
-function hypervolume(front::Matrix, reference_point::Vector)
+function hypervolume(front::Matrix, reference_point::Vector; verbose=true)
 	front_ = [ front[i,:] for i in 1:size(front,1) ]
-	hypervolume(front_, reference_point)
+	hypervolume(front_, reference_point; verbose)
 end
