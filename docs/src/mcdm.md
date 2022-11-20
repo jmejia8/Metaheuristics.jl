@@ -38,6 +38,7 @@ Currently available methods are listed in the following table.
 | `WPMMethod`     |      S     | W           | [JMcDM](@ref) |
 | `WaspasMethod`  |      S     | W           | [JMcDM](@ref) |
 | `MarcosMethod`  |      S     | W           | [JMcDM](@ref) |
+| `ROVMethod`     |      S     | W           | [JMcDM](@ref) |
 
 A **Method** can suggest Single (S) or Multiple (M) **Strategies**.
 Also, Methods can represent **Preferences** by using weight vectors (W),
@@ -79,6 +80,7 @@ Supported MCDM methods:
 * `WPMMethod`
 * `WaspasMethod`
 * `MarcosMethod`
+* `ROVMethod`
 
 See the [JMcDM documentation](https://jbytecode.github.io/JMcDM/docs/build/mcdms/) for
 more details about the methods.
