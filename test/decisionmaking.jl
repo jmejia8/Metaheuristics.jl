@@ -64,7 +64,7 @@ end
             @test Metaheuristics.compare(fval(best_sol), fval(ref_sol)) == 0
         end
 
-        @test Metaheuristics.summary(res, w, [:topsis, :electre, :vikor]) isa DataFrame
+        @test Metaheuristics.summary(res, w, [:topsis, :electre, :vikor]) isa Dict
 
         # check default method TopsisMethod
         @test mcdm(MCDMSetting(res, w)).bestIndex == mcdm(res, w, TopsisMethod()).bestIndex

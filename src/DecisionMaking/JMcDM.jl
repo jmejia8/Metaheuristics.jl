@@ -13,8 +13,8 @@ export best_alternative
 export ArasMethod, CocosoMethod, CodasMethod, CoprasMethod 
 export EdasMethod, ElectreMethod, GreyMethod, MabacMethod, MaircaMethod
 export MooraMethod, SawMethod, TopsisMethod, VikorMethod, WPMMethod
-export WaspasMethod, MarcosMethod
-export DataFrame
+export WaspasMethod, MarcosMethod, ROVMethod
+
 
 
 """
@@ -44,6 +44,8 @@ Supported McDM methods:
 * `WPMMethod`
 * `WaspasMethod`
 * `MarcosMethod`
+* `ROVMethod`
+
 
 ### Example 1:
 
@@ -84,7 +86,7 @@ function JMcDM.mcdm(
     )
 
     fns = [minimum for i in 1:size(f, 1)]
-    JMcDM.mcdm(JMcDM.DataFrame(f, :auto), w, fns, args...)
+    JMcDM.mcdm(f, w, fns, args...)
 end
 
 function JMcDM.mcdm(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
@@ -98,7 +100,7 @@ end
 
 function JMcDM.MCDMSetting(f::AbstractMatrix{<: AbstractFloat}, weights)
     fns = [minimum for i in 1:size(f, 1)]
-    JMcDM.MCDMSetting(JMcDM.DataFrame(f, :auto), weights, fns)
+    JMcDM.MCDMSetting(f, weights, fns)
 end
 
 
@@ -117,7 +119,7 @@ function JMcDM.summary(
     )
 
     fns = [minimum for i in 1:size(f, 1)]
-    JMcDM.summary(JMcDM.DataFrame(f, :auto), w, fns, methods)
+    JMcDM.summary(f, w, fns, methods)
 end
 
 
