@@ -1,10 +1,10 @@
 module Metaheuristics
 
-export WOA, GOA, GSA, CGSA, SA, CMAES_AEP
-export CFO, DE, ABC, PSO
+export WOA, CGSA, SA
+export DE, ABC, PSO
 
 # v2 items
-export optimize, ECA, Options, State, Information, Engine, Problem
+export optimize, ECA, Options, State, Information, Problem
 export MOEAD_DE
 
 # v2.1 items

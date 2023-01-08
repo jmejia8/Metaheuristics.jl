@@ -14,7 +14,7 @@ Returns the Generational Distance.
 - `plus` if true then computes the GD+
 - `inverted` if true then computes IGD
 """
-function generational_distance(front, true_pareto_front; p = 1, inverted = false, plus=false)
+function generational_distance(front::AbstractMatrix, true_pareto_front::AbstractMatrix; p = 1, inverted = false, plus=false)
 
 	if inverted
 		tmp = true_pareto_front
@@ -47,23 +47,15 @@ function generational_distance(front, true_pareto_front; p = 1, inverted = false
 end
 
 
-function generational_distance(front::Union{Array{T}, State},
-						       true_pareto_front::Array{T};
+function generational_distance(front,
+						       true_pareto_front;
 								p = 1,
 								inverted = false,
 								plus = false
-		) where T <: AbstractMultiObjectiveSolution
+		)
 	generational_distance(fvals(front), fvals(true_pareto_front); p=p,inverted=inverted,plus=plus)
 end
 
-
-function generational_distance(front::Union{Array{T}, State}, true_pareto_front;
-		p = 1,
-		inverted = false,
-		plus = false
-		) where T <: AbstractMultiObjectiveSolution
-	generational_distance(fvals(front), (true_pareto_front); p=p,inverted=inverted,plus=plus)
-end
 
 
 """
