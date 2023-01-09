@@ -9,10 +9,10 @@ High-performance metaheuristics for global optimization.
 
 [![Build Status](https://github.com/jmejia8/Metaheuristics.jl/workflows/CI/badge.svg)](https://github.com/jmejia8/Metaheuristics.jl/actions)
 [![codecov](https://codecov.io/gh/jmejia8/Metaheuristics.jl/branch/master/graph/badge.svg?token=5B5KhU17or)](https://codecov.io/gh/jmejia8/Metaheuristics.jl)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/stable/)
 [![Doc](https://img.shields.io/badge/docs-dev-blue.svg)](https://jmejia8.github.io/Metaheuristics.jl/dev/)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.04723/status.svg)](https://doi.org/10.21105/joss.04723)
-
 
 ## Installation
 
