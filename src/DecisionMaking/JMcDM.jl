@@ -129,9 +129,11 @@ function decisionmaking(
     result.bestIndex
 end
 
+#=
 function decisionmaking(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
     decisionmaking(fvals(population), args...)
 end
+=#
 
 
 function decisionmaking(st::State, args...)
@@ -175,9 +177,4 @@ end
 function best_alternative(st::State, args...)
     best_alternative(st.population, args...)
 end
-
-best_alternative(status::State, args...) = best_alternative(status.population,args...)
-
-
-
 

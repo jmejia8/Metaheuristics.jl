@@ -45,5 +45,3 @@ function best_alternative(
     return population[idx]
 end
 
-best_alternative(st::State, args...) = best_alternative(st.population, args...)
-
