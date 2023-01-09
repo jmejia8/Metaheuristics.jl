@@ -67,7 +67,7 @@ julia> result = optimize(f, bounds, MCCGA())
 
 julia> using Metaheuristics                                                                                         
                                                               
-julia> function f(x::Vector{Float64})::Float64 = (x[1]-pi)^2 + (x[2]-exp(1))^2                                                                                
+julia> f(x::Vector{Float64})::Float64 = (x[1]-pi)^2 + (x[2]-exp(1))^2                                                                                
                                                               
 julia> bounds = [ -500.0  -500.0;                                    
                    500.0  500.0]                                      
