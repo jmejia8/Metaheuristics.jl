@@ -183,10 +183,10 @@ function final_stage!(
 end
 
 
-function environmental_selection!(population, parameters::CCMO, consider_constrints=true)
+function environmental_selection!(population, parameters::CCMO, consider_constraints::Bool=true)
     spea2 = SPEA2().parameters
     spea2.N = parameters.base.N
-    if consider_constrints
+    if consider_constraints
         environmental_selection!(population,spea2)
         parameters.fitness = spea2.fitness
         return

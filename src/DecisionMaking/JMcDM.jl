@@ -79,52 +79,31 @@ julia> res.population[dm.bestIndex]
 (f = [0.32301132058506055, 0.43208538139854685], g = [0.0], h = [0.0], x = [3.230e-01, 1.919e-04, …, 1.353e-04])
 ```
 """
-function JMcDM.mcdm(
-    f::AbstractMatrix{<:AbstractFloat}, # objective functions by col
-    w,
-    args...
-    )
-
-    fns = [minimum for i in 1:size(f, 1)]
-    JMcDM.mcdm(f, w, fns, args...)
-end
-
-function JMcDM.mcdm(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
+function JMcDM.mcdm(population::AbstractArray{<: AbstractMultiObjectiveSolution}, w, args...)
     fs = fvals(population) # Pareto solutions
-    mcdm(fs, args...)
+    fns = [minimum for i in 1:size(fs, 1)]
+    JMcDM.mcdm(fs, w, fns, args...)
 end
 
-function JMcDM.mcdm(st::State,args...)
-    mcdm(st.population, args...)
+function JMcDM.mcdm(st::State, args...)
+    JMcDM.mcdm(st.population, args...)
 end
-
-function JMcDM.MCDMSetting(f::AbstractMatrix{<: AbstractFloat}, weights)
-    fns = [minimum for i in 1:size(f, 1)]
-    JMcDM.MCDMSetting(f, weights, fns)
-end
-
 
 function JMcDM.MCDMSetting(status::State,args...)
     MCDMSetting(status.population, args...)
 end
 
-function JMcDM.MCDMSetting(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
-    MCDMSetting(fvals(population), args...)
+function JMcDM.MCDMSetting(population::AbstractArray{<: AbstractMultiObjectiveSolution}, w, args...)
+
+    fs  = fvals(population)
+    fns = [minimum for i in 1:size(fs, 1)]
+    MCDMSetting(fs, w, fns, args...)
 end
 
-function JMcDM.summary(
-    f::AbstractMatrix{<: AbstractFloat},
-    w::Array{Float64,1}, 
-    methods::Array{Symbol,1}
-    )
-
-    fns = [minimum for i in 1:size(f, 1)]
-    JMcDM.summary(f, w, fns, methods)
-end
-
-
-function JMcDM.summary(population::AbstractArray{<: AbstractMultiObjectiveSolution},args...)
-    summary(fvals(population), args...)
+function JMcDM.summary(population::AbstractArray{<: AbstractMultiObjectiveSolution},w, args...)
+    fs = fvals(population)
+    fns = [minimum for i in 1:size(fs, 1)]
+    summary(fs, w, fns, args...)
 end
 
 
@@ -139,7 +118,9 @@ function decisionmaking(
     method::T
     ) where T <: JMcDM.MCDMMethod
 
-    result = mcdm(f, w, method)
+
+    fns = [minimum for i in 1:size(f, 1)]
+    result = mcdm(f, w, fns, method)
 
     if result.bestIndex isa Tuple
         return [result.bestIndex...]
