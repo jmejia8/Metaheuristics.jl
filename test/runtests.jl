@@ -1,6 +1,7 @@
 using Metaheuristics
 using Test
 using Aqua # Aqua: Auto QUality Assurance for Julia packages
+using UnicodePlots
 
 Aqua.test_all(Metaheuristics, ambiguities = false)
 

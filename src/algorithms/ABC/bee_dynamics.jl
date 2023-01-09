@@ -24,7 +24,6 @@ Get the fitness of a bee when optimize using ABC algorithm.
 """
 fval(bee::Bee) = bee.sol.f
 
-Base.show(io::IO, ::MIME"text/html", pop::Vector{Bee{xf_indiv}}) = show(io, "text/html", [p.sol for p in pop])
 
 minimum(st::State{Bee{xf_indiv}}) = st.best_sol.sol.f
 minimum(st::State{Bee{xfgh_indiv}}) = st.best_sol.sol.f
