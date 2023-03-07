@@ -21,20 +21,20 @@
 end
 
 @testset "DecisionMaking: ROI" begin
-    function test_roi()
+    function test_roi(w = [0.1 0.9; 0.9 0.1], δ = [0.1,0.1])
         _, _, pf = Metaheuristics.TestProblems.ZDT1();
         res = State(pf[1], pf)
-
-        w = [0.1 0.9; 0.9 0.1]
-        δ = [0.1,0.1]
+        
         method = ROIArchiving(δ)
         idx = decisionmaking(res, w, method)
         @test !isempty(idx)
         sols = best_alternative(res, w, method)
         @test length(sols) == length(idx)
     end
+
     
     test_roi() 
+    test_roi([0.0 1; 1 0; 0.5 0.5], [0.1, 0.2, 0.3]) 
 end
 
 @testset "DecisionMaking: JMcDM" begin

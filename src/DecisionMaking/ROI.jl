@@ -91,7 +91,7 @@ function roiarchiving(population, w, parameters::ROIArchiving; verbose=true)
     
     δ_w = parameters.δ_w_transformed
 
-    size(w,2) != length(δ_w) && error("|weight_points| is different to |δ_w|")
+    size(w,1) != length(δ_w) && error("|weight_points| is different to |δ_w|")
 
     non_dominated = Metaheuristics.get_non_dominated_solutions_perm(population)
     isempty(non_dominated) && return Int[]
