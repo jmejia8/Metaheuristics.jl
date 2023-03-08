@@ -78,16 +78,12 @@ end
 
 function roiarchiving(population, w, parameters::ROIArchiving; verbose=true)
 
-    if isempty(population) || isempty(w)
-        # nothing to do
-        return Int[]
-    end
+    (isempty(population) || isempty(w)) && (return Int[]) # nothing to do
 
     feasible_sols = Metaheuristics.is_feasible.(population)
-    if !any(feasible_sols)
-        # we cannot work on infeasible solutions
-        return Int[]
-    end
+
+    # we cannot work on infeasible solutions
+    !any(feasible_sols) && (return Int[])
     
     δ_w = parameters.δ_w_transformed
 
