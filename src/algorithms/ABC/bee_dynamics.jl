@@ -137,9 +137,10 @@ function chooseBest(bees, best)
     return best
 end
 
+#=
 function initialbees(N, problem)
      P = generate_population(N, problem)
 
      return [ Bee(sol) for sol in P ]
 end 
-
+=#

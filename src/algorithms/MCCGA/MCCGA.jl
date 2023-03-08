@@ -125,11 +125,8 @@ function initialize!(
 
     parameters.probvector = initialprobs(lower, upper, maxsamples = parameters.maxsamples)
 
-    # sample a vector to create an initial State
-    x = sample(parameters.probvector) |> floats
-    initial_sol = create_solution(x, problem)
-    return State(initial_sol, [initial_sol for i in 1:parameters.N])
-
+    # sample vectors to create an initial State
+    return gen_initial_state(problem,parameters,information,options,status)
 end
 
 function update_state!(
