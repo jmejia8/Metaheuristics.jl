@@ -106,6 +106,10 @@ Metaheuristics.compare
 Metaheuristics.gen_initial_state
 ```
 
+```@docs
+set_inital_solutions!
+```
+
 ## Variation 
 
 ```@docs
