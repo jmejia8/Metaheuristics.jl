@@ -20,10 +20,18 @@
         for method in methods
             for N in [5, 10, 20] # vary the population size
                 algo = method(N = N, options = options, information = information)
-                # initial solutions
-                X = rand(10, size(bounds, 2))
-                X[1,:] = x_optimum #zeros(size(bounds, 2))
+                # one solution
+                set_user_solutions!(algo, x_optimum, f)
+                # multiple solutions
+                X = rand(5, size(bounds, 2))
                 set_user_solutions!(algo, X, f)
+
+                # check if size of x and f is defferent
+                X = ones(4, size(bounds, 2))
+                set_user_solutions!(algo,
+                                    X,
+                                    f.([ones(size(bounds, 2)) for i in 1:5]),
+                                    verbose = false)
 
                 res = optimize(f, bounds, algo)
 
