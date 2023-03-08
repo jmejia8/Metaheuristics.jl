@@ -51,7 +51,7 @@ function _complete_population!(status,problem,parameters,information,options)
         # increase population if necessary
         parameters.N = length(status.population)
         # TODO: use this options.debug == true to show the message?
-        @warn("Population size increased to $(parameters.N) due to initial solutions.")
+        options.debug && @warn("Population size increased to $(parameters.N) due to initial solutions.")
         return
     end
 

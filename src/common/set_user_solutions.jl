@@ -1,7 +1,7 @@
 include("gen_initial_state.jl")
 
 """
-    set_user_solutions!(optimizer, x, fx)
+    set_user_solutions!(optimizer, x, fx;verbose=true)
 
 Provide initial solutions to the `optimizer`.
 - `x` can be a `Vector` and `fx` a function or `fx = f(x)`
@@ -37,7 +37,7 @@ stop reason: Small difference of objective function values.
 ```
 
 """
-function set_user_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution)
+function set_user_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution;kargs...)
     status = algo.status
     if !isnothing(status.best_sol) && !isempty(status.population)
         push!(status.population, solution)
@@ -48,23 +48,23 @@ function set_user_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution
 end
 
 
-function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, fx)
-    set_user_solutions!(algo, create_child(x, fx))
+function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, fx;kargs...)
+    set_user_solutions!(algo, create_child(x, fx); kargs...)
 end
 
-function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, f::Function)
-    set_user_solutions!(algo, x, f(x))
+function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, f::Function;kargs...)
+    set_user_solutions!(algo, x, f(x); kargs...)
 end
 
 
-function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::AbstractVector)
+function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::AbstractVector;verbose=true)
     n = size(X, 1)
     m = length(fX)
 
     if n != m
-        @warn "$(n) decision vectors provided but $(m) objective values."
+        verbose && @warn "$(n) decision vectors provided but $(m) objective values."
         n = min(m, n)
-        println("Taking ", n, " as the number of initial solutions.")
+        verbose && println("Taking ", n, " as the number of initial solutions.")
     end
 
     # nothing to do due to it is necessary the objective value
@@ -80,7 +80,7 @@ function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::Abs
     algo
 end
 
-function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, f::Function)
-    set_user_solutions!(algo, X, [f(X[i,:]) for i in 1:size(X,1)])
+function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, f::Function;kargs...)
+    set_user_solutions!(algo, X, [f(X[i,:]) for i in 1:size(X,1)];kargs...)
 end
 
