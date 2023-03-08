@@ -135,17 +135,11 @@ function initialize!(
 
     max_it = 500
     options.iterations = options.iterations == 0 ? max_it : options.iterations
-    options.f_calls_limit = options.f_calls_limit == 0 ? options.iterations * N : options.f_calls_limit
 
     # random initialization for agents.
-    P = generate_population(N, problem)
-
-    # Current best
-    theBest = get_best(P)
-
-
-    status = State(theBest, P)
-    status.f_calls = N
+    status = gen_initial_state(problem,parameters,information,options,status)
+    N = parameters.N
+    options.f_calls_limit = options.f_calls_limit == 0 ? options.iterations * N : options.f_calls_limit
 
     # Velocity
     parameters.V = isempty(parameters.V) ? zeros(N,D) : parameters.V
@@ -153,8 +147,7 @@ function initialize!(
     parameters.X = isempty(parameters.X) ? positions(status) : parameters.X
     # function values
     if isempty(parameters.fitness)
-
-        parameters.fitness = fval.(status.population)
+        parameters.fitness = fvals(status.population)
     end
     
 

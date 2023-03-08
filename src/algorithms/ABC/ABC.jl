@@ -90,7 +90,10 @@ function initialize!(
         options.debug && @info "Increasing f calls limit to $(options.f_calls_limit)"
     end
 
-    bees = initialbees(parameters.N, problem)
+
+    _st = gen_initial_state(problem,parameters,information,options,status)
+    bees = [Bee(sol) for sol in _st.population]
+
     nevals = length(bees)
 
     best_sol = deepcopy(getBestBee(bees))

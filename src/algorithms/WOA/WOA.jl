@@ -82,16 +82,14 @@ function initialize!(
   options.iterations * parameters.N : options.f_calls_limit
 
 
-  P = generate_population(parameters.N, problem)
-  best_sol = deepcopy(get_best(P))
-  status = State(best_sol, P)
+  # P = generate_population(parameters.N, problem)
+  # best_sol = deepcopy(get_best(P))
+  # status = State(best_sol, P)
   #=
   status.population = P
   status.best_sol = deepcopy(get_best(status.population))
   =#
-  status.f_calls = parameters.N
-
-  status
+  return gen_initial_state(problem,parameters,information,options,status)
 
 end
 
