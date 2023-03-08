@@ -23,7 +23,7 @@
                 # initial solutions
                 X = rand(10, size(bounds, 2))
                 X[1,:] = x_optimum #zeros(size(bounds, 2))
-                set_inital_solutions!(algo, X, f)
+                set_user_solutions!(algo, X, f)
 
                 res = optimize(f, bounds, algo)
 
@@ -59,7 +59,7 @@
                 # initial solutions
                 X = rand(10, size(bounds, 2))
                 X[1,:] = x_optimum
-                set_inital_solutions!(algo, X, f)
+                set_user_solutions!(algo, X, f)
 
                 res = optimize(f, bounds, algo)
                 @test length(res.population) == algo.parameters.N 

@@ -107,7 +107,7 @@ Metaheuristics.gen_initial_state
 ```
 
 ```@docs
-set_inital_solutions!
+set_user_solutions!
 ```
 
 ## Variation 

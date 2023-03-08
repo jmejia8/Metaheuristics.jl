@@ -1,7 +1,7 @@
 include("gen_initial_state.jl")
 
 """
-    set_inital_solutions!(optimizer, x, fx)
+    set_user_solutions!(optimizer, x, fx)
 
 Provide initial solutions to the `optimizer`.
 - `x` can be a `Vector` and `fx` a function or `fx = f(x)`
@@ -18,12 +18,12 @@ julia> algo  = ECA(N = 61); # optimizer
 julia> # one solution can be provided
        x0 = [0.5, 0.5 0.5];
 
-julia> set_inital_solutions!(algo, x0, f);
+julia> set_user_solutions!(algo, x0, f);
 
 julia> # providing multiple solutions
        X0 = rand(30, 3); # 30 solutions with dim 3
 
-julia> set_inital_solutions!(algo, X0, f);
+julia> set_user_solutions!(algo, X0, f);
 
 julia> optimize(f, [0 0 0; 1 1 1.0], algo)
 +=========== RESULT ==========+
@@ -37,7 +37,7 @@ stop reason: Small difference of objective function values.
 ```
 
 """
-function set_inital_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution)
+function set_user_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution)
     status = algo.status
     if !isnothing(status.best_sol) && !isempty(status.population)
         push!(status.population, solution)
@@ -48,16 +48,16 @@ function set_inital_solutions!(algo::AbstractAlgorithm, solution::AbstractSoluti
 end
 
 
-function set_inital_solutions!(algo::AbstractAlgorithm, x::AbstractVector, fx)
-    set_inital_solutions!(algo, create_child(x, fx))
+function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, fx)
+    set_user_solutions!(algo, create_child(x, fx))
 end
 
-function set_inital_solutions!(algo::AbstractAlgorithm, x::AbstractVector, f::Function)
-    set_inital_solutions!(algo, x, f(x))
+function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, f::Function)
+    set_user_solutions!(algo, x, f(x))
 end
 
 
-function set_inital_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::AbstractVector)
+function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::AbstractVector)
     n = size(X, 1)
     m = length(fX)
 
@@ -72,7 +72,7 @@ function set_inital_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::A
 
     # TODO: this part can be parallelized
     for i in 1:n
-        set_inital_solutions!(algo, X[i,:], fX[i])
+        set_user_solutions!(algo, X[i,:], fX[i])
     end
 
     # TODO check population size provided in algo.parameters.N
@@ -80,7 +80,7 @@ function set_inital_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::A
     algo
 end
 
-function set_inital_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, f::Function)
-    set_inital_solutions!(algo, X, [f(X[i,:]) for i in 1:size(X,1)])
+function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, f::Function)
+    set_user_solutions!(algo, X, [f(X[i,:]) for i in 1:size(X,1)])
 end
 
