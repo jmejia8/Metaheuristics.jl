@@ -16,7 +16,7 @@ f (generic function with 1 method)
 julia> algo  = ECA(N = 61); # optimizer
 
 julia> # one solution can be provided
-       x0 = [0.5, 0.5 0.5];
+       x0 = [0.5, 0.5, 0.5];
 
 julia> set_user_solutions!(algo, x0, f);
 
