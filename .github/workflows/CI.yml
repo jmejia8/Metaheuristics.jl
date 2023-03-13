@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - nightly
+          - 1.5
         os:
           - ubuntu-latest
         arch:
