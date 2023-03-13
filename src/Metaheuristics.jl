@@ -124,6 +124,8 @@ include("algorithms/stop_criteria.jl")
 
 include("DecisionMaking/DecisionMaking.jl")
 
+include("precompile/precompile.jl")
+
 #######################################################
 #                                                     #
 #           D E P R E C A T E D                       #
