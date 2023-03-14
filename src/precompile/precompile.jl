@@ -5,21 +5,27 @@ using SnoopPrecompile
 
 
     @precompile_all_calls begin
-        
+        # limit the resources for a faster pre compilation
+        options = Options(iterations=4, f_calls_limit=1000)
         begin
             local f(x) = sum(x .^ 2)
-            optimize(f, [-1 -1 -1; 1 1 1.0], ABC())
-            optimize(f, [-1 -1 -1; 1 1 1.0], CGSA())
-            optimize(f, [-1 -1 -1; 1 1 1.0], DE())
-            optimize(f, [-1 -1 -1; 1 1 1.0], ECA())
-            optimize(f, [-1 -1 -1; 1 1 1.0], PSO())
-            optimize(f, [-1 -1 -1; 1 1 1.0], SA())
-            optimize(f, [-1 -1 -1; 1 1 1.0], WOA())
+            local bounds = [-1 -1 -1; 1 1 1.0]
+            for algo in [
+                         ABC( N=10, options=options),
+                         CGSA(N=10, options=options),
+                         DE(  N=10, options=options),
+                         ECA( N=10, options=options),
+                         PSO( N=10, options=options),
+                         SA(  N=10, options=options),
+                         WOA( N=10, options=options)
+                        ]
+                optimize(f, bounds, algo)
+            end
         end
 
         begin
             local f, bounds, pf = Metaheuristics.TestProblems.MTP()
-            ccmo = CCMO(NSGA2(N = 100, p_m = 0.001))
+            ccmo = CCMO(NSGA2(N = 100, p_m = 0.001), options = options)
             optimize(f, bounds, ccmo)
         end
 
@@ -30,13 +36,18 @@ using SnoopPrecompile
                 initializer = RandomPermutation(N = 100),
                 crossover = OrderCrossover(),
                 mutation = SlightMutation(),
+                options = options               
             )
             optimize(g, zeros(Int, 2, perm_size), ga)
         end
 
         begin
             local f, bounds, solutions = Metaheuristics.TestProblems.rastrigin()
-            result = optimize(f, bounds, MCCGA())
+            result = optimize(f, bounds, MCCGA(options = options))
+            fvals(result)
+            positions(result)
+            minimizer(result)
+            minimum(result)
         end
 
         begin
@@ -49,7 +60,7 @@ using SnoopPrecompile
             nobjectives = 2
             npartitions = 100
             weights = gen_ref_dirs(nobjectives, npartitions)
-            moead_de = MOEAD_DE(weights, options = Options(debug = false, iterations = 250))
+            moead_de = MOEAD_DE(weights, options = Options(debug = false, iterations = 2))
             status_moead = optimize(h, bounds, moead_de)
         end
 
@@ -60,14 +71,14 @@ using SnoopPrecompile
                 -1 -1
                 1 1.0
             ]
-            nsga2 = NSGA2(N = 100, p_cr = 0.85)
+            nsga2 = NSGA2(N = 100, p_cr = 0.85, options = options)
             status = optimize(j, bounds, nsga2)
         end
 
 
         begin
             local g, bounds, pf = Metaheuristics.TestProblems.get_problem(:DTLZ2)
-            nsga3 = NSGA3(p_cr = 0.9)
+            nsga3 = NSGA3(p_cr = 0.9, options = options)
             status = optimize(g, bounds, nsga3)
         end
 
@@ -77,7 +88,7 @@ using SnoopPrecompile
                 -1 -1
                 1 1.0
             ]
-            sms_emoa = SMS_EMOA(N = 100, p_cr = 0.85)
+            sms_emoa = SMS_EMOA(N = 100, p_cr = 0.85, options = options)
             status = optimize(k, bounds, sms_emoa)
         end
 
@@ -87,8 +98,9 @@ using SnoopPrecompile
                 -1 -1
                 1 1.0
             ]
-            nsga2 = SPEA2(N = 100, p_cr = 0.85)
-            status = optimize(m, bounds, nsga2)
+            spea2 = SPEA2(N = 100, p_cr = 0.85, options = options)
+            status = optimize(m, bounds, spea2)
+            fvals(status)
         end
 
     end
