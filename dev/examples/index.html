@@ -7,27 +7,27 @@
  -5.0  -5.0  -5.0  -5.0  -5.0  -5.0  -5.0  -5.0  -5.0  -5.0
   5.0   5.0   5.0   5.0   5.0   5.0   5.0   5.0   5.0   5.0</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; information = Information(f_optimum = 0.0); # information on the minimization problem</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; options = Options(f_calls_limit = 9000*10, f_tol = 1e-5); # generic settings</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; algorithm = ECA(information = information, options = options) # metaheuristic used to optimize</code><code class="nohighlight hljs ansi" style="display:block;">ECA(η_max=2.0, K=7, N=0, N_init=0, p_exploit=0.95, p_bin=0.02, p_cr=Float64[], ε=0.0, adaptive=false, resize_population=false)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; result = optimize(f, bounds, algorithm) # start the minimization process</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
   iteration: 1286
-    minimum: 0.994959
-  minimizer: [-5.166577067913781e-10, 6.765803070113765e-10, -0.9949586432197183, -2.532575785714035e-9, -3.77026076575558e-9, -1.3196599245167825e-9, -2.5174009993818615e-9, 2.6147009237307244e-9, -7.992052783049742e-10, 5.231324677290273e-9]
+    minimum: 2.98488
+  minimizer: [0.9949586378048056, 0.9949586373506797, -1.908459754803786e-9, 0.9949586385625017, 1.6140749859367702e-9, -1.715122871774295e-9, 1.8006675541838289e-10, -2.7879386588273553e-9, 1.5688193937781122e-9, 3.0808411267288818e-9]
     f calls: 90020
- total time: 2.3424 s
+ total time: 2.2172 s
 stop reason: Maximum objective function calls exceeded.
-+============================+</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimum(result)</code><code class="nohighlight hljs ansi" style="display:block;">0.9949590570932969</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimizer(result)</code><code class="nohighlight hljs ansi" style="display:block;">10-element Array{Float64,1}:
- -5.166577067913781e-10
-  6.765803070113765e-10
- -0.9949586432197183
- -2.532575785714035e-9
- -3.77026076575558e-9
- -1.3196599245167825e-9
- -2.5174009993818615e-9
-  2.6147009237307244e-9
- -7.992052783049742e-10
-  5.231324677290273e-9</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; result = optimize(f, bounds, algorithm) # note that second run is faster</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
++============================+</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimum(result)</code><code class="nohighlight hljs ansi" style="display:block;">2.9848771712798623</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; minimizer(result)</code><code class="nohighlight hljs ansi" style="display:block;">10-element Array{Float64,1}:
+  0.9949586378048056
+  0.9949586373506797
+ -1.908459754803786e-9
+  0.9949586385625017
+  1.6140749859367702e-9
+ -1.715122871774295e-9
+  1.8006675541838289e-10
+ -2.7879386588273553e-9
+  1.5688193937781122e-9
+  3.0808411267288818e-9</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; result = optimize(f, bounds, algorithm) # note that second run is faster</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
   iteration: 1286
-    minimum: 0.994959
-  minimizer: [1.8410816745545921e-9, 2.704617095064162e-9, -0.9949586369948571, 4.4182175703544177e-10, -1.4096854966760505e-10, -4.2156626242817325e-9, 1.6478370884931113e-9, -1.3535904382605012e-9, -1.4987303100086613e-10, 6.416278910584228e-9]
+    minimum: 2.98488
+  minimizer: [0.9949586352997437, 0.9949586364061185, -2.9714456558347418e-9, 0.9949586378603771, -3.3905263965662307e-11, -3.4709663485176453e-9, 1.0214110499269525e-10, 3.163493044195293e-9, -5.909019783411483e-10, 4.840789348122196e-9]
     f calls: 89950
- total time: 0.4866 s
+ total time: 0.3934 s
 stop reason: Maximum number of iterations exceeded.
 +============================+</code></pre><h2 id="Constrained-Optimization"><a class="docs-heading-anchor" href="#Constrained-Optimization">Constrained Optimization</a><a id="Constrained-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Constrained-Optimization" title="Permalink"></a></h2><p>It is common that optimization models include constraints that must be satisfied. For example: <a href="https://en.wikipedia.org/wiki/Test_functions_for_optimization">The Rosenbrock function constrained to a disk</a></p><p>Minimize:</p><p class="math-container">\[{\displaystyle f(x,y)=(1-x)^{2}+100(y-x^{2})^{2}}\]</p><p>subject to:</p><p class="math-container">\[{\displaystyle x^{2}+y^{2}\leq 2}\]</p><p>where <span>$-2 \leq x,y \leq 2$</span>.</p><p>In <code>Metaheuristics.jl</code>, a feasible solution is such that <span>$g(x) \leq 0$</span> and <span>$h(x) \approx 0$</span>. Hence, in this example the constraint is given by <span>$g(x) = x^2 + y^2 - 2 \leq 0$</span>. Moreover, the equality and inequality constraints must be saved into  <code>Array</code>s.</p><div class="admonition is-compat"><header class="admonition-header">Constraints handling</header><div class="admonition-body"><p>In this package, if the algorithm was not designed for constrained optimization, then solutions with the lower constraint violation sum will be preferred.</p></div></div><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Metaheuristics</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; function f(x)
            x,y = x[1], x[2]
@@ -41,13 +41,13 @@ stop reason: Maximum number of iterations exceeded.
        end</code><code class="nohighlight hljs ansi" style="display:block;">f (generic function with 1 method)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; bounds = [-2.0 -2; 2 2]</code><code class="nohighlight hljs ansi" style="display:block;">2×2 Array{Float64,2}:
  -2.0  -2.0
   2.0   2.0</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; optimize(f, bounds, ECA(N=30, K=3))</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
-  iteration: 667
-    minimum: 2.65887e-08
-  minimizer: [0.9998371430574097, 0.9996734982177095]
-    f calls: 20010
+  iteration: 231
+    minimum: 0.00393079
+  minimizer: [0.9373040069985948, 0.8785388014871096]
+    f calls: 6930
   feasibles: 30 / 30 in final population
- total time: 2.3100 s
-stop reason: Maximum objective function calls exceeded.
+ total time: 2.1659 s
+stop reason: Small difference of objective function values.
 +============================+</code></pre><h2 id="Multiobjective-Optimization"><a class="docs-heading-anchor" href="#Multiobjective-Optimization">Multiobjective Optimization</a><a id="Multiobjective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multiobjective-Optimization" title="Permalink"></a></h2><p>To implement a multiobjective optimization problem and solve it, you can proceed as usual. Here, you need to provide constraints if they exist, otherwise put <code>gx = [0.0]; hx = [0.0];</code> to indicate an unconstrained multiobjective problem.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Metaheuristics</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; function f(x)
            # objective functions
            v = 1.0 + sum(x .^ 2)
@@ -65,51 +65,51 @@ stop reason: Maximum objective function calls exceeded.
        end</code><code class="nohighlight hljs ansi" style="display:block;">f (generic function with 1 method)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; bounds = [zeros(30) ones(30)]&#39;;</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; optimize(f, bounds, NSGA2())</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
   iteration: 251
  population:100-element Array{Metaheuristics.xFgh_solution{Array{Float64,1}},1}:
- (f = [3.801807533169356e-9, 1.000144166891758], g = [0.0], h = [0.0], x = [3.801e-09, 1.679e-03, …, 5.742e-04])
- (f = [2.0002040030724855, 0.0], g = [0.0], h = [0.0], x = [1.000e+00, 2.764e-03, …, 7.037e-04])
- (f = [0.7038771879723322, 0.3410594637983734], g = [0.0], h = [0.0], x = [5.430e-01, 2.165e-03, …, 3.982e-03])
- (f = [0.7731481580929838, 0.32641058109733306], g = [0.0], h = [0.0], x = [5.740e-01, 1.688e-03, …, 7.652e-04])
- (f = [0.04348248261553579, 0.7942626477270632], g = [0.0], h = [0.0], x = [4.335e-02, 6.547e-03, …, 4.292e-04])
- (f = [0.055338676181776215, 0.7687711569847894], g = [0.0], h = [0.0], x = [5.509e-02, 1.393e-03, …, 4.530e-04])
- (f = [0.34665602811274154, 0.4828321180966505], g = [0.0], h = [0.0], x = [3.150e-01, 7.197e-03, …, 4.659e-04])
- (f = [0.306915221101877, 0.5053275302892596], g = [0.0], h = [0.0], x = [2.838e-01, 2.135e-03, …, 4.316e-04])
- (f = [1.4509806024907008, 0.13837918783380376], g = [0.0], h = [0.0], x = [8.453e-01, 7.700e-03, …, 6.057e-03])
- (f = [0.8179220688373421, 0.30771006804377043], g = [0.0], h = [0.0], x = [5.997e-01, 8.168e-03, …, 9.456e-03])
+ (f = [3.1044604527798354e-7, 1.000085031798596], g = [0.0], h = [0.0], x = [3.102e-07, 4.950e-03, …, 6.620e-04])
+ (f = [2.000222024132176, 0.0], g = [0.0], h = [0.0], x = [1.000e+00, 1.758e-03, …, 5.850e-05])
+ (f = [0.9238018502436844, 0.27694956806171855], g = [0.0], h = [0.0], x = [6.488e-01, 4.966e-03, …, 7.309e-03])
+ (f = [0.9968171732268185, 0.2561247268785965], g = [0.0], h = [0.0], x = [6.808e-01, 1.497e-03, …, 6.069e-04])
+ (f = [1.6854373683692145, 0.0789706391380007], g = [0.0], h = [0.0], x = [9.160e-01, 1.396e-03, …, 6.099e-04])
+ (f = [0.7892225832559919, 0.31551425388050525], g = [0.0], h = [0.0], x = [5.862e-01, 5.553e-03, …, 9.066e-03])
+ (f = [0.7623958028703098, 0.3228338278695602], g = [0.0], h = [0.0], x = [5.734e-01, 5.133e-03, …, 7.752e-04])
+ (f = [1.631022493403558, 0.09318542606542927], g = [0.0], h = [0.0], x = [8.998e-01, 4.986e-03, …, 6.494e-04])
+ (f = [1.7303877689701272, 0.06879031093513624], g = [0.0], h = [0.0], x = [9.276e-01, 5.278e-03, …, 7.552e-04])
+ (f = [0.0005934634473243062, 0.976535831255509], g = [0.0], h = [0.0], x = [5.929e-04, 4.982e-03, …, 8.307e-04])
  ⋮
- (f = [1.631993550898666, 0.09359546226531504], g = [0.0], h = [0.0], x = [8.995e-01, 1.747e-03, …, 3.854e-03])
- (f = [0.03637398305306754, 0.8111370238277731], g = [0.0], h = [0.0], x = [3.630e-02, 7.106e-03, …, 3.647e-04])
- (f = [0.36516610160062984, 0.47399185129063326], g = [0.0], h = [0.0], x = [3.287e-01, 3.063e-02, …, 2.123e-03])
- (f = [1.9201200615258531, 0.020028357557006205], g = [0.0], h = [0.0], x = [9.797e-01, 7.011e-03, …, 8.627e-04])
- (f = [1.6642786223526946, 0.0841812887672904], g = [0.0], h = [0.0], x = [9.101e-01, 2.199e-03, …, 5.777e-04])
- (f = [0.7789844191703709, 0.31773346677942027], g = [0.0], h = [0.0], x = [5.817e-01, 1.117e-03, …, 6.724e-04])
- (f = [0.5144629761891798, 0.40781714340291525], g = [0.0], h = [0.0], x = [4.322e-01, 1.870e-03, …, 4.044e-03])
- (f = [1.1846810971663482, 0.20652763970285543], g = [0.0], h = [0.0], x = [7.543e-01, 1.623e-03, …, 3.803e-04])
- (f = [0.27916220382054807, 0.5230320874610476], g = [0.0], h = [0.0], x = [2.610e-01, 7.681e-03, …, 2.917e-02])
+ (f = [1.788668016468031, 0.05345391376682517], g = [0.0], h = [0.0], x = [9.444e-01, 7.675e-04, …, 5.156e-03])
+ (f = [0.06018131107714936, 0.7593261396998494], g = [0.0], h = [0.0], x = [5.986e-02, 6.556e-03, …, 6.986e-04])
+ (f = [0.678261036673403, 0.3495260901734498], g = [0.0], h = [0.0], x = [5.291e-01, 1.673e-03, …, 9.221e-03])
+ (f = [0.34483343147111156, 0.4839131907459965], g = [0.0], h = [0.0], x = [3.136e-01, 4.957e-03, …, 7.102e-04])
+ (f = [0.13457598511174024, 0.6486103429969879], g = [0.0], h = [0.0], x = [1.321e-01, 1.026e-03, …, 5.714e-03])
+ (f = [1.0367953942368473, 0.24646631471640082], g = [0.0], h = [0.0], x = [6.963e-01, 1.361e-03, …, 4.092e-04])
+ (f = [0.42823653813284107, 0.4459996994712472], g = [0.0], h = [0.0], x = [3.734e-01, 9.164e-04, …, 2.194e-03])
+ (f = [1.1557059918322805, 0.21410848279822353], g = [0.0], h = [0.0], x = [7.435e-01, 1.026e-03, …, 5.761e-03])
+ (f = [1.7697934057962164, 0.05826113883263623], g = [0.0], h = [0.0], x = [9.391e-01, 1.733e-03, …, 6.512e-04])
 non-dominated solution(s):
 100-element Array{Metaheuristics.xFgh_solution{Array{Float64,1}},1}:
- (f = [3.801807533169356e-9, 1.000144166891758], g = [0.0], h = [0.0], x = [3.801e-09, 1.679e-03, …, 5.742e-04])
- (f = [2.0002040030724855, 0.0], g = [0.0], h = [0.0], x = [1.000e+00, 2.764e-03, …, 7.037e-04])
- (f = [0.7038771879723322, 0.3410594637983734], g = [0.0], h = [0.0], x = [5.430e-01, 2.165e-03, …, 3.982e-03])
- (f = [0.7731481580929838, 0.32641058109733306], g = [0.0], h = [0.0], x = [5.740e-01, 1.688e-03, …, 7.652e-04])
- (f = [0.04348248261553579, 0.7942626477270632], g = [0.0], h = [0.0], x = [4.335e-02, 6.547e-03, …, 4.292e-04])
- (f = [0.055338676181776215, 0.7687711569847894], g = [0.0], h = [0.0], x = [5.509e-02, 1.393e-03, …, 4.530e-04])
- (f = [0.34665602811274154, 0.4828321180966505], g = [0.0], h = [0.0], x = [3.150e-01, 7.197e-03, …, 4.659e-04])
- (f = [0.306915221101877, 0.5053275302892596], g = [0.0], h = [0.0], x = [2.838e-01, 2.135e-03, …, 4.316e-04])
- (f = [1.4509806024907008, 0.13837918783380376], g = [0.0], h = [0.0], x = [8.453e-01, 7.700e-03, …, 6.057e-03])
- (f = [0.8179220688373421, 0.30771006804377043], g = [0.0], h = [0.0], x = [5.997e-01, 8.168e-03, …, 9.456e-03])
+ (f = [3.1044604527798354e-7, 1.000085031798596], g = [0.0], h = [0.0], x = [3.102e-07, 4.950e-03, …, 6.620e-04])
+ (f = [2.000222024132176, 0.0], g = [0.0], h = [0.0], x = [1.000e+00, 1.758e-03, …, 5.850e-05])
+ (f = [0.9238018502436844, 0.27694956806171855], g = [0.0], h = [0.0], x = [6.488e-01, 4.966e-03, …, 7.309e-03])
+ (f = [0.9968171732268185, 0.2561247268785965], g = [0.0], h = [0.0], x = [6.808e-01, 1.497e-03, …, 6.069e-04])
+ (f = [1.6854373683692145, 0.0789706391380007], g = [0.0], h = [0.0], x = [9.160e-01, 1.396e-03, …, 6.099e-04])
+ (f = [0.7892225832559919, 0.31551425388050525], g = [0.0], h = [0.0], x = [5.862e-01, 5.553e-03, …, 9.066e-03])
+ (f = [0.7623958028703098, 0.3228338278695602], g = [0.0], h = [0.0], x = [5.734e-01, 5.133e-03, …, 7.752e-04])
+ (f = [1.631022493403558, 0.09318542606542927], g = [0.0], h = [0.0], x = [8.998e-01, 4.986e-03, …, 6.494e-04])
+ (f = [1.7303877689701272, 0.06879031093513624], g = [0.0], h = [0.0], x = [9.276e-01, 5.278e-03, …, 7.552e-04])
+ (f = [0.0005934634473243062, 0.976535831255509], g = [0.0], h = [0.0], x = [5.929e-04, 4.982e-03, …, 8.307e-04])
  ⋮
- (f = [1.631993550898666, 0.09359546226531504], g = [0.0], h = [0.0], x = [8.995e-01, 1.747e-03, …, 3.854e-03])
- (f = [0.03637398305306754, 0.8111370238277731], g = [0.0], h = [0.0], x = [3.630e-02, 7.106e-03, …, 3.647e-04])
- (f = [0.36516610160062984, 0.47399185129063326], g = [0.0], h = [0.0], x = [3.287e-01, 3.063e-02, …, 2.123e-03])
- (f = [1.9201200615258531, 0.020028357557006205], g = [0.0], h = [0.0], x = [9.797e-01, 7.011e-03, …, 8.627e-04])
- (f = [1.6642786223526946, 0.0841812887672904], g = [0.0], h = [0.0], x = [9.101e-01, 2.199e-03, …, 5.777e-04])
- (f = [0.7789844191703709, 0.31773346677942027], g = [0.0], h = [0.0], x = [5.817e-01, 1.117e-03, …, 6.724e-04])
- (f = [0.5144629761891798, 0.40781714340291525], g = [0.0], h = [0.0], x = [4.322e-01, 1.870e-03, …, 4.044e-03])
- (f = [1.1846810971663482, 0.20652763970285543], g = [0.0], h = [0.0], x = [7.543e-01, 1.623e-03, …, 3.803e-04])
- (f = [0.27916220382054807, 0.5230320874610476], g = [0.0], h = [0.0], x = [2.610e-01, 7.681e-03, …, 2.917e-02])
+ (f = [1.788668016468031, 0.05345391376682517], g = [0.0], h = [0.0], x = [9.444e-01, 7.675e-04, …, 5.156e-03])
+ (f = [0.06018131107714936, 0.7593261396998494], g = [0.0], h = [0.0], x = [5.986e-02, 6.556e-03, …, 6.986e-04])
+ (f = [0.678261036673403, 0.3495260901734498], g = [0.0], h = [0.0], x = [5.291e-01, 1.673e-03, …, 9.221e-03])
+ (f = [0.34483343147111156, 0.4839131907459965], g = [0.0], h = [0.0], x = [3.136e-01, 4.957e-03, …, 7.102e-04])
+ (f = [0.13457598511174024, 0.6486103429969879], g = [0.0], h = [0.0], x = [1.321e-01, 1.026e-03, …, 5.714e-03])
+ (f = [1.0367953942368473, 0.24646631471640082], g = [0.0], h = [0.0], x = [6.963e-01, 1.361e-03, …, 4.092e-04])
+ (f = [0.42823653813284107, 0.4459996994712472], g = [0.0], h = [0.0], x = [3.734e-01, 9.164e-04, …, 2.194e-03])
+ (f = [1.1557059918322805, 0.21410848279822353], g = [0.0], h = [0.0], x = [7.435e-01, 1.026e-03, …, 5.761e-03])
+ (f = [1.7697934057962164, 0.05826113883263623], g = [0.0], h = [0.0], x = [9.391e-01, 1.733e-03, …, 6.512e-04])
     f calls: 50100
   feasibles: 100 / 100 in final population
- total time: 3.7062 s
+ total time: 3.7025 s
 stop reason: Maximum objective function calls exceeded.
 +============================+</code></pre><h2 id="Bilevel-Optimization"><a class="docs-heading-anchor" href="#Bilevel-Optimization">Bilevel Optimization</a><a id="Bilevel-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Bilevel-Optimization" title="Permalink"></a></h2><p>Bilevel optimization problems can be solved by using the package <a href="https://github.com/jmejia8/BilevelHeuristics.jl">BilevelHeuristics.jl</a> which extends  <code>Metaheuristics.jl</code> for handling those hierarchical problems.</p><p>Defining objective functions corresponding to the BO problem.</p><p><strong>Upper level (leader problem):</strong></p><pre><code class="language-julia hljs">using BilevelHeuristics
 
@@ -153,10 +153,10 @@ julia&gt; sol = best_alternative(res, w, dm_method)
  0.6
  0.6</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; X = [ bounds[1,:] + rand(D).* ( bounds[2,:] -  bounds[1,:]) for i in 1:19  ]; # random solutions (uniform distribution)</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; push!(X, x_known); # save an interest solution</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; population = [ Metaheuristics.create_child(x, f(x)) for x in X ]; # generate the population with 19+1 solutions</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; prev_status = State(Metaheuristics.get_best(population), population); # prior state</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; method = ECA(N = length(population))</code><code class="nohighlight hljs ansi" style="display:block;">ECA(η_max=2.0, K=7, N=20, N_init=20, p_exploit=0.95, p_bin=0.02, p_cr=Float64[], ε=0.0, adaptive=false, resize_population=false)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; method.status = prev_status; # say to ECA that you have generated a population</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; optimize(f, bounds, method) # optimize</code><code class="nohighlight hljs ansi" style="display:block;">+=========== RESULT ==========+
   iteration: 5001
-    minimum: 1.59012e-127
-  minimizer: [-8.79998859118886e-65, 4.803399617141476e-66, -1.6152205156954737e-64, -4.539699182974699e-65, 1.2516499236161984e-65, -3.2731725513503724e-64, -5.1603128709743975e-65, -8.822423226019204e-65, -5.392453112904543e-65, -4.947173433641656e-65]
+    minimum: 1.77142e-126
+  minimizer: [1.3989837816970935e-64, -7.067667917067964e-64, -4.537111561878049e-65, 1.0916733843890296e-64, 2.0829661083230208e-64, -5.910024943956745e-64, 3.602012120871177e-64, -3.0369526515015282e-64, 2.0436867044712568e-64, 7.628502436114329e-64]
     f calls: 100000
- total time: 0.5609 s
+ total time: 0.5038 s
 stop reason: Maximum objective function calls exceeded.
 +============================+</code></pre><h2 id="Batch-Evaluation"><a class="docs-heading-anchor" href="#Batch-Evaluation">Batch Evaluation</a><a id="Batch-Evaluation-1"></a><a class="docs-heading-anchor-permalink" href="#Batch-Evaluation" title="Permalink"></a></h2><p>Evaluating multiple solutions at the same time can reduce computational time. To do that, define your function on an input <code>N x D</code> matrix and function values into matrices with outcomes in rows for all <code>N</code> solutions. Also, you need to put <code>parallel_evaluation=true</code> in the <a href="../api/#Metaheuristics.Options"><code>Options</code></a> to indicate that your <code>f</code> is prepared for parallel evaluations.</p><pre><code class="language-julia hljs">f(X) = begin
     fx = sum(X.^2, dims=2)       # objective function ∑x²
@@ -208,16 +208,16 @@ res = optimize(f, [-10ones(5) 10ones(5)], ECA(options=options))</code></pre><p>S
        
            return
        end</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; f, bounds, opt = Metaheuristics.TestProblems.get_problem(:sphere);</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; optimize(f, bounds, ECA())</code><code class="nohighlight hljs ansi" style="display:block;">[ Info: Diversity-based stop criterium
-distances_mean = 0.0009130263229254064
+distances_mean = 0.0009987657977885696
 +=========== RESULT ==========+
-  iteration: 181
-    minimum: 2.10756e-07
-  minimizer: [-0.00026089279464154, -2.431180389117382e-5, -0.00019280763751555337, -0.00025934192563223146, 9.949743058082673e-5, 0.00015100745454623408, -6.389053889323837e-5, 1.0773034760357997e-5, 1.5054185572254308e-5, 2.321042791152901e-5]
-    f calls: 12670
- total time: 0.3936 s
+  iteration: 184
+    minimum: 7.15349e-07
+  minimizer: [0.00014447346385466984, 0.0003041857335424048, 0.00042940147119596716, 9.547576075937653e-6, 0.00017314527804098692, -5.059300580945048e-5, -0.0005194594163441437, 0.00017355920951572234, 0.00010957104920988931, 0.0002701209360178327]
+    f calls: 12880
+ total time: 0.4041 s
 stop reason: Unknown stop reason.
 +============================+</code></pre><h2 id="Restarting-search"><a class="docs-heading-anchor" href="#Restarting-search">Restarting search</a><a id="Restarting-search-1"></a><a class="docs-heading-anchor-permalink" href="#Restarting-search" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.Restart" href="#Metaheuristics.Restart"><code>Metaheuristics.Restart</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">Restart(optimizer, every=100)</code></pre><p>Resets the <code>optimizer</code> every specified number of iterations (100 by default).</p><p><strong>Example</strong></p><pre><code class="language-julia-repl hljs">julia&gt; f, bounds, _ = Metaheuristics.TestProblems.rastrigin();
 
 julia&gt; optimize(f, bounds, Restart(ECA(), every=200))</code></pre><p><strong>Customization</strong></p><p>The restart condition can be updated by overloading the <code>restart_condition</code> method:</p><pre><code class="language-julia hljs">function Metaheuristics.restart_condition(status, restart::Restart, information, options)
     st.iteration % params.every == 0
-end</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/6a4eec1a9f7984c1c4f410f8bc27dd057c2a80c9/src/algorithms/Restart/Restart.jl#L8-L31">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/parallelization/">« Parallelization</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Tuesday 14 March 2023 16:01">Tuesday 14 March 2023</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/251d7293060156c40757f3f6c5da8303a59b7c6c/src/algorithms/Restart/Restart.jl#L8-L31">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/parallelization/">« Parallelization</a><a class="docs-footer-nextpage" href="../algorithms/">Algorithms »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Friday 17 March 2023 18:09">Friday 17 March 2023</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
