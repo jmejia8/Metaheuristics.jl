@@ -73,7 +73,8 @@ function initialize!(
     kargs...
   )
 
-  lb, ub= problem.bounds[1,:], problem.bounds[2,:]
+  lb = problem.search_space.lb
+  ub = problem.search_space.ub
 
   #Initialize the positions of search agents
   max_it = 500
@@ -110,7 +111,7 @@ function update_state!(
 
   Max_iter = options.iterations
   N = parameters.N
-  D = size(problem.bounds, 2)
+  D = getdim(problem)
   t = status.iteration
 
   a=2-t*((2)/Max_iter) # a decreases linearly fron 2 to 0 in Eq. (2.3)
@@ -158,7 +159,7 @@ function update_state!(
 
     end # for j
 
-    reset_to_violated_bounds!(x, problem.bounds)
+    reset_to_violated_bounds!(x, problem.search_space)
     X_new[i,:] = x
   end # for i
 

@@ -1,12 +1,12 @@
 """
       optimize(
             f::Function, # objective function
-            bounds::AbstractMatrix,
+            search_space,
             method::AbstractAlgorithm = ECA();
             logger::Function = (status) -> nothing,
       )
 
-Minimize a n-dimensional function `f` with domain `bounds` (2×n matrix) using `method = ECA()` by default.
+Minimize a n-dimensional function `f` with domain `search_space` (2×n matrix) using `method = ECA()` by default.
 
 # Example
 Minimize f(x) = Σx² where x ∈ [-10, 10]³.
@@ -35,7 +35,7 @@ julia> result = optimize(f, bounds)
 """
 function optimize(
         f::Function, # objective function
-        bounds::AbstractMatrix,
+        search_space,
         method::AbstractAlgorithm = ECA();
         logger::Function = (status) -> nothing,
     )
@@ -51,7 +51,7 @@ function optimize(
     parameters = method.parameters
     ###################################
 
-    problem = Problem(f, Array(bounds); parallel_evaluation=options.parallel_evaluation)
+    problem = Problem(f, search_space; parallel_evaluation=options.parallel_evaluation)
     seed!(options.seed)
 
     ###################################
@@ -137,7 +137,7 @@ function show_status(status, parameters, options)
 end
 
 """
-    optimize!(f, bounds, method;logger)
+    optimize!(f, search_space, method;logger)
 
 Perform an iteration of `method`, and save the results in `method.status`.
 
@@ -156,7 +156,7 @@ See also [`optimize`](@docs).
 """
 function optimize!(
         f::Function, # objective function
-        bounds::AbstractMatrix,
+        search_space,
         method::AbstractAlgorithm;
         logger::Function = (status) -> nothing,
     )
@@ -167,7 +167,7 @@ function optimize!(
     information = method.information
     options = method.options
     parameters = method.parameters
-    problem = Problem(f, Array(bounds); parallel_evaluation=options.parallel_evaluation)
+    problem = Problem(f, search_space; parallel_evaluation=options.parallel_evaluation)
     ###################################
 
     status = method.status

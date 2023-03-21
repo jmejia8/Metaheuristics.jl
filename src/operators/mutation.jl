@@ -46,11 +46,11 @@ end
 
 Polynomial Mutation applied to a vector of real numbers.
 """
-function polynomial_mutation!(vector, bounds, η=20, prob = 1 / length(vector))
+function polynomial_mutation!(vector, bounds::Bounds, η=20, prob = 1 / length(vector))
     do_mutation = rand(length(vector)) .< prob
 
-    xu = view(bounds, 2,do_mutation)
-    xl = view(bounds, 1,do_mutation)
+    xu = view(bounds.ub, do_mutation)
+    xl = view(bounds.lb, do_mutation)
     x = view(vector, do_mutation)
 
     δ1 = (x - xl) ./ (xu - xl)
@@ -79,8 +79,8 @@ Polynomial mutation.
 struct PolynomialMutation
     η::Float64
     p::Float64
-    bounds::Matrix{Float64}
-    PolynomialMutation(;η = 15.0, bounds = zeros(0,0), p=1/size(bounds,2)) = begin
+    bounds
+    PolynomialMutation(;η = 15.0, bounds = zeros(0,0), p=1/getdim(bounds)) = begin
         new(η, isfinite(p) ? p : 1e-2, bounds)
     end
 end

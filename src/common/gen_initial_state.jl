@@ -13,7 +13,7 @@ function gen_initial_state(problem,parameters,information,options, status)
         options.debug && @warn("Population size in provided State differs from that in parameters")
     end
 
-    size(problem.bounds,2) != length(get_position(status.best_sol)) &&
+    getdim(problem) != length(get_position(status.best_sol)) &&
         error("Invalid population (dimension does not match with bounds)")
 
     _complete_population!(status,problem,parameters,information,options)

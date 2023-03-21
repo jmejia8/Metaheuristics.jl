@@ -33,25 +33,50 @@ function get_result(algorithm::AbstractAlgorithm)
     algorithm.status
 end
 
-mutable struct Problem{T} <: AbstractProblem
+mutable struct Problem{S} <: AbstractProblem
     f::Function
-    bounds::Array{T,2}
+    search_space::S
     f_calls::Int
     parallel_evaluation::Bool
 end
 
-function Problem(f::Function, bounds::Array; parallel_evaluation=false)
+function Base.getproperty(obj::Problem, sym::Symbol)
+    if sym === :bounds
+        @warn "`bounds` property is deprecated. Use `search_space` instead"
+        error("bounds")
+        se = obj.search_space
+        return Array([se.lb se.ub]')
+    else # fallback to getfield
+        return getfield(obj, sym)
+    end
+end
+
+function getdim(problem::Problem)
+    return SearchSpaces.getdim(problem.search_space)
+end
+
+
+function Problem(f::Function, search_space::AbstractSearchSpace; parallel_evaluation=false)
+    Problem(f, search_space, 0, parallel_evaluation)
+end
+
+function Problem(f::Function, bounds::Array{T,2}; kargs...) where T <: Number
+    # old problem definition
 
     if size(bounds,1) > 2 && size(bounds,2) == 2
         bounds = Array(bounds')
     end
 
-    Problem(f, bounds, 0, parallel_evaluation)
+    Problem(f, Bounds(lb = bounds[1,:], ub = bounds[2,:]); kargs...)
+end
+
+
+function Problem(f::Function, bounds::Array{Bool,2}; kargs...)
+    Problem(f, BitArrays(size(bounds,2)); kargs...)
 end
 
 function evaluate(x, problem::Problem)
     problem.f_calls += 1
     return problem.f(x)
 end
-
 

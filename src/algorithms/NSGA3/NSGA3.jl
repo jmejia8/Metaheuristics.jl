@@ -272,8 +272,9 @@ function initialize!(
     options::Options,
     args...;
     kargs...
-)
-    D = size(problem.bounds, 2)
+    )
+
+    D = getdim(problem)
 
     if parameters.p_m < 0.0
         parameters.p_m = 1.0 / D
@@ -324,7 +325,7 @@ function reproduction(status, parameters::NSGA3, problem)
     @assert !isempty(status.population)
 
     I = randperm(parameters.N)
-    Q = zeros(parameters.N, size(problem.bounds, 2))
+    Q = zeros(parameters.N, getdim(problem))
     for i = 1:parameters.N ÷ 2
 
         pa = status.population[I[2i-1]]
@@ -332,7 +333,7 @@ function reproduction(status, parameters::NSGA3, problem)
 
         c1, c2 = GA_reproduction(get_position(pa),
                                  get_position(pb),
-                                 problem.bounds;
+                                 problem.search_space;
                                  η_cr = parameters.η_cr,
                                  p_cr = parameters.p_cr,
                                  η_m = parameters.η_m,

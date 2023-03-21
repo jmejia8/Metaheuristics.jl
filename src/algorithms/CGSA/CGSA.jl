@@ -126,12 +126,13 @@ function initialize!(
 
     Rnorm = parameters.Rnorm
     N = parameters.N
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
     fobj = problem.f
 
 
     # bounds vectors
-    low, up = problem.bounds[1,:], problem.bounds[2,:]
+    low = problem.search_space.lb
+    up = problem.search_space.ub
 
     max_it = 500
     options.iterations = options.iterations == 0 ? max_it : options.iterations
@@ -209,7 +210,7 @@ function update_state!(
     # Checking allowable range. 
     # X = correctPop(X, low, up)
     for i = 1:N
-        x = reset_to_violated_bounds!(X[i,:], problem.bounds)
+        x = reset_to_violated_bounds!(X[i,:], problem.search_space)
         X[i,:] = x
     end
 

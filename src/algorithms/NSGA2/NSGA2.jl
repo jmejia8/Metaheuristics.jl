@@ -120,7 +120,7 @@ offspring. Return two vectors.
 """
 function GA_reproduction(pa::AbstractVector{T},
         pb::AbstractVector{T},
-        bounds;
+        bounds::Bounds;
         η_cr = 20,
         η_m  = 15,
         p_cr = 0.9,
@@ -156,7 +156,7 @@ Same that `GA_reproduction` but only returns one offspring.
 """
 function GA_reproduction_half(pa::AbstractVector{T},
         pb::AbstractVector{T},
-        bounds;
+        bounds::Bounds;
         η_cr = 20,
         η_m  = 15,
         p_cr = 0.9,
@@ -180,7 +180,7 @@ function reproduction(pa, pb, parameters::AbstractNSGA, problem)
     # crossover and mutation
     c1, c2 = GA_reproduction(get_position(pa),
                              get_position(pb),
-                             problem.bounds;
+                             problem.search_space;
                              η_cr = parameters.η_cr,
                              p_cr = parameters.p_cr,
                              η_m = parameters.η_m,
@@ -203,7 +203,7 @@ function initialize!(
     args...;
     kargs...
 )
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
 
     if parameters.p_m < 0.0
         parameters.p_m = 1.0 / D
@@ -256,7 +256,7 @@ function reproduction(status, parameters::AbstractNSGA, problem)
     @assert !isempty(status.population)
 
     N_half = parameters.N
-    Q = zeros(2N_half, size(problem.bounds, 2))
+    Q = zeros(2N_half, getdim(problem))
 
     for i in 1:N_half
         pa = tournament_selection(status.population)
@@ -264,7 +264,7 @@ function reproduction(status, parameters::AbstractNSGA, problem)
 
         c1, c2 = GA_reproduction(get_position(pa),
                                  get_position(pb),
-                                 problem.bounds;
+                                 problem.search_space;
                                  η_cr = parameters.η_cr,
                                  p_cr = parameters.p_cr,
                                  η_m = parameters.η_m,

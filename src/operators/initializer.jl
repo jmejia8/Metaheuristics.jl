@@ -118,7 +118,7 @@ end
 
 function gen_initial_state(problem,parameters::RandomPermutation,information,options)
 
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
     X = zeros(Int, parameters.N, D)
     N = parameters.N
     for i in 1:parameters.N

@@ -120,8 +120,8 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
     
-    lower = problem.bounds[1,:]
-    upper = problem.bounds[2,:]
+    lower = problem.search_space.lb
+    upper = problem.search_space.ub
 
     parameters.probvector = initialprobs(lower, upper, maxsamples = parameters.maxsamples)
 

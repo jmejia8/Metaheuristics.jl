@@ -155,7 +155,7 @@ function initialize!(
         args...;
         kargs...
     )
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
 
 
 
@@ -213,7 +213,7 @@ function reproduction(status, parameters::AbstractDifferentialEvolution, problem
         x = get_position(population[i])
         u = DE_mutation(population, F, strategy, 1)
         v = DE_crossover(x, u, CR)
-        evo_boundary_repairer!(v, xBest, problem.bounds)
+        evo_boundary_repairer!(v, xBest, problem.search_space)
         X[i,:] = v
     end
 

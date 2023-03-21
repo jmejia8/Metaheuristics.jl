@@ -119,7 +119,7 @@ function eca_solution(status, parameters, options, problem, I, i)
     end
     # binary crossover
     y, M_current = crossover(U[u_best].x, y, parameters.p_cr)
-    evo_boundary_repairer!(y, c, problem.bounds)
+    evo_boundary_repairer!(y, c, problem.search_space)
     y, M_current
 end
 
@@ -135,7 +135,7 @@ function update_state!(
     )
 
     I = randperm(parameters.N)
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
@@ -237,7 +237,7 @@ function initialize!(
         args...;
         kargs...
     )
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
 
 
     if parameters.N <= parameters.K
@@ -299,7 +299,7 @@ function reproduction(status, parameters::ECA, problem)
                               parameters.K,
                               parameters.η_max;
                               i=i,
-                             bounds = problem.bounds)
+                             bounds = problem.search_space)
     end
 
     X 

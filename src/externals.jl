@@ -9,6 +9,9 @@ import Base.minimum
 using JMcDM
 using Requires
 
+using SearchSpaces
+import SearchSpaces: AbstractSearchSpace, getdim
+
 function __init__()
     @require UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228" begin
         include("common/show_plots.jl")

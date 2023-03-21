@@ -22,7 +22,7 @@ function update_state!(
     feasible_solutions = findall( s->s.is_feasible, population )
     weights = compute_weights(population)
 
-    X_next = zeros(parameters.N, size(problem.bounds, 2))
+    X_next = zeros(parameters.N, getdim(problem))
 
     # For each elements in Population
     for i = 1:parameters.N
@@ -52,7 +52,7 @@ function update_state!(
         mask = rand(length(y)) .< 1.0 / length(y)
         y[mask] = v[mask]
 
-        evo_boundary_repairer!(y, c, problem.bounds)
+        evo_boundary_repairer!(y, c, problem.search_space)
         X_next[i,:] = y
     end
 

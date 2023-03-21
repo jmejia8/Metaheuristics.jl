@@ -91,8 +91,8 @@ function initialize!(
    )
 
 
-    l = view( problem.bounds, 1,:)
-    u = view( problem.bounds, 2,:)
+    l = problem.search_space.lb
+    u = problem.search_space.ub
 
     if isempty(parameters.x_initial)
         parameters.x_initial = l .+ (u .- l) .* rand(length(u))
@@ -139,8 +139,8 @@ function update_state!(
     T = nevals / max_evals 
     μ = 10.0 ^( 100T )    
 
-    l = view( problem.bounds, 1,:)
-    u = view( problem.bounds, 2,:)
+    l = problem.search_space.lb
+    u = problem.search_space.ub
 
     # For each temperature we take 500 test points to simulate reach termal
     # equilibrium.
@@ -153,7 +153,7 @@ function update_state!(
 
         # Next step is to keep solution within bounds
         #x1 = (x1 .< l).*l+(l .<= x1).*(x1 .<= u).*x1+(u .< x1).*u			
-        reset_to_violated_bounds!(x1, problem.bounds)
+        reset_to_violated_bounds!(x1, problem.search_space)
         fx1 = evaluate(x1, problem)
 
         status.f_calls += 1

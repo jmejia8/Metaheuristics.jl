@@ -55,7 +55,7 @@ function updateBee!(bee, bee2, problem)
     v = ϕ*(bee.sol.x - bee2.sol.x)
 
     x_new = bee.sol.x + v
-    replace_with_random_in_bounds!(x_new, problem.bounds)
+    replace_with_random_in_bounds!(x_new, problem.search_space)
 
     new_sol = create_solution(x_new, problem)
 

@@ -227,31 +227,31 @@ end
 
 ##########################################################3
 
-function _gen_X(N, bounds::AbstractMatrix{T}) where T <: AbstractFloat 
-    a = view(bounds, 1, :)'
-    b = view(bounds, 2, :)'
-    D = length(a)
-    a .+ (b - a) .* rand(eltype(bounds), N, D)
+function _gen_X(N, bounds::Bounds{T}) where T <: AbstractFloat 
+    a = bounds.lb'
+    D = SearchSpaces.getdim(bounds)
+    a .+ (bounds.Δ') .* rand(T, N, D)
 end
 
-function _gen_X(N, bounds::AbstractMatrix{T}) where T <: Integer
-    a = view(bounds, 1, :)'
-    b = view(bounds, 2, :)'
-    D = length(a)
+function _gen_X(N, bounds::Bounds{T}) where T <: Integer
+    a = bounds.lb'
+    b = bounds.ub'
+    D = SearchSpaces.getdim(bounds)
 
-    X = zeros(eltype(bounds), N, D)
+    X = zeros(T, N, D)
     for i in 1:D
         X[:,i] = rand(a[i]:b[i], N)
     end
     return X
 end
 
-function _gen_X(N, bounds::AbstractMatrix{T}) where T <: Bool
-    rand(eltype(bounds), N, size(bounds, 2))
+function _gen_X(N, search_space::BitArrays)
+    rand(Bool, N, SearchSpaces.getdim(search_space))
 end
 
+
 function generate_population(N::Int, problem;ε=0.0, parallel_evaluation = false)
-    X = _gen_X(N, problem.bounds)
+    X = _gen_X(N, problem.search_space)
 
     if problem.parallel_evaluation
         return create_solutions(X, problem; ε=ε)

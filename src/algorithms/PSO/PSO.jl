@@ -80,7 +80,7 @@ function update_state!(
     )
     xGBest = get_position(status.best_sol)
 
-    X_new = zeros(parameters.N, size(problem.bounds, 2))
+    X_new = zeros(parameters.N, getdim(problem))
 
     # For each elements in population
     for i in 1:parameters.N
@@ -88,7 +88,7 @@ function update_state!(
         xPBest = get_position(status.population[i])
         parameters.v[i, :] = velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
         x += parameters.v[i, :]
-        reset_to_violated_bounds!(x, problem.bounds)
+        reset_to_violated_bounds!(x, problem.search_space)
         X_new[i,:] = x
     end
 
@@ -119,7 +119,7 @@ function initialize!(
     args...;
     kargs...
        )
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
 
 
     if parameters.N == 0

@@ -54,10 +54,10 @@ end
 
 Simulated binomial crossover for given two `Vectors{Real}`.
 """
-function SBX_crossover(vector1, vector2, bounds, η=15, p_variable = 0.9)
-    xu = view(bounds, 2,:)
-    xl = view(bounds, 1,:)
-    D = length(vector1)
+function SBX_crossover(vector1, vector2, bounds::Bounds, η=15, p_variable = 0.9)
+    xu = bounds.ub
+    xl = bounds.lb
+    D = getdim(bounds)
 
     do_crossover = ones(Bool, D)
     do_crossover[rand(D) .> p_variable] .= false
@@ -104,7 +104,7 @@ Simulated Binomial Crossover.
 mutable struct SBX
     η::Float64
     p::Float64
-    bounds::Matrix{Float64}
+    bounds
     SBX(;η = 15, p = 0.9, bounds = zeros(0,0)) = new(η, p, bounds)
 end
 
