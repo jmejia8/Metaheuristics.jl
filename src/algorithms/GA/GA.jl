@@ -41,7 +41,7 @@ f (generic function with 1 method)
 
 julia> dim = 10;
 
-julia> optimize(f, repeat([false, true], 1, dim), GA())
+julia> optimize(f, BitArrays(dim), GA())
 +=========== RESULT ==========+
   iteration: 500
     minimum: 0
@@ -62,7 +62,7 @@ julia> perm_size = 10;
 
 julia> ga = GA(;initializer = RandomPermutation(N=100), crossover=OrderCrossover(), mutation=SlightMutation());
 
-julia> optimize(f, zeros(Int,2,perm_size), ga)
+julia> optimize(f, Permutations(perm_size), ga)
 +=========== RESULT ==========+
   iteration: 500
     minimum: 0
