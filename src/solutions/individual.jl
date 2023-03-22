@@ -130,28 +130,28 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 ```
 
 """
-function create_child(x, fResult::Float64;ε=0.0)
-    return xf_solution(x, fResult)
+function create_child(x, fResult::Real;ε=0.0)
+    return xf_solution(x, Float64(fResult))
 end
 
 # constrained single objective
 function create_child(x,
-        fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}};
+        fResult::Tuple{Real,Array{Real,1},Array{Real,1}};
         ε=0.0
     )
     f, g, h = fResult
     isempty(g) && isempty(h) && (return xf_solution(x, f))
 
-    return xfgh_indiv(x, f, g, h; ε=ε)
+    return xfgh_indiv(x, Float64(f), Float64.(g), Float64.(h); ε=ε)
 end
 
 # constrained multi-objective
 function create_child(x,
-        fResult::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}};
+        fResult::Tuple{Array{Real,1},Array{Float64,1},Array{Float64,1}};
         ε = 0.0
     )
     f, g, h = fResult
-    return xFgh_indiv(x, f, g, h;ε=ε)
+    return xFgh_indiv(x, Float64.(f), Float64.(g), Float64.(h);ε=ε)
 end
 
 ##########################################################3
