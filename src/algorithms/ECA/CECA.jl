@@ -8,7 +8,7 @@ function update_state!(
         kargs...
     )
 
-    I = randperm(parameters.N)
+    I = randperm(options.rng, parameters.N)
     N = parameters.N
     population = status.population
 
@@ -40,7 +40,7 @@ function update_state!(
         u_best = argmax(mass)
 
         # stepsize
-        η = parameters.η_max * rand()
+        η = parameters.η_max * rand(options.rng)
 
         # u: worst element in U
         u = U[u_worst].x
@@ -49,10 +49,10 @@ function update_state!(
         # current-to-center/bin
         y = x .+ η .* (c .- u)
         
-        mask = rand(length(y)) .< 1.0 / length(y)
+        mask = rand(options.rng, length(y)) .< 1.0 / length(y)
         y[mask] = v[mask]
 
-        evo_boundary_repairer!(y, c, problem.search_space)
+        evo_boundary_repairer!(y, c, problem.search_space, rng)
         X_next[i,:] = y
     end
 

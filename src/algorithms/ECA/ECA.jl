@@ -97,14 +97,14 @@ function ECA(;
 
 end
 
-function eca_solution(status, parameters, options, problem, I, i)
+function eca_solution(status, parameters, options, problem, I, i, rng = default_rng_mh())
     p = status.f_calls / options.f_calls_limit
     # generate U masses
     U = getU(status.population, parameters.K, I, i, parameters.N)
     # generate center of mass
     c, u_worst, u_best = center(U)
     # stepsize
-    η = parameters.η_max * rand()
+    η = parameters.η_max * rand(rng)
     # u: worst element in U
     u = U[u_worst] |> get_position
     # current-to-center/bin
@@ -118,8 +118,8 @@ function eca_solution(status, parameters, options, problem, I, i)
         y = get_position(status.population[i]) .+ η .*(minimizer(status) .- c)
     end
     # binary crossover
-    y, M_current = crossover(U[u_best].x, y, parameters.p_cr)
-    evo_boundary_repairer!(y, c, problem.search_space)
+    y, M_current = crossover(U[u_best].x, y, parameters.p_cr, options.rng)
+    evo_boundary_repairer!(y, c, problem.search_space, rng)
     y, M_current
 end
 
@@ -134,7 +134,7 @@ function update_state!(
         kargs...
     )
 
-    I = randperm(parameters.N)
+    I = randperm(options.rng, parameters.N)
     D = getdim(problem)
 
     parameters.adaptive && (Mcr_fail = zeros(D))
@@ -145,7 +145,7 @@ function update_state!(
 
     # For each elements in Population
     for i in 1:parameters.N
-        y, M_current = eca_solution(status, parameters, options,problem,I,i)
+        y, M_current = eca_solution(status, parameters, options,problem,I,i, options.rng)
 
         if options.parallel_evaluation
             X_next[i,:] = y
@@ -174,7 +174,7 @@ function update_state!(
 
     if parameters.adaptive
         parameters.p_cr =
-            adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N)
+            adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N, options.rng)
     end
 
     resize_population!(status, parameters, options)
@@ -258,7 +258,7 @@ function initialize!(
 
 
     if parameters.adaptive
-        parameters.p_cr = rand(D)
+        parameters.p_cr = rand(options.rng, D)
     else
         parameters.p_cr = parameters.p_bin .* ones(D)
     end

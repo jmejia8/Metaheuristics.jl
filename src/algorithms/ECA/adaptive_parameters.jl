@@ -1,9 +1,9 @@
-function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64})
+function adaptCrossover(p_cr::Vector{Float64}, M::Vector{Float64}, rng = default_rng_mh())
     p_best = p_cr[argmin(M)]
 
     for i = 1:length(p_cr)
         if M[i] > 0.3
-            pn = abs(p_best .+ 0.3 * randn())
+            pn = abs(p_best .+ 0.3 * randn(rng))
             if pn > 1.0
                 pn = 1.0
             end

@@ -67,7 +67,7 @@ end
 
 
 
-function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions)
+function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions, rng = default_rng_mh())
     # at least half of the population is feasible to generate random centers
     if length(feasible_solutions) >= 0.5N || length(feasible_solutions) == 0
         return getU_ids(K, I, i, N)
@@ -82,7 +82,7 @@ function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions)
         U_ids = I[j.+1]
     end
     
-    push!(U_ids, rand(feasible_solutions))
+    push!(U_ids, rand(rng, feasible_solutions))
 
     return U_ids
 end
@@ -91,11 +91,12 @@ function crossover(
     x::Vector{Float64},
     y::Vector{Float64},
     p_cr::Vector{Float64},
+    rng = default_rng_mh()
 )
     D = length(x)
     tmp2 = zeros(D)
     for j = 1:D
-        if rand() < p_cr[j]
+        if rand(rng) < p_cr[j]
             y[j] = x[j]
             tmp2[j] += 1
         end
@@ -113,9 +114,9 @@ calculate the center of mass and `η_max` is the maximum stepsize.
 """
 function ECA_operator(
         # population::AbstractArray{xf_indiv}, K, η_max;
-        population, K, η_max;
-        i = rand(1:length(population)),
-        U = rand(population, K),
+        population, K, η_max, rng = default_rng_mh();
+        i = rand(rng, 1:length(population)),
+        U = rand(rng, population, K),
         bounds = nothing
     )
 
@@ -125,7 +126,7 @@ function ECA_operator(
     c, u_worst, u_best = center(U)
 
     # stepsize
-    η = η_max * rand()
+    η = η_max * rand(rng)
 
     # u: worst element in U
     u = get_position(U[u_worst])
@@ -135,7 +136,7 @@ function ECA_operator(
         return y
     end
 
-    evo_boundary_repairer!(y, c, bounds)
+    evo_boundary_repairer!(y, c, bounds, rng)
 
     return y
 end
