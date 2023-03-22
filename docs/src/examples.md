@@ -6,28 +6,68 @@ examples for using the implemented `Metaheuristics`.
 ## Single-Objective Optimization
 
 
-```@repl
+Firstly import this package
+
+```@example SingleObjective
 using Metaheuristics
+```
+Now, let us define the objective function to be minimized:
 
-f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x) ) # objective function
+```@example SingleObjective
+f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x) )
+```
 
-bounds = [-5ones(10) 5ones(10)]' # limits/bounds
+The search space (a.k.a. box-constraints) can be defined as follows:
 
-information = Information(f_optimum = 0.0); # information on the minimization problem
+```@example SingleObjective
+bounds = Bounds(lb = -5ones(10), ub = 5ones(10))
+```
 
-options = Options(f_calls_limit = 9000*10, f_tol = 1e-5); # generic settings
+!!! compat "Bounds in a Matrix format."
+    You can also define the bounds using `bounds = [-5ones(10) 5ones(10)]'`; however this
+    is not longer recommended.
 
-algorithm = ECA(information = information, options = options) # metaheuristic used to optimize
+It is possible to provide some information on the minimization problem.
+Let's provide the true optimum to stop the optimizer when a tolerance `f_tol` is satisfied.
 
-result = optimize(f, bounds, algorithm) # start the minimization process
+```@example SingleObjective
+information = Information(f_optimum = 0.0)
+```
 
+Generic options or settings (e.g. budget limitation, tolerances, etc) can be provided as follows:
 
+```@example SingleObjective
+options = Options(f_calls_limit = 9000*10, f_tol = 1e-5, seed=1)
+```
+
+Now, we can provide the Information and Options to the optimizer (ECA in this example).
+
+```@example SingleObjective
+algorithm = ECA(information = information, options = options)
+```
+
+Now, the optimization is performed as follows:
+
+```@example SingleObjective
+result = optimize(f, bounds, algorithm)
+```
+
+The minimum and minimizer:
+
+```@example SingleObjective
 minimum(result)
+```
+
+```@example SingleObjective
 minimizer(result)
+```
 
 
-result = optimize(f, bounds, algorithm) # note that second run is faster
+!!! compat "Second run is faster"
+    As you may know, the second run is faster:
 
+```@example SingleObjective
+result = optimize(f, bounds, algorithm)
 ```
 
 ## Constrained Optimization
@@ -81,6 +121,7 @@ you need to provide constraints if they exist, otherwise put `gx = [0.0]; hx = [
 to indicate an unconstrained multiobjective problem.
 
 ```@repl
+using UnicodePlots # to visualize in console (optional)
 using Metaheuristics
 
 function f(x)
