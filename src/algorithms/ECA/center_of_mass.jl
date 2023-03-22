@@ -27,13 +27,7 @@ end
 
 
 function center(U, mass)
-    d = length(U[1].x)
-
-    c = zeros(Float64, d)
-
-    for i = 1:length(mass)
-        c += mass[i] .* U[i].x
-    end
+    c = sum(m * get_position(u) for (m, u) in zip(mass, U))
 
     return c / sum(mass)
 end
