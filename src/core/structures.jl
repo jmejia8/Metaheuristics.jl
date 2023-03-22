@@ -43,7 +43,6 @@ end
 function Base.getproperty(obj::Problem, sym::Symbol)
     if sym === :bounds
         @warn "`bounds` property is deprecated. Use `search_space` instead"
-        error("bounds")
         se = obj.search_space
         return Array([se.lb se.ub]')
     else # fallback to getfield

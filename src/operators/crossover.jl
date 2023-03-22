@@ -96,6 +96,11 @@ function SBX_crossover(vector1, vector2, bounds::Bounds, η=15, p_variable = 0.9
     return cc1, cc2
 end
 
+function SBX_crossover(vector1, vector2, bounds::AbstractMatrix, η=15, p_variable = 0.9)
+    b = Bounds(lb = bounds[1,:], ub = bounds[2,:])
+    SBX_crossover(vector1, vector2, b, η, p_variable)
+end
+
 """
     SBX(;η, p, bounds)
 

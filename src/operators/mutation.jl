@@ -71,6 +71,11 @@ function polynomial_mutation!(vector, bounds::Bounds, η=20, prob = 1 / length(v
     vector
 end
 
+function polynomial_mutation!(vector, bounds::AbstractMatrix, η=20, prob = 1 / length(vector))
+    b = Bounds(lb = bounds[1,:], ub = bounds[2,:])
+    polynomial_mutation!(vector, b, η, prob)
+end
+
 """
     PolynomialMutation(;η, p, bounds)
 

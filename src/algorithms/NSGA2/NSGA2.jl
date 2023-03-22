@@ -176,6 +176,17 @@ function GA_reproduction_half(pa::AbstractVector{T},
     return c
 end
 
+function GA_reproduction_half(pa::AbstractVector{T},
+        pb::AbstractVector{T},
+        bounds::AbstractMatrix;
+        kargs...
+    ) where T <: AbstractFloat
+
+    b = Bounds(lb = bounds[1,:], ub = bounds[2,:])
+    GA_reproduction_half(pa, pb, b; kargs...)
+
+end
+
 function reproduction(pa, pb, parameters::AbstractNSGA, problem)
     # crossover and mutation
     c1, c2 = GA_reproduction(get_position(pa),
