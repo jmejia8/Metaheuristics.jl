@@ -130,13 +130,13 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 ```
 
 """
-function create_child(x, fResult::Real;ε=0.0)
+function create_child(x, fResult::T;ε=0.0) where T <: Real
     return xf_solution(x, Float64(fResult))
 end
 
 # constrained single objective
 function create_child(x,
-        fResult::Tuple{Real,Array{Real,1},Array{Real,1}};
+        fResult::Tuple{Real,Array{<:Real,1},Array{<:Real,1}};
         ε=0.0
     )
     f, g, h = fResult
@@ -147,7 +147,7 @@ end
 
 # constrained multi-objective
 function create_child(x,
-        fResult::Tuple{Array{Real,1},Array{Float64,1},Array{Float64,1}};
+        fResult::Tuple{Vector{<:Real},Vector{<:Real},Vector{<:Real}};
         ε = 0.0
     )
     f, g, h = fResult
@@ -226,11 +226,13 @@ function create_child(X::AbstractMatrix,
 end
 
 
+#=
 function create_child(X::AbstractMatrix, fResult; ε=0.0)
     error("""Objective function should return either a Vector or a Tuple depending on the problem.
           Current output: $fResult of type $(typeof(fResult))
           Examples on parallelization at https://jmejia8.github.io/Metaheuristics.jl/stable/tutorials/parallelization""")
 end
+=#
 
 
 function create_child(x, fResult; ε = 0.0)
