@@ -2,6 +2,8 @@ _mat_to_bounds(bounds::AbstractMatrix) = Bounds(lb=bounds[1,:], ub=bounds[2,:])
 
 
 function reflected_back_to_bound!(x, bounds::Bounds)
+    !bounds.rigid && (return x)
+
     for i in 1:getdim(bounds)
         l = bounds.lb[i]
         u = bounds.ub[i]
@@ -17,6 +19,7 @@ reflected_back_to_bound!(x, bounds::AbstractMatrix) = reflected_back_to_bound!(x
 
 
 function replace_with_random_in_bounds!(x, bounds::Bounds)
+    !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
     Δ = bounds.Δ
@@ -31,6 +34,7 @@ end
 replace_with_random_in_bounds!(x, bounds::AbstractMatrix) = replace_with_random_in_bounds!(x, _mat_to_bounds(bounds))
 
 function wrap_to_bounds!(x, bounds::Bounds)
+    !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
     for i in 1:getdim(bounds)
@@ -47,6 +51,7 @@ end
 wrap_to_bounds!(x, bounds::AbstractMatrix) = wrap_to_bounds!(x, _mat_to_bounds(bounds))
 
 function reset_to_violated_bounds!(x, bounds::Bounds)
+    !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
     for i in 1:getdim(bounds)
@@ -64,6 +69,7 @@ end
 reset_to_violated_bounds!(x, bounds::AbstractMatrix) = reset_to_violated_bounds!(x, _mat_to_bounds(bounds))
 
 function evo_boundary_repairer!(x, x_best, bounds::Bounds)          
+    !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
     for i in 1:getdim(bounds)
