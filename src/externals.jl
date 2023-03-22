@@ -8,8 +8,9 @@ import Base.minimum
 
 using JMcDM
 using Requires
+using Reexport
 
-using SearchSpaces
+@reexport using SearchSpaces
 import SearchSpaces: AbstractSearchSpace, getdim
 
 function __init__()
