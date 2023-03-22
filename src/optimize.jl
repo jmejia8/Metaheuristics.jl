@@ -40,7 +40,7 @@ function optimize(
         logger::Function = (status) -> nothing,
     )
 
-    method = deepcopy(method)
+    # TODO: method = deepcopy(method)
 
 
     #####################################
