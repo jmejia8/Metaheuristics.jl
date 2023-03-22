@@ -225,6 +225,21 @@ function create_child(X::AbstractMatrix,
     population
 end
 
+
+function create_child(X::AbstractMatrix, fResult; ε=0.0)
+    error("""Objective function should return either a Vector or a Tuple depending on the problem.
+          Current output: $fResult of type $(typeof(fResult))
+          Examples on parallelization at https://jmejia8.github.io/Metaheuristics.jl/stable/tutorials/parallelization""")
+end
+
+
+function create_child(x, fResult; ε = 0.0)
+    error("""
+          Objective function should return either a numerical value or a Tuple depending on the problem.
+          Current output:  $fResult of type $(typeof(fResult))
+          Examples at https://jmejia8.github.io/Metaheuristics.jl/stable/examples""")
+end
+
 ##########################################################3
 
 function _gen_X(N, bounds::Bounds{T}) where T <: AbstractFloat 
