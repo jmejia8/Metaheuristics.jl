@@ -16,7 +16,7 @@ High-performance metaheuristics for global optimization.
 
 ## Installation
 
-Open the Julia REPL (v1.1 or later) and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 ```
 pkg> add Metaheuristics
@@ -113,6 +113,8 @@ upper bounds.
 D = 10
 bounds = [-5ones(D) 5ones(D)]'
 ```
+
+Newer versions (3.3.x and above) accept `bounds = Bounds(lb = -5ones(D), ub = 5ones(D))`.
 
 Approximate the optimum using the function `optimize`.
 
