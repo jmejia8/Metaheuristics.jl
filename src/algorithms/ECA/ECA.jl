@@ -264,7 +264,6 @@ function initialize!(
     end
 
 
-    # initialize!(problem, nothing, parameters, status, information, options)
     st = gen_initial_state(problem,parameters,information,options, status)
     st
 
