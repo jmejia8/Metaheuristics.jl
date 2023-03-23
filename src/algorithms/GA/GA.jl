@@ -153,6 +153,40 @@ function GA(;
     )
 end
 
+# this method is called in src/optimize.jl
+function set_parameters!(
+        f,
+        search_space::Bounds, # real/integer encoding
+        ::Type{T}
+    ) where T <: GA 
+    
+    N = 100
+    GA(;
+        N = N,
+        initializer = RandomInBounds(;N),
+        selection   = TournamentSelection(;N),
+        crossover   = SBX(;bounds=search_space),
+        mutation    = PolynomialMutation(;bounds=search_space),
+        environmental_selection = ElitistReplacement()
+      )
+end
+
+
+function set_parameters!(
+        f,
+        search_space::Permutations, # permutation-based encoding
+        ::Type{T}
+    ) where T <: GA
+
+    GA(;
+       N = 100,
+       initializer = RandomPermutation(;N),
+       selection   = TournamentSelection(;N),
+       crossover   = OrderCrossover(),
+       mutation    = SlightMutation(),
+       environmental_selection = ElitistReplacement()
+    )
+end
 
 function initialize!(
         status,

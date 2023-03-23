@@ -226,3 +226,34 @@ function optimize!(
 
     return method
 end
+
+"""
+    set_parameters!(f, search_space, T)
+
+Set default parameters regarding f and the search_space.
+"""
+set_parameters!(f, search_space, ::Type{T}) where T <: AbstractParameters = T()
+
+
+# TODO: deprecate this method
+function set_parameters!(
+        f,
+        b::AbstractMatrix,
+        ::Type{T}
+    ) where T <: AbstractParameters
+    search_space = _mat_to_bounds(b)
+    set_parameters!(f, search_space, T)
+end
+
+function optimize(
+        f::Function,
+        search_space,
+        ::Type{T};
+        kargs...
+    ) where T <: AbstractParameters
+
+    # configure parameters depending on the search_space
+    algo = set_parameters!(f, search_space, T)
+    # call optimize api
+    optimize(f, search_space, algo; kargs...)
+end
