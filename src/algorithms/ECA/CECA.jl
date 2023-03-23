@@ -52,7 +52,7 @@ function update_state!(
         mask = rand(options.rng, length(y)) .< 1.0 / length(y)
         y[mask] = v[mask]
 
-        evo_boundary_repairer!(y, c, problem.search_space, rng)
+        evo_boundary_repairer!(y, c, problem.search_space, options.rng)
         X_next[i,:] = y
     end
 

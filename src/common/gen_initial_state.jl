@@ -29,7 +29,7 @@ end
 
 function gen_initial_state(problem,parameters,information,options)
     # population array
-    population = generate_population(parameters.N, problem,ε=options.h_tol)
+    population = generate_population(parameters.N, problem, options.rng,ε=options.h_tol)
 
     # best solution
     best_solution = get_best(population)

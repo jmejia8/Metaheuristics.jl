@@ -1,3 +1,4 @@
+import Random
 import Random: randperm, shuffle!, shuffle, seed!
 import Printf.@printf
 import LinearAlgebra
@@ -9,6 +10,8 @@ import Base.minimum
 using JMcDM
 using Requires
 using Reexport
+
+# Base.rand(x::Int) = error("adfd")
 
 @reexport using SearchSpaces
 import SearchSpaces: AbstractSearchSpace, getdim

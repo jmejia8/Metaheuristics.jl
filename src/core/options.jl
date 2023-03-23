@@ -1,3 +1,5 @@
+default_rng_mh(seed=1223334444) = Random.default_rng(Int(seed))
+
 #####################################################
 #
 #         STRUCTURES FOR THE OPTIONS
@@ -20,6 +22,7 @@ mutable struct Options
     search_type::Symbol
     seed::UInt
     parallel_evaluation::Bool
+    rng
 end
 
 """
@@ -53,6 +56,8 @@ Main properties:
 - `store_convergence` if `true`, then push the current `State` in `State.convergence` at each generation/iteration
 - `debug` if `true`, then `optimize` function reports the current `State` (and interest information) for each iterations.
 - `seed` non-negative integer for the random generator seed.
+- `parallel_evaluation` enables batch evaluations.
+- `rng` user-defined Random Number Generator.
 
 # Example
 
@@ -108,7 +113,8 @@ function Options(;
         debug = false,
         search_type = :minimize,
         parallel_evaluation = false,
-        seed = rand(UInt)
+        seed = rand(UInt32),
+        rng = Random.Xoshiro(seed)#default_rng_mh(seed),
     )
 
 
@@ -120,7 +126,8 @@ function Options(;
             promote(store_convergence, show_results, debug)...,
             Symbol(search_type),
             UInt(seed),
-            Bool(parallel_evaluation)
+            Bool(parallel_evaluation),
+            rng
            )
 
 end

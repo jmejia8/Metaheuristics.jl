@@ -18,14 +18,14 @@ end
 reflected_back_to_bound!(x, bounds::AbstractMatrix) = reflected_back_to_bound!(x, _mat_to_bounds(bounds))
 
 
-function replace_with_random_in_bounds!(x, bounds::Bounds)
+function replace_with_random_in_bounds!(x, bounds::Bounds, rng = default_rng_mh())
     !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
     Δ = bounds.Δ
     for i in 1:getdim(bounds)
         if !( lb[i] <= x[i] <= ub[i] )
-            x[i] = lb[i] + rand() * Δ[i]
+            x[i] = lb[i] + rand(rng) * Δ[i]
         end
     end
     x
@@ -68,7 +68,7 @@ function reset_to_violated_bounds!(x, bounds::Bounds)
 end
 reset_to_violated_bounds!(x, bounds::AbstractMatrix) = reset_to_violated_bounds!(x, _mat_to_bounds(bounds))
 
-function evo_boundary_repairer!(x, x_best, bounds::Bounds)          
+function evo_boundary_repairer!(x, x_best, bounds::Bounds, rng=default_rng_mh())
     !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
@@ -76,17 +76,17 @@ function evo_boundary_repairer!(x, x_best, bounds::Bounds)
         l = lb[i]
         u = ub[i]
         if l > x[i]
-            α = rand()
+            α = rand(rng)
             x[i] =  α*l + (1.0 - α) * x_best[i]
         elseif x[i] > u  
-            β = rand()
+            β = rand(rng)
             x[i] =  β*u + (1.0 - β) * x_best[i]
         end
 
     end
     x  
 end
-evo_boundary_repairer!(x, x_best, bounds::AbstractMatrix) = evo_boundary_repairer!(x, x_best, _mat_to_bounds(bounds))
+evo_boundary_repairer!(x, x_best, bounds::AbstractMatrix, rng=default_rng_mh()) = evo_boundary_repairer!(x, x_best, _mat_to_bounds(bounds), rng)
 
 
 function is_in_bounds(x, bounds::Bounds) 
