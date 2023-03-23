@@ -58,7 +58,7 @@ function initialize!(
     elite_sols = sortperm(status.population, lt = is_better)
 
     θ = round(Int, 0.2length(elite_sols))
-    s = rand(status.population[elite_sols[1:θ]])
+    s = rand(options.rng, status.population[elite_sols[1:θ]])
     
     parameters.ε_0 = sum_violations(s)
     parameters.Tc = round(Int, 0.2*options.iterations)

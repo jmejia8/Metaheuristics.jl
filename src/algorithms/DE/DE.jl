@@ -96,14 +96,15 @@ function update_state!(
     CR = parameters.CR
 
 
+    rng = options.rng
     # stepsize
     if parameters.F_min < parameters.F_max
-        F = parameters.F_min + (F_max - parameters.F_min) * rand()
+        F = parameters.F_min + (F_max - parameters.F_min) * rand(rng)
     end
 
     if parameters.CR_min < parameters.CR_max
         CR =
-        parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand()
+        parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand(rng)
     end
 
     new_vectors = reproduction(status, parameters, problem)
