@@ -5,17 +5,18 @@ There can never be more than one queen on a chess row, column or diagonal becaus
 
 ## Solution Representation
 
-A naive representation is to use a binary representation of the chessboard $c_{ij}$
+A naive representation is to use a binary matrix to represent a chessboard $c_{ij}$
 where $c_{ij}=1$ would indicate a queen in row $i$ and column $j$; however the search
-space cardinality is huge for this representation.
+space cardinality (number of solutions) is huge for this representation.
 A permutation-based representation can be used instead.
 A permutation will contain in position $j$ the row $i$ where a queen is, removing a lot of
 infeasible solutions (queens attacking horizontally and vertically).
 
+Let's compute the number of solutions (a.k.a. cardinality):
 
 ```@repl
 using Metaheuristics
-N = 8 # queens
+N = 8 # for 8-queens
 cardinality(BitArrays(N*N))
 cardinality(Permutations(N))
 ```
@@ -34,9 +35,9 @@ function attacks(chessboard)
         Δrows = i + chessboard[i]
         Δcols = i - chessboard[i]
         for j = (i+1):N
-            # check diagona [\]
+            # check diagonal [\]
             n_attacks +=  j + chessboard[j] == Δrows ? 1 : 0
-            # check diagona [/]
+            # check inverse diagonal [/]
             n_attacks +=  j - chessboard[j] == Δcols ? 1 : 0
         end
     end
@@ -55,6 +56,7 @@ To minimize the number of attacks, let's use a Genetic Algorithm:
 ```@example queens
 using Metaheuristics # hide
 N = 8
+optimize(attacks, Permutations(N), GA); # hide
 result = optimize(attacks, Permutations(N), GA)
 ```
 
@@ -78,3 +80,20 @@ for (i,j) = enumerate(perm); chessboard[i,j] = true;end
 chessboard
 ```
 
+## The 20-queens case
+
+```@example queens
+N = 20
+perm = optimize(attacks, Permutations(N), GA) |> minimizer
+```
+
+```@example queens
+attacks(perm)
+```
+
+
+```@example queens
+chessboard = zeros(Bool, N, N)
+for (i,j) = enumerate(perm); chessboard[i,j] = true;end
+chessboard
+```
