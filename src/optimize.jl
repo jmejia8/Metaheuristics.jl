@@ -228,21 +228,27 @@ function optimize!(
 end
 
 """
-    set_parameters!(f, search_space, T)
+    get_parameters(f, search_space, H)
 
-Set default parameters regarding f and the search_space.
+Get default parameters for metaheuristic `H` regarding f and the search_space.
+
+### Example
+
+```julia
+ga = Metaheuristics.get_parameters(f, Permutations(10), GA)
+```
 """
-set_parameters!(f, search_space, ::Type{T}) where T <: AbstractParameters = T()
+get_parameters(f, search_space, ::Type{T}) where T <: AbstractParameters = T()
 
 
 # TODO: deprecate this method
-function set_parameters!(
+function get_parameters(
         f,
         b::AbstractMatrix,
         ::Type{T}
     ) where T <: AbstractParameters
     search_space = _mat_to_bounds(b)
-    set_parameters!(f, search_space, T)
+    get_parameters(f, search_space, T)
 end
 
 function optimize(
@@ -253,7 +259,7 @@ function optimize(
     ) where T <: AbstractParameters
 
     # configure parameters depending on the search_space
-    algo = set_parameters!(f, search_space, T)
+    algo = get_parameters(f, search_space, T)
     # call optimize api
     optimize(f, search_space, algo; kargs...)
 end

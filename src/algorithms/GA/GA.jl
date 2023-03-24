@@ -154,7 +154,7 @@ function GA(;
 end
 
 # this method is called in src/optimize.jl
-function set_parameters!(
+function get_parameters(
         f,
         search_space::Bounds, # real/integer encoding
         ::Type{T}
@@ -172,14 +172,15 @@ function set_parameters!(
 end
 
 
-function set_parameters!(
+function get_parameters(
         f,
         search_space::Permutations, # permutation-based encoding
         ::Type{T}
     ) where T <: GA
 
+    N = 100
     GA(;
-       N = 100,
+       N = N,
        initializer = RandomPermutation(;N),
        selection   = TournamentSelection(;N),
        crossover   = OrderCrossover(),
