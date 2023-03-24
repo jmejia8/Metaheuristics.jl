@@ -19,6 +19,7 @@ makedocs(
                                   "tutorials/simple-tutorial.md",
                                   "tutorials/create-metaheuristic.md",
                                   "tutorials/parallelization.md",
+                                  "tutorials/n-queens.md",
                                  ],
                   "Examples" =>  "examples.md",
                   "Algorithms" => "algorithms.md",
