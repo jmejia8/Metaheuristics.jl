@@ -22,7 +22,7 @@ export GA, RandomInBounds, RandomBinary, RandomPermutation
 export TournamentSelection, RouletteWheelSelection
 export UniformCrossover, OrderCrossover, SBX
 export BitFlipMutation, SlightMutation, PolynomialMutation
-export GenerationalReplacement, ElitistReplacement
+export GenerationalReplacement, ElitistReplacement, RankAndCrowding
 export sample, LatinHypercubeSampling, Grid 
 export εDE, Restart
 export optimize!
