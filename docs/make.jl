@@ -28,6 +28,7 @@ makedocs(
                   "Multi-Criteria Decision Making" => "mcdm.md",
                   "Visualization" => "visualization.md",
                   "API References" => "api.md",
+                  "FAQ" => "faq.md",
                   "Contributing" => "contributing.md",
                   "References" => "references.md",
                  ]

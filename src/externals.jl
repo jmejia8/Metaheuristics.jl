@@ -11,8 +11,6 @@ using JMcDM
 using Requires
 using Reexport
 
-# Base.rand(x::Int) = error("adfd")
-
 @reexport using SearchSpaces
 import SearchSpaces: AbstractSearchSpace, getdim
 

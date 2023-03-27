@@ -24,7 +24,7 @@ cardinality(Permutations(N))
 ## Objective Function
 
 It is necessary to minimize the number of attacks, the following objective function is
-proposed:
+proposed to this end:
 
 ```@example queens
 function attacks(chessboard)
