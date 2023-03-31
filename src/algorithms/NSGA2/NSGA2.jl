@@ -120,7 +120,7 @@ offspring. Return two vectors.
 """
 function GA_reproduction(pa::AbstractVector{T},
         pb::AbstractVector{T},
-        bounds::Bounds;
+        bounds::BoxConstrainedSpace;
         η_cr = 20,
         η_m  = 15,
         p_cr = 0.9,
@@ -156,7 +156,7 @@ Same that `GA_reproduction` but only returns one offspring.
 """
 function GA_reproduction_half(pa::AbstractVector{T},
         pb::AbstractVector{T},
-        bounds::Bounds;
+        bounds::BoxConstrainedSpace;
         η_cr = 20,
         η_m  = 15,
         p_cr = 0.9,
@@ -182,7 +182,7 @@ function GA_reproduction_half(pa::AbstractVector{T},
         kargs...
     ) where T <: AbstractFloat
 
-    b = Bounds(lb = bounds[1,:], ub = bounds[2,:])
+    b = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
     GA_reproduction_half(pa, pb, b; kargs...)
 
 end

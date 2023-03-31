@@ -252,7 +252,7 @@ Perform Differential Evolution operators and polynomial mutation using three vec
 `a, b, c` and parameters `F, CR, p_m, η`, i.e., stepsize, crossover and
 mutation probability.
 """
-function MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds::Bounds)
+function MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds::BoxConstrainedSpace)
     D = length(a)
     # binomial crossover
     v = zeros(length(a))

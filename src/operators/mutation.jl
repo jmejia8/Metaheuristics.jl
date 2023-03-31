@@ -46,7 +46,7 @@ end
 
 Polynomial Mutation applied to a vector of real numbers.
 """
-function polynomial_mutation!(vector, bounds::Bounds, η=20, prob = 1 / length(vector))
+function polynomial_mutation!(vector, bounds::BoxConstrainedSpace, η=20, prob = 1 / length(vector))
     do_mutation = rand(length(vector)) .< prob
 
     xu = view(bounds.ub, do_mutation)
@@ -72,7 +72,7 @@ function polynomial_mutation!(vector, bounds::Bounds, η=20, prob = 1 / length(v
 end
 
 function polynomial_mutation!(vector, bounds::AbstractMatrix, η=20, prob = 1 / length(vector))
-    b = Bounds(lb = bounds[1,:], ub = bounds[2,:])
+    b = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
     polynomial_mutation!(vector, b, η, prob)
 end
 

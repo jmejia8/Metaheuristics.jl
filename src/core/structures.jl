@@ -66,7 +66,7 @@ function Problem(f::Function, bounds::AbstractMatrix{T}; kargs...) where T <: Nu
         bounds = Array(bounds')
     end
 
-    Problem(f, Bounds(lb = bounds[1,:], ub = bounds[2,:]); kargs...)
+    Problem(f, BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:]); kargs...)
 end
 
 

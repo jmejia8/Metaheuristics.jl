@@ -54,7 +54,7 @@ end
 
 Simulated binomial crossover for given two `Vectors{Real}`.
 """
-function SBX_crossover(vector1, vector2, bounds::Bounds, η=15, p_variable = 0.9)
+function SBX_crossover(vector1, vector2, bounds::BoxConstrainedSpace, η=15, p_variable = 0.9)
     xu = bounds.ub
     xl = bounds.lb
     D = getdim(bounds)
@@ -97,7 +97,7 @@ function SBX_crossover(vector1, vector2, bounds::Bounds, η=15, p_variable = 0.9
 end
 
 function SBX_crossover(vector1, vector2, bounds::AbstractMatrix, η=15, p_variable = 0.9)
-    b = Bounds(lb = bounds[1,:], ub = bounds[2,:])
+    b = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
     SBX_crossover(vector1, vector2, b, η, p_variable)
 end
 

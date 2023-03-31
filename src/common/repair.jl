@@ -1,7 +1,7 @@
-_mat_to_bounds(bounds::AbstractMatrix) = Bounds(lb=bounds[1,:], ub=bounds[2,:])
+_mat_to_bounds(bounds::AbstractMatrix) = BoxConstrainedSpace(lb=bounds[1,:], ub=bounds[2,:])
 
 
-function reflected_back_to_bound!(x, bounds::Bounds)
+function reflected_back_to_bound!(x, bounds::BoxConstrainedSpace)
     !bounds.rigid && (return x)
 
     for i in 1:getdim(bounds)
@@ -18,7 +18,7 @@ end
 reflected_back_to_bound!(x, bounds::AbstractMatrix) = reflected_back_to_bound!(x, _mat_to_bounds(bounds))
 
 
-function replace_with_random_in_bounds!(x, bounds::Bounds, rng = default_rng_mh())
+function replace_with_random_in_bounds!(x, bounds::BoxConstrainedSpace, rng = default_rng_mh())
     !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
@@ -33,7 +33,7 @@ end
 
 replace_with_random_in_bounds!(x, bounds::AbstractMatrix) = replace_with_random_in_bounds!(x, _mat_to_bounds(bounds))
 
-function wrap_to_bounds!(x, bounds::Bounds)
+function wrap_to_bounds!(x, bounds::BoxConstrainedSpace)
     !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
@@ -50,7 +50,7 @@ function wrap_to_bounds!(x, bounds::Bounds)
 end
 wrap_to_bounds!(x, bounds::AbstractMatrix) = wrap_to_bounds!(x, _mat_to_bounds(bounds))
 
-function reset_to_violated_bounds!(x, bounds::Bounds)
+function reset_to_violated_bounds!(x, bounds::BoxConstrainedSpace)
     !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
@@ -68,7 +68,7 @@ function reset_to_violated_bounds!(x, bounds::Bounds)
 end
 reset_to_violated_bounds!(x, bounds::AbstractMatrix) = reset_to_violated_bounds!(x, _mat_to_bounds(bounds))
 
-function evo_boundary_repairer!(x, x_best, bounds::Bounds, rng=default_rng_mh())
+function evo_boundary_repairer!(x, x_best, bounds::BoxConstrainedSpace, rng=default_rng_mh())
     !bounds.rigid && (return x)
     lb = bounds.lb
     ub = bounds.ub
@@ -89,7 +89,7 @@ end
 evo_boundary_repairer!(x, x_best, bounds::AbstractMatrix, rng=default_rng_mh()) = evo_boundary_repairer!(x, x_best, _mat_to_bounds(bounds), rng)
 
 
-function is_in_bounds(x, bounds::Bounds) 
+function is_in_bounds(x, bounds::BoxConstrainedSpace) 
     for i in 1:getdim(bounds)
         l = bounds.lb[i]
         u = bounds.ub[i]

@@ -41,7 +41,7 @@ f (generic function with 1 method)
 
 julia> dim = 10;
 
-julia> optimize(f, BitArrays(dim), GA())
+julia> optimize(f, BitArraySpace(dim), GA())
 +=========== RESULT ==========+
   iteration: 500
     minimum: 0
@@ -62,7 +62,7 @@ julia> perm_size = 10;
 
 julia> ga = GA(;initializer = RandomPermutation(N=100), crossover=OrderCrossover(), mutation=SlightMutation());
 
-julia> optimize(f, Permutations(perm_size), ga)
+julia> optimize(f, PermutationSpace(perm_size), ga)
 +=========== RESULT ==========+
   iteration: 500
     minimum: 0
@@ -156,7 +156,7 @@ end
 # this method is called in src/optimize.jl
 function get_parameters(
         f,
-        search_space::Bounds, # real/integer encoding
+        search_space::BoxConstrainedSpace, # real/integer encoding
         ::Type{T}
     ) where T <: GA 
     
@@ -174,7 +174,7 @@ end
 
 function get_parameters(
         f,
-        search_space::Permutations, # permutation-based encoding
+        search_space::PermutationSpace, # permutation-based encoding
         ::Type{T}
     ) where T <: GA
 

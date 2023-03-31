@@ -244,13 +244,13 @@ end
 
 ##########################################################3
 
-function _gen_X(N, bounds::Bounds{T}, rng = default_rng_mh()) where T <: AbstractFloat 
+function _gen_X(N, bounds::BoxConstrainedSpace{T}, rng = default_rng_mh()) where T <: AbstractFloat 
     a = bounds.lb'
     D = SearchSpaces.getdim(bounds)
     a .+ (bounds.Δ') .* rand(rng, T, N, D)
 end
 
-function _gen_X(N, bounds::Bounds{T}, rng = default_rng_mh()) where T <: Integer
+function _gen_X(N, bounds::BoxConstrainedSpace{T}, rng = default_rng_mh()) where T <: Integer
     a = bounds.lb'
     b = bounds.ub'
     D = SearchSpaces.getdim(bounds)
@@ -262,7 +262,7 @@ function _gen_X(N, bounds::Bounds{T}, rng = default_rng_mh()) where T <: Integer
     return X
 end
 
-function _gen_X(N, search_space::BitArrays, rng = default_rng_mh())
+function _gen_X(N, search_space::BitArraySpace, rng = default_rng_mh())
     rand(rng, Bool, N, SearchSpaces.getdim(search_space))
 end
 
