@@ -12,7 +12,8 @@ using Requires
 using Reexport
 
 @reexport using SearchSpaces
-import SearchSpaces: AbstractSearchSpace, getdim
+import SearchSpaces: AbstractSearchSpace,getdim
+import SearchSpaces: AtomicSearchSpace, AbstractSampler, Sampler
 
 function __init__()
     @require UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228" begin

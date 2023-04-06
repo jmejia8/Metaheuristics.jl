@@ -244,39 +244,16 @@ end
 
 ##########################################################3
 
-function _gen_X(N, bounds::BoxConstrainedSpace{T}, rng = default_rng_mh()) where T <: AbstractFloat 
-    a = bounds.lb'
-    D = SearchSpaces.getdim(bounds)
-    a .+ (bounds.Δ') .* rand(rng, T, N, D)
-end
-
-function _gen_X(N, bounds::BoxConstrainedSpace{T}, rng = default_rng_mh()) where T <: Integer
-    a = bounds.lb'
-    b = bounds.ub'
-    D = SearchSpaces.getdim(bounds)
-
-    X = zeros(T, N, D)
-    for i in 1:D
-        X[:,i] = rand(rng, a[i]:b[i], N)
-    end
-    return X
-end
-
-function _gen_X(N, search_space::BitArraySpace, rng = default_rng_mh())
-    rand(rng, Bool, N, SearchSpaces.getdim(search_space))
-end
-
-
 function generate_population(N::Int, problem, rng = default_rng_mh();ε=0.0, parallel_evaluation = false)
-    X = _gen_X(N, problem.search_space, rng)
+
+    space = problem.search_space
 
     if problem.parallel_evaluation
+        X = sample(RandomSampler(space; rng), N)
         return create_solutions(X, problem; ε=ε)
     end
     
-    population = [ create_solution(X[i,:], problem; ε=ε) for i in 1:N]
-
-    return population
+    [create_solution(x, problem; ε=ε) for x in rand(rng, space, N)]
 end
 
 
