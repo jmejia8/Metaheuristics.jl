@@ -71,7 +71,7 @@ end
 
 
 function Problem(f::Function, bounds::Array{Bool,2}; kargs...)
-    Problem(f, BitArrays(size(bounds,2)); kargs...)
+    Problem(f, BitArraySpace(size(bounds,2)); kargs...)
 end
 
 function evaluate(x, problem::Problem)

@@ -21,7 +21,7 @@ Distances = "^0.10.7"
 JMcDM = "^0.7.1"
 Reexport = "^1"
 Requires = "1"
-SearchSpaces = "^0.1.2"
+SearchSpaces = "^0.2"
 SnoopPrecompile = "1"
 julia = "^1.7"
 
