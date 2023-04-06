@@ -17,8 +17,8 @@ Let's compute the number of solutions (a.k.a. cardinality):
 ```@repl
 using Metaheuristics
 N = 8 # for 8-queens
-cardinality(BitArrays(N*N))
-cardinality(Permutations(N))
+cardinality(BitArraySpace(N*N))
+cardinality(PermutationSpace(N))
 ```
 
 ## Objective Function
@@ -56,8 +56,8 @@ To minimize the number of attacks, let's use a Genetic Algorithm:
 ```@example queens
 using Metaheuristics # hide
 N = 8
-optimize(attacks, Permutations(N), GA); # hide
-result = optimize(attacks, Permutations(N), GA)
+optimize(attacks, PermutationSpace(N), GA); # hide
+result = optimize(attacks, PermutationSpace(N), GA)
 ```
 
 It can be observed that the number of attacks is:
@@ -84,7 +84,7 @@ chessboard
 
 ```@example queens
 N = 20
-perm = optimize(attacks, Permutations(N), GA) |> minimizer
+perm = optimize(attacks, PermutationSpace(N), GA) |> minimizer
 ```
 
 ```@example queens

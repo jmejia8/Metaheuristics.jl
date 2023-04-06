@@ -16,21 +16,22 @@ Note that the global optimum is obtained when $x_i = 0$ for all $i$. Thus, $\min
 
 Objective function:
 
-```julia
+```@example julia
+using Metaheuristics # hide
 f(x) = 10length(x) + sum( x.^2 - 10cos.(2pi*x) )
 ```
 
 Bounds:
 
-```julia
-bounds = [-5ones(10) 5ones(10)]'
+```@example julia
+bounds = BoxConstrainedSpace(lb = -5ones(10), ub = 5ones(10))
 ```
 
 ## Providing Information
 
 Since the optimum is known, then we can provide this information to the optimizer.
 
-```julia
+```@example julia
 information = Information(f_optimum = 0.0)
 ```
 
@@ -41,8 +42,9 @@ of function evaluations. To do that, let's assume that the metaheuristic should 
 $9000D$ times the objective function. Moreover, since `information` is provided, then we
 can set the desired accuracy ($|f(x) - f(x^*)| $) to $10^{-5}$.
 
-```julia
-options = Options(f_calls_limit = 9000*10, f_tol = 1e-5)
+```@example julia
+options = Options(f_calls_limit = 9000*10, f_tol = 1e-5);
+nothing # hide
 ```
 
 ## Choose a Metaheuristic
@@ -55,7 +57,7 @@ algorithm following the same steps.
 The metaheuristics accept their parameters but share two common and **optional** settings
 `information` and `options`.
 
-```julia
+```@example julia
 algorithm = ECA(information = information, options = options)
 ```
 
@@ -67,23 +69,23 @@ algorithm = ECA(information = information, options = options)
 Now, we are able to approximate the optimum. To do that it is necessary to use the `optimize`
 function as follows:
 
-```julia
+```@example julia
 result = optimize(f, bounds, algorithm)
 ```
 
 ## Get the Results
 
-Once `optimize` stops, we can get the approximate solutions.
+Once [`optimize`](@ref) stops, we can get the approximate solutions.
 
 Approximated minimum:
 
-```julia
+```@example julia
 fx = minimum(result)
 ```
 
 Approximated minimizer:
 
-```julia
+```@example julia
 x = minimizer(result)
 ```
 
@@ -97,7 +99,7 @@ get their positions.
 
 We recommend you wrap your program in a function for performance purposes:
 
-```julia
+```@example julia
 using Metaheuristics
 
 function main()
@@ -105,7 +107,7 @@ function main()
     f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x) )
     
     # limits/bounds
-    bounds = [-5ones(10) 5ones(10)]'
+    bounds = BoxConstrainedSpace(lb = -5ones(10), ub = 5ones(10))
     
     # information on the minimization problem
     information = Information(f_optimum = 0.0)
@@ -119,14 +121,13 @@ function main()
     # start the minimization process
     result = optimize(f, bounds, algorithm)
 
-    
     fx = minimum(result)
     x = minimizer(result)
 
-    @show fx
-    @show x
+    x, fx
 end
 
+main()
 ```
 
 ## Summary
