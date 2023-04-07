@@ -9,6 +9,7 @@ mutable struct xf_solution{X} <: AbstractUnconstrainedSolution # Single Objectiv
 end
 
 const xf_indiv = xf_solution{Vector{Float64}}
+include("utils.jl")
 
 # Single Objective Constrained
 mutable struct xfgh_solution{X} <: AbstractConstrainedSolution 
@@ -310,17 +311,19 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 generateChild(x, fx) = create_child(x, fx)
 
 function create_solution(x::AbstractVector, problem::Problem; ε=0.0)
+    xx = _fix_type(x, problem.search_space)
     problem.f_calls += 1
-    return create_child(x, problem.f(x), ε=ε)
+    return create_child(xx, problem.f(xx), ε=ε)
 end
 
 
 function create_solutions(X::AbstractMatrix, problem::Problem; ε=0.0)
-    problem.f_calls += size(X,1)
     if problem.parallel_evaluation
+        problem.f_calls += size(X,1)
+        # FIXME: fix type of X
         return create_child(X, problem.f(X), ε=ε)
     end
-    [create_child(X[i,:], problem.f(X[i,:]), ε=ε) for i in 1:size(X,1)]
+    [create_solution(X[i,:], problem, ε=ε) for i in 1:size(X,1)]
 end
 
 # getters for the above structures

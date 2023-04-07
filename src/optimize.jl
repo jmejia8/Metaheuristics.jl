@@ -40,6 +40,8 @@ function optimize(
         logger::Function = (status) -> nothing,
     )
 
+
+    check_compat(search_space, method.parameters)
     # TODO: method = deepcopy(method)
 
 
@@ -161,6 +163,9 @@ function optimize!(
         method::AbstractAlgorithm;
         logger::Function = (status) -> nothing,
     )
+
+    # check whether optimizer is compatible with search_space
+    check_compat(search_space, method.parameters)
 
     #####################################
     # common settings
