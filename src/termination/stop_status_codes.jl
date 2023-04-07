@@ -1,29 +1,11 @@
-"""
-    TerminationStatusCode
-An Enum of possible => values for [`State`](@ref).
-Possible values:
-
-- `ITERATION_LIMIT`
-- `TIME_LIMIT`
-- `EVALUATIONS_LIMIT`
-- `ACCURACY_LIMIT`
-- `OBJECTIVE_VARIANCE_LIMIT`
-- `OBJECTIVE_DIFFERENCE_LIMIT`
-- `OTHER_LIMIT`
-- `UNKNOWN_STOP_REASON`
-
-See also [`termination_status_message`](@ref).
-"""
-const TerminationStatusCode = AbstractTermination
-
-struct IterationLimit           <: TerminationStatusCode end
-struct TimeLimit                <: TerminationStatusCode end
-struct EvaluationsLimit         <: TerminationStatusCode end
-struct AccuracyLimit            <: TerminationStatusCode end
-struct OtherLimit               <: TerminationStatusCode end
-struct UnknownStopReason        <: TerminationStatusCode end
-struct ObjectiveVarianceLimit   <: TerminationStatusCode end
-struct ObjectiveDifferenceLimit <: TerminationStatusCode end
+struct IterationLimit           <: AbstractTermination end
+struct TimeLimit                <: AbstractTermination end
+struct EvaluationsLimit         <: AbstractTermination end
+struct AccuracyLimit            <: AbstractTermination end
+struct OtherLimit               <: AbstractTermination end
+struct ObjectiveVarianceLimit   <: AbstractTermination end
+struct ObjectiveDifferenceLimit <: AbstractTermination end
+struct UnknownStopReason        <: AbstractTermination end
 
 
 const ITERATION_LIMIT           = IterationLimit()

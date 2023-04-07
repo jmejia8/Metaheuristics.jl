@@ -23,6 +23,8 @@ get_position(bee::Bee) = bee.sol.x
 Get the fitness of a bee when optimize using ABC algorithm.
 """
 fval(bee::Bee) = bee.sol.f
+fvals(bees::Vector{<:Bee}) = fval.(bees)
+is_feasible(bee::Bee) = is_feasible(bee.sol)
 
 
 minimum(st::State{Bee{xf_indiv}}) = st.best_sol.sol.f

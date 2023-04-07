@@ -32,7 +32,6 @@ include("externals.jl")
 
 
 include("core/abstracts.jl")
-include("core/stop_status_codes.jl")
 include("core/information.jl")
 include("core/options.jl")
 include("core/state.jl")
@@ -45,11 +44,12 @@ include("solutions/display.jl")
 
 include("operators/operators.jl")
 
+include("termination/termination.jl")
+
 include("common/utils.jl")
 include("common/multi-objective-functions.jl")
 include("common/repair.jl")
 
-include("common/stop.jl")
 include("common/compare.jl")
 include("common/non-dominated-sorting.jl")
 include("common/set_user_solutions.jl")
