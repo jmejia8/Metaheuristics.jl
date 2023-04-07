@@ -104,13 +104,13 @@ end
     minimizer(state)
 Returns the approximation to the minimizer (argmin f(x)) stored in `state`.
 """
-minimizer(s::State) = s.best_sol.x
+minimizer(s::State) = get_position(s.best_sol)
 
 """
     minimum(state::Metaheuristics.State)
 Returns the approximation to the minimum (min f(x)) stored in `state`.
 """
-minimum(s::State) = s.best_sol.f
+minimum(s::State) = fval(s.best_sol)
 
 """
     positions(state)
