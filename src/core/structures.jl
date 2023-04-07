@@ -23,6 +23,19 @@ function Base.show(io::IO, alg::Algorithm)
     Base.show(io, alg.parameters)
 end
 
+function Base.show(io::IO, parameters::AbstractParameters)
+    s = typeof(parameters)
+
+    fns = fieldnames(s)
+    all_vals = [getfield(parameters, f) for f in fns]
+    # remove those parameters containing empty arrays before showing
+    mask = findall(v -> !(v isa Array && isempty(v)), all_vals)
+    vals = [sprint(show, v) for v in all_vals[mask]]
+    str = string(s) * "(" * join(string.(fns[mask]) .* "=" .* vals, ", ") * ")"
+
+    print(io, str)
+end
+
 termination_status_message(alg::Algorithm) = termination_status_message(alg.status)
 should_stop(algorithm::AbstractAlgorithm) = algorithm.status.stop
 function get_result(algorithm::AbstractAlgorithm)

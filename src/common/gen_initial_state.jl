@@ -37,14 +37,6 @@ function gen_initial_state(problem,parameters,information,options)
     return State(best_solution, population; f_calls = length(population), iteration=1)
 end
 
-function Base.show(io::IO, parameters::AbstractParameters)
-    s = typeof(parameters)
-
-    vals = string.(map(f -> getfield(parameters, f), fieldnames(s)))
-    str = string(s) * "(" * join(string.(fieldnames(s)) .* "=" .* vals, ", ") * ")"
-
-    print(io, str)
-end
 
 function _complete_population!(status,problem,parameters,information,options)
     if parameters.N < length(status.population)
