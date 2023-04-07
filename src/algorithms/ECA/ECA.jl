@@ -237,6 +237,13 @@ function initialize!(
         args...;
         kargs...
     )
+
+    if  !(problem.search_space isa BoxConstrainedSpace)
+        s = string(typeof(problem.search_space))
+        error("ECA only works on box-contrained spaces but "*s*" was given.")
+    end
+    
+
     D = getdim(problem)
 
 

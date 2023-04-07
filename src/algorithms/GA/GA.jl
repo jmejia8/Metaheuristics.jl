@@ -8,6 +8,9 @@ mutable struct GA{T1, T2, T3, T4, T5} <: AbstractGA
     environmental_selection::T5
 end
 
+iscompatible(search_space::BitArraySpace, algorithm::GA) = true
+iscompatible(search_space::PermutationSpace, algorithm::GA) = true
+
 """
     GA(;
         N = 100,

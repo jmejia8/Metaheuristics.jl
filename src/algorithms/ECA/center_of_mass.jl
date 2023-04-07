@@ -1,7 +1,7 @@
 ################################################
 # Unconstrained
 ################################################
-function fitnessToMass(fitness::Vector{Float64})
+function fitnessToMass(fitness::Vector{<:Real})
     m = minimum(fitness)
 
     if m < 0
@@ -18,9 +18,9 @@ end
     get the mass in a vector `m[i] = f[i] + 2*max_fitness*sum_vio[i] `, tolerance
     in equality constraints are given by `epsilon`
 """
-getMass(U::Array{xf_indiv,1}) = fitnessToMass(fvals(U))
+getMass(U::Array{xf_solution{Vector{T}},1}) where T <: Real = fitnessToMass(fvals(U))
 
-function getMass(U::Array{xfgh_indiv,1})
+function getMass(U::Array{xfgh_solution{Vector{T}},1}) where T <: Real
     fitness = fvals(U)
     fitnessToMass(fitness + 2maximum(abs.(fitness))*sum_violations.(U))
 end
@@ -88,8 +88,8 @@ function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions, rn
 end
 
 function crossover(
-    x::Vector{Float64},
-    y::Vector{Float64},
+    x::Vector{<:Real},
+    y::Vector{<:Real},
     p_cr::Vector{Float64},
     rng = default_rng_mh()
 )
@@ -113,7 +113,6 @@ Compute a solution using ECA variation operator, `K` is the number of solutions 
 calculate the center of mass and `η_max` is the maximum stepsize.
 """
 function ECA_operator(
-        # population::AbstractArray{xf_indiv}, K, η_max;
         population, K, η_max, rng = default_rng_mh();
         i = rand(rng, 1:length(population)),
         U = rand(rng, population, K),

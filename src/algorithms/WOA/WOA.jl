@@ -135,7 +135,7 @@ function update_state!(
 
     p = rand()        # p in Eq. (2.6)
 
-    x = copy(status.population[i].x)
+    x = zeros(D)
     for j = 1:D
       if p < 0.5   
         if abs(A) >= 1

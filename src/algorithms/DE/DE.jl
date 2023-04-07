@@ -19,7 +19,7 @@ include("epsilonDE.jl")
     DE(;
         N  = 0,
         F  = 1.0,
-        CR = 0.9,
+        CR = 0.5,
         strategy = :rand1,
         information = Information(),
         options = Options()
@@ -57,8 +57,8 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], DE(N=50, F=1.5, CR=0.8))
 """
 function DE(;
         N::Int = 0,
-        F = 1.0,
-        CR = 0.9,
+        F = 0.7,
+        CR = 0.5,
         CR_min = CR,
         CR_max = CR,
         F_min = F,
@@ -208,14 +208,14 @@ function reproduction(status, parameters::AbstractDifferentialEvolution, problem
     F = parameters.F
     CR = parameters.CR
 
-    X = zeros(N,D)
+    X = zeros(eltype(xBest), N,D)
 
     for i in 1:N
         x = get_position(population[i])
         u = DE_mutation(population, F, strategy, 1)
         v = DE_crossover(x, u, CR)
         evo_boundary_repairer!(v, xBest, problem.search_space)
-        X[i,:] = v
+        X[i,:] = _fix_type(v, problem.search_space)
     end
 
     X 
