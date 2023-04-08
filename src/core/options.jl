@@ -27,8 +27,8 @@ end
 
 """
     Options(;
-        x_tol::Real = 0.0,
-        f_tol::Real = 0.0,
+        x_tol::Real = 1e-5,
+        f_tol::Real = eps(),
         g_tol::Real = 0.0,
         h_tol::Real = 0.0,
         f_calls_limit::Real = 0,
@@ -99,8 +99,8 @@ julia> state = optimize(f, bounds, ECA(options=options))
 
 """
 function Options(;
-        x_tol = 0.0,
-        f_tol = 0.0,
+        x_tol = 1e-8,
+        f_tol = eps(),
         g_tol = 0.0,
         h_tol = 0.0,
         f_calls_limit = 0.0,
@@ -114,7 +114,7 @@ function Options(;
         search_type = :minimize,
         parallel_evaluation = false,
         seed = rand(UInt32),
-        rng = Random.Xoshiro(seed)#default_rng_mh(seed),
+        rng  = default_rng_mh(seed),
     )
 
 
