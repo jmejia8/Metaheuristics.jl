@@ -245,26 +245,18 @@ ga = Metaheuristics.get_parameters(f, Permutations(10), GA)
 """
 get_parameters(f, search_space, ::Type{T}) where T <: AbstractParameters = T()
 
-
-# TODO: deprecate this method
-function get_parameters(
-        f,
-        b::AbstractMatrix,
-        ::Type{T}
-    ) where T <: AbstractParameters
-    search_space = _mat_to_bounds(b)
-    get_parameters(f, search_space, T)
-end
-
 function optimize(
         f::Function,
-        search_space,
+        _search_space,
         ::Type{T};
+        logger::Function = (status) -> nothing,
         kargs...
     ) where T <: AbstractParameters
 
+    search_space = _mat_to_bounds(_search_space)
     # configure parameters depending on the search_space
     algo = get_parameters(f, search_space, T)
+    set_user_parameters!(algo; kargs...)
     # call optimize api
-    optimize(f, search_space, algo; kargs...)
+    optimize(f, search_space, algo; logger)
 end

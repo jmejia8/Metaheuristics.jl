@@ -39,11 +39,8 @@ end
 function gen_initial_state(problem,parameters::RandomPermutation,information,options)
 
     D = getdim(problem)
-    X = zeros(Int, parameters.N, D)
     N = parameters.N
-    for i in 1:parameters.N
-        X[i,:] = shuffle(1:D)
-    end
+    X = sample(RandomSampler(problem.search_space; options.rng), N)
 
     if problem.parallel_evaluation
         population = create_solutions(X, problem; ε=options.h_tol)

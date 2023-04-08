@@ -1,6 +1,3 @@
-_mat_to_bounds(bounds::AbstractMatrix) = BoxConstrainedSpace(lb=bounds[1,:], ub=bounds[2,:])
-
-
 function reflected_back_to_bound!(x, bounds::BoxConstrainedSpace)
     !bounds.rigid && (return x)
 

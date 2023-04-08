@@ -10,3 +10,5 @@ function pairwise_distances(A::Matrix, dist = Euclidean(); diag_val=Inf)
     return D
 end
 
+_mat_to_bounds(bounds::AbstractMatrix) = BoxConstrainedSpace(lb=bounds[1,:], ub=bounds[2,:])
+_mat_to_bounds(space::AbstractSearchSpace) =  space

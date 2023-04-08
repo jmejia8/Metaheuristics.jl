@@ -10,6 +10,7 @@ mutable struct Options
     f_tol::Float64
     g_tol::Float64
     h_tol::Float64
+    f_tol_rel::Float64
     f_calls_limit::Float64
     g_calls_limit::Float64
     h_calls_limit::Float64
@@ -28,7 +29,9 @@ end
 """
     Options(;
         x_tol::Real = 1e-5,
-        f_tol::Real = eps(),
+        f_tol::Real = 0.0,
+        f_tol_rel::Real = eps(),
+        f_tol_abs::Real = 0.0,
         g_tol::Real = 0.0,
         h_tol::Real = 0.0,
         f_calls_limit::Real = 0,
@@ -50,9 +53,10 @@ Main properties:
 
 - `x_tol` tolerance to the true minimizer if specified in `Information`.
 - `f_tol` tolerance to the true minimum if specified in `Information`.
+- `f_tol_rel` relative tolerance.
 - `f_calls_limit` is the maximum number of function evaluations limit.
 - `time_limit` is the maximum time that `optimize` can spend in seconds.
-- `iterations` is the maximum number iterationn permited.
+- `iterations` is the maximum number of allowed iterations.
 - `store_convergence` if `true`, then push the current `State` in `State.convergence` at each generation/iteration
 - `debug` if `true`, then `optimize` function reports the current `State` (and interest information) for each iterations.
 - `seed` non-negative integer for the random generator seed.
@@ -100,9 +104,11 @@ julia> state = optimize(f, bounds, ECA(options=options))
 """
 function Options(;
         x_tol = 1e-8,
-        f_tol = eps(),
+        f_tol = 0.0,
         g_tol = 0.0,
         h_tol = 0.0,
+        f_tol_rel = eps(),
+        f_tol_abs = 0.0,
         f_calls_limit = 0.0,
         g_calls_limit = 0.0,
         h_calls_limit = 0.0,
@@ -119,7 +125,7 @@ function Options(;
 
 
     Options(
-            promote(x_tol, f_tol, g_tol, h_tol)...,
+            promote(x_tol, f_tol, g_tol, h_tol, f_tol_rel)...,
             promote(f_calls_limit, g_calls_limit, h_calls_limit, time_limit)...,
             promote(iterations)...,
             # Results options
