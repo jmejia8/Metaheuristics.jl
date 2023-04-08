@@ -5,10 +5,12 @@ function termination_status_message(criterion::ConvergenceTermination)
 end
 
 function stop_check(status::State, criterion::ConvergenceTermination)
+    population = status.population
+    # nothing to do for empty populations
+    isempty(population) && return false
     # check multi-objective problem
     fval(first(status.population)) isa Array && return false
 
-    population = status.population
     feasible = is_feasible.(population)
 
     # check whether feasibility is ratio over 30%
@@ -79,11 +81,16 @@ Base.@kwdef struct RelativeParameterConvergence <: ConvergenceTermination
 end
 
 function stop_check(population::AbstractVector, criterion::RelativeParameterConvergence)
+    
     fx = fvals(population)
     xhi = population[argmax(fx)] |> get_position
     xlo = population[argmin(fx)] |> get_position
-    a = max(abs.(xlo), abs.(xhi))
-    maximum(abs.(xhi - xlo)) / max(maximum(a), eps()) <= criterion.xtol
+    # check for numerical representation
+    if eltype(xhi) <: Number
+        a = max(abs.(xlo), abs.(xhi))
+        return maximum(abs.(xhi -xlo))/max(maximum(a), eps()) <= criterion.xtol
+    end
+    xhi == xlo
 end
 
 struct CheckConvergence <: ConvergenceTermination
