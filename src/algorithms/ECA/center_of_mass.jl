@@ -28,6 +28,11 @@ function getMass(U::Array{xfgh_solution{Vector{T}},1}) where T <: Real
     fitnessToMass(fitness + max(M, 100)*sum_violations.(U))
 end
 
+function getMass(U::Array{xFgh_solution{Vector{T}},1}) where T <: Real
+    fitness = sum(fvals(U), dims=2) |> vec
+    M = 2maximum(abs.(fitness))
+    fitnessToMass(fitness + max(M, 100)*sum_violations.(U))
+end
 
 function center(U, mass)
     c = sum(m * get_position(u) for (m, u) in zip(mass, U))
