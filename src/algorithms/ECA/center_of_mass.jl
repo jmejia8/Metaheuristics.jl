@@ -2,7 +2,9 @@
 # Unconstrained
 ################################################
 function fitnessToMass(fitness::Vector{<:Real})
-    m = minimum(fitness)
+    m, M = extrema(fitness)
+    # avoid dividing by zero
+    m ≈ 0 && M ≈ 0 && return ones(eltype(fitness), length(fitness))
 
     if m < 0
         fitness = 2 * abs(m) .+ fitness
@@ -22,7 +24,8 @@ getMass(U::Array{xf_solution{Vector{T}},1}) where T <: Real = fitnessToMass(fval
 
 function getMass(U::Array{xfgh_solution{Vector{T}},1}) where T <: Real
     fitness = fvals(U)
-    fitnessToMass(fitness + 2maximum(abs.(fitness))*sum_violations.(U))
+    M = 2maximum(abs.(fitness))
+    fitnessToMass(fitness + max(M, 100)*sum_violations.(U))
 end
 
 

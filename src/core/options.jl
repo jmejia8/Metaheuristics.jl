@@ -23,6 +23,7 @@ mutable struct Options
     search_type::Symbol
     seed::UInt
     parallel_evaluation::Bool
+    verbose::Bool
     rng
 end
 
@@ -43,6 +44,7 @@ end
         debug::Bool = false,
         seed = rand(UInt),
         parallel_evaluation = false,
+        verbose = false,
     )
 
 
@@ -61,6 +63,7 @@ Main properties:
 - `debug` if `true`, then `optimize` function reports the current `State` (and interest information) for each iterations.
 - `seed` non-negative integer for the random generator seed.
 - `parallel_evaluation` enables batch evaluations.
+- `verbose` show simplified results each iteration.
 - `rng` user-defined Random Number Generator.
 
 # Example
@@ -119,6 +122,7 @@ function Options(;
         debug = false,
         search_type = :minimize,
         parallel_evaluation = false,
+        verbose = false,
         seed = rand(UInt32),
         rng  = default_rng_mh(seed),
     )
@@ -133,6 +137,7 @@ function Options(;
             Symbol(search_type),
             UInt(seed),
             Bool(parallel_evaluation),
+            Bool(verbose),
             rng
            )
 

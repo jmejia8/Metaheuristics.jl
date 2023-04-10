@@ -4,7 +4,7 @@ function termination_status_message(criterion::ConvergenceTermination)
     "Due to Convergence Termination criterion."
 end
 
-function stop_check(status::State, criterion::ConvergenceTermination)
+function stop_check(status::State, criterion::ConvergenceTermination; report=true)
     population = status.population
     # nothing to do for empty populations
     isempty(population) && return false
@@ -18,7 +18,7 @@ function stop_check(status::State, criterion::ConvergenceTermination)
 
     stop = stop_check(population[feasible], criterion)
     
-    stop && (status.termination_status_code = criterion)
+    report && stop && (status.termination_status_code = criterion)
     
     stop
 end
