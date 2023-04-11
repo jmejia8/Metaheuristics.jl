@@ -99,17 +99,15 @@ function CGSA(;
         X::Matrix{Float64} = zeros(0,0),
         V::Matrix{Float64} = zeros(0,0),
         fitness::Vector{Float64} = zeros(0),
-        information = Information(),
-        options = Options()
+        kargs...
     )
 
     parameters = CGSA(N, chValueInitial, chaosIndex, ElitistCheck, Rpower, Rnorm, wMax, wMin, X, V, fitness)
 
 
     Algorithm(
-        parameters,
-        information = information,
-        options = options,
+        parameters;
+        kargs...
     )
 end
 

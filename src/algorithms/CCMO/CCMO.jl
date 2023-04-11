@@ -74,13 +74,12 @@ stop reason: Maximum number of iterations exceeded.
 
 """
 function CCMO(base_algorithm;
-        information = Information(),
-        options = Options(),
+        kargs...
     )
 
     parameters = CCMO(base_algorithm.parameters, xFgh_indiv[],Float64[],Float64[])
 
-    Algorithm(parameters, information = information, options = options)
+    Algorithm(parameters; kargs...)
 end
 
 function initialize!(

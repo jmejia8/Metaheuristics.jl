@@ -54,16 +54,14 @@ function ABC(;
         Ne = div(N+1, 2),
         No = div(N+1, 2),
         limit=10,
-        information = Information(),
-        options = Options()
+        kargs...
     )
     
     parameters = ABC(N, Ne, No, limit)
 
     Algorithm(
-        parameters,
-        information = information,
-        options = options,
+        parameters;
+        kargs...
     )
 
     

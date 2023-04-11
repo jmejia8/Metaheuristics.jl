@@ -89,17 +89,12 @@ function MCCGA(;
         maxsamples = 10_000,
         mutation = 1 / N,
         use_local_search = true,
-        information = Information(),
-        options = Options()
+        kargs...
     )
 
     parameters = MCCGA(N, maxsamples, mutation, [], use_local_search)
 
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters;kargs...)
 end
 
 function initialize!(

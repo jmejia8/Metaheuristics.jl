@@ -68,17 +68,12 @@ function NSGA3(;
     p_m = -1,
     partitions=12,
     reference_points=Vector{Float64}[],
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
     parameters = NSGA3(N, promote( Float64(η_cr), p_cr, η_m, p_m )..., partitions,
                       reference_points)
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters; kargs...)
 
 end
 

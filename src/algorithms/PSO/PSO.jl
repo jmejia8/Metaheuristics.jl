@@ -50,23 +50,18 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], PSO(N = 100, C1=1.5, C2=1.5, ω = 0.7))
 
 """
 function PSO(;
-    N::Int = 0,
-    C1 = 2.0,
-    C2 = 2.0,
-    ω = 0.8,
-    v = Float64[],
-    flock = xf_indiv[],
-    information = Information(),
-    options = Options(),
-)
+        N::Int = 0,
+        C1 = 2.0,
+        C2 = 2.0,
+        ω = 0.8,
+        v = Float64[],
+        flock = xf_indiv[],
+        kargs...
+    )
 
-parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
+    parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
 
-Algorithm(
-    parameters,
-    information = information,
-    options = options,
-)
+    Algorithm( parameters; kargs...)
 end
 
 function update_state!(

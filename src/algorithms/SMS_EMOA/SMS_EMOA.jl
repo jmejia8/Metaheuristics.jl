@@ -72,16 +72,11 @@ function SMS_EMOA(;
     η_m = 20,
     p_m = -1,
     n_samples = 10_000,
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
     parameters = SMS_EMOA(N, promote( Float64(η_cr), p_cr, η_m, p_m)..., n_samples)
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters; kargs...)
 
 end
 

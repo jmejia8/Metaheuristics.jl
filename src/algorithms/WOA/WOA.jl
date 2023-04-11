@@ -51,15 +51,11 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], WOA(N = 100))
 
 ```
 """
-function WOA(;N = 30, information = Information(), options = Options())
+function WOA(;N = 30, kargs...)
   parameters = WOA(N)
 
 
-  Algorithm(
-            parameters,
-            information = information,
-            options = options,
-           )
+  Algorithm( parameters; kargs...)
 
 end
 

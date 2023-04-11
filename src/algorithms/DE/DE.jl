@@ -64,19 +64,14 @@ function DE(;
         F_min = F,
         F_max = F,
         strategy::Symbol = :rand1,
-        information = Information(),
-        options = Options(),
+        kargs...
     )
 
 
     parameters =
     DE(N, promote(F, CR, CR_min, CR_max, F_min, F_max)..., strategy)
 
-    Algorithm(
-              parameters,
-              information = information,
-              options = options,
-             )
+    Algorithm(parameters; kargs...)
 
 end
 

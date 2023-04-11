@@ -65,17 +65,12 @@ function SA(;
         x_initial::Vector = zeros(0),
         N::Int = 500,
         tol_fun::Real= 1e-4,
-        information = Information(),
-        options = Options()
+        kargs...
     )
     
     parameters = SA(N, x_initial, tol_fun, zeros(0), Inf)
 
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm( parameters; kargs...)
 
     
 end

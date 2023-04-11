@@ -107,8 +107,7 @@ function MOEAD_DE(weights ;
     B = Array{Int}[],
     s1 = 0.01,
     s2 = 20.0,
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
 
@@ -131,15 +130,7 @@ function MOEAD_DE(weights ;
 
     initialize_closest_weight_vectors!(parameters)
 
-    alg = Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
-
-
-
-    alg
+    Algorithm(parameters;kargs...)
 
 end
 

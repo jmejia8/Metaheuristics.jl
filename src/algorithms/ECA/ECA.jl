@@ -69,8 +69,7 @@ function ECA(;
     ε::Float64 = 0.0,
     adaptive::Bool = false,
     resize_population::Bool = false,
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
 
@@ -89,11 +88,7 @@ function ECA(;
         adaptive,
         resize_population,
     )
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters; kargs...)
 
 end
 

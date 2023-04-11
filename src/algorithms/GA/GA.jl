@@ -138,8 +138,7 @@ function GA(;
         crossover   = UniformCrossover(p = p_crossover),
         mutation    = BitFlipMutation(p = p_mutation),
         environmental_selection = ElitistReplacement(),
-        options     = Options(),
-        information = Information()
+        kargs...
     )
 
     parameters = GA(initializer,
@@ -149,11 +148,7 @@ function GA(;
                     environmental_selection
                    )
 
-    Algorithm(
-        parameters,
-        information = information,
-        options = options
-    )
+    Algorithm( parameters; kargs...)
 end
 
 # this method is called in src/optimize.jl
