@@ -144,7 +144,6 @@ function show_status_oneline(status, parameters, options)
     # @printf("Iter: % 3d | Evals: % 5.0f | ", t, e)
     if m isa Number
         push!(d, "  Minimum " => m)
-        # @printf("Min: % 2.3g | ", m)
     else
         n = length(get_non_dominated_solutions(status.population))
         s = sprint(print, "$n/$(length(status.population))")
@@ -152,10 +151,8 @@ function show_status_oneline(status, parameters, options)
         # 
     end
     # feas = count(is_feasible.(status.population)) ÷ length(status.population)
-    # @printf("Feasible: % 2d %% | ", 100feas)
     try
         push!(d, " Mean CVio" => mean(sum_violations.(status.population)))
-        # @printf("CVio: % 1.2g | ", mean(sum_violations.(status.population)))
     catch
     end
 
@@ -174,9 +171,8 @@ function show_status_oneline(status, parameters, options)
         push!(d, "Converged " => @sprintf("%10s", v))
     end
     
-    # @printf("Time:  | ", status.overall_time)
 
-    if status.iteration <= 1 || status.iteration % 100 == 0
+    if status.iteration <= 1 || status.iteration % 1000 == 0
         nm = first.(d)
         lines = [fill('-', length(n) + 2) |> join for n in nm]
         println("+", join(lines, "+"), "+")

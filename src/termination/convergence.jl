@@ -1,5 +1,9 @@
 abstract type ConvergenceTermination <: AbstractTermination end
 
+include("moo_convergence.jl")
+
+
+
 function termination_status_message(criterion::ConvergenceTermination)
     "Due to Convergence Termination criterion."
 end
@@ -8,8 +12,6 @@ function stop_check(status::State, criterion::ConvergenceTermination; report=tru
     population = status.population
     # nothing to do for empty populations
     isempty(population) && return false
-    # check multi-objective problem
-    fval(first(status.population)) isa Array && return false
 
     feasible = is_feasible.(population)
 
@@ -17,6 +19,7 @@ function stop_check(status::State, criterion::ConvergenceTermination; report=tru
     count(feasible) / length(population) < 0.3 && return false
 
     stop = stop_check(population[feasible], criterion)
+
     
     report && stop && (status.termination_status_code = criterion)
     

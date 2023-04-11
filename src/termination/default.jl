@@ -9,5 +9,12 @@ function default_stop_check(status, information, options)
     stop_check(status, CheckConvergence(
                                         f_tol_abs = options.f_tol,
                                         f_tol_rel = options.f_tol_rel,
-                                        x_tol =options.x_tol))
+                                        x_tol =options.x_tol)) #=||
+    stop_check(
+               status,
+               CheckConvergence(
+                                criteria=[RobustConvergence(ftol=options.f_tol)]
+                               )
+              )
+              =#
 end

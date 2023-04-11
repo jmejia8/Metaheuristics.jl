@@ -1,7 +1,7 @@
 function set_user_parameters!(algo::AbstractAlgorithm; kargs...)
     parameters = algo.parameters
     options = algo.options
-    # information = algo.information
+    # TODO information = algo.information
     T = typeof(parameters)
     for (field, value) in kargs
         # set algorithm parameters
@@ -10,8 +10,8 @@ function set_user_parameters!(algo::AbstractAlgorithm; kargs...)
         # set optional parameters
         elseif ismutable(options) && hasfield(Options, field)
             setproperty!(options, field, value)
-        # elseif ismutable(information) && hasfield(Information, field)
-        #     setproperty!(information, field, value)
+        # TODO elseif ismutable(information) && hasfield(Information, field)
+        # TODO     setproperty!(information, field, value)
         else
             @warn "Parameter `$field = $value` never used."
         end

@@ -40,7 +40,14 @@ function gen_initial_state(problem,parameters::RandomPermutation,information,opt
 
     D = getdim(problem)
     N = parameters.N
-    X = sample(RandomSampler(problem.search_space; options.rng), N)
+
+    if problem.search_space isa BoxConstrainedSpace
+        search_space = PermutationSpace(getdim(problem.search_space))
+    else
+        search_space = problem.search_space
+    end
+    
+    X = sample(RandomSampler(search_space; options.rng), N)
 
     if problem.parallel_evaluation
         population = create_solutions(X, problem; ε=options.h_tol)
