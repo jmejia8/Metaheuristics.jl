@@ -63,7 +63,7 @@ include("PerformanceIndicators/PerformanceIndicators.jl")
 include("algorithms/algorithm.jl")
 include("parameters/parameters.jl")
 
-include("optimize.jl")
+include("optimize/optimize.jl")
 
 #######################################################
 #                                                     #
