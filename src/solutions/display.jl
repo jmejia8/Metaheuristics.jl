@@ -85,7 +85,7 @@ function Base.show(io::IO, status::State)
         n = count(is_feasible, status.population)
         @printf(io,"%12s %d / %d in final population\n", "feasibles:", n, length(status.population))
     end
-    @printf(io,"%12s %.4f s\n", "total time:", status.final_time - status.start_time)
+    @printf(io,"%12s %.4f s\n", "total time:", status.overall_time)
 
     txt = status.stop ? termination_status_message(status) : ""
     @printf(io,"%12s %s\n", "stop reason:", txt)
