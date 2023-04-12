@@ -1,8 +1,9 @@
 function _during_optimization!(status, parameters, problem, information, options, convergence, logger)
     status.iteration += 1
     # perform one optimization step
+    t = time()
     update_state!(status, parameters, problem, information, options)
-    status.overall_time = time() - status.start_time
+    status.overall_time += time() - t
     # store the number of function evaluations
     status.f_calls = problem.f_calls
     # show status if debug = true

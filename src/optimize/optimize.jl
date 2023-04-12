@@ -90,18 +90,16 @@ function optimize!(
         return method
     end
 
-    #####################################
-    # common settings
-    #####################################
-    information = method.information
-    options = method.options
-    parameters = method.parameters
-    convergence = empty(status.population)
     problem = Problem(f, search_space; parallel_evaluation=options.parallel_evaluation)
-    ###################################
-    
+    problem.f_calls = status.f_calls
 
-    _during_optimization!(status, parameters, problem, information, options, convergence, logger)
+    _during_optimization!(status,
+                          method.parameters,
+                          problem,
+                          method.information,
+                          method.options,
+                          empty(status.population), # convergence
+                          logger)
 
     if status.stop
         options.debug && @info "Performing final stage due to stop criteria."

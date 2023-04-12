@@ -15,6 +15,7 @@ function _before_optimization!(f, search_space, method, logger)
     options.debug && @info("Initializing population...")
     status = initialize!(status,parameters, problem, information, options)
     status.start_time = start_time
+    status.overall_time += time() - start_time
     method.status = status
     
     # show status if necessary
