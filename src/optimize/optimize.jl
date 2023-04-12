@@ -49,7 +49,15 @@ function optimize(
     status, parameters, problem, information, options, convergence = _before_optimization!(f, search_space, method, logger)
 
     while !status.stop
-        _during_optimization!(status, parameters, problem, information, options, convergence, logger)
+        _during_optimization!(status,
+                              parameters,
+                              problem,
+                              information,
+                              options,
+                              convergence,
+                              logger,
+                              method.termination
+                             )
     end
 
     _after_optimization!(status, parameters, problem, information, options, convergence)
@@ -90,20 +98,33 @@ function optimize!(
         return method
     end
 
-    problem = Problem(f, search_space; parallel_evaluation=options.parallel_evaluation)
+    options = method.options
+    problem = Problem(f, search_space;
+                      parallel_evaluation=options.parallel_evaluation)
     problem.f_calls = status.f_calls
 
-    _during_optimization!(status,
+    # main optimization step
+    _during_optimization!(
+                          status,
                           method.parameters,
                           problem,
                           method.information,
-                          method.options,
+                          options,
                           empty(status.population), # convergence
-                          logger)
+                          logger,
+                          method.termination
+                         )
 
     if status.stop
         options.debug && @info "Performing final stage due to stop criteria."
-        _after_optimization!(status, parameters, problem, information, options, convergence)
+        _after_optimization!(
+                             status,
+                             method.parameters,
+                             problem,
+                             method.information,
+                             options,
+                             empty(status.population), # convergence
+                            )
     end
     
 

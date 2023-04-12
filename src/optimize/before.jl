@@ -10,13 +10,35 @@ function _before_optimization!(f, search_space, method, logger)
     seed!(options.seed)
 
     # initialization steps
-    start_time = time()
     status = method.status
     options.debug && @info("Initializing population...")
-    status = initialize!(status,parameters, problem, information, options)
+    start_time = time()
+    # initialize population (... and optimizer)
+    status = initialize!(status, parameters, problem, information, options)
+
+    # save times
     status.start_time = start_time
     status.overall_time += time() - start_time
     method.status = status
+    termination = method.termination
+
+    # set termination based on convergence if necessary
+    if isempty(termination.checkall) && isempty(termination.checkany)
+        if fval(first(status.population)) isa Array
+            # multi-objective termination criterion
+            c = RobustConvergence(ftol=options.f_tol)
+            options.debug && @info("Set termination criteria: RobustConvergence")
+        else
+            # single-objective criteria (convergence based)
+            c = CheckConvergence(f_tol_abs = options.f_tol,
+                                 f_tol_rel = options.f_tol_rel,
+                                 x_tol = options.x_tol)
+            options.debug && @info("Set termination criteria: convergence indicators")
+        end
+        
+        push!(termination.checkany, c)
+    end
+    
     
     # show status if necessary
     show_status(status, parameters, options)
@@ -27,7 +49,12 @@ function _before_optimization!(f, search_space, method, logger)
 
     options.debug && @info("Starting main loop...")
     logger(status)
-    status.stop = status.stop || default_stop_check(status, information, options)
+
+    status.stop = status.stop ||
+                    # common stop criteria (budget based)
+                    default_stop_check(status, information, options) ||
+                    # stop criteria given by user
+                    stop_check(status, termination)
 
     status, parameters, problem, information, options, convergence
 end

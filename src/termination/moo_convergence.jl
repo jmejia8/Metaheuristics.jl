@@ -8,9 +8,8 @@ Base.@kwdef mutable struct RobustConvergence <: ConvergenceTermination
     _iter::Int = 0
 end
 
-function check_extremas(fa, fb, tol)
-    @show maximum(abs.(fb - fa))
-    maximum(abs.(fb - fa)) < tol
+function _check_extremas(fa, fb, tol)
+    maximum(abs.(fb - fa)) <= tol
 end
 
 function stop_check(f_current, f_last, criterion::RobustConvergence)
@@ -20,18 +19,19 @@ function stop_check(f_current, f_last, criterion::RobustConvergence)
     fmax = nadir(f_current)
     # normalization denominator
     Δ = fmax - fmin
-    Δ[dnom .≈ 0] .= 1
+    Δ[Δ .≈ 0] .= one(eltype(Δ))
     
     # if extrema are not in tolerance, then don't stop
-    !check_extremas(fmin ./ Δ, ideal(f_last) ./ Δ, tol) && return false
-    !check_extremas(fmax ./ Δ, nadir(f_last) ./ Δ, tol) && return false 
+    !_check_extremas(fmin ./ Δ, ideal(f_last) ./ Δ, tol) && return false
+    !_check_extremas(fmax ./ Δ, nadir(f_last) ./ Δ, tol) && return false 
+    
+    
     
     # normalize fronts
-    f_current = (fs - fmin) ./ Δ
-    f_last = (fvals(last_population) - fmin) ./ Δ
+    f_current = (f_current .- fmin') ./ Δ'
+    f_last = (f_last .- fmin') ./ Δ'
     # stop if extrema and now IGD is under tolerance
-    indicator = PerformanceIndicators.igd(f_prev, f_current)
-    @show indicator
+    indicator = PerformanceIndicators.igd(f_last, f_current)
     indicator <= tol
 end
 

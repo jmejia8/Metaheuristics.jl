@@ -161,7 +161,7 @@ julia> n_fes, fxs = convergence(state);
 ```
 
 """
-convergence(s::State) = begin
+function convergence(s::State)
     sc = s.convergence
     isempty(sc) ? (zeros(Int, 0), zeros(0)) : (map(nfes, sc), map(minimum, sc))
 end

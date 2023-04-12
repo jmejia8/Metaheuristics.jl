@@ -3,7 +3,7 @@ mutable struct Algorithm{T} <: AbstractAlgorithm
     status::State
     information::Information
     options::Options
-    # termination::Termination
+    termination::Termination
 end
 
 function Algorithm(
@@ -11,7 +11,7 @@ function Algorithm(
         initial_state::State = State(nothing, []),
         information::Information = Information(),
         options::Options = Options(),
-        # termination = Termination()
+        termination = Termination(),
         kargs...
     )
     if !isempty(kargs)
@@ -21,7 +21,12 @@ function Algorithm(
         @warn "Parameters: `$pp` never used."
     end
 
-    Algorithm(parameters, initial_state, information, options)
+    if !(termination isa Termination)
+        termination = Termination(checkany = [termination])
+    end
+    
+
+    Algorithm(parameters, initial_state, information, options, termination)
 
 end
 
