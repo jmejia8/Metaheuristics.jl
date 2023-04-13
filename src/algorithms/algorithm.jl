@@ -70,6 +70,6 @@ function check_compat(search_space, algorithm::AbstractParameters)
     
     a = typeof(algorithm)
     s = typeof(search_space)
-    error("Implemented metaheuristic `$a` is not compatible with search space `$s`.")
+    error("Implemented metaheuristic `$a` is not compatible with search space `$s`. Try using bounds.")
 end
 

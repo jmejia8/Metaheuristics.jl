@@ -239,7 +239,7 @@ end
 function create_child(x, fResult; ε = 0.0)
     error("""
           Objective function should return either a numerical value or a Tuple depending on the problem.
-          Current output:  $fResult of type $(typeof(fResult))
+          Current output:  `$fResult` of type `$(typeof(fResult))`
           Examples at https://jmejia8.github.io/Metaheuristics.jl/stable/examples""")
 end
 

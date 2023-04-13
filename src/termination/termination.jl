@@ -3,6 +3,13 @@ include("convergence.jl")
 include("budget.jl")
 include("default.jl")
 
+"""
+    Termination(checkall, checkany)
+
+Define a termination criterion. This criterion will suggest a stop condition
+if all conditions in `checkall` are satisfied or at least one in `checkany`
+is fulfilled.
+"""
 Base.@kwdef struct Termination <: AbstractTermination
     checkall::Vector = Any[]
     checkany::Vector = Any[]
