@@ -243,7 +243,7 @@ function initialize!(
 
 
     if parameters.N <= parameters.K
-        parameters.N = parameters.K * D
+        parameters.N = min(parameters.K * D, 1000)
     end
 
     if options.f_calls_limit == 0
