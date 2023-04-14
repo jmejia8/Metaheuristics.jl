@@ -47,7 +47,7 @@ end
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.5
             @test Metaheuristics.PerformanceIndicators.spacing(result) < 0.5
             @test Metaheuristics.PerformanceIndicators.covering(pf, result.population) <= 1.0
-            @test Metaheuristics.PerformanceIndicators.covering(result, result) ≈ 0.0
+            @test Metaheuristics.PerformanceIndicators.covering(result, result, verbose=false) ≈ 0.0
 
             # number of function evaluations should be reported correctly
             @test f_calls == result.f_calls
