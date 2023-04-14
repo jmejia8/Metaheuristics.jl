@@ -31,7 +31,15 @@ function Algorithm(
 end
 
 function Base.show(io::IO, alg::Algorithm)
-    Base.show(io, alg.parameters)
+    title = "Algorithm Parameters"
+    decor = join(repeat('=', length(title)))
+    printstyled(io, title, "\n", color=:blue, bold=true)
+    printstyled(io, decor, "\n", color=:gray)
+    print(io, "  ")
+    Base.show(IOContext(io, :compact => true), alg.parameters)
+    println(io, "\n")
+
+    show(io, alg.status)
 end
 
 function Base.show(io::IO, parameters::AbstractParameters)
@@ -40,7 +48,7 @@ function Base.show(io::IO, parameters::AbstractParameters)
     fns = fieldnames(s)
     all_vals = [getfield(parameters, f) for f in fns]
     # remove those parameters containing empty arrays before showing
-    mask = findall(v -> !(v isa Array && isempty(v)), all_vals)
+    mask = findall(v -> !(v isa Array), all_vals)
     vals = [sprint(show, v) for v in all_vals[mask]]
     str = string(s) * "(" * join(string.(fns[mask]) .* "=" .* vals, ", ") * ")"
 
