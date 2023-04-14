@@ -198,10 +198,10 @@ function update_state!(
 
 
     #Calculation of accelaration in gravitational field. eq.7-10,21.
-    a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
+    a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it, options.rng)
 
     #Agent movement. eq.11-12
-    X, V = move(X,a,V)
+    X, V = move(X,a,V, options.rng)
 
 
     #

@@ -109,6 +109,7 @@ function update_state!(
   N = parameters.N
   D = getdim(problem)
   t = status.iteration
+  rng = options.rng
 
   a=2-t*((2)/Max_iter) # a decreases linearly fron 2 to 0 in Eq. (2.3)
 
@@ -119,23 +120,23 @@ function update_state!(
 
   # Update the Position of search agents 
   for i=1:N
-    r1 = rand() # r1 is a random number in [0,1]
-    r2 = rand() # r2 is a random number in [0,1]
+    r1 = rand(rng) # r1 is a random number in [0,1]
+    r2 = rand(rng) # r2 is a random number in [0,1]
 
     A = 2a*r1 - a  # Eq. (2.3) in the paper
     C = 2r2        # Eq. (2.4) in the paper
 
 
     b = 1               #  parameters in Eq. (2.5)
-    l = (a2-1)*rand()+1   #  parameters in Eq. (2.5)
+    l = (a2-1)*rand(rng)+1   #  parameters in Eq. (2.5)
 
-    p = rand()        # p in Eq. (2.6)
+    p = rand(rng)        # p in Eq. (2.6)
 
     x = zeros(D)
     for j = 1:D
       if p < 0.5   
         if abs(A) >= 1
-          rand_leader_index = floor(Int, N* rand()+1)
+          rand_leader_index = floor(Int, N* rand(rng)+1)
           X_rand  = status.population[rand_leader_index].x
           D_X_rand= abs(C*X_rand[j] - x[j]  ) # Eq. (2.7)
           x[j] = X_rand[j]-A*D_X_rand       # Eq. (2.8)

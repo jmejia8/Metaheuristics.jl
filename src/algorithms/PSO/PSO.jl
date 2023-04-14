@@ -81,7 +81,7 @@ function update_state!(
     for i in 1:parameters.N
         x = get_position(parameters.flock[i])
         xPBest = get_position(status.population[i])
-        parameters.v[i, :] = velocity(x, parameters.v[i, :], xPBest, xGBest, parameters)
+        parameters.v[i, :] = velocity(x, parameters.v[i, :], xPBest, xGBest, parameters, options.rng)
         x += parameters.v[i, :]
         reset_to_violated_bounds!(x, problem.search_space)
         X_new[i,:] = x

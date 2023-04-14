@@ -50,14 +50,14 @@ function fit(fx)
     1.0 + abs(fx)
 end
 
-function updateBee!(bee, bee2, problem)
+function updateBee!(bee, bee2, problem, rng)
     D = length(bee.sol.x)
-    ϕ = -1.0 + 2.0rand()
+    ϕ = -1.0 + 2.0rand(rng)
 
     v = ϕ*(bee.sol.x - bee2.sol.x)
 
     x_new = bee.sol.x + v
-    replace_with_random_in_bounds!(x_new, problem.search_space)
+    replace_with_random_in_bounds!(x_new, problem.search_space, rng)
 
     new_sol = create_solution(x_new, problem)
 
@@ -70,18 +70,18 @@ function updateBee!(bee, bee2, problem)
     end
 end
 
-function getK(i, N)
-    j = rand(1:N)
+function getK(i, N, rng)
+    j = rand(rng, 1:N)
     while j == i
-        j = rand(1:N)
+        j = rand(rng, 1:N)
     end
     j
 end
 
-function employedPhase!(bees, problem, Ne)
+function employedPhase!(bees, problem, Ne, rng)
     N = length(bees)
-    for i in randperm(N)[1:Ne]
-        updateBee!(bees[i], bees[getK(i, N)], problem)
+    for i in randperm(rng, N)[1:Ne]
+        updateBee!(bees[i], bees[getK(i, N, rng)], problem, rng)
     end
 end
 
@@ -99,13 +99,13 @@ function roulettSelect(bees, sum_f)
     return length(bees)
 end
 
-function outlookerPhase!(bees, problem, No::Int)
+function outlookerPhase!(bees, problem, No::Int, rng)
     N = length(bees)
     sum_f = sum(map(x->x.fit, bees))
 
     for i=1:No
         j = roulettSelect(bees, sum_f)
-        updateBee!(bees[j], bees[getK(j, N)], problem)
+        updateBee!(bees[j], bees[getK(j, N, rng)], problem, rng)
     end
 end
 

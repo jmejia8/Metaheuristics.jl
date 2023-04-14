@@ -4,24 +4,26 @@
 ##################################################################
 
 function initialprobs(
-    lower::Array{T,1},
-    upper::Array{T,1};
-    maxsamples = 10000,
-) where {T<:Number}
+        lower::Array{T,1},
+        upper::Array{T,1},
+        rng;
+        maxsamples = 10000,
+    ) where {T<:Number}
+
     p = length(lower)
     @assert p == length(upper)
 
     bitlen = p * 32
     mat = Array{Int8,2}(undef, maxsamples, bitlen)
     for tries = 1:maxsamples
-        randvalues = map((x, y) -> x + rand() * (y - x), lower, upper)
+        randvalues = map((x, y) -> x + rand(rng) * (y - x), lower, upper)
         mat[tries, :] .= bits(randvalues)
     end
     return colmeans(mat)
 end
 
-function sample(probs::Array{T,1}) where {T<:Number}
-    return map(x -> if rand() < x
+function sample(probs::Array{T,1}, rng) where {T<:Number}
+    return map(x -> if rand(rng) < x
         1
     else
         0

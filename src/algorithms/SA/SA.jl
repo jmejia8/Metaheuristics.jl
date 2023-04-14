@@ -88,9 +88,10 @@ function initialize!(
 
     l = problem.search_space.lb
     u = problem.search_space.ub
+    rng = options.rng
 
     if isempty(parameters.x_initial)
-        parameters.x_initial = l .+ (u .- l) .* rand(length(u))
+        parameters.x_initial = l .+ (u .- l) .* rand(rng, length(u))
 	end
 
     if options.f_calls_limit == 0
@@ -129,6 +130,7 @@ function update_state!(
     max_evals = options.f_calls_limit
     N = parameters.N
     TolFun = parameters.tol_fun
+    rng = options.rng
 
     # T is the inverse of temperature.
     T = nevals / max_evals 
@@ -141,7 +143,7 @@ function update_state!(
     # equilibrium.
     for i = 1:N        
         # We generate new test point using newSol function      
-        dx = newSol(2rand(length(parameters.x)) .- 1.0 , μ) .* (u-l)
+        dx = newSol(2rand(rng, length(parameters.x)) .- 1.0 , μ) .* (u-l)
 
         # the test point and fx1=f(x1)
         x1 = parameters.x + dx
@@ -159,7 +161,7 @@ function update_state!(
         # If the function variation,df, is <0 we take test point as current
         # point. And if df>0 we use Metropolis condition to accept or
         # reject the test point as current point.
-        if (df < 0 || rand() < exp(-T*df/(abs(parameters.fx)) / TolFun))
+        if (df < 0 || rand(rng) < exp(-T*df/(abs(parameters.fx)) / TolFun))
             parameters.x = x1
             parameters.fx= fx1
         end        

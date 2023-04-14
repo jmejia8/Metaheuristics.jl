@@ -47,7 +47,7 @@ function Gconstant(iteration,max_it)
 end
 
 #This function calculates the accelaration of each agent in gravitational field. eq.7-10,21.
-function Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
+function Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it, rng)
 	N, D   = size(X)
 	final_per= 2 #In the last iteration, only 2 percent of agents apply force to the others.
 
@@ -68,7 +68,7 @@ function Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
 			if j != i
 				R = norm(X[i,:]-X[j,:], Rnorm) #Euclidian distanse.
 				for k=1:D 
-                    E[i, k]= E[i,k]+rand() * (M[j]) * ((X[j,k]-X[i,k])/(R^Rpower + eps()))
+                    E[i, k]= E[i,k]+rand(rng) * (M[j]) * ((X[j,k]-X[i,k])/(R^Rpower + eps()))
 					#note that Mp(i)/Mi(i)=1
 				end
 			end
@@ -82,10 +82,10 @@ function Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
 end
 
 # This function updates the velocity and position of agents.
-function move(X,a,V)
+function move(X,a,V, rng)
 	# movement.
 	N, D = size(X)
-	V = rand(N, D).*V + a # eq. 11.
+	V = rand(rng, N, D).*V + a # eq. 11.
 	X = X + V # eq. 12.
 
 	return X, V

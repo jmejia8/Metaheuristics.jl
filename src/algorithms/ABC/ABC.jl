@@ -120,10 +120,10 @@ function update_state!(
     a = bounds.lb
     b = bounds.ub
 
-    employedPhase!(bees,problem,  Ne)
-    outlookerPhase!(bees,problem, No)
+    employedPhase!(bees,problem,  Ne, options.rng)
+    outlookerPhase!(bees,problem, No, options.rng)
 
-    @inline genPos(D=D, a=a, b=b) = a + (b - a) .* rand(D)
+    @inline genPos(D=D, a=a, b=b) = a + (b - a) .* rand(options.rng, D)
     best = chooseBest(bees, status.best_sol)
 
     status.f_calls += Ne + No + scoutPhase!(bees, problem, genPos, parameters.limit)
