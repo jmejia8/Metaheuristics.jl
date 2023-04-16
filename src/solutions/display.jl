@@ -58,16 +58,13 @@ function Base.show(io::IO, solution::xFgh_indiv)
 end
 
 
+show_pf(io, pf) = nothing
 function describe_result(io, status::State{T}) where T <: xFgh_solution
-    # @printf(io, "  %-16s", "Population:")
-    # show(io, "text/plain", Array(status.population))
-
     # non-dominated
     pf = get_non_dominated_solutions(status.population)
-    print(io, "  Non-dominated solution(s): ")
+    @printf(io,"  %-16s ", "Non-dominated:")
     println(io, length(pf), " / ", length(status.population))
-    show(io, "text/plain", pf)
-    print(io, "\n")
+    show_pf(io, pf)
 end
 
 function describe_result(io, status::State)

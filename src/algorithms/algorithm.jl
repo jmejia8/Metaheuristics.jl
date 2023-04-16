@@ -30,11 +30,14 @@ function Algorithm(
 
 end
 
-function Base.show(io::IO, alg::Algorithm)
-    title = "Algorithm Parameters"
+function _print_title(io, title)
     decor = join(repeat('=', length(title)))
     printstyled(io, title, "\n", color=:blue, bold=true)
     printstyled(io, decor, "\n", color=:gray)
+end
+
+function Base.show(io::IO, alg::Algorithm)
+    _print_title(io, "Algorithm Parameters")
     print(io, "  ")
     Base.show(IOContext(io, :compact => true), alg.parameters)
     println(io, "\n")

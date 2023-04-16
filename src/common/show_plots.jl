@@ -86,3 +86,10 @@ end
 
 
 Base.show(io::IO, ::MIME"text/html", pop::Vector{Bee{xf_indiv}}) = show(io, "text/html", [p.sol for p in pop])
+
+
+function show_pf(io, pf::Vector{T}) where T <: xFgh_solution
+    show(io, "text/plain", pf)
+    print(io, "\n")
+end
+
