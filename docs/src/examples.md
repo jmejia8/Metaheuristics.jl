@@ -64,11 +64,8 @@ minimizer(result)
 
 
 !!! compat "Second run is faster"
-    As you may know, the second run is faster:
+    As you may know, the second run can be faster:
 
-```@example SingleObjective
-result = optimize(f, bounds, algorithm)
-```
 
 ## Constrained Optimization
 
