@@ -12,15 +12,11 @@ mutable struct Options
     h_tol::Float64
     f_tol_rel::Float64
     f_calls_limit::Float64
-    g_calls_limit::Float64
-    h_calls_limit::Float64
     time_limit::Float64
 
     iterations::Int
     store_convergence::Bool
-    show_results::Bool
     debug::Bool
-    search_type::Symbol
     seed::UInt
     parallel_evaluation::Bool
     verbose::Bool
@@ -36,8 +32,6 @@ end
         g_tol::Real = 0.0,
         h_tol::Real = 0.0,
         f_calls_limit::Real = 0,
-        g_calls_limit::Real = 0,
-        h_calls_limit::Real = 0,
         time_limit::Real = Inf,
         iterations::Int = 1,
         store_convergence::Bool = false,
@@ -68,9 +62,8 @@ Main properties:
 
 # Example
 
-```jldoctest
-julia> options = Options(f_calls_limit = 1000, debug=true, seed=1)
-Options(0.0, 0.0, 0.0, 0.0, 1000.0, 0.0, 0.0, 0, false, true, true, :minimize, 0x0000000000000001)
+```julia-repl
+julia> options = Options(f_calls_limit = 1000, debug=false, seed=1);
 
 julia> f(x) = sum(x.^2)
 f (generic function with 1 method)
@@ -81,27 +74,7 @@ julia> bounds = [  -10.0 -10 -10; # lower bounds
  -10.0  -10.0  -10.0
   10.0   10.0   10.0
 
-julia> state = optimize(f, bounds, ECA(options=options))
-[ Info: Initializing population...
-[ Info: Starting main loop...
-+=========== RESULT ==========+
-| Iter.: 1
-| f(x) = 6.97287
-| solution.x = [-2.3628796262231875, -0.6781207370770752, -0.9642728360479853]
-| f calls: 42
-| Total time: 0.0004 s
-+============================+
-
-...
-
-[ Info: Stopped since call_limit was met.
-+=========== RESULT ==========+
-| Iter.: 47
-| f(x) = 1.56768e-08
-| solution.x = [-2.2626761322304715e-5, -9.838697194048792e-5, 7.405966506272336e-5]
-| f calls: 1000
-| Total time: 0.0313 s
-+============================+
+julia> state = optimize(f, bounds, ECA(options=options));
 ```
 
 """
@@ -130,11 +103,10 @@ function Options(;
 
     Options(
             promote(x_tol, f_tol, g_tol, h_tol, f_tol_rel)...,
-            promote(f_calls_limit, g_calls_limit, h_calls_limit, time_limit)...,
+            promote(f_calls_limit, time_limit)...,
             promote(iterations)...,
             # Results options
-            promote(store_convergence, show_results, debug)...,
-            Symbol(search_type),
+            promote(store_convergence, debug)...,
             UInt(seed),
             Bool(parallel_evaluation),
             Bool(verbose),
@@ -143,3 +115,17 @@ function Options(;
 
 end
 
+
+function Base.show(io::IO, options::Options)
+    _print_title(io, "Options")
+
+    txt = String[]
+    ln = Int[]
+    for field in fieldnames(Options)
+        v = getfield(options, field)
+        fl = string(field) .* ":"
+        push!(txt, @sprintf("  %-16s %s\n", fl, string(v)))
+        push!(ln, length(fl))
+    end
+    println(io, join(txt[sortperm(ln)]))
+end

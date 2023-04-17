@@ -9,7 +9,7 @@ makedocs(
                                   prettyurls = get(ENV, "CI", nothing) == "true",
                                   assets = ["assets/favicon.ico", "assets/extra_styles.css"],
                                   analytics = "UA-184071594-1",
-                                  collapselevel = 2,
+                                  collapselevel = 1,
                                  ),
          sitename="Metaheuristics.jl",
          authors = "Jesús Mejía",

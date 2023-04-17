@@ -285,7 +285,7 @@ algorithm performance or test new mechanisms. This example illustrates how to do
 Let's assume that we want to modify the stop criteria for `ECA`. See [Contributing](@ref) 
 for more details.
 
-```@repl
+```julia
 using Metaheuristics
 import LinearAlgebra: norm
 

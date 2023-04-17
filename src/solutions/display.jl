@@ -3,21 +3,18 @@ import Base.show
 function print_vector(io, vector)
     n_items_in_vector = 5
     if length(vector) < n_items_in_vector
-        show(io, vector)
+        show(IOContext(io, :compact => true), vector)
         return
     end
 
     @printf(io, "[")
 
     for x in vector[1:2]
-        # show(IOContext(io, :compact=>true), x)
-        # print(io, ", ")
         @printf(io, "%g, ", x)
     end
     print(io, "…, ")
     for x in vector[end:end]
         @printf(io, "%g", x)
-        # show(IOContext(io, :compact=>true), x)
     end
 
     @printf(io, "]")
@@ -76,7 +73,6 @@ end
 
 
 function Base.show(io::IO, status::State)
-    # println(io, "+=========== RESULT ==========+")
     title = "Optimization Result"
     decor = join(repeat('=', length(title)))
     printstyled(io, title, "\n", color=:blue, bold=true)
@@ -97,7 +93,6 @@ function Base.show(io::IO, status::State)
 
     txt = status.stop ? termination_status_message(status) : ""
     @printf(io,"  %-16s %s\n", "Stop reason:", txt)
-    # println(io, "+============================+")
 end
 
 
