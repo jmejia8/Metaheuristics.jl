@@ -4,3 +4,39 @@ dl dd div:target {
     border-radius: 10px;
 }
 
+html.theme--documenter-dark #documenter .docs-main,
+#documenter .docs-main{
+    max-width: 45rem;
+}
+
+
+pre {
+    border-radius: 7px;
+}
+
+article.docstring {
+    border:none;
+    box-shadow: 1px 1px 9px -2px rgba(0,0,0,0.7);
+    -webkit-box-shadow: 1px 1px 9px -2px rgba(0,0,0,0.7);
+    -moz-box-shadow: 1px 1px 9px -2px rgba(0,0,0,0.7);
+    margin-bottom: 2em;
+}
+
+code.nohighlight.ansi {
+    transition: opacity .5s ease-out;
+    opacity: 0.5;
+}
+
+.documenter-example-output code.nohighlight.ansi{
+    opacity: 0.8;
+}
+
+
+pre:hover > code.nohighlight.ansi {
+    opacity: 9;
+}
+
+.content pre {
+  border: 1px solid #e6e6e6;
+}
+
