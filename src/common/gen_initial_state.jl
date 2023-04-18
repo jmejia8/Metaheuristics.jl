@@ -13,7 +13,7 @@ function gen_initial_state(problem,parameters,information,options, status)
         options.debug && @warn("Population size in provided State differs from that in parameters")
     end
 
-    size(problem.bounds,2) != length(get_position(status.best_sol)) &&
+    getdim(problem) != length(get_position(status.best_sol)) &&
         error("Invalid population (dimension does not match with bounds)")
 
     _complete_population!(status,problem,parameters,information,options)
@@ -29,7 +29,7 @@ end
 
 function gen_initial_state(problem,parameters,information,options)
     # population array
-    population = generate_population(parameters.N, problem,ε=options.h_tol)
+    population = generate_population(parameters.N, problem, options.rng,ε=options.h_tol)
 
     # best solution
     best_solution = get_best(population)
@@ -37,14 +37,6 @@ function gen_initial_state(problem,parameters,information,options)
     return State(best_solution, population; f_calls = length(population), iteration=1)
 end
 
-function Base.show(io::IO, parameters::AbstractParameters)
-    s = typeof(parameters)
-
-    vals = string.(map(f -> getfield(parameters, f), fieldnames(s)))
-    str = string(s) * "(" * join(string.(fieldnames(s)) .* "=" .* vals, ", ") * ")"
-
-    print(io, str)
-end
 
 function _complete_population!(status,problem,parameters,information,options)
     if parameters.N < length(status.population)

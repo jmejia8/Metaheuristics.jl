@@ -8,6 +8,9 @@ mutable struct GA{T1, T2, T3, T4, T5} <: AbstractGA
     environmental_selection::T5
 end
 
+iscompatible(search_space::BitArraySpace, algorithm::GA) = true
+iscompatible(search_space::PermutationSpace, algorithm::GA) = true
+
 """
     GA(;
         N = 100,
@@ -41,7 +44,7 @@ f (generic function with 1 method)
 
 julia> dim = 10;
 
-julia> optimize(f, repeat([false, true], 1, dim), GA())
+julia> optimize(f, BitArraySpace(dim), GA())
 +=========== RESULT ==========+
   iteration: 500
     minimum: 0
@@ -62,7 +65,7 @@ julia> perm_size = 10;
 
 julia> ga = GA(;initializer = RandomPermutation(N=100), crossover=OrderCrossover(), mutation=SlightMutation());
 
-julia> optimize(f, zeros(Int,2,perm_size), ga)
+julia> optimize(f, PermutationSpace(perm_size), ga)
 +=========== RESULT ==========+
   iteration: 500
     minimum: 0
@@ -135,8 +138,7 @@ function GA(;
         crossover   = UniformCrossover(p = p_crossover),
         mutation    = BitFlipMutation(p = p_mutation),
         environmental_selection = ElitistReplacement(),
-        options     = Options(),
-        information = Information()
+        kargs...
     )
 
     parameters = GA(initializer,
@@ -146,13 +148,44 @@ function GA(;
                     environmental_selection
                    )
 
-    Algorithm(
-        parameters,
-        information = information,
-        options = options
-    )
+    Algorithm( parameters; kargs...)
 end
 
+# this method is called in src/optimize.jl
+function get_parameters(
+        f,
+        search_space::BoxConstrainedSpace, # real/integer encoding
+        ::Type{T}
+    ) where T <: GA 
+    
+    N = 100
+    GA(;
+        N = N,
+        initializer = RandomInBounds(;N),
+        selection   = TournamentSelection(;N),
+        crossover   = SBX(;bounds=search_space),
+        mutation    = PolynomialMutation(;bounds=search_space),
+        environmental_selection = ElitistReplacement()
+      )
+end
+
+
+function get_parameters(
+        f,
+        search_space::PermutationSpace, # permutation-based encoding
+        ::Type{T}
+    ) where T <: GA
+
+    N = 100
+    GA(;
+       N = N,
+       initializer = RandomPermutation(;N),
+       selection   = TournamentSelection(;N),
+       crossover   = OrderCrossover(),
+       mutation    = SlightMutation(),
+       environmental_selection = ElitistReplacement()
+    )
+end
 
 function initialize!(
         status,

@@ -67,17 +67,11 @@ function SPEA2(;
     p_cr = 0.9,
     η_m = 20,
     p_m = -1,
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
     parameters = SPEA2(N, promote( Float64(η_cr), p_cr, η_m, p_m )...,[])
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
-
+    Algorithm(parameters; kargs...)
 end
 
 

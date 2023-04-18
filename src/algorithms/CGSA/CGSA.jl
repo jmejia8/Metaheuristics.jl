@@ -99,17 +99,15 @@ function CGSA(;
         X::Matrix{Float64} = zeros(0,0),
         V::Matrix{Float64} = zeros(0,0),
         fitness::Vector{Float64} = zeros(0),
-        information = Information(),
-        options = Options()
+        kargs...
     )
 
     parameters = CGSA(N, chValueInitial, chaosIndex, ElitistCheck, Rpower, Rnorm, wMax, wMin, X, V, fitness)
 
 
     Algorithm(
-        parameters,
-        information = information,
-        options = options,
+        parameters;
+        kargs...
     )
 end
 
@@ -126,12 +124,13 @@ function initialize!(
 
     Rnorm = parameters.Rnorm
     N = parameters.N
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
     fobj = problem.f
 
 
     # bounds vectors
-    low, up = problem.bounds[1,:], problem.bounds[2,:]
+    low = problem.search_space.lb
+    up = problem.search_space.ub
 
     max_it = 500
     options.iterations = options.iterations == 0 ? max_it : options.iterations
@@ -199,17 +198,17 @@ function update_state!(
 
 
     #Calculation of accelaration in gravitational field. eq.7-10,21.
-    a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it)
+    a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it, options.rng)
 
     #Agent movement. eq.11-12
-    X, V = move(X,a,V)
+    X, V = move(X,a,V, options.rng)
 
 
     #
     # Checking allowable range. 
     # X = correctPop(X, low, up)
     for i = 1:N
-        x = reset_to_violated_bounds!(X[i,:], problem.bounds)
+        x = reset_to_violated_bounds!(X[i,:], problem.search_space)
         X[i,:] = x
     end
 

@@ -1,8 +1,10 @@
 ################################################
 # Unconstrained
 ################################################
-function fitnessToMass(fitness::Vector{Float64})
-    m = minimum(fitness)
+function fitnessToMass(fitness::Vector{<:Real})
+    m, M = extrema(fitness)
+    # avoid dividing by zero
+    m ≈ 0 && M ≈ 0 && return ones(eltype(fitness), length(fitness))
 
     if m < 0
         fitness = 2 * abs(m) .+ fitness
@@ -18,22 +20,22 @@ end
     get the mass in a vector `m[i] = f[i] + 2*max_fitness*sum_vio[i] `, tolerance
     in equality constraints are given by `epsilon`
 """
-getMass(U::Array{xf_indiv,1}) = fitnessToMass(fvals(U))
+getMass(U::Array{xf_solution{Vector{T}},1}) where T <: Real = fitnessToMass(fvals(U))
 
-function getMass(U::Array{xfgh_indiv,1})
+function getMass(U::Array{xfgh_solution{Vector{T}},1}) where T <: Real
     fitness = fvals(U)
-    fitnessToMass(fitness + 2maximum(abs.(fitness))*sum_violations.(U))
+    M = 2maximum(abs.(fitness))
+    fitnessToMass(fitness + max(M, 100)*sum_violations.(U))
 end
 
+function getMass(U::Array{xFgh_solution{Vector{T}},1}) where T <: Real
+    fitness = sum(fvals(U), dims=2) |> vec
+    M = 2maximum(abs.(fitness))
+    fitnessToMass(fitness + max(M, 100)*sum_violations.(U))
+end
 
 function center(U, mass)
-    d = length(U[1].x)
-
-    c = zeros(Float64, d)
-
-    for i = 1:length(mass)
-        c += mass[i] .* U[i].x
-    end
+    c = sum(m * get_position(u) for (m, u) in zip(mass, U))
 
     return c / sum(mass)
 end
@@ -73,7 +75,7 @@ end
 
 
 
-function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions)
+function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions, rng = default_rng_mh())
     # at least half of the population is feasible to generate random centers
     if length(feasible_solutions) >= 0.5N || length(feasible_solutions) == 0
         return getU_ids(K, I, i, N)
@@ -88,20 +90,21 @@ function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions)
         U_ids = I[j.+1]
     end
     
-    push!(U_ids, rand(feasible_solutions))
+    push!(U_ids, rand(rng, feasible_solutions))
 
     return U_ids
 end
 
 function crossover(
-    x::Vector{Float64},
-    y::Vector{Float64},
+    x::Vector{<:Real},
+    y::Vector{<:Real},
     p_cr::Vector{Float64},
+    rng = default_rng_mh()
 )
     D = length(x)
     tmp2 = zeros(D)
     for j = 1:D
-        if rand() < p_cr[j]
+        if rand(rng) < p_cr[j]
             y[j] = x[j]
             tmp2[j] += 1
         end
@@ -118,10 +121,9 @@ Compute a solution using ECA variation operator, `K` is the number of solutions 
 calculate the center of mass and `η_max` is the maximum stepsize.
 """
 function ECA_operator(
-        # population::AbstractArray{xf_indiv}, K, η_max;
-        population, K, η_max;
-        i = rand(1:length(population)),
-        U = rand(population, K),
+        population, K, η_max, rng = default_rng_mh();
+        i = rand(rng, 1:length(population)),
+        U = rand(rng, population, K),
         bounds = nothing
     )
 
@@ -131,7 +133,7 @@ function ECA_operator(
     c, u_worst, u_best = center(U)
 
     # stepsize
-    η = η_max * rand()
+    η = η_max * rand(rng)
 
     # u: worst element in U
     u = get_position(U[u_worst])
@@ -141,7 +143,7 @@ function ECA_operator(
         return y
     end
 
-    !isempty(bounds) && evo_boundary_repairer!(y, c, bounds)
+    evo_boundary_repairer!(y, c, bounds, rng)
 
     return y
 end

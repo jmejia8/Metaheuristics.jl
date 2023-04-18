@@ -65,17 +65,12 @@ function SA(;
         x_initial::Vector = zeros(0),
         N::Int = 500,
         tol_fun::Real= 1e-4,
-        information = Information(),
-        options = Options()
+        kargs...
     )
     
     parameters = SA(N, x_initial, tol_fun, zeros(0), Inf)
 
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm( parameters; kargs...)
 
     
 end
@@ -91,11 +86,12 @@ function initialize!(
    )
 
 
-    l = view( problem.bounds, 1,:)
-    u = view( problem.bounds, 2,:)
+    l = problem.search_space.lb
+    u = problem.search_space.ub
+    rng = options.rng
 
     if isempty(parameters.x_initial)
-        parameters.x_initial = l .+ (u .- l) .* rand(length(u))
+        parameters.x_initial = l .+ (u .- l) .* rand(rng, length(u))
 	end
 
     if options.f_calls_limit == 0
@@ -134,26 +130,27 @@ function update_state!(
     max_evals = options.f_calls_limit
     N = parameters.N
     TolFun = parameters.tol_fun
+    rng = options.rng
 
     # T is the inverse of temperature.
     T = nevals / max_evals 
     μ = 10.0 ^( 100T )    
 
-    l = view( problem.bounds, 1,:)
-    u = view( problem.bounds, 2,:)
+    l = problem.search_space.lb
+    u = problem.search_space.ub
 
     # For each temperature we take 500 test points to simulate reach termal
     # equilibrium.
     for i = 1:N        
         # We generate new test point using newSol function      
-        dx = newSol(2rand(length(parameters.x)) .- 1.0 , μ) .* (u-l)
+        dx = newSol(2rand(rng, length(parameters.x)) .- 1.0 , μ) .* (u-l)
 
         # the test point and fx1=f(x1)
         x1 = parameters.x + dx
 
         # Next step is to keep solution within bounds
         #x1 = (x1 .< l).*l+(l .<= x1).*(x1 .<= u).*x1+(u .< x1).*u			
-        reset_to_violated_bounds!(x1, problem.bounds)
+        reset_to_violated_bounds!(x1, problem.search_space)
         fx1 = evaluate(x1, problem)
 
         status.f_calls += 1
@@ -164,7 +161,7 @@ function update_state!(
         # If the function variation,df, is <0 we take test point as current
         # point. And if df>0 we use Metropolis condition to accept or
         # reject the test point as current point.
-        if (df < 0 || rand() < exp(-T*df/(abs(parameters.fx)) / TolFun))
+        if (df < 0 || rand(rng) < exp(-T*df/(abs(parameters.fx)) / TolFun))
             parameters.x = x1
             parameters.fx= fx1
         end        

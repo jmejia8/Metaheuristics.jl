@@ -9,6 +9,7 @@ mutable struct xf_solution{X} <: AbstractUnconstrainedSolution # Single Objectiv
 end
 
 const xf_indiv = xf_solution{Vector{Float64}}
+include("utils.jl")
 
 # Single Objective Constrained
 mutable struct xfgh_solution{X} <: AbstractConstrainedSolution 
@@ -130,28 +131,28 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 ```
 
 """
-function create_child(x, fResult::Float64;ε=0.0)
-    return xf_solution(x, fResult)
+function create_child(x, fResult::T;ε=0.0) where T <: Real
+    return xf_solution(x, Float64(fResult))
 end
 
 # constrained single objective
 function create_child(x,
-        fResult::Tuple{Float64,Array{Float64,1},Array{Float64,1}};
+        fResult::Tuple{Real,Array{<:Real,1},Array{<:Real,1}};
         ε=0.0
     )
     f, g, h = fResult
     isempty(g) && isempty(h) && (return xf_solution(x, f))
 
-    return xfgh_indiv(x, f, g, h; ε=ε)
+    return xfgh_indiv(x, Float64(f), Float64.(g), Float64.(h); ε=ε)
 end
 
 # constrained multi-objective
 function create_child(x,
-        fResult::Tuple{Array{Float64,1},Array{Float64,1},Array{Float64,1}};
+        fResult::Tuple{Vector{<:Real},Vector{<:Real},Vector{<:Real}};
         ε = 0.0
     )
     f, g, h = fResult
-    return xFgh_indiv(x, f, g, h;ε=ε)
+    return xFgh_indiv(x, Float64.(f), Float64.(g), Float64.(h);ε=ε)
 end
 
 ##########################################################3
@@ -225,41 +226,35 @@ function create_child(X::AbstractMatrix,
     population
 end
 
+
+#=
+function create_child(X::AbstractMatrix, fResult; ε=0.0)
+    error("""Objective function should return either a Vector or a Tuple depending on the problem.
+          Current output: $fResult of type $(typeof(fResult))
+          Examples on parallelization at https://jmejia8.github.io/Metaheuristics.jl/stable/tutorials/parallelization""")
+end
+=#
+
+
+function create_child(x, fResult; ε = 0.0)
+    error("""
+          Objective function should return either a numerical value or a Tuple depending on the problem.
+          Current output:  `$fResult` of type `$(typeof(fResult))`
+          Examples at https://jmejia8.github.io/Metaheuristics.jl/stable/examples""")
+end
+
 ##########################################################3
 
-function _gen_X(N, bounds::AbstractMatrix{T}) where T <: AbstractFloat 
-    a = view(bounds, 1, :)'
-    b = view(bounds, 2, :)'
-    D = length(a)
-    a .+ (b - a) .* rand(eltype(bounds), N, D)
-end
+function generate_population(N::Int, problem, rng = default_rng_mh();ε=0.0, parallel_evaluation = false)
 
-function _gen_X(N, bounds::AbstractMatrix{T}) where T <: Integer
-    a = view(bounds, 1, :)'
-    b = view(bounds, 2, :)'
-    D = length(a)
-
-    X = zeros(eltype(bounds), N, D)
-    for i in 1:D
-        X[:,i] = rand(a[i]:b[i], N)
-    end
-    return X
-end
-
-function _gen_X(N, bounds::AbstractMatrix{T}) where T <: Bool
-    rand(eltype(bounds), N, size(bounds, 2))
-end
-
-function generate_population(N::Int, problem;ε=0.0, parallel_evaluation = false)
-    X = _gen_X(N, problem.bounds)
+    space = problem.search_space
 
     if problem.parallel_evaluation
+        X = sample(RandomSampler(space; rng), N)
         return create_solutions(X, problem; ε=ε)
     end
     
-    population = [ create_solution(X[i,:], problem; ε=ε) for i in 1:N]
-
-    return population
+    [create_solution(x, problem; ε=ε) for x in rand(rng, space, N)]
 end
 
 
@@ -316,17 +311,19 @@ julia> population = [ Metaheuristics.create_child(rand(2), (randn(2),  randn(2),
 generateChild(x, fx) = create_child(x, fx)
 
 function create_solution(x::AbstractVector, problem::Problem; ε=0.0)
+    xx = _fix_type(x, problem.search_space)
     problem.f_calls += 1
-    return create_child(x, problem.f(x), ε=ε)
+    return create_child(xx, problem.f(xx), ε=ε)
 end
 
 
 function create_solutions(X::AbstractMatrix, problem::Problem; ε=0.0)
-    problem.f_calls += size(X,1)
     if problem.parallel_evaluation
+        problem.f_calls += size(X,1)
+        # FIXME: fix type of X
         return create_child(X, problem.f(X), ε=ε)
     end
-    [create_child(X[i,:], problem.f(X[i,:]), ε=ε) for i in 1:size(X,1)]
+    [create_solution(X[i,:], problem, ε=ε) for i in 1:size(X,1)]
 end
 
 # getters for the above structures

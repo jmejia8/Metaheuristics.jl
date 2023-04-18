@@ -69,8 +69,7 @@ function ECA(;
     ε::Float64 = 0.0,
     adaptive::Bool = false,
     resize_population::Bool = false,
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
 
@@ -89,22 +88,18 @@ function ECA(;
         adaptive,
         resize_population,
     )
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters; kargs...)
 
 end
 
-function eca_solution(status, parameters, options, problem, I, i)
+function eca_solution(status, parameters, options, problem, I, i, rng = default_rng_mh())
     p = status.f_calls / options.f_calls_limit
     # generate U masses
     U = getU(status.population, parameters.K, I, i, parameters.N)
     # generate center of mass
     c, u_worst, u_best = center(U)
     # stepsize
-    η = parameters.η_max * rand()
+    η = parameters.η_max * rand(rng)
     # u: worst element in U
     u = U[u_worst] |> get_position
     # current-to-center/bin
@@ -118,8 +113,8 @@ function eca_solution(status, parameters, options, problem, I, i)
         y = get_position(status.population[i]) .+ η .*(minimizer(status) .- c)
     end
     # binary crossover
-    y, M_current = crossover(U[u_best].x, y, parameters.p_cr)
-    evo_boundary_repairer!(y, c, problem.bounds)
+    y, M_current = crossover(U[u_best].x, y, parameters.p_cr, options.rng)
+    evo_boundary_repairer!(y, c, problem.search_space, rng)
     y, M_current
 end
 
@@ -134,8 +129,8 @@ function update_state!(
         kargs...
     )
 
-    I = randperm(parameters.N)
-    D = size(problem.bounds, 2)
+    I = randperm(options.rng, parameters.N)
+    D = getdim(problem)
 
     parameters.adaptive && (Mcr_fail = zeros(D))
 
@@ -145,7 +140,7 @@ function update_state!(
 
     # For each elements in Population
     for i in 1:parameters.N
-        y, M_current = eca_solution(status, parameters, options,problem,I,i)
+        y, M_current = eca_solution(status, parameters, options,problem,I,i, options.rng)
 
         if options.parallel_evaluation
             X_next[i,:] = y
@@ -174,7 +169,7 @@ function update_state!(
 
     if parameters.adaptive
         parameters.p_cr =
-            adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N)
+            adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N, options.rng)
     end
 
     resize_population!(status, parameters, options)
@@ -237,11 +232,18 @@ function initialize!(
         args...;
         kargs...
     )
-    D = size(problem.bounds, 2)
+
+    if  !(problem.search_space isa BoxConstrainedSpace)
+        s = string(typeof(problem.search_space))
+        error("ECA only works on box-contrained spaces but "*s*" was given.")
+    end
+    
+
+    D = getdim(problem)
 
 
     if parameters.N <= parameters.K
-        parameters.N = parameters.K * D
+        parameters.N = min(parameters.K * D, 1000)
     end
 
     if options.f_calls_limit == 0
@@ -258,13 +260,12 @@ function initialize!(
 
 
     if parameters.adaptive
-        parameters.p_cr = rand(D)
+        parameters.p_cr = rand(options.rng, D)
     else
         parameters.p_cr = parameters.p_bin .* ones(D)
     end
 
 
-    # initialize!(problem, nothing, parameters, status, information, options)
     st = gen_initial_state(problem,parameters,information,options, status)
     st
 
@@ -299,7 +300,7 @@ function reproduction(status, parameters::ECA, problem)
                               parameters.K,
                               parameters.η_max;
                               i=i,
-                             bounds = problem.bounds)
+                             bounds = problem.search_space)
     end
 
     X 

@@ -74,13 +74,12 @@ stop reason: Maximum number of iterations exceeded.
 
 """
 function CCMO(base_algorithm;
-        information = Information(),
-        options = Options(),
+        kargs...
     )
 
     parameters = CCMO(base_algorithm.parameters, xFgh_indiv[],Float64[],Float64[])
 
-    Algorithm(parameters, information = information, options = options)
+    Algorithm(parameters; kargs...)
 end
 
 function initialize!(
@@ -150,10 +149,10 @@ function reproduction(status, parameters::CCMO{NSGA2}, problem)
     # selection
     _s = TournamentSelection(;N=base.N ÷ 2)
     # crossover
-    _c = SBX(η=base.η_cr, p = base.p_cr, bounds = problem.bounds)
+    _c = SBX(η=base.η_cr, p = base.p_cr, bounds = problem.search_space)
     # mutation
-    base.p_m < 0.0 && (base.p_m = 1/size(bounds,2)) 
-    _m = PolynomialMutation(η=base.η_m, p = base.p_m, bounds = problem.bounds)
+    base.p_m < 0.0 && (base.p_m = 1/getdim(problem)) 
+    _m = PolynomialMutation(η=base.η_m, p = base.p_m, bounds = problem.search_space)
 
     # population 1
     parent_mask = selection(population, _s, fitness=fitness1)

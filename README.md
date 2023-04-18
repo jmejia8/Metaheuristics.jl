@@ -16,7 +16,7 @@ High-performance metaheuristics for global optimization.
 
 ## Installation
 
-Open the Julia REPL (v1.1 or later) and press `]` to open the Pkg prompt. To add this package, use the add command:
+Open the Julia REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
 ```
 pkg> add Metaheuristics
@@ -105,14 +105,15 @@ Code the objective function:
 f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
 ```
 
-Instantiate the bounds, note that `bounds` should be a $2\times 10$ `Matrix` where
-the first row corresponds to the lower bounds whilst the second row corresponds to the
-upper bounds.
+Instantiate the bounds:
 
 ```julia
 D = 10
-bounds = [-5ones(D) 5ones(D)]'
+bounds = boxconstraints(lb = -5ones(D), ub = 5ones(D))
 ```
+
+Also, `bounds` can be a $2\times 10$ `Matrix` where the first row corresponds to the
+lower bounds whilst the second row corresponds to the upper bounds.
 
 Approximate the optimum using the function `optimize`.
 

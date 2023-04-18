@@ -3,18 +3,18 @@ import Base.show
 function print_vector(io, vector)
     n_items_in_vector = 5
     if length(vector) < n_items_in_vector
-        show(io, vector)
+        show(IOContext(io, :compact => true), vector)
         return
     end
 
     @printf(io, "[")
 
-    for x in vector[1:2]
-        @printf(io, "%1.3e, ", x)
+    for x in vector[1:3]
+        @printf(io, "%g, ", x)
     end
     print(io, "…, ")
     for x in vector[end:end]
-        @printf(io, "%1.3e", x)
+        @printf(io, "%g", x)
     end
 
     @printf(io, "]")
@@ -55,47 +55,50 @@ function Base.show(io::IO, solution::xFgh_indiv)
 end
 
 
+show_pf(io, pf) = nothing
 function describe_result(io, status::State{T}) where T <: xFgh_solution
-    @printf(io, "%12s", "population:")
-    show(io, "text/plain", Array(status.population))
-
     # non-dominated
     pf = get_non_dominated_solutions(status.population)
-    println(io, "\nnon-dominated solution(s):")
-    show(io, "text/plain", pf)
-    print(io, "\n")
+    @printf(io,"  %-16s ", "Non-dominated:")
+    println(io, length(pf), " / ", length(status.population))
+    show_pf(io, pf)
 end
 
 function describe_result(io, status::State)
-    @printf(io,"%12s %g\n", "minimum:", minimum(status))
-    @printf(io,"%12s ", "minimizer:")
-    show(io, minimizer(status))
+    @printf(io,"  %-16s %g\n", "Minimum:", minimum(status))
+    @printf(io,"  %-16s ", "Minimizer:")
+    print_vector(io, minimizer(status))
     println(io, "")
 end
 
 
 function Base.show(io::IO, status::State)
-    println(io, "+=========== RESULT ==========+")
-    @printf(io,"%12s %.0f\n", "iteration:", status.iteration)
+    title = "Optimization Result"
+    decor = join(repeat('=', length(title)))
+    printstyled(io, title, "\n", color=:blue, bold=true)
+    printstyled(io, decor, "\n", color=:gray)
+
+    status.best_sol isa Nothing && return println(io, "  Empty status.")
+
+    @printf(io,"  %-16s %.0f\n", "Iteration:", status.iteration)
 
     describe_result(io, status)
-    @printf(io,"%12s %.0f\n", "f calls:", status.f_calls)
+    @printf(io,"  %-16s %.0f\n", "Function calls:", status.f_calls)
 
     if eltype(status.population) <: AbstractConstrainedSolution
         n = count(is_feasible, status.population)
-        @printf(io,"%12s %d / %d in final population\n", "feasibles:", n, length(status.population))
+        @printf(io,"  %-16s %d / %d in final population\n", "Feasibles:", n, length(status.population))
     end
-    @printf(io,"%12s %.4f s\n", "total time:", status.final_time - status.start_time)
+    @printf(io,"  %-16s %.4f s\n", "Total time:", status.overall_time)
 
     txt = status.stop ? termination_status_message(status) : ""
-    @printf(io,"%12s %s\n", "stop reason:", txt)
-    println(io, "+============================+")
+    @printf(io,"  %-16s %s\n", "Stop reason:", txt)
 end
 
 
 function Base.show(io::IO, ::MIME"text/html", status::State)
     println(io, "<pre>")
-    show(io, "text/plain", status)
+    show(IOContext(io, :color => false), "text/plain", status)
     println(io, "</pre>")
 end
 

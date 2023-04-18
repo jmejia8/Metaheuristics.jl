@@ -89,17 +89,12 @@ function MCCGA(;
         maxsamples = 10_000,
         mutation = 1 / N,
         use_local_search = true,
-        information = Information(),
-        options = Options()
+        kargs...
     )
 
     parameters = MCCGA(N, maxsamples, mutation, [], use_local_search)
 
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters;kargs...)
 end
 
 function initialize!(
@@ -120,10 +115,10 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
     
-    lower = problem.bounds[1,:]
-    upper = problem.bounds[2,:]
+    lower = problem.search_space.lb
+    upper = problem.search_space.ub
 
-    parameters.probvector = initialprobs(lower, upper, maxsamples = parameters.maxsamples)
+    parameters.probvector = initialprobs(lower, upper, options.rng, maxsamples = parameters.maxsamples)
 
     # sample vectors to create an initial State
     return gen_initial_state(problem,parameters,information,options,status)
@@ -143,8 +138,8 @@ function update_state!(
     chsize = length(probvector)
 
     # parents
-    ch1 = sample(probvector)
-    ch2 = sample(probvector)
+    ch1 = sample(probvector, options.rng)
+    ch2 = sample(probvector, options.rng)
 
     # evaluate cost function
     sol1 = create_solution(floats(ch1), problem)
@@ -203,7 +198,7 @@ function final_stage!(
     costfunction(x) = evaluate(x, problem)
 
     probvector = parameters.probvector
-    sampledvector = sample(probvector)
+    sampledvector = sample(probvector, options.rng)
 
     # initial solution for the local search
     initial_solution = floats(sampledvector)

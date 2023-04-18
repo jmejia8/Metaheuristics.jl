@@ -1,6 +1,6 @@
 # Metaheuristics - an Intuitive Package for Global Optimization
 
-**Author: Jesus Mejía (@jmejia8)**
+**Author: Jesús-Adolfo Mejía-de-Dios (@jmejia8)**
 
 High-performance algorithms for optimization coded purely in a high-performance language.
 
@@ -26,13 +26,13 @@ global optimization.
 
 Open the Julia (Julia 1.1 or Later) REPL and press `]` to open the Pkg prompt. To add this package, use the add command:
 
-```
+```julia-repl
 pkg> add Metaheuristics
 ```
 
 Or, equivalently, via the `Pkg` API:
 
-```julia
+```julia-repl
 julia> import Pkg; Pkg.add("Metaheuristics")
 ```
 
@@ -53,36 +53,45 @@ dimension number, assume $D=10$.
 
 Firstly, import the Metaheuristics package:
 
-```julia
+```@example julia
 using Metaheuristics
 ```
 
 Code the objective function:
-```julia
+
+```@example julia
 f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x)  )
+nothing # hide
 ```
 
-Instantiate the bounds, note that `bounds` should be a $2\times 10$ `Matrix` where
-the first row corresponds to the lower bounds whilst the second row corresponds to the
-upper bounds.
+Instantiate the bounds:
 
-```julia
+```@example julia
 D = 10
-bounds = [-5ones(D) 5ones(D)]'
+bounds = boxconstraints(lb = -5ones(D), ub = 5ones(D))
+nothing # hide
 ```
+
+Also, `bounds` can be a $2\times 10$ `Matrix` where the first row corresponds to the
+lower bounds whilst the second row corresponds to the upper bounds.
 
 Approximate the optimum using the function `optimize`.
 
-```julia
+```@example julia
+import Random: seed! # hide
+seed!(50) # hide
 result = optimize(f, bounds)
 ```
 
 Optimize returns a `State` datatype which contains some information about the approximation.
 For instance, you may use mainly two functions to obtain such an approximation.
 
-```julia
-@show minimum(result)
-@show minimizer(result)
+```@example julia
+minimum(result)
+```
+
+```@example julia
+minimizer(result)
 ```
 
 

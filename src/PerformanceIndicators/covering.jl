@@ -32,16 +32,19 @@ end
 
 covering(A::Vector{T}, B::Vector{T}) where T <: AbstractMultiObjectiveSolution = covering(fval.(A), fval.(B))
 
-function covering(A::State{T}, B::State{T}) where T <: AbstractMultiObjectiveSolution
+function covering(A::State{T}, B::State{T};
+        verbose = true
+    ) where T <: AbstractMultiObjectiveSolution
+
 	A_non_dominated = get_non_dominated_solutions(A.population)
 	B_non_dominated = get_non_dominated_solutions(B.population)
 	
 	length(A_non_dominated) != length(A.population) &&
-	@warn "Some solutions in B dominate each other (solutions ignored)."
+	verbose && @warn "Some solutions in B dominate each other (solutions ignored)."
 
 
 	length(B_non_dominated) != length(B.population) &&
-	@warn "Some solutions in B dominate each other (solutions ignored)."
+	verbose && @warn "Some solutions in B dominate each other (solutions ignored)."
 
 	covering(A_non_dominated, B_non_dominated)
 end

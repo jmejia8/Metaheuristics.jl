@@ -72,16 +72,11 @@ function SMS_EMOA(;
     η_m = 20,
     p_m = -1,
     n_samples = 10_000,
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
     parameters = SMS_EMOA(N, promote( Float64(η_cr), p_cr, η_m, p_m)..., n_samples)
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters; kargs...)
 
 end
 
@@ -102,7 +97,7 @@ function update_state!(
     J = randperm(parameters.N)
 
     if options.parallel_evaluation
-        Q = zeros(parameters.N, size(problem.bounds, 2))
+        Q = zeros(parameters.N, getdim(problem))
     end 
 
     for i = 1:parameters.N
@@ -112,15 +107,15 @@ function update_state!(
         # crossover
         _, c = SBX_crossover(get_position(pa),
                              get_position(pb),
-                             problem.bounds,
+                             problem.search_space,
                              parameters.η_cr,
                              parameters.p_cr)
        
         # mutation
-        polynomial_mutation!(c, problem.bounds, parameters.η_m, parameters.p_m)
+        polynomial_mutation!(c, problem.search_space, parameters.η_m, parameters.p_m)
        
         # repair solutions if necesary
-        reset_to_violated_bounds!(c, problem.bounds)
+        reset_to_violated_bounds!(c, problem.search_space)
 
         if options.parallel_evaluation
             Q[i,:] = c
@@ -165,9 +160,9 @@ function initialize!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-)
-    D = size(problem.bounds, 2)
+    kargs...)
+
+    D = getdim(problem)
 
     if parameters.p_m < 0.0
         parameters.p_m = 1.0 / D

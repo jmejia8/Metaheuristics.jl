@@ -198,6 +198,10 @@ GenerationalReplacement
 ElitistReplacement
 ```
 
+```@docs
+RankAndCrowding
+```
+
 ## Population
 
 

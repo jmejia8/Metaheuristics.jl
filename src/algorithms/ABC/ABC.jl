@@ -54,16 +54,14 @@ function ABC(;
         Ne = div(N+1, 2),
         No = div(N+1, 2),
         limit=10,
-        information = Information(),
-        options = Options()
+        kargs...
     )
     
     parameters = ABC(N, Ne, No, limit)
 
     Algorithm(
-        parameters,
-        information = information,
-        options = options,
+        parameters;
+        kargs...
     )
 
     
@@ -82,7 +80,7 @@ function initialize!(
     options.parallel_evaluation &&
         error("ABC is not supporting parallel evaluation. Put `options.parallel_evaluation=false`")
 
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
@@ -113,19 +111,19 @@ function update_state!(
         kargs...
     )
 
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
     fobj = problem.f
     bees = status.population
     Ne = parameters.Ne
     No = parameters.No
-    bounds = problem.bounds
-    a = view(bounds, 1,:)
-    b = view(bounds, 2,:)
+    bounds = problem.search_space
+    a = bounds.lb
+    b = bounds.ub
 
-    employedPhase!(bees,problem,  Ne)
-    outlookerPhase!(bees,problem, No)
+    employedPhase!(bees,problem,  Ne, options.rng)
+    outlookerPhase!(bees,problem, No, options.rng)
 
-    @inline genPos(D=D, a=Array(a), b = Array(b)) = a + (b - a) .* rand(D)
+    @inline genPos(D=D, a=a, b=b) = a + (b - a) .* rand(options.rng, D)
     best = chooseBest(bees, status.best_sol)
 
     status.f_calls += Ne + No + scoutPhase!(bees, problem, genPos, parameters.limit)

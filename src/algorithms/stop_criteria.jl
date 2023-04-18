@@ -1,3 +1,4 @@
+#=
 function stop_criteria!(
         status,
         parameters::Union{ECA, DE, PSO, CGSA},
@@ -11,3 +12,4 @@ function stop_criteria!(
 
     status.stop = diff_check(status, information, options)
 end
+=#

@@ -107,8 +107,7 @@ function MOEAD_DE(weights ;
     B = Array{Int}[],
     s1 = 0.01,
     s2 = 20.0,
-    information = Information(),
-    options = Options(),
+    kargs...
 )
 
 
@@ -131,15 +130,7 @@ function MOEAD_DE(weights ;
 
     initialize_closest_weight_vectors!(parameters)
 
-    alg = Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
-
-
-
-    alg
+    Algorithm(parameters;kargs...)
 
 end
 
@@ -166,7 +157,7 @@ function initialize!(
 
 
     status = gen_initial_state(problem,parameters,information,options,status)
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
     parameters.nobjectives = length(status.population[1].f)
     parameters.p_m = parameters.p_m < 0.0 ? 1.0 / D : parameters.p_m
 
@@ -193,7 +184,7 @@ function update_state!(
     F = parameters.F
     CR = parameters.CR
 
-    D = size(problem.bounds, 2)
+    D = getdim(problem)
 
 
     N = parameters.N
@@ -211,7 +202,7 @@ function update_state!(
         # reproduction
         v = MOEAD_DE_reproduction(i, P_idx, population, parameters, problem)
         # repair
-        replace_with_random_in_bounds!(v, problem.bounds)
+        replace_with_random_in_bounds!(v, problem.search_space)
         h = create_solution(v, problem)
         # update z
         update_reference_point!(parameters.z, h)
@@ -252,13 +243,13 @@ Perform Differential Evolution operators and polynomial mutation using three vec
 `a, b, c` and parameters `F, CR, p_m, η`, i.e., stepsize, crossover and
 mutation probability.
 """
-function MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds)
+function MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds::BoxConstrainedSpace)
     D = length(a)
     # binomial crossover
     v = zeros(length(a))
 
-    la = view(bounds, 1, :)
-    lb = view(bounds, 2, :)
+    la = bounds.lb
+    lb = bounds.ub
 
     # binomial crossover
     for j in 1:D
@@ -309,7 +300,7 @@ function MOEAD_DE_reproduction(i, P_idx, population, parameters::MOEAD_DE, probl
                           parameters.CR,
                           parameters.p_m,
                           parameters.η,
-                          problem.bounds)
+                          problem.search_space)
 end
 
 g_te_ap(gx, V, τ, s1, s2) = V < τ ? gx + s1*V^2 : gx + s1*τ^2 + s2*(V - τ)

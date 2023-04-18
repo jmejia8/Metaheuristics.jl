@@ -14,16 +14,26 @@ Possible values:
 
 See also [`termination_status_message`](@ref).
 """
-@enum(TerminationStatusCode,
-      ITERATION_LIMIT, 
-      TIME_LIMIT, 
-      EVALUATIONS_LIMIT, 
-      ACCURACY_LIMIT, 
-      OBJECTIVE_VARIANCE_LIMIT,
-      OBJECTIVE_DIFFERENCE_LIMIT,
-      OTHER_LIMIT,
-      UNKNOWN_STOP_REASON,
-     )
+const TerminationStatusCode = AbstractTermination
+
+struct IterationLimit           <: TerminationStatusCode end
+struct TimeLimit                <: TerminationStatusCode end
+struct EvaluationsLimit         <: TerminationStatusCode end
+struct AccuracyLimit            <: TerminationStatusCode end
+struct OtherLimit               <: TerminationStatusCode end
+struct UnknownStopReason        <: TerminationStatusCode end
+struct ObjectiveVarianceLimit   <: TerminationStatusCode end
+struct ObjectiveDifferenceLimit <: TerminationStatusCode end
+
+
+const ITERATION_LIMIT           = IterationLimit()
+const TIME_LIMIT                = TimeLimit()
+const EVALUATIONS_LIMIT         = EvaluationsLimit()
+const ACCURACY_LIMIT            = AccuracyLimit()
+const OTHER_LIMIT               = OtherLimit()
+const UNKNOWN_STOP_REASON       = UnknownStopReason()
+const OBJECTIVE_VARIANCE_LIMIT  = ObjectiveVarianceLimit()
+const OBJECTIVE_DIFFERENCE_LIMIT= ObjectiveDifferenceLimit()
 
 """
     termination_status_message(status)

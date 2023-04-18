@@ -51,15 +51,11 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], WOA(N = 100))
 
 ```
 """
-function WOA(;N = 30, information = Information(), options = Options())
+function WOA(;N = 30, kargs...)
   parameters = WOA(N)
 
 
-  Algorithm(
-            parameters,
-            information = information,
-            options = options,
-           )
+  Algorithm( parameters; kargs...)
 
 end
 
@@ -73,7 +69,8 @@ function initialize!(
     kargs...
   )
 
-  lb, ub= problem.bounds[1,:], problem.bounds[2,:]
+  lb = problem.search_space.lb
+  ub = problem.search_space.ub
 
   #Initialize the positions of search agents
   max_it = 500
@@ -110,8 +107,9 @@ function update_state!(
 
   Max_iter = options.iterations
   N = parameters.N
-  D = size(problem.bounds, 2)
+  D = getdim(problem)
   t = status.iteration
+  rng = options.rng
 
   a=2-t*((2)/Max_iter) # a decreases linearly fron 2 to 0 in Eq. (2.3)
 
@@ -122,23 +120,23 @@ function update_state!(
 
   # Update the Position of search agents 
   for i=1:N
-    r1 = rand() # r1 is a random number in [0,1]
-    r2 = rand() # r2 is a random number in [0,1]
+    r1 = rand(rng) # r1 is a random number in [0,1]
+    r2 = rand(rng) # r2 is a random number in [0,1]
 
     A = 2a*r1 - a  # Eq. (2.3) in the paper
     C = 2r2        # Eq. (2.4) in the paper
 
 
     b = 1               #  parameters in Eq. (2.5)
-    l = (a2-1)*rand()+1   #  parameters in Eq. (2.5)
+    l = (a2-1)*rand(rng)+1   #  parameters in Eq. (2.5)
 
-    p = rand()        # p in Eq. (2.6)
+    p = rand(rng)        # p in Eq. (2.6)
 
-    x = copy(status.population[i].x)
+    x = zeros(D)
     for j = 1:D
       if p < 0.5   
         if abs(A) >= 1
-          rand_leader_index = floor(Int, N* rand()+1)
+          rand_leader_index = floor(Int, N* rand(rng)+1)
           X_rand  = status.population[rand_leader_index].x
           D_X_rand= abs(C*X_rand[j] - x[j]  ) # Eq. (2.7)
           x[j] = X_rand[j]-A*D_X_rand       # Eq. (2.8)
@@ -158,7 +156,7 @@ function update_state!(
 
     end # for j
 
-    reset_to_violated_bounds!(x, problem.bounds)
+    reset_to_violated_bounds!(x, problem.search_space)
     X_new[i,:] = x
   end # for i
 

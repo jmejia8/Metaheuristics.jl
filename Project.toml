@@ -1,7 +1,7 @@
 name = "Metaheuristics"
 uuid = "bcdb8e00-2c21-11e9-3065-2b553b22f898"
 authors = ["Jesus Mejia <jesusmejded@gmail.com>"]
-version = "3.2.16"
+version = "3.3.0"
 
 [deps]
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
@@ -10,16 +10,20 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+SearchSpaces = "eb7571c6-2196-4f03-99b8-52a5a35b3163"
 SnoopPrecompile = "66db9d55-30c0-4569-8b51-7e840670fc0c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 Distances = "^0.10.7"
 JMcDM = "^0.7.1"
+Reexport = "^1"
 Requires = "1"
+SearchSpaces = "^0.2"
 SnoopPrecompile = "1"
-julia = "^1.5"
+julia = "^1.7"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
