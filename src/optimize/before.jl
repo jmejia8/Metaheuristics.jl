@@ -1,12 +1,12 @@
 function _before_optimization!(f, search_space, method, logger)
-    # check whether optimizer is compatible with search_space
-    check_compat(search_space, method.parameters)
 
     # TODO: method = deepcopy(method)
     information = method.information
     options = method.options
     parameters = method.parameters
     problem = Problem(f, search_space; parallel_evaluation=options.parallel_evaluation)
+    # check whether optimizer is compatible with search_space
+    check_compat(problem.search_space, method.parameters)
     seed!(options.seed)
 
     # initialization steps

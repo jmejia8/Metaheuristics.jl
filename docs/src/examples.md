@@ -63,8 +63,8 @@ minimizer(result)
 ```
 
 
-!!! compat "Second run is faster"
-    As you may know, the second run can be faster:
+!!! compat "Second run is faster in Julia"
+    As you may know, the second run can be faster.
 
 
 ## Constrained Optimization
@@ -224,24 +224,20 @@ Sometimes you may need to use the starter solutions you need before the optimiza
 process begins, well, this example illustrates how to do it.
 
 ```@repl
-using Metaheuristics
-f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere);
-D = size(bounds,2);
+using Metaheuristics # hide
+f(x) = abs(x[1]) + x[2]  + x[3]^2 # objective function
+algo  = ECA(N = 61); # optimizer
 
-x_known = 0.6ones(D) # known solution
+# one solution can be provided
+x0 = [0.5, 0.5, 0.5];
 
-X = [ bounds[1,:] + rand(D).* ( bounds[2,:] -  bounds[1,:]) for i in 1:19  ]; # random solutions (uniform distribution)
+set_user_solutions!(algo, x0, f);
 
-push!(X, x_known); # save an interest solution
+# or multiple solutions can be given
+X0 = rand(30, 3); # 30 solutions with dim 3
 
-population = [ Metaheuristics.create_child(x, f(x)) for x in X ]; # generate the population with 19+1 solutions
-
-prev_status = State(Metaheuristics.get_best(population), population); # prior state
-
-method = ECA(N = length(population))
-method.status = prev_status; # say to ECA that you have generated a population
-
-optimize(f, bounds, method) # optimize
+set_user_solutions!(algo, X0, f);
+optimize(f, [0 0 0; 1 1 1.0], algo)
 ```
 
 
