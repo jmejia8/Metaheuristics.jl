@@ -27,6 +27,7 @@ export sample, LatinHypercubeSampling, Grid
 export εDE, Restart
 export optimize!
 export set_user_solutions!
+export boxconstraints
 
 include("externals.jl")
 

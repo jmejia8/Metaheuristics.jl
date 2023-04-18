@@ -9,7 +9,7 @@ function print_vector(io, vector)
 
     @printf(io, "[")
 
-    for x in vector[1:2]
+    for x in vector[1:3]
         @printf(io, "%g, ", x)
     end
     print(io, "…, ")
@@ -98,7 +98,7 @@ end
 
 function Base.show(io::IO, ::MIME"text/html", status::State)
     println(io, "<pre>")
-    show(io, "text/plain", status)
+    show(IOContext(io, :color => false), "text/plain", status)
     println(io, "</pre>")
 end
 

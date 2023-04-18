@@ -13,6 +13,7 @@ get_parameters(f, search_space, ::Type{T}) where T <: AbstractParameters = T()
 
 
 function show_status_oneline(status, parameters, options)
+    # sorry of the hard code :-)
     !options.verbose && (return)
     d = Any[
          "Iteration" => status.iteration,

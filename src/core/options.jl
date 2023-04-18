@@ -25,8 +25,8 @@ end
 
 """
     Options(;
-        x_tol::Real = 1e-5,
-        f_tol::Real = 0.0,
+        x_tol::Real = 1e-8,
+        f_tol::Real = 1e-12,
         f_tol_rel::Real = eps(),
         f_tol_abs::Real = 0.0,
         g_tol::Real = 0.0,
@@ -80,7 +80,7 @@ julia> state = optimize(f, bounds, ECA(options=options));
 """
 function Options(;
         x_tol = 1e-8,
-        f_tol = 0.0,
+        f_tol = 1e-12,
         g_tol = 0.0,
         h_tol = 0.0,
         f_tol_rel = eps(),

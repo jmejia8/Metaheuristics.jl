@@ -15,6 +15,24 @@ using Reexport
 import SearchSpaces: AbstractSearchSpace,getdim
 import SearchSpaces: AtomicSearchSpace, AbstractSampler, Sampler
 
+"""
+    boxconstraints(lb, ub, [rigid])
+    BoxConstrainedSpace(ub, lb, [rigid])
+
+Define a box-constrained search space (alias for BoxConstrainedSpace).
+
+See [`SearchSpaces.BoxConstrainedSpace`](@ref) for more details.
+
+# Example
+
+```julia
+f(x) = (x[1] - 100)^2 + sum(abs.(x[2:end]))
+bounds = boxconstraints(lb = zeros(5), ub = ones(5), rigid = false)
+optimize(f, bounds, ECA)
+```
+"""
+const boxconstraints = BoxConstrainedSpace
+
 function __init__()
     @require UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228" begin
         include("common/show_plots.jl")
