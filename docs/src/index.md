@@ -1,6 +1,6 @@
 # Metaheuristics - an Intuitive Package for Global Optimization
 
-**Author: Jesus Mejía (@jmejia8)**
+**Author: Jesús-Adolfo Mejía-de-Dios (@jmejia8)**
 
 High-performance algorithms for optimization coded purely in a high-performance language.
 
@@ -68,7 +68,7 @@ Instantiate the bounds:
 
 ```@example julia
 D = 10
-bounds = BoxConstrainedSpace(lb = -5ones(D), ub = 5ones(D))
+bounds = boxconstraints(lb = -5ones(D), ub = 5ones(D))
 nothing # hide
 ```
 

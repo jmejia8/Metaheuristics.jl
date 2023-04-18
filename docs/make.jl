@@ -10,6 +10,7 @@ makedocs(
                                   assets = ["assets/favicon.ico", "assets/extra_styles.css"],
                                   analytics = "UA-184071594-1",
                                   collapselevel = 1,
+                                  ansicolor=true,
                                  ),
          sitename="Metaheuristics.jl",
          authors = "Jesús Mejía",

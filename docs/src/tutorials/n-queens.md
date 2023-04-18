@@ -84,7 +84,7 @@ chessboard
 
 ```@example queens
 N = 20
-perm = optimize(attacks, PermutationSpace(N), GA) |> minimizer
+perm = optimize(attacks, PermutationSpace(N), GA, seed=1) |> minimizer
 ```
 
 ```@example queens

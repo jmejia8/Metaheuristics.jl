@@ -20,10 +20,10 @@ f(x) = 10length(x) + sum( x.^2 - 10cos.(2π*x) )
 The search space (a.k.a. box-constraints) can be defined as follows:
 
 ```@example SingleObjective
-bounds = BoxConstrainedSpace(lb = -5ones(10), ub = 5ones(10))
+bounds = boxconstraints(lb = -5ones(10), ub = 5ones(10))
 ```
 
-!!! compat "BoxConstrainedSpace in a Matrix format."
+!!! compat "boxconstraints in a Matrix format."
     You can also define the bounds using `bounds = [-5ones(10) 5ones(10)]'`; however this
     is not longer recommended.
 
