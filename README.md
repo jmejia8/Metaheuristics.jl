@@ -109,7 +109,7 @@ Instantiate the bounds:
 
 ```julia
 D = 10
-bounds = BoxConstrainedSpace(lb = -5ones(D), ub = 5ones(D))
+bounds = boxconstraints(lb = -5ones(D), ub = 5ones(D))
 ```
 
 Also, `bounds` can be a $2\times 10$ `Matrix` where the first row corresponds to the
