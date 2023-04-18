@@ -46,6 +46,10 @@ function Problem(f::Function, bounds::Array{Bool,2}; kargs...)
     Problem(f, BitArraySpace(size(bounds,2)); kargs...)
 end
 
+function Problem(f::Function, b::Tuple{AbstractVector, AbstractVector}; kargs...)
+    Problem(f, _mat_to_bounds(b); kargs...)
+end
+
 function evaluate(x, problem::Problem)
     problem.f_calls += 1
     return problem.f(x)

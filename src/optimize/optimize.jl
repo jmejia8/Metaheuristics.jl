@@ -142,10 +142,10 @@ function optimize(
         kargs...
     ) where T <: AbstractParameters
 
-    search_space = _mat_to_bounds(_search_space)
+    problem = Problem(f, _search_space)
     # configure parameters depending on the search_space
-    algo = get_parameters(f, search_space, T)
+    algo = get_parameters(f, problem.search_space, T)
     set_user_parameters!(algo; kargs...)
     # call optimize api
-    optimize(f, search_space, algo; logger)
+    optimize(f, problem.search_space, algo; logger)
 end
