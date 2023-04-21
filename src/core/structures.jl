@@ -31,8 +31,9 @@ function Problem(f::Function, search_space::AbstractSearchSpace; parallel_evalua
     Problem(f, search_space, 0, parallel_evaluation)
 end
 
-function Problem(f::Function, bounds::AbstractMatrix{T}; kargs...) where T <: Number
+function Problem(f::Function, _bounds::AbstractMatrix{T}; kargs...) where T <: Number
     # old problem definition
+    bounds = Array(_bounds)
 
     if size(bounds,1) > 2 && size(bounds,2) == 2
         bounds = Array(bounds')
