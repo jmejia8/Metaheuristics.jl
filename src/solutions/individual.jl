@@ -246,7 +246,7 @@ end
 ##########################################################3
 
 @inline _num_to_vec(v::Number) = [v]
-@inline _num_to_vec(v::Array) = v
+@inline _num_to_vec(v::AbstractArray) = v
 
 function generate_population(N::Int, problem, rng = default_rng_mh();ε=0.0, parallel_evaluation = false)
 
