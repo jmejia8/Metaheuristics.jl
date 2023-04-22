@@ -11,7 +11,9 @@ using JMcDM
 using Requires
 using Reexport
 
-@reexport using SearchSpaces
+@reexport import SearchSpaces
+@reexport import SearchSpaces: BoxConstrainedSpace, PermutationSpace, BitArraySpace
+using SearchSpaces
 import SearchSpaces: AbstractSearchSpace,getdim
 import SearchSpaces: AtomicSearchSpace, AbstractSampler, Sampler
 
