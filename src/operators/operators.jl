@@ -12,6 +12,7 @@ include("selection/selection.jl")
 include("crossover/order.jl")
 include("crossover/sbx.jl")
 include("crossover/uniform.jl")
+include("crossover/binomial.jl")
 
 include("mutation/bitflip.jl")
 include("mutation/polynomial.jl")
