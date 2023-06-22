@@ -13,10 +13,10 @@ end
 function PolynomialMutation(;
         η = 15.0,
         bounds = zeros(0,0),
-        p=1/getdim(bounds),
+        p=1/getdim(_mat_to_bounds(bounds)),
         rng = default_rng_mh()
     )
-    PolynomialMutation(η, isfinite(p) ? p : 1e-2, bounds, rng)
+    PolynomialMutation(η, isfinite(p) ? p : 1e-2, _mat_to_bounds(bounds), rng)
 end
 
 function mutation!(Q, parameters::PolynomialMutation)
