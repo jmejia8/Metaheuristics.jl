@@ -61,14 +61,14 @@ end
 
 mutable struct BiasedSelection
     num_elites::Int
+    num_offsprings::Int
 end
 
-BiasedSelection(;num_elites = 0) = BiasedSelection(num_elites)
 
 function selection(population, parameters::BiasedSelection)
     elites = 1:parameters.num_elites
     no_elites = parameters.num_elites+1:length(population)
-    n = length(population) ÷ 2
+    n = parameters.num_offsprings ÷ 2
 
     parent = ones(Int, 2n)
     parent[1:2:end] = rand(elites, n)
