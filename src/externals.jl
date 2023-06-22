@@ -13,6 +13,7 @@ using Reexport
 
 @reexport import SearchSpaces
 @reexport import SearchSpaces: BoxConstrainedSpace, PermutationSpace, BitArraySpace
+@reexport import SearchSpaces: cardinality
 using SearchSpaces
 import SearchSpaces: AbstractSearchSpace,getdim
 import SearchSpaces: AtomicSearchSpace, AbstractSampler, Sampler

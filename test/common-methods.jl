@@ -186,7 +186,8 @@ import Random: seed!
         pop1 = Metaheuristics.create_child(rand(N,D), rand(N)) 
         pop2 = Metaheuristics.create_child(rand(N,D), (rand(N), -ones(N,2), zeros(N,2))) 
 
-        problem = Metaheuristics.Problem(x -> rand(), [zeros(D)'; ones(D)'])
+        bounds = [zeros(D)'; ones(D)']
+        problem = Metaheuristics.Problem(x -> rand(), bounds)
         for pop in [pop1, pop2]
             status = State(pop[1], pop)
             X = Metaheuristics.reproduction(status, ECA(N=N,K=3).parameters, problem)
@@ -195,6 +196,9 @@ import Random: seed!
         end
 
         v = Metaheuristics.GA_reproduction_half(rand(D), rand(D), problem.bounds)
+        @test PolynomialMutation(;bounds) isa PolynomialMutation
+        @test SBX(;bounds) isa SBX
+
         @test length(v) == D
     end
 

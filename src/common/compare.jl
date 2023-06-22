@@ -78,7 +78,7 @@ end
 """
 function compare(a::Vector, b::Vector)
     k = length(a)
-    @assert k == length(b)
+    @assert k == length(b) "Seems that objective function returns vectors of different sizes."
 
     i = 1
     while i <= k && a[i] == b[i]

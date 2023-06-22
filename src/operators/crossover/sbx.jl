@@ -10,7 +10,7 @@ mutable struct SBX
     rng
 end
 
-SBX(;η=15, p=0.9, bounds=zeros(0,0), rng = default_rng_mh()) = SBX(η, p, bounds, rng)
+SBX(;η=15, p=0.9, bounds=zeros(0,0), rng = default_rng_mh()) = SBX(η, p, _mat_to_bounds(bounds), rng)
 
 
 function crossover(population, parameters::SBX)
