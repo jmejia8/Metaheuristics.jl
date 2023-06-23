@@ -14,6 +14,7 @@ export hval, gval, hvals, gvals
 export NSGA3, gen_ref_dirs
 
 export SMS_EMOA, SPEA2, MCCGA, CCMO
+export BRKGA
 
 export PerformanceIndicators, pareto_front, nadir, ideal
 export termination_status_message
@@ -120,7 +121,7 @@ include("algorithms/Restart/Restart.jl")
 
 # genetic algorithm
 include("algorithms/MCCGA/MCCGA.jl")
-
+include("algorithms/BRKGA/BRKGA.jl")
 
 include("algorithms/stop_criteria.jl")
 

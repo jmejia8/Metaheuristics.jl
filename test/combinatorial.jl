@@ -52,10 +52,23 @@
         @test minimum(result) ≈ f(1:n)
         test_results(result)
     end
- 
+
+    function rkga()
+        n = 5
+        target_perm = collect(reverse(1:n))
+        # decoder
+        decode(rk) = sortperm(rk);
+        # objective function
+        f(rk) = sum(abs.(decode(rk) - target_perm));
+        res = optimize(f, [zeros(n) ones(n)], BRKGA(num_elites=50))
+        @test decode(minimizer(res)) == target_perm
+    end
+
+
+    rkga()
     #### Permutation
     TSP_problem()
- 
+
     #### Binary
     options = Options(seed = 1, f_tol = 1e-16, iterations=1000)
     information = Information(f_optimum = 0.0)

@@ -58,3 +58,20 @@ function binary_tournament(population, fitness::Vector{T})  where T <: Real
 
     return fitness[a] < fitness[b] ? population[a] : population[b]
 end
+
+mutable struct BiasedSelection
+    num_elites::Int
+    num_offsprings::Int
+end
+
+
+function selection(population, parameters::BiasedSelection)
+    elites = 1:parameters.num_elites
+    no_elites = parameters.num_elites+1:length(population)
+    n = parameters.num_offsprings ÷ 2
+
+    parent = ones(Int, 2n)
+    parent[1:2:end] = rand(elites, n)
+    parent[2:2:end] = rand(no_elites, n)
+    parent
+end

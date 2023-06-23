@@ -1,3 +1,6 @@
+include("insert_random.jl")
+
+
 """
     DE_mutation(population, F = 1.0, strategy = :rand1)
 

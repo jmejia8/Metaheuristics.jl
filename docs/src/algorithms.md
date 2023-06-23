@@ -22,6 +22,7 @@ contributor's understanding of the algorithms detailed in the published paper.
 | GA        |  Single    |      ✅     |   ➖        |   ✅        | [`GA`](@ref)           |
 | CCMO      |  Multi     |      ✅     |   ➖        |   ✅        | [`CCMO`](@ref)         |
 | $\varepsilon$DE |  Single   | ✅     |   ➖        |   ✅        | [`εDE`](@ref)          |
+| BRKGA     |  Single    |      ✅     |   ➖        |   ✅        | [`BRKGA`](@ref)           |
 
 
 ✅ = supported,
@@ -173,4 +174,12 @@ CCMO
 
 ```@docs
 εDE
+```
+
+## BRKGA
+
+Biased Random Key Genetic Algorithm by [Gonalves2010](@cite).
+
+```@docs
+BRKGA
 ```
