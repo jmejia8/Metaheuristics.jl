@@ -37,6 +37,7 @@ end
         store_convergence::Bool = false,
         debug::Bool = false,
         seed = rand(UInt),
+        rng  = default_rng_mh(seed),
         parallel_evaluation = false,
         verbose = false,
     )
