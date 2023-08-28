@@ -243,8 +243,8 @@ function final_stage!(
 end
 
 
-function tournament_selection(P, options)
-    a = rand(options.rng, 1:length(P))
+function tournament_selection(P, a=-1; options)
+    (a < 0) && (a = rand(options.rng, 1:length(P)))
     # chose two different solutions at random
     b = rand(options.rng, 1:length(P))
     while a == b 
@@ -266,8 +266,8 @@ function reproduction(status, parameters::AbstractNSGA, problem, options)
     Q = zeros(2N_half, getdim(problem))
 
     for i in 1:N_half
-        pa = tournament_selection(status.population, options)
-        pb = tournament_selection(status.population, options)
+        pa = tournament_selection(status.population; options)
+        pb = tournament_selection(status.population; options)
 
         c1, c2 = GA_reproduction(get_position(pa),
                                  get_position(pb),
