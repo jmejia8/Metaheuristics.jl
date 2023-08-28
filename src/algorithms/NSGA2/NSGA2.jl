@@ -120,7 +120,7 @@ function GA_reproduction(pa::AbstractVector{T},
         η_m  = 15,
         p_cr = 0.9,
         p_m  = 0.1,
-        rng = default_rng_mh()
+        rng  = default_rng_mh()
     ) where T <: AbstractFloat
 
 
@@ -128,8 +128,8 @@ function GA_reproduction(pa::AbstractVector{T},
     c1, c2 = SBX_crossover(pa, pb, bounds, η_cr, p_cr, rng)
 
     # mutation
-    polynomial_mutation!(c1, bounds,η_m, p_m)
-    polynomial_mutation!(c2, bounds,η_m, p_m)
+    polynomial_mutation!(c1, bounds, η_m, p_m, rng)
+    polynomial_mutation!(c2, bounds, η_m, p_m, rng)
 
     # rapair solutions if necesary
     reset_to_violated_bounds!(c1, bounds)
@@ -156,15 +156,16 @@ function GA_reproduction_half(pa::AbstractVector{T},
         η_cr = 20,
         η_m  = 15,
         p_cr = 0.9,
-        p_m  = 0.1
+        p_m  = 0.1,
+        rng  = default_rng_mh()
     ) where T <: AbstractFloat
 
 
     # crossover
-    _, c = SBX_crossover(pa, pb, bounds, η_cr, p_cr)
+    _, c = SBX_crossover(pa, pb, bounds, η_cr, p_cr, rng)
 
     # mutation
-    polynomial_mutation!(c, bounds,η_m, p_m)
+    polynomial_mutation!(c, bounds, η_m, p_m, rng)
 
     # rapair solution if necesary
     reset_to_violated_bounds!(c, bounds)
