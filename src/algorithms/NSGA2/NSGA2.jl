@@ -91,7 +91,7 @@ function update_state!(
     )
 
 
-    Q = reproduction(status, parameters, problem)
+    Q = reproduction(status, parameters, problem, options)
 
     append!(status.population, create_solutions(Q, problem))
 
@@ -243,11 +243,12 @@ function final_stage!(
 end
 
 
-function tournament_selection(P, a = rand(1:length(P)))
+function tournament_selection(P, options)
+    a = rand(options.rng, 1:length(P))
     # chose two different solutions at random
-    b = rand(1:length(P))
+    b = rand(options.rng, 1:length(P))
     while a == b 
-        b = rand(1:length(P))
+        b = rand(options.rng, 1:length(P))
     end
 
     # perform selection
@@ -258,15 +259,15 @@ end
 ###########################################
 ## generic GA reproduction
 ###########################################
-function reproduction(status, parameters::AbstractNSGA, problem)
+function reproduction(status, parameters::AbstractNSGA, problem, options)
     @assert !isempty(status.population)
 
     N_half = parameters.N
     Q = zeros(2N_half, getdim(problem))
 
     for i in 1:N_half
-        pa = tournament_selection(status.population)
-        pb = tournament_selection(status.population)
+        pa = tournament_selection(status.population, options)
+        pb = tournament_selection(status.population, options)
 
         c1, c2 = GA_reproduction(get_position(pa),
                                  get_position(pb),
