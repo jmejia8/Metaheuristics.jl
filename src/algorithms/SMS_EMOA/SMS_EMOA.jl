@@ -101,8 +101,8 @@ function update_state!(
     end 
 
     for i = 1:parameters.N
-        pa = tournament_selection(status.population, I[i])
-        pb = tournament_selection(status.population, J[i])
+        pa = tournament_selection(status.population, options, I[i])
+        pb = tournament_selection(status.population, options, J[i])
 
         # crossover
         _, c = SBX_crossover(get_position(pa),

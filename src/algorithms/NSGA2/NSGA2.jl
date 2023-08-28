@@ -119,12 +119,13 @@ function GA_reproduction(pa::AbstractVector{T},
         η_cr = 20,
         η_m  = 15,
         p_cr = 0.9,
-        p_m  = 0.1
+        p_m  = 0.1,
+        rng = default_rng_mh()
     ) where T <: AbstractFloat
 
 
     # crossover
-    c1, c2 = SBX_crossover(pa, pb, bounds, η_cr, p_cr)
+    c1, c2 = SBX_crossover(pa, pb, bounds, η_cr, p_cr, rng)
 
     # mutation
     polynomial_mutation!(c1, bounds,η_m, p_m)
@@ -182,7 +183,7 @@ function GA_reproduction_half(pa::AbstractVector{T},
 
 end
 
-function reproduction(pa, pb, parameters::AbstractNSGA, problem)
+function reproduction(pa, pb, parameters::AbstractNSGA, problem, options)
     # crossover and mutation
     c1, c2 = GA_reproduction(get_position(pa),
                              get_position(pb),
@@ -190,7 +191,8 @@ function reproduction(pa, pb, parameters::AbstractNSGA, problem)
                              η_cr = parameters.η_cr,
                              p_cr = parameters.p_cr,
                              η_m = parameters.η_m,
-                             p_m = parameters.p_m)
+                             p_m = parameters.p_m,
+                             rng = options.rng)
 
     # evaluate offspring
     create_solution(c1, problem), create_solution(c2, problem) 
@@ -243,7 +245,7 @@ function final_stage!(
 end
 
 
-function tournament_selection(P, a=-1; options)
+function tournament_selection(P, options, a=-1)
     (a < 0) && (a = rand(options.rng, 1:length(P)))
     # chose two different solutions at random
     b = rand(options.rng, 1:length(P))
@@ -266,8 +268,8 @@ function reproduction(status, parameters::AbstractNSGA, problem, options)
     Q = zeros(2N_half, getdim(problem))
 
     for i in 1:N_half
-        pa = tournament_selection(status.population; options)
-        pb = tournament_selection(status.population; options)
+        pa = tournament_selection(status.population, options)
+        pb = tournament_selection(status.population, options)
 
         c1, c2 = GA_reproduction(get_position(pa),
                                  get_position(pb),
