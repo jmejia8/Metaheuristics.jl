@@ -278,7 +278,8 @@ function reproduction(status, parameters::AbstractNSGA, problem, options)
                                  η_cr = parameters.η_cr,
                                  p_cr = parameters.p_cr,
                                  η_m = parameters.η_m,
-                                 p_m = parameters.p_m)
+                                 p_m = parameters.p_m,
+                                 options.rng)
         Q[2i-1,:] = c1
         Q[2i,:] = c2
     end
