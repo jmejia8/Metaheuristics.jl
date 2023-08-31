@@ -90,7 +90,7 @@ function update_state!(
         parameters.fitness = compute_fitness(status.population)
     end
 
-    Q = reproduction(status, parameters, problem)
+    Q = reproduction(status, parameters, problem, options)
 
     append!(status.population, create_solutions(Q, problem))
 
