@@ -94,7 +94,7 @@ Optimizasyon Yöntemi", TR Patent 2018-GE-510,239
 function bits(f::T)::Array{Int8,1} where {T<:Number}
     newf = Float32(f)
     casted = reinterpret(Int32, newf)
-    return reverse(map(i-> casted >> i & 1, 0:31))
+    return map(i-> casted >> i & 1, 31:(-1):0)
 end
 
 """
