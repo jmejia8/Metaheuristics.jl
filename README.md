@@ -47,6 +47,7 @@ considered in most of the [implemented algorithms](https://jmejia8.github.io/Met
 - **WOA**: Whale Optimization Algorithm
 - **MCCGA**: Machine-coded Compact Genetic Algorithm
 - **GA**: Genetic Algorithm
+- **BRKGA**: Biased Random Key Genetic Algorithm
 
 ### Multi-Objective Optimization
 
