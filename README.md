@@ -164,5 +164,5 @@ in your scientific paper if you use `Metaheristics.jl`.
 ## Contributing
 
 
-Please, be free to send me your PR, issue or any comment about this package for Julia.
+Please feel free to send me your PR, issue or any comment about this package for Julia.
 
