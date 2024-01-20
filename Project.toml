@@ -17,12 +17,21 @@ SnoopPrecompile = "66db9d55-30c0-4569-8b51-7e840670fc0c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
+Aqua = "^0.8"
 Distances = "^0.10.7"
 JMcDM = "^0.7.1"
+LinearAlgebra = "1"
+Pkg = "1"
+Printf = "1"
+Random = "1"
 Reexport = "^1"
 Requires = "1"
+Statistics = "1"
 SearchSpaces = "^0.2"
 SnoopPrecompile = "1"
+Test = "1"
+UnicodePlots = "2.6, 3"
+
 julia = "^1.7"
 
 [extras]
