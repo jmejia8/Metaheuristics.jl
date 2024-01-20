@@ -94,7 +94,7 @@ function update_state!(
     rng = options.rng
     # stepsize
     if parameters.F_min < parameters.F_max
-        F = parameters.F_min + (F_max - parameters.F_min) * rand(rng)
+        F = parameters.F_min + (parameters.F_max - parameters.F_min) * rand(rng)
     end
 
     if parameters.CR_min < parameters.CR_max
