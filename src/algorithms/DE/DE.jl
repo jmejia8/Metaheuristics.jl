@@ -185,14 +185,14 @@ end
 
 
 function reproduction(status, parameters::AbstractDifferentialEvolution, problem)
-    @assert !isempty(status.population)
+    population = status.population
+    @assert !isempty(population)
 
     N = parameters.N
-    D = length(get_position(status.population[1]))
+    D = length(get_position(population[1]))
 
     strategy = parameters.strategy
     xBest = get_position(status.best_sol)
-    population = status.population
     F = parameters.F
     CR = parameters.CR
 
@@ -203,7 +203,7 @@ function reproduction(status, parameters::AbstractDifferentialEvolution, problem
         u = DE_mutation(population, F, strategy, 1)
         v = DE_crossover(x, u, CR)
         evo_boundary_repairer!(v, xBest, problem.search_space)
-        X[i,:] = _fix_type(v, problem.search_space)
+        X[i,:] .= _fix_type(v, problem.search_space)
     end
 
     X 
