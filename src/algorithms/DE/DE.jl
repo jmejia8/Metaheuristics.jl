@@ -68,8 +68,7 @@ function DE(;
     )
 
 
-    parameters =
-    DE(N, promote(F, CR, CR_min, CR_max, F_min, F_max)..., strategy)
+    parameters = DE(N, promote(F, CR, CR_min, CR_max, F_min, F_max)..., strategy)
 
     Algorithm(parameters; kargs...)
 
@@ -85,21 +84,15 @@ function update_state!(
         args...;
         kargs...
     )
-    population = status.population
-
-    F = parameters.F
-    CR = parameters.CR
 
 
-    rng = options.rng
     # stepsize
     if parameters.F_min < parameters.F_max
-        F = parameters.F_min + (parameters.F_max - parameters.F_min) * rand(rng)
+        parameters.F = parameters.F_min + (parameters.F_max - parameters.F_min) * rand(options.rng)
     end
 
     if parameters.CR_min < parameters.CR_max
-        CR =
-        parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand(rng)
+        parameters.CR = parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand(options.rng)
     end
 
     new_vectors = reproduction(status, parameters, problem)
@@ -192,25 +185,25 @@ end
 
 
 function reproduction(status, parameters::AbstractDifferentialEvolution, problem)
-    @assert !isempty(status.population)
+    population = status.population
+    @assert !isempty(population)
 
     N = parameters.N
-    D = length(get_position(status.population[1]))
+    D = length(get_position(population[1]))
 
     strategy = parameters.strategy
     xBest = get_position(status.best_sol)
-    population = status.population
     F = parameters.F
     CR = parameters.CR
 
-    X = zeros(eltype(xBest), N,D)
+    X = zeros(eltype(xBest), N, D)
 
     for i in 1:N
         x = get_position(population[i])
         u = DE_mutation(population, F, strategy, 1)
         v = DE_crossover(x, u, CR)
         evo_boundary_repairer!(v, xBest, problem.search_space)
-        X[i,:] = _fix_type(v, problem.search_space)
+        X[i,:] .= _fix_type(v, problem.search_space)
     end
 
     X 
