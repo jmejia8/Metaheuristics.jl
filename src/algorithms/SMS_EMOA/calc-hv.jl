@@ -1,9 +1,28 @@
+#in julia 1.11 and above, compute_itspace was removed.
+if isdefined(Base,:compute_itspace)
+    compute_itspace(A,v) = Base.compute_itspace(A,v)
+else
+    # Works around inference's lack of ability to recognize partial constness
+    struct DimSelector{dims, T}
+        A::T
+    end
+    
+    DimSelector{dims}(x::T) where {dims, T} = DimSelector{dims, T}(x)
+    (ds::DimSelector{dims, T})(i) where {dims, T} = i in dims ? axes(ds.A, i) : (:,)
+
+    function compute_itspace(A, ::Val{dims}) where {dims}
+        negdims = filter(i->!(i in dims), 1:ndims(A))
+        axs = Iterators.product(ntuple(DimSelector{dims}(A), ndims(A))...)
+        vec(permutedims(collect(axs), (dims..., negdims...)))
+    end
+end
+
 function sortslicesperm(A::AbstractArray; dims::Union{Integer, Tuple{Vararg{Integer}}}, kws...)
     _sortslicesperm(A, Val{dims}(); kws...)
 end
 
 function _sortslicesperm(A::AbstractArray, d::Val{dims}; kws...) where dims
-    itspace = Base.compute_itspace(A, d)
+    itspace = compute_itspace(A, d)
     vecs = map(its->view(A, its...), itspace)
     p = sortperm(vecs; kws...)
     if ndims(A) == 2 && isa(dims, Integer) && isa(A, Array)
