@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Parallelization · Metaheuristics.jl</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-184071594-1"></script><script>  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-184071594-1', {'page_path': location.pathname + location.search + location.hash});
+</script><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/><link href="../../assets/extra_styles.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img class="docs-light-only" src="../../assets/logo.png" alt="Metaheuristics.jl logo"/><img class="docs-dark-only" src="../../assets/logo-dark.png" alt="Metaheuristics.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">Metaheuristics.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Index</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2"><span class="docs-label">Tutorials</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../simple-tutorial/">Getting Started</a></li><li><a class="tocitem" href="../create-metaheuristic/">Create Your Own Metaheuristic</a></li><li class="is-active"><a class="tocitem" href>Parallelization</a><ul class="internal"><li><a class="tocitem" href="#Threads:-Single-Objective-Optimization"><span>Threads: Single-Objective Optimization</span></a></li><li><a class="tocitem" href="#Threads:-Constrained-Optimization"><span>Threads: Constrained Optimization</span></a></li><li><a class="tocitem" href="#Threads:-Multi-objective-Optimization"><span>Threads: Multi-objective Optimization</span></a></li><li><a class="tocitem" href="#Distributed"><span>Distributed</span></a></li></ul></li><li><a class="tocitem" href="../n-queens/">N-Queens</a></li></ul></li><li><a class="tocitem" href="../../examples/">Examples</a></li><li><a class="tocitem" href="../../algorithms/">Algorithms</a></li><li><a class="tocitem" href="../../problems/">Problems</a></li><li><a class="tocitem" href="../../indicators/">Performance Indicators</a></li><li><a class="tocitem" href="../../mcdm/">Multi-Criteria Decision Making</a></li><li><a class="tocitem" href="../../visualization/">Visualization</a></li><li><a class="tocitem" href="../../api/">API References</a></li><li><a class="tocitem" href="../../faq/">FAQ</a></li><li><a class="tocitem" href="../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Parallelization</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Parallelization</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/Metaheuristics.jl/blob/master/docs/src/tutorials/parallelization.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Parallelization"><a class="docs-heading-anchor" href="#Parallelization">Parallelization</a><a id="Parallelization-1"></a><a class="docs-heading-anchor-permalink" href="#Parallelization" title="Permalink"></a></h1><p>Evaluating multiple solutions at the same time can reduce computational time. This tutorial shows how to implement parallel evaluations.</p><h2 id="Threads:-Single-Objective-Optimization"><a class="docs-heading-anchor" href="#Threads:-Single-Objective-Optimization">Threads: Single-Objective Optimization</a><a id="Threads:-Single-Objective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Threads:-Single-Objective-Optimization" title="Permalink"></a></h2><p>First, open Julia with the command <code>julia -t4</code> if you have <code>4</code> threads available (select the number of threads regarding your computer capabilities).</p><p>Let&#39;s assume that you have an expensive objective function that takes a decision vector.</p><pre><code class="language-julia-repl hljs">julia&gt; f(x) = begin
+           sleep(1)
+           sum(x)
+       end</code></pre><p><strong>Without parallelization:</strong></p><pre><code class="language-julia-repl hljs">julia&gt; optimize(f, [-10ones(5) 10ones(5)], ECA(options=Options(iterations=10)))
+
++=========== RESULT ==========+
+  iteration: 10
+    minimum: -41.6528
+  minimizer: [-9.397440235044382, -9.928665036618323, -4.635292227471077, -8.901490335239036, -8.789883453491104]
+    f calls: 350
+ total time: 350.7866 s
+stop reason: Maximum number of iterations exceeded.
++============================+</code></pre><p>To evaluate <code>f</code> in different threads, you only need to perform a batch evaluation as follows. Note that set <code>parallel_evaluation = true</code> in <code>Options()</code> is mandatory for batch evaluations.</p><pre><code class="language-julia-repl hljs">julia&gt; function f_parallel(X)
+           fitness = zeros(size(X,1))
+           Threads.@threads for i in 1:size(X,1)
+               fitness[i] = f(X[i,:])
+           end
+           fitness
+       end
+
+julia&gt; options = Options(iterations=10, parallel_evaluation=true);
+
+julia&gt; optimize(f_parallel, [-10ones(5) 10ones(5)], ECA(;options))
++=========== RESULT ==========+
+  iteration: 10
+    minimum: -40.3347
+  minimizer: [-8.584413535451635, -7.376644826521645, -7.756398645618526, -9.066386783877238, -7.550888765058555]
+    f calls: 350
+ total time: 90.2019 s
+stop reason: Maximum number of iterations exceeded.
++============================+</code></pre><p>You can see 300% (approx) of speed up using 4 threads.</p><h2 id="Threads:-Constrained-Optimization"><a class="docs-heading-anchor" href="#Threads:-Constrained-Optimization">Threads: Constrained Optimization</a><a id="Threads:-Constrained-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Threads:-Constrained-Optimization" title="Permalink"></a></h2><p>This part gives how to evaluate constraints in different threads.</p><pre><code class="language-julia-repl hljs">julia&gt; function f_parallel(X)
+           N = size(X,1)
+           fx, gx, hx = zeros(N), zeros(N,2), zeros(N,1)
+           Threads.@threads for i in 1:size(X,1)
+               x = X[i,:]
+               fx[i] = sum(x.^2)     # objective function
+               gx[i, 1] = sum(x) - 1 # constraint 1
+               gx[i, 2] = 1 - sum(x) # constraint 2
+           end
+           fx, gx, hx
+       end
+
+julia&gt; options = Options(parallel_evaluation=true);
+
+julia&gt; optimize(f_parallel, [-10ones(5) 10ones(5)], ECA(;options))
++=========== RESULT ==========+
+  iteration: 1345
+    minimum: 0.2
+  minimizer: [0.20000000134830526, 0.19999999986544995, 0.1999999991116526, 0.19999999921887918, 0.20000000045571298]
+    f calls: 47075
+  feasibles: 35 / 35 in final population
+ total time: 0.8151 s
+stop reason: Small difference of objective function values.
++============================+</code></pre><h2 id="Threads:-Multi-objective-Optimization"><a class="docs-heading-anchor" href="#Threads:-Multi-objective-Optimization">Threads: Multi-objective Optimization</a><a id="Threads:-Multi-objective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Threads:-Multi-objective-Optimization" title="Permalink"></a></h2><p>Assume that <code>f</code> is an expensive function.</p><pre><code class="language-julia-repl hljs">julia&gt; f, bounds, pf = Metaheuristics.TestProblems.ZDT3();</code></pre><p>Let&#39;s implement a function that evaluates <code>f</code> in multiple threads.</p><pre><code class="language-julia-repl hljs">julia&gt; function f_parallel(X)
+                  N = size(X,1)
+                  nobjectives = 2
+                  fx, gx, hx = zeros(N,nobjectives), zeros(N,1), zeros(N,1)
+                  Threads.@threads for i in 1:N
+                      fx[i,:], gx[i,:], hx[i,:] = f(X[i,:])
+                  end
+                  fx, gx, hx
+              end
+f_parallel (generic function with 1 method)</code></pre><p>Now, optimize <code>f_parallel</code>.</p><pre><code class="language-julia-repl hljs">julia&gt; options = Options(parallel_evaluation=true); # this is important
+
+julia&gt; optimize(f_parallel, bounds, NSGA2(;options))
++=========== RESULT ==========+
+  iteration: 500
+ population:         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+         ┌────────────────────────────────────────┐ 
+       2 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⢣⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠈⠢⠤⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   f₂    │⠀⠀⠀⠀⠀⠀⠀⠀⠘⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠣⡀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠻⠍⠉⠉⠉⠉⠉⠉⢭⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠀⠀⠀⠀⠀⠀⠀⢰⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢇⠀⠀│ 
+      -1 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         └────────────────────────────────────────┘ 
+         ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀0.9⠀ 
+         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+non-dominated solution(s):
+         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+         ┌────────────────────────────────────────┐ 
+       2 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⢣⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠈⠢⠤⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   f₂    │⠀⠀⠀⠀⠀⠀⠀⠀⠘⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠣⡀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠻⠍⠉⠉⠉⠉⠉⠉⢭⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠀⠀⠀⠀⠀⠀⠀⢰⠀⠀⠀│ 
+         │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢇⠀⠀│ 
+      -1 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+         └────────────────────────────────────────┘ 
+         ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀0.9⠀ 
+         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    f calls: 50000
+  feasibles: 100 / 100 in final population
+ total time: 1.8363 s
+stop reason: Maximum objective function calls exceeded.
++============================+</code></pre><h2 id="Distributed"><a class="docs-heading-anchor" href="#Distributed">Distributed</a><a id="Distributed-1"></a><a class="docs-heading-anchor-permalink" href="#Distributed" title="Permalink"></a></h2><p>Contributions are welcome. See &quot;<a href="../../contributing/#Contributing">Contributing</a>&quot; for more details.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../create-metaheuristic/">« Create Your Own Metaheuristic</a><a class="docs-footer-nextpage" href="../n-queens/">N-Queens »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 29 March 2024 05:19">Friday 29 March 2024</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
