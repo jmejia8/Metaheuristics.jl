@@ -1,4 +1,4 @@
-abstract type AbstractVNS <: MH.AbstractParameters end
+abstract type AbstractVNS <: AbstractParameters end
 
 
 Base.@kwdef struct VND{I, N, L} <: AbstractVNS
@@ -8,18 +8,18 @@ Base.@kwdef struct VND{I, N, L} <: AbstractVNS
 end
 
 function VND(;initial = nothing, neighborhood = nothing, local_search = nothing,
-        options=MH.Options(), information=MH.Information())
+        options=Options(), information=Information())
 
     parameters = VND(initial, neighborhood, local_search)
     
-    MH.Algorithm(parameters; options, information)
+    Algorithm(parameters; options, information)
 end
 
 
-MH.iscompatible(::MH.BitArraySpace, ::AbstractVNS) = true
-MH.iscompatible(::MH.PermutationSpace, ::AbstractVNS) = true
+iscompatible(::BitArraySpace, ::AbstractVNS) = true
+iscompatible(::PermutationSpace, ::AbstractVNS) = true
 
-function MH.initialize!(status, parameters::AbstractVNS, problem, information, options, args...; kargs...)
+function initialize!(status, parameters::AbstractVNS, problem, information, options, args...; kargs...)
 
     if isnothing(parameters.initial)
         x0 = rand(options.rng, problem.search_space)
@@ -32,12 +32,12 @@ function MH.initialize!(status, parameters::AbstractVNS, problem, information, o
         options.iterations = 500
     end
     
-    sol = MH.create_solution(x0, problem)
+    sol = create_solution(x0, problem)
 	# TODO
-	MH.State(sol, [sol])
+	State(sol, [sol])
 end
 
-function MH.update_state!(
+function update_state!(
         status,
         parameters::VND,
         problem,
@@ -53,7 +53,7 @@ function MH.update_state!(
     #  check if movement is required
     while l <= length(parameters.neighborhood)
         # current solution
-        x = MH.minimizer(status)
+        x = minimizer(status)
         # exploration of the neighborhood
         neighborhood = parameters.neighborhood[l]
         # local search around x
@@ -66,7 +66,7 @@ function MH.update_state!(
         end
 
         # move or not
-        if MH.is_better(sol, status.best_sol)
+        if is_better(sol, status.best_sol)
             status.best_sol = sol
             l = 1
             improvement = true
@@ -80,5 +80,5 @@ function MH.update_state!(
 end
 
 
-function MH.final_stage!(status, parameters::AbstractVNS, problem, information, options, args...; kargs...)
+function final_stage!(status, parameters::AbstractVNS, problem, information, options, args...; kargs...)
 end

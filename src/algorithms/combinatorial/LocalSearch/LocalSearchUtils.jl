@@ -11,10 +11,10 @@ function local_search(x, neighbourhood::Neighbourhood, ls::AbstractLocalSearch, 
 end
 
 function local_search(x, neighbourhood::InternalNeighbourhood, ::BestImprovingSearch, problem)
-    best = MH.create_solution(copy(x), problem)
+    best = create_solution(copy(x), problem)
     for xnew in neighbourhood
-        sol = MH.create_solution(xnew, problem)
-        if MH.is_better(sol, best)
+        sol = create_solution(xnew, problem)
+        if is_better(sol, best)
             best = deepcopy(sol)
         end
     end
@@ -22,10 +22,10 @@ function local_search(x, neighbourhood::InternalNeighbourhood, ::BestImprovingSe
 end
 
 function local_search(x, neighbourhood::InternalNeighbourhood, ::FirstImprovingSearch, problem)
-    initial = MH.create_solution(copy(x), problem) 
+    initial = create_solution(copy(x), problem) 
     for xnew in neighbourhood
-        sol = MH.create_solution(xnew, problem)
-        if MH.is_better(sol, initial)
+        sol = create_solution(xnew, problem)
+        if is_better(sol, initial)
             return deepcopy(sol)
         end
     end
@@ -33,11 +33,11 @@ function local_search(x, neighbourhood::InternalNeighbourhood, ::FirstImprovingS
 end
 
 function local_search(x, ls::AbstractLocalSearch, problem)
-    if problem.search_space isa MH.PermutationSpace
-        neighbourhood = TwoOpt(;x)
-    elseif problem.search_space isa MH.BoxConstrained
-        neighbourhood = MH.GridSampler(problem.search_space)
-    elseif problem.search_space isa MH.BitArraySpace
+    if problem.search_space isa PermutationSpace
+        neighbourhood = TwoOptNeighbourhood()
+    elseif problem.search_space isa BoxConstrained
+        neighbourhood = GridSampler(problem.search_space)
+    elseif problem.search_space isa BitArraySpace
         # TODO
         neighbourhood = nothing
     else
