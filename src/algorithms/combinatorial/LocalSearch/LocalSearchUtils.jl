@@ -2,15 +2,15 @@ abstract type AbstractLocalSearch end
 struct BestImprovingSearch  <: AbstractLocalSearch end
 struct FirstImprovingSearch <: AbstractLocalSearch end
 
-include("neighbourhood.jl")
+include("neighborhood.jl")
 
-function local_search(x, neighbourhood::Neighbourhood, ls::AbstractLocalSearch, problem)
+function local_search(x, neighbourhood::Neighborhood, ls::AbstractLocalSearch, problem)
     # creates an iterator and perform local search over the iterator
     iter = NeighborhoodIterator(x, neighbourhood)
     local_search(x, iter, ls, problem)
 end
 
-function local_search(x, neighbourhood::InternalNeighbourhood, ::BestImprovingSearch, problem)
+function local_search(x, neighbourhood::InternalNeighborhood, ::BestImprovingSearch, problem)
     best = create_solution(copy(x), problem)
     for xnew in neighbourhood
         sol = create_solution(xnew, problem)
@@ -21,7 +21,7 @@ function local_search(x, neighbourhood::InternalNeighbourhood, ::BestImprovingSe
     best
 end
 
-function local_search(x, neighbourhood::InternalNeighbourhood, ::FirstImprovingSearch, problem)
+function local_search(x, neighbourhood::InternalNeighborhood, ::FirstImprovingSearch, problem)
     initial = create_solution(copy(x), problem) 
     for xnew in neighbourhood
         sol = create_solution(xnew, problem)
@@ -34,7 +34,7 @@ end
 
 function local_search(x, ls::AbstractLocalSearch, problem)
     if problem.search_space isa PermutationSpace
-        neighbourhood = TwoOptNeighbourhood()
+        neighbourhood = TwoOptNeighborhood()
     elseif problem.search_space isa BoxConstrained
         neighbourhood = GridSampler(problem.search_space)
     elseif problem.search_space isa BitArraySpace

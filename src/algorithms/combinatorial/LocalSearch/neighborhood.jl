@@ -1,12 +1,12 @@
-abstract type Neighbourhood end
-abstract type InternalNeighbourhood <: Neighbourhood end
+abstract type Neighborhood end
+abstract type InternalNeighborhood <: Neighborhood end
 
-struct NeighborhoodIterator{X, N} <: InternalNeighbourhood
+struct NeighborhoodIterator{X, N} <: InternalNeighborhood
     x::X
     neighborhood::N
 end
 
-Base.@kwdef struct TwoOptNeighbourhood <: Neighbourhood
+Base.@kwdef struct TwoOptNeighborhood <: Neighborhood
     k::Int = 2
 end
 
@@ -22,7 +22,7 @@ end
 =#
 
 
-function neighborhood_structure(x, s::Neighbourhood, i)
+function neighborhood_structure(x, s::Neighborhood, i)
     # The i-th neighbour in the k-th neighborhood around x
     n = nameof(typeof(s))
 
@@ -39,7 +39,7 @@ function neighborhood_structure(x, s::Neighbourhood, i)
 end
 
 
-function neighborhood_structure(permutation, s::TwoOptNeighbourhood, i)
+function neighborhood_structure(permutation, s::TwoOptNeighborhood, i)
     k = s.k-1
     if i isa Integer
         if !(1 <= i <= length(permutation)-k && 1 <= k <= length(permutation))
