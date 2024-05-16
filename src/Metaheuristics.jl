@@ -76,57 +76,12 @@ include("optimize/optimize.jl")
 # template file
 include("algorithms/template.jl")
 
-include("algorithms/GA/GA.jl")
-
-# ECA algorithm
-include("algorithms/ECA/ECA.jl")
-include("algorithms/ECA/CECA.jl")
-
-# Differential algorithm
-include("algorithms/DE/DE.jl")
-
-# PSO algorithm
-include("algorithms/PSO/PSO.jl")
-
-# The whale optimization algorithm
-# S Mirjalili, A Lewis - Advances in Engineering Software, 2016
-include("algorithms/WOA/WOA.jl")
-
-# Mirjalili, Seyedali, and Amir H. Gandomi.
-# "Chaotic gravitational constants for the gravitational search algorithm."
-# Applied Soft Computing 53 (2017): 407-419.
-include("algorithms/CGSA/CGSA.jl")
-
-# SA: Simulated Annealing
-# Kirkpatrick, S., Gelatt, C.D., & Vecchi, M.P. (1983). Optimization by
-# Simulated Annealing. _Science, 220_, 671-680.
-include("algorithms/SA/SA.jl")
-
-
-# Aritifical Bee colony
-include("algorithms/ABC/ABC.jl")
-
-# MOEA decomposition based using Differential Evolution
-include("algorithms/MOEAD_DE/MOEAD_DE.jl")
-
-# Non-dominate sorting Genetic Algorithm
-include("algorithms/NSGA2/NSGA2.jl")
-include("algorithms/NSGA3/NSGA3.jl")
-include("algorithms/SMS_EMOA/SMS_EMOA.jl")
-include("algorithms/SPEA2/SPEA2.jl")
-
-include("algorithms/CCMO/CCMO.jl")
-include("algorithms/Restart/Restart.jl")
-
-
-# genetic algorithm
-include("algorithms/MCCGA/MCCGA.jl")
-include("algorithms/BRKGA/BRKGA.jl")
+include("algorithms/singleobjective/singleobjective.jl")
+include("algorithms/multiobjective/multiobjective.jl")
+include("algorithms/combinatorial/combinatorial.jl")
 
 include("algorithms/stop_criteria.jl")
-
 include("DecisionMaking/DecisionMaking.jl")
-
 include("precompile/precompile.jl")
 
 #######################################################
