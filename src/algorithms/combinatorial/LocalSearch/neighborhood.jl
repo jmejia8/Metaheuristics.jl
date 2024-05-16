@@ -10,18 +10,16 @@ Base.@kwdef struct TwoOptNeighborhood <: Neighborhood
     k::Int = 2
 end
 
-function neighborhood_structure(x, s::Neighborhood, i)
+function neighborhood_structure(x, s, i)
     # The i-th neighbour in the k-th neighborhood around x
     n = nameof(typeof(s))
 
-    println("""
+    error("""
             Define your neighborhood as follows:
 
-            `
             function neighborhood_structure(x, s::$n, i)
                 # ...
             end
-            `
             """
            )
 end

@@ -1,7 +1,7 @@
 abstract type AbstractVNS <: AbstractParameters end
 
 
-Base.@kwdef struct VND{I, N, L} <: AbstractVNS
+struct VND{I, N, L} <: AbstractVNS
     initial::I 
     neighborhood::N # neighborhood structures
     local_search::L  # local search strategy

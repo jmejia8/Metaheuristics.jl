@@ -1,6 +1,6 @@
 include("VND.jl")
 
-Base.@kwdef struct VNS{I, S, L, C, N} <: AbstractVNS
+struct VNS{I, S, L, C, N} <: AbstractVNS
     initial::I
     neighborhood_shaking::S
     neighborhood_local::L
