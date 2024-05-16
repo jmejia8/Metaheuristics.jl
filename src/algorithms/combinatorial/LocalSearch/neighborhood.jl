@@ -10,18 +10,6 @@ Base.@kwdef struct TwoOptNeighborhood <: Neighborhood
     k::Int = 2
 end
 
-#=
-function Base.iterate(two_opt::TwoOpt, state=1)
-    i, permutation, k = state, two_opt.x, two_opt.k-1
-    if !(1 <= i <= length(permutation)-k && 1 <= k <= length(permutation))
-        return nothing
-    end
-    reverse!(view(permutation, i:i+k))
-    permutation, state+1
-end
-=#
-
-
 function neighborhood_structure(x, s::Neighborhood, i)
     # The i-th neighbour in the k-th neighborhood around x
     n = nameof(typeof(s))
