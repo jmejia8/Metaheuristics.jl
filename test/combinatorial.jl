@@ -64,6 +64,11 @@
         @test decode(minimizer(res)) == target_perm
     end
 
+    function grasp_vns()
+        
+    end
+    
+
 
     rkga()
     #### Permutation
@@ -98,3 +103,78 @@
 end
 
 
+
+@testset "Combinatorial II" begin
+    struct MyKPNeighborhood <: Metaheuristics.Neighborhood
+        k::Int
+    end
+
+    struct KPInstance
+        profit
+        weight
+        capacity
+    end
+
+    function Metaheuristics.compute_cost(candidates, constructor, instance::KPInstance)
+        # Ration profit / weight
+        ratio = instance.profit[candidates] ./ instance.weight[candidates]
+        # It is assumed minimizing non-negative costs
+        maximum(ratio) .- ratio
+    end
+
+    function Metaheuristics.neighborhood_structure(x, s::MyKPNeighborhood, rng)
+        # this is defined due to shaking procedure requires a random one
+        # not the i-th neighbor.
+        i = rand(rng, 1:length(x))
+        reverse!(view(x, i:min(length(x), i+s.k)))
+        x
+    end
+
+    function Metaheuristics.neighborhood_structure(x, s::MyKPNeighborhood, i::Integer)
+        # return the i-th neighbor around x, regarding s.k structure
+        i > length(x) && return nothing
+        reverse!(view(x, i:min(length(x), i+s.k)))
+        x
+    end
+
+    function vns_grasp()
+        profit = [55, 10,47, 5, 4, 50, 8, 61, 85, 87]
+        weight = [95, 4, 60, 32, 23, 72, 80, 62, 65, 46]
+        capacity = 269
+        optimum = 295
+
+        # objective function and search space
+        f, search_space, _ =Metaheuristics.TestProblems.knapsack(profit, weight, capacity)
+        options = Options(iterations=50, seed=1)
+
+        ###########################################
+        # VND/VNS
+        ###########################################
+        # list the neighborhood structures
+        neighborhood_shaking = [MyKPNeighborhood(6), MyKPNeighborhood(5), MyKPNeighborhood(4)]
+        neighborhood_local = [MyKPNeighborhood(3), MyKPNeighborhood(2), MyKPNeighborhood(1)]
+        local_search = Metaheuristics.FirstImprovingSearch()
+        # instantiate VNS
+        vnd = Metaheuristics.VNS(;neighborhood_shaking, neighborhood_local, local_search, options)
+
+        res = Metaheuristics.optimize(f, search_space, vnd)
+        @test -minimum(res) == optimum
+
+
+        ###########################################
+        # GRASP
+        ###########################################
+        candidates = rand(search_space)
+        instance = KPInstance(profit, weight, capacity)
+        constructor  = Metaheuristics.GreedyRandomizedContructor(;candidates, instance, α = 0.95)
+        local_search = Metaheuristics.BestImprovingSearch()
+        neighborhood = Metaheuristics.TwoOptNeighborhood()
+        grasp = GRASP(;constructor, local_search)
+
+        # optimize and display results
+        res = optimize(f, search_space, grasp)
+        @test -minimum(res) == optimum
+    end
+
+    vns_grasp()
+end

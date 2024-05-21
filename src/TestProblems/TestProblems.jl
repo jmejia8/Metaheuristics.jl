@@ -5,6 +5,7 @@ import ..generateChild, ..gen_ref_dirs, ..norm, ..get_non_dominated_solutions
 include("box-constrained.jl")
 include("constrained.jl")
 include("multiobjective.jl")
+include("combinatorial.jl")
 
 const _problems_dict = Dict(
                       :sphere => sphere,
@@ -34,6 +35,8 @@ const _problems_dict = Dict(
                       :C1_DTLZ3 => C1_DTLZ3,
                       :C2_DTLZ2 => C2_DTLZ2,
                       :C3_DTLZ4 => C3_DTLZ4,
+                      #################################
+                      :knapsack => knapsack,
                      )
 
 """
