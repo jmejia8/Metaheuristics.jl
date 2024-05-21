@@ -17,7 +17,7 @@ include("constructor.jl")
 """
     GRASP(;initial, constructor, local_search,...)
 
-Generalized Random Adaptive Search Procedure.
+Greedy Randomized Adaptive Search Procedure.
 
 # Allowed parameters
 

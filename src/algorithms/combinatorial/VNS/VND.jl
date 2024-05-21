@@ -10,7 +10,7 @@ end
 """
     VND(;initial, neighborhood, local_search,...)
 
-Variational Neighborhood Descendent.
+Variable Neighborhood Descent.
 
 # Allowed parameters
 

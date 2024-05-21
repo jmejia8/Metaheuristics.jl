@@ -12,7 +12,7 @@ BRKGA
 
 ## GRASP
 
-Generalized Random Adaptive Search Procedure.
+Greedy randomized adaptive search procedure.
 
 ```@docs
 GRASP
@@ -34,7 +34,7 @@ Metaheuristics.compute_cost
 
 ## VND
 
-Variational Neighborhood Descendent.
+Variable Neighborhood Descent.
 
 ```@docs
 VND
@@ -42,7 +42,7 @@ VND
 
 ## VNS
 
-General Variational Neighborhood Search.
+General Variable Neighborhood Search.
 
 ```@docs
 VNS
