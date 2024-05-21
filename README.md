@@ -36,18 +36,22 @@ Some representative metaheuristics are developed here, including those for singl
 multi-objective optimization. Moreover, some constraint handling techniques have been
 considered in most of the [implemented algorithms](https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/).
 
+### Combinatorial Optimization
+
+- **GRASP**: Greedy randomized adaptive search procedure.
+- **VND**: Variable Neighborhood Descent.
+- **VNS**: Variable Neighborhood Search.
+- **BRKGA**: Biased Random Key Genetic Algorithm.
+
 ### Single-Objective Optimization
 
 - **ECA**: Evolutionary Centers Algorithm
 - **DE**:  Differential Evolution
 - **PSO**: Particle Swarm Optimization
-- **ABC**: Artificial Bee Colony
-- **GSA**: Gravitational Search Algorithm
 - **SA**:  Simulated Annealing
-- **WOA**: Whale Optimization Algorithm
 - **MCCGA**: Machine-coded Compact Genetic Algorithm
 - **GA**: Genetic Algorithm
-- **BRKGA**: Biased Random Key Genetic Algorithm
+- [and more...](https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/)
 
 ### Multi-Objective Optimization
 
