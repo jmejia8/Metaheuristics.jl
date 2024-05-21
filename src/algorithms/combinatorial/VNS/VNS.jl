@@ -12,9 +12,32 @@ end
 struct SequentialChange end
 struct CyclicChange end
 
+"""
+    VNS(;initial, neighborhood_shaking, neighborhood_local, local_search, neighborhood_change)
+
+General Variational Neighborhood Search.
+
+# Allowed parameters
+
+- `initial`: Use this parameter to provide an initial solution (optional).
+- `neighborhood_shaking`: Neighborhood structure for the shaking step.
+- `neighborhood_local`: Neighborhood structure for the local search.
+- `local_search`: the local search strategy `BestImprovingSearch()` (default) and `FirstImprovingSearch()`.
+- `neighborhood_change`: The procedure for changing among neighborhood structures  (default `SequentialChange()`).
+
+
+# Example: Knapsack Problem
+
+TODO
+"""
 function VNS(;initial=nothing,neighborhood_shaking=nothing, neighborhood_local=nothing,
-        local_search=nothing, neighborhood_change=SequentialChange(),
+        local_search=FirstImprovingSearch(), neighborhood_change=SequentialChange(),
         options=Options(), information=Information())
+
+    # TODO
+    if isnothing(neighborhood_shaking) && isnothing(neighborhood_local) 
+        error("Provide neighborhood_shaking and neighborhood_local.")
+    end
 
     parameters = VNS(initial, neighborhood_shaking, neighborhood_local,
                      local_search, neighborhood_change)
@@ -55,7 +78,7 @@ function update_state!(status, parameters::VNS, problem, information, options, a
         # perform local search around xp using VND
         # TODO: update this for considering other VNS variants (for the local search)
         vnd = VND(;initial=xp, neighborhood=parameters.neighborhood_local,
-                  local_search = FirstImprovingSearch())
+                  local_search = parameters.local_search)
         _res_local = optimize(problem.f, problem.search_space, vnd)
         sol_new = _res_local.best_sol
 

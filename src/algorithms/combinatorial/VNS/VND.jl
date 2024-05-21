@@ -7,7 +7,23 @@ struct VND{I, N, L} <: AbstractVNS
     local_search::L  # local search strategy
 end
 
-function VND(;initial = nothing, neighborhood = nothing, local_search = nothing,
+"""
+    VND(;initial, neighborhood, local_search,...)
+
+Variational Neighborhood Descendent.
+
+# Allowed parameters
+
+- `initial`: Use this parameter to provide an initial solution (optional).
+- `neighborhood`: Neighborhood structure.
+- `local_search` the local search strategy `BestImprovingSearch()` (default) and `FirstImprovingSearch()`.
+
+
+# Example: Knapsack Problem
+
+TODO
+"""
+function VND(;initial = nothing, neighborhood = nothing, local_search = BestImprovingSearch(),
         options=Options(), information=Information())
 
     parameters = VND(initial, neighborhood, local_search)

@@ -6,63 +6,36 @@ struct GRASP{I, T, L} <: AbstractGRASP
 	local_search::L
 end
 
-Base.@kwdef struct GreedyRandomizedContructor
-    candidates
-    instance = nothing
-    α::Float64 = 0.6
-    rng = default_rng_mh()
-end
-
-
 function construct(constructor)
     @error "Define your own randomized greedy constructor"
     status.stop = true
     nothing
 end
 
-function local_search(x, localsearch, problem)
-    @error "Define your own local search"
-    nothing
-end
+include("constructor.jl")
 
+"""
+    GRASP(;initial, constructor, local_search,...)
 
-function compute_cost(candidates, constructor, instance)
-    @warn "Define compute_cost for\nconstructor=$constructor\ninstance=$instance"
-    zeros(length(candidates))
-end
+Generalized Random Adaptive Search Procedure.
 
+# Allowed parameters
 
-function construct(constructor::GreedyRandomizedContructor)
-    candidates = constructor.candidates |> copy
-    α = constructor.α
-    # create empty solution S
-    S = empty(candidates)
-    # construct solution
-    while !isempty(candidates)
-        cost = compute_cost(candidates, constructor, constructor.instance)
-        cmin = minimum(cost)
-        cmax = maximum(cost)
-        # compute restricted candidate list
-        RCL = [i for i in eachindex(candidates) if cost[i] <= cmin + α*(cmax - cmin) ]
-        if isempty(RCL)
-            @error "RCL is empty. Try increasing α or check your `compute_cost` method."
-            return
-        end
-        
-        # select candidate at random and insert into solution
-        s = rand(constructor.rng, RCL)
-        push!(S, candidates[s])
-        # update list of candidates
-        deleteat!(candidates, s)
-    end
-    S
-end
+- `initial`: an initial solution if necessary.
+- `constructor` parameters for the greedy constructor.
+- `local_search` the local search strategy `BestImprovingSearch()` (default) and `FirstImprovingSearch()`.
 
-function GRASP(;initial=nothing, constructor=nothing, local_search=nothing,
+See [`GreedyRandomizedContructor`](@ref)
+
+# Example: Knapsack Problem
+
+TODO
+"""
+function GRASP(;initial=nothing, constructor=nothing, local_search=BestImprovingSearch(),
                 options = Options(), information=Information())
 	# TODO
-	if isnothing(constructor) || isnothing(local_search)
-        error("Provide a constructor and a local search")
+	if isnothing(constructor)
+        error("Provide a constructor.")
 	end
     grasp = GRASP(initial, constructor, local_search)
     Algorithm(grasp; options, information)
