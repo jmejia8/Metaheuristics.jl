@@ -79,7 +79,7 @@ end
 function show_status(status, parameters, options)
     !options.debug && (return show_status_oneline(status, parameters, options))
     status.final_time = time()
-    msg = "Current Status of " * string(typeof(parameters))
+    msg = "Current Status of " * string(nameof(typeof(parameters)))
     @info msg
     display(status)
 end

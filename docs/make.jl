@@ -1,7 +1,7 @@
 using Documenter, Metaheuristics
 using DocumenterCitations
 
-bib = CitationBibliography(joinpath(@__DIR__, "references.bib"))
+bib = CitationBibliography(joinpath(@__DIR__, "references.bib"), style=:authoryear)
 
 makedocs(
          bib,
@@ -23,7 +23,13 @@ makedocs(
                                   "tutorials/n-queens.md",
                                  ],
                   "Examples" =>  "examples.md",
-                  "Algorithms" => "algorithms.md",
+                  "Algorithms" => [
+                                  "algorithms/index.md",
+                                  "algorithms/singleobjective.md",
+                                  "algorithms/multiobjective.md",
+                                  "algorithms/combinatorial.md",
+                                 ],
+                  #"Algorithms" => "algorithms.md",
                   "Problems" => "problems.md",
                   "Performance Indicators" => "indicators.md",
                   "Multi-Criteria Decision Making" => "mcdm.md",
