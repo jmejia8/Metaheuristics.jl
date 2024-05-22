@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Combinatorial · Metaheuristics.jl</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-184071594-1"></script><script>  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-184071594-1', {'page_path': location.pathname + location.search + location.hash});
+</script><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/><link href="../../assets/extra_styles.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img class="docs-light-only" src="../../assets/logo.png" alt="Metaheuristics.jl logo"/><img class="docs-dark-only" src="../../assets/logo-dark.png" alt="Metaheuristics.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">Metaheuristics.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Index</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox"/><label class="tocitem" for="menuitem-2"><span class="docs-label">Tutorials</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tutorials/simple-tutorial/">Getting Started</a></li><li><a class="tocitem" href="../../tutorials/create-metaheuristic/">Create Your Own Metaheuristic</a></li><li><a class="tocitem" href="../../tutorials/parallelization/">Parallelization</a></li><li><a class="tocitem" href="../../tutorials/n-queens/">N-Queens</a></li></ul></li><li><a class="tocitem" href="../../examples/">Examples</a></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox" checked/><label class="tocitem" for="menuitem-4"><span class="docs-label">Algorithms</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../">Index</a></li><li><a class="tocitem" href="../singleobjective/">Single-objective</a></li><li><a class="tocitem" href="../multiobjective/">Multi-objective</a></li><li class="is-active"><a class="tocitem" href>Combinatorial</a><ul class="internal"><li><a class="tocitem" href="#BRKGA"><span>BRKGA</span></a></li><li><a class="tocitem" href="#GRASP"><span>GRASP</span></a></li><li><a class="tocitem" href="#VND"><span>VND</span></a></li><li><a class="tocitem" href="#VNS"><span>VNS</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../problems/">Problems</a></li><li><a class="tocitem" href="../../indicators/">Performance Indicators</a></li><li><a class="tocitem" href="../../mcdm/">Multi-Criteria Decision Making</a></li><li><a class="tocitem" href="../../visualization/">Visualization</a></li><li><a class="tocitem" href="../../api/">API References</a></li><li><a class="tocitem" href="../../faq/">FAQ</a></li><li><a class="tocitem" href="../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Algorithms</a></li><li class="is-active"><a href>Combinatorial</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Combinatorial</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/Metaheuristics.jl/blob/master/docs/src/algorithms/combinatorial.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Combinatorial"><a class="docs-heading-anchor" href="#Combinatorial">Combinatorial</a><a id="Combinatorial-1"></a><a class="docs-heading-anchor-permalink" href="#Combinatorial" title="Permalink"></a></h1><p>These algorithms can be used for solving combinatorial optimization.</p><h2 id="BRKGA"><a class="docs-heading-anchor" href="#BRKGA">BRKGA</a><a id="BRKGA-1"></a><a class="docs-heading-anchor-permalink" href="#BRKGA" title="Permalink"></a></h2><p>Biased Random Key Genetic Algorithm.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.BRKGA" href="#Metaheuristics.BRKGA"><code>Metaheuristics.BRKGA</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">BRKGA(num_elites = 20, num_mutants = 10, num_offsprings = 70, bias = 0.7)</code></pre><p>Biased Random Key Genetic Algorithm (BRKGA).</p><p><strong>Example</strong></p><pre><code class="language-julia-repl hljs">julia&gt; target_perm = collect(reverse(1:10))
+10-element Vector{Int64}:
+ 10
+  9
+  8
+  7
+  6
+  5
+  4
+  3
+  2
+  1
+
+julia&gt; decode(rk) = sortperm(rk);
+
+julia&gt; f(rk) = sum(abs.(decode(rk) - target_perm));
+
+julia&gt; res = optimize(f, [zeros(10) ones(10)], BRKGA(num_elites=70))
+Optimization Result
+===================
+  Iteration:       22
+  Minimum:         0
+  Minimizer:       [0.938595, 0.851247, 0.823736, …, 0.375321]
+  Function calls:  2200
+  Total time:      0.0238 s
+  Stop reason:     Due to Convergence Termination criterion.
+
+julia&gt; decode(minimizer(res))
+10-element Vector{Int64}:
+ 10
+  9
+  8
+  7
+  6
+  5
+  4
+  3
+  2
+  1</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/e2f23a51340ba1151aebafb089c024bde5d9e79b/src/algorithms/combinatorial/BRKGA/BRKGA.jl#L1-L49">source</a></section></article><h2 id="GRASP"><a class="docs-heading-anchor" href="#GRASP">GRASP</a><a id="GRASP-1"></a><a class="docs-heading-anchor-permalink" href="#GRASP" title="Permalink"></a></h2><p>Greedy randomized adaptive search procedure.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.GRASP" href="#Metaheuristics.GRASP"><code>Metaheuristics.GRASP</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">GRASP(;initial, constructor, local_search,...)</code></pre><p>Greedy Randomized Adaptive Search Procedure.</p><p><strong>Allowed parameters</strong></p><ul><li><code>initial</code>: an initial solution if necessary.</li><li><code>constructor</code> parameters for the greedy constructor.</li><li><code>local_search</code> the local search strategy <code>BestImprovingSearch()</code> (default) and <code>FirstImprovingSearch()</code>.</li></ul><p>See <a href="#Metaheuristics.GreedyRandomizedContructor"><code>GreedyRandomizedContructor</code></a></p><p><strong>Example: Knapsack Problem</strong></p><pre><code class="language-julia hljs">import Metaheuristics as MH
+
+# define type for saving knapsack problem instance
+struct KPInstance
+    profit
+    weight
+    capacity
+end
+
+function MH.compute_cost(candidates, constructor, instance::KPInstance)
+    # Ration profit / weight
+    ratio = instance.profit[candidates] ./ instance.weight[candidates]
+    # It is assumed minimizing non-negative costs
+    maximum(ratio) .- ratio
+end
+
+function main()
+    # problem instance
+    profit = [55, 10,47, 5, 4, 50, 8, 61, 85, 87]
+    weight = [95, 4, 60, 32, 23, 72, 80, 62, 65, 46]
+    capacity = 269
+    optimum = 295
+    instance = KPInstance(profit, weight, capacity)
+
+    # objective function and search space
+    f, search_space, _ = MH.TestProblems.knapsack(profit, weight, capacity)
+    candidates = rand(search_space)
+
+    # define each GRASP component
+    constructor  = MH.GreedyRandomizedContructor(;candidates, instance, α = 0.95)
+    local_search = MH.BestImprovingSearch()
+    neighborhood = MH.TwoOptNeighborhood()
+    grasp = MH.GRASP(;constructor, local_search)
+    
+    # optimize and display results
+    result = MH.optimize(f, search_space, grasp)
+    display(result)
+    # compute GAP
+    fx = -minimum(result)
+    GAP = (optimum - fx) / optimum
+    println(&quot;The GAP is &quot;, GAP)
+end
+
+main()</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/e2f23a51340ba1151aebafb089c024bde5d9e79b/src/algorithms/combinatorial/GRASP/GRASP.jl#L17-L78">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.GreedyRandomizedContructor" href="#Metaheuristics.GreedyRandomizedContructor"><code>Metaheuristics.GreedyRandomizedContructor</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">GreedyRandomizedContructor(;candidates, instance, α, rng)</code></pre><p>This structure can be used to use the Greedy Randomized Contructor.</p><ul><li><code>candidates</code> vector of candidates (item to choose to form a solution).</li><li><code>instance</code> a user define structure for saving data on the problem instance.</li><li><code>α</code>  controls the randomness (0 deterministic greedy heuristic, 1 for pure random).</li><li><code>rng</code> storages the random number generator.</li></ul><p>This constructor assumes overwriting the <code>compute_cost</code> function:</p><pre><code class="language-julia hljs">import Metaheuristics as MH
+struct MyInstance end
+function MH.compute_cost(candidates, constructor, instance::MyInstance)
+    # ...
+end</code></pre><p>See also <a href="#Metaheuristics.compute_cost"><code>compute_cost</code></a> and <a href="#Metaheuristics.GRASP"><code>GRASP</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/e2f23a51340ba1151aebafb089c024bde5d9e79b/src/algorithms/combinatorial/GRASP/constructor.jl#L1-L22">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.construct" href="#Metaheuristics.construct"><code>Metaheuristics.construct</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">construct(constructor)</code></pre><p>Constructor procedure for GRASP.</p><p>See also <a href="#Metaheuristics.GreedyRandomizedContructor"><code>GreedyRandomizedContructor</code></a>, <a href="#Metaheuristics.compute_cost"><code>compute_cost</code></a> and <a href="#Metaheuristics.GRASP"><code>GRASP</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/e2f23a51340ba1151aebafb089c024bde5d9e79b/src/algorithms/combinatorial/GRASP/constructor.jl#L43-L49">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.compute_cost" href="#Metaheuristics.compute_cost"><code>Metaheuristics.compute_cost</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">compute_cost(candidates, constructor, instance)</code></pre><p>Compute the cost for each candidate in <code>candidates</code>, for given <code>constructor</code> and provided <code>instance</code>.</p><p>See also <a href="#Metaheuristics.GreedyRandomizedContructor"><code>GreedyRandomizedContructor</code></a> and <a href="#Metaheuristics.GRASP"><code>GRASP</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/e2f23a51340ba1151aebafb089c024bde5d9e79b/src/algorithms/combinatorial/GRASP/constructor.jl#L30-L37">source</a></section></article><h2 id="VND"><a class="docs-heading-anchor" href="#VND">VND</a><a id="VND-1"></a><a class="docs-heading-anchor-permalink" href="#VND" title="Permalink"></a></h2><p>Variable Neighborhood Descent.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.VND" href="#Metaheuristics.VND"><code>Metaheuristics.VND</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">VND(;initial, neighborhood, local_search,...)</code></pre><p>Variable Neighborhood Descent.</p><p><strong>Allowed parameters</strong></p><ul><li><code>initial</code>: Use this parameter to provide an initial solution (optional).</li><li><code>neighborhood</code>: Neighborhood structure.</li><li><code>local_search</code> the local search strategy <code>BestImprovingSearch()</code> (default) and <code>FirstImprovingSearch()</code>.</li></ul><p><strong>Example: Knapsack Problem</strong></p><pre><code class="language-julia hljs">import Metaheuristics as MH
+
+struct MyKPNeighborhood &lt;: MH.Neighborhood
+    k::Int
+end
+
+function MH.neighborhood_structure(x, s::MyKPNeighborhood, i::Integer)
+    # return the i-th neighbor around x, regarding s.k structure
+    i &gt; length(x) &amp;&amp; return nothing
+    reverse!(view(x, i:min(length(x), i+s.k)))
+    x
+end
+
+
+function main()
+    profit = [55, 10,47, 5, 4, 50, 8, 61, 85, 87]
+    weight = [95, 4, 60, 32, 23, 72, 80, 62, 65, 46]
+    capacity = 269
+
+    # objective function and search space
+    f, search_space, _ = MH.TestProblems.knapsack(profit, weight, capacity)
+
+    # list the neighborhood structures
+    neighborhood = [MyKPNeighborhood(1), MyKPNeighborhood(2), MyKPNeighborhood(3)]
+    local_search = MH.BestImprovingSearch()
+    # instantiate VNS
+    vnd = MH.VND(;neighborhood, local_search)
+
+    res = MH.optimize(f, search_space, vnd)
+    display(res)
+end
+
+main()</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/e2f23a51340ba1151aebafb089c024bde5d9e79b/src/algorithms/combinatorial/VNS/VND.jl#L10-L59">source</a></section></article><h2 id="VNS"><a class="docs-heading-anchor" href="#VNS">VNS</a><a id="VNS-1"></a><a class="docs-heading-anchor-permalink" href="#VNS" title="Permalink"></a></h2><p>General Variable Neighborhood Search.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.VNS" href="#Metaheuristics.VNS"><code>Metaheuristics.VNS</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">VNS(;initial, neighborhood_shaking, neighborhood_local, local_search, neighborhood_change)</code></pre><p>General Variational Neighborhood Search.</p><p><strong>Allowed parameters</strong></p><ul><li><code>initial</code>: Use this parameter to provide an initial solution (optional).</li><li><code>neighborhood_shaking</code>: Neighborhood structure for the shaking step.</li><li><code>neighborhood_local</code>: Neighborhood structure for the local search.</li><li><code>local_search</code>: the local search strategy <code>BestImprovingSearch()</code> (default) and <code>FirstImprovingSearch()</code>.</li><li><code>neighborhood_change</code>: The procedure for changing among neighborhood structures  (default <code>SequentialChange()</code>).</li></ul><p><strong>Example: Knapsack Problem</strong></p><pre><code class="language-julia hljs">import Metaheuristics as MH
+
+struct MyKPNeighborhood &lt;: MH.Neighborhood
+    k::Int
+end
+
+function MH.neighborhood_structure(x, s::MyKPNeighborhood, rng)
+    # this is defined due to shaking procedure requires a random one
+    # not the i-th neighbor.
+    i = rand(rng, 1:length(x))
+    reverse!(view(x, i:min(length(x), i+s.k)))
+    x
+end
+
+function MH.neighborhood_structure(x, s::MyKPNeighborhood, i::Integer)
+    # return the i-th neighbor around x, regarding s.k structure
+    i &gt; length(x) &amp;&amp; return nothing
+    reverse!(view(x, i:min(length(x), i+s.k)))
+    x
+end
+
+function main()
+    profit = [55, 10,47, 5, 4, 50, 8, 61, 85, 87]
+    weight = [95, 4, 60, 32, 23, 72, 80, 62, 65, 46]
+    capacity = 269
+    nitems = length(weight)
+
+    # objective function and search space
+    f, search_space, _ = MH.TestProblems.knapsack(profit, weight, capacity)
+
+    # list the neighborhood structures
+    neighborhood_shaking = [MyKPNeighborhood(6), MyKPNeighborhood(5), MyKPNeighborhood(4)]
+    neighborhood_local = [MyKPNeighborhood(3), MyKPNeighborhood(2), MyKPNeighborhood(1)]
+    local_search = MH.BestImprovingSearch()
+    # instantiate VNS
+    vnd = MH.VNS(;neighborhood_shaking, neighborhood_local, local_search, options=MH.Options(verbose=true))
+
+    res = MH.optimize(f, search_space, vnd)
+    display(res)
+end
+
+main()</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/e2f23a51340ba1151aebafb089c024bde5d9e79b/src/algorithms/combinatorial/VNS/VNS.jl#L15-L75">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../multiobjective/">« Multi-objective</a><a class="docs-footer-nextpage" href="../../problems/">Problems »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Wednesday 22 May 2024 07:04">Wednesday 22 May 2024</span>. Using Julia version 1.10.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
