@@ -1,5 +1,5 @@
 """
-    GreedyRandomizedContructor(;candidates, instance, α, rng)
+    GreedyRandomizedConstructor(;candidates, instance, α, rng)
 
 This structure can be used to use the Greedy Randomized Contructor.
 
@@ -20,7 +20,7 @@ end
 
 See also [`compute_cost`](@ref) and [`GRASP`](@ref)
 """
-Base.@kwdef struct GreedyRandomizedContructor
+Base.@kwdef struct GreedyRandomizedConstructor
     candidates
     instance = nothing
     α::Float64 = 0.6
@@ -33,7 +33,7 @@ end
 Compute the cost for each candidate in `candidates`, for given `constructor` and
 provided `instance`.
 
-See also [`GreedyRandomizedContructor`](@ref) and [`GRASP`](@ref)
+See also [`GreedyRandomizedConstructor`](@ref) and [`GRASP`](@ref)
 """
 function compute_cost(candidates, constructor, instance)
     @warn "Define compute_cost for\nconstructor=$constructor\ninstance=$instance"
@@ -45,9 +45,9 @@ end
 
 Constructor procedure for GRASP.
 
-See also [`GreedyRandomizedContructor`](@ref), [`compute_cost`](@ref) and [`GRASP`](@ref)
+See also [`GreedyRandomizedConstructor`](@ref), [`compute_cost`](@ref) and [`GRASP`](@ref)
 """
-function construct(constructor::GreedyRandomizedContructor)
+function construct(constructor::GreedyRandomizedConstructor)
     candidates = constructor.candidates |> copy
     α = constructor.α
     # create empty solution S

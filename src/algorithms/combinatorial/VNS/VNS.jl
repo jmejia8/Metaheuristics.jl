@@ -22,7 +22,7 @@ General Variational Neighborhood Search.
 - `initial`: Use this parameter to provide an initial solution (optional).
 - `neighborhood_shaking`: Neighborhood structure for the shaking step.
 - `neighborhood_local`: Neighborhood structure for the local search.
-- `local_search`: the local search strategy `BestImprovingSearch()` (default) and `FirstImprovingSearch()`.
+- `local_search`: the local search strategy `BestImproveSearch()` (default) and `FirstImproveSearch()`.
 - `neighborhood_change`: The procedure for changing among neighborhood structures  (default `SequentialChange()`).
 
 
@@ -62,7 +62,7 @@ function main()
     # list the neighborhood structures
     neighborhood_shaking = [MyKPNeighborhood(6), MyKPNeighborhood(5), MyKPNeighborhood(4)]
     neighborhood_local = [MyKPNeighborhood(3), MyKPNeighborhood(2), MyKPNeighborhood(1)]
-    local_search = MH.BestImprovingSearch()
+    local_search = MH.BestImproveSearch()
     # instantiate VNS
     vnd = MH.VNS(;neighborhood_shaking, neighborhood_local, local_search, options=MH.Options(verbose=true))
 
@@ -74,7 +74,7 @@ main()
 ```
 """
 function VNS(;initial=nothing,neighborhood_shaking=nothing, neighborhood_local=nothing,
-        local_search=FirstImprovingSearch(), neighborhood_change=SequentialChange(),
+        local_search=FirstImproveSearch(), neighborhood_change=SequentialChange(),
         options=Options(), information=Information())
 
     # TODO

@@ -23,9 +23,9 @@ Greedy Randomized Adaptive Search Procedure.
 
 - `initial`: an initial solution if necessary.
 - `constructor` parameters for the greedy constructor.
-- `local_search` the local search strategy `BestImprovingSearch()` (default) and `FirstImprovingSearch()`.
+- `local_search` the local search strategy `BestImproveSearch()` (default) and `FirstImproveSearch()`.
 
-See [`GreedyRandomizedContructor`](@ref)
+See [`GreedyRandomizedConstructor`](@ref)
 
 # Example: Knapsack Problem
 
@@ -59,8 +59,8 @@ function main()
     candidates = rand(search_space)
 
     # define each GRASP component
-    constructor  = MH.GreedyRandomizedContructor(;candidates, instance, α = 0.95)
-    local_search = MH.BestImprovingSearch()
+    constructor  = MH.GreedyRandomizedConstructor(;candidates, instance, α = 0.95)
+    local_search = MH.BestImproveSearch()
     neighborhood = MH.TwoOptNeighborhood()
     grasp = MH.GRASP(;constructor, local_search)
     
@@ -76,7 +76,7 @@ end
 main()
 ```
 """
-function GRASP(;initial=nothing, constructor=nothing, local_search=BestImprovingSearch(),
+function GRASP(;initial=nothing, constructor=nothing, local_search=BestImproveSearch(),
                 options = Options(), information=Information())
 	# TODO
 	if isnothing(constructor)

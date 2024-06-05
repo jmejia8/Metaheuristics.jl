@@ -16,7 +16,7 @@ Variable Neighborhood Descent.
 
 - `initial`: Use this parameter to provide an initial solution (optional).
 - `neighborhood`: Neighborhood structure.
-- `local_search` the local search strategy `BestImprovingSearch()` (default) and `FirstImprovingSearch()`.
+- `local_search` the local search strategy `BestImproveSearch()` (default) and `FirstImproveSearch()`.
 
 
 # Example: Knapsack Problem
@@ -46,7 +46,7 @@ function main()
 
     # list the neighborhood structures
     neighborhood = [MyKPNeighborhood(1), MyKPNeighborhood(2), MyKPNeighborhood(3)]
-    local_search = MH.BestImprovingSearch()
+    local_search = MH.BestImproveSearch()
     # instantiate VNS
     vnd = MH.VND(;neighborhood, local_search)
 
@@ -57,7 +57,7 @@ end
 main()
 ```
 """
-function VND(;initial = nothing, neighborhood = nothing, local_search = BestImprovingSearch(),
+function VND(;initial = nothing, neighborhood = nothing, local_search = BestImproveSearch(),
         options=Options(), information=Information())
 
     parameters = VND(initial, neighborhood, local_search)

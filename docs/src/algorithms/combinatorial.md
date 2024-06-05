@@ -19,7 +19,7 @@ GRASP
 ```
 
 ```@docs
-Metaheuristics.GreedyRandomizedContructor
+Metaheuristics.GreedyRandomizedConstructor
 ```
 
 ```@docs
