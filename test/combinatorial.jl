@@ -153,7 +153,7 @@ end
         # list the neighborhood structures
         neighborhood_shaking = [MyKPNeighborhood(6), MyKPNeighborhood(5), MyKPNeighborhood(4)]
         neighborhood_local = [MyKPNeighborhood(3), MyKPNeighborhood(2), MyKPNeighborhood(1)]
-        local_search = Metaheuristics.FirstImprovingSearch()
+        local_search = Metaheuristics.FirstImproveSearch()
         # instantiate VNS
         vnd = Metaheuristics.VNS(;neighborhood_shaking, neighborhood_local, local_search, options)
 
@@ -166,8 +166,8 @@ end
         ###########################################
         candidates = rand(search_space)
         instance = KPInstance(profit, weight, capacity)
-        constructor  = Metaheuristics.GreedyRandomizedContructor(;candidates, instance, α = 0.95)
-        local_search = Metaheuristics.BestImprovingSearch()
+        constructor  = Metaheuristics.GreedyRandomizedConstructor(;candidates, instance, α = 0.95)
+        local_search = Metaheuristics.BestImproveSearch()
         neighborhood = Metaheuristics.TwoOptNeighborhood()
         grasp = GRASP(;constructor, local_search)
 
