@@ -1,6 +1,6 @@
 abstract type AbstractLocalSearch end
-struct BestImprovingSearch  <: AbstractLocalSearch end
-struct FirstImprovingSearch <: AbstractLocalSearch end
+struct BestImproveSearch  <: AbstractLocalSearch end
+struct FirstImproveSearch <: AbstractLocalSearch end
 
 include("neighborhood.jl")
 
@@ -10,7 +10,7 @@ function local_search(x, neighbourhood::Neighborhood, ls::AbstractLocalSearch, p
     local_search(x, iter, ls, problem)
 end
 
-function local_search(x, neighbourhood::InternalNeighborhood, ::BestImprovingSearch, problem)
+function local_search(x, neighbourhood::InternalNeighborhood, ::BestImproveSearch, problem)
     best = create_solution(copy(x), problem)
     for xnew in neighbourhood
         sol = create_solution(xnew, problem)
@@ -21,7 +21,7 @@ function local_search(x, neighbourhood::InternalNeighborhood, ::BestImprovingSea
     best
 end
 
-function local_search(x, neighbourhood::InternalNeighborhood, ::FirstImprovingSearch, problem)
+function local_search(x, neighbourhood::InternalNeighborhood, ::FirstImproveSearch, problem)
     initial = create_solution(copy(x), problem) 
     for xnew in neighbourhood
         sol = create_solution(xnew, problem)
