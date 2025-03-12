@@ -176,5 +176,34 @@ end
         @test -minimum(res) == optimum
     end
 
+
     vns_grasp()
+end
+
+@testset "Combinatorial: MixedInteger" begin
+    function mixed_integer()
+        f(sol) = sum(sol[:v]) + sum((sol[:w] .- 100).^2) - sum(sol[:x]) + sum(abs.(sol[:y] .- 1000)) + sum(sol[:z])
+        # define multiple compatible search spaces
+        v = BoxConstrainedSpace(-10ones(Int, 6), 10ones(Int, 6))
+        w = BoxConstrainedSpace(-10ones(Int, 7), 10ones(Int, 7), rigid=false)
+        x = BoxConstrainedSpace(-ones(3), ones(3))
+        y = BoxConstrainedSpace(-ones(4), ones(4), rigid=false)
+        z = BitArraySpace(5)
+
+        search_space = MixedSpace(:v=>v, :w=>w, :x=>x, :y=>y, :z=>z)
+        @test search_space.key_order == (:v, :w, :x, :y, :z)
+
+        for algo in [DE(N=50), ECA(N=50), PSO(N=50), SA(), CGSA(N=50), ABC(N=50)]
+            # optimize and get the results
+            options = Options(verbose=false,seed=1, iterations=10)
+            res = optimize(f, search_space, MixedInteger(algo; options))
+            @test minimum(res) isa Number
+            @test minimizer(res) isa AbstractVector
+            d = Metaheuristics.vec_to_dict(minimizer(res), search_space) 
+            @test d isa Dict
+            @test sort(collect(keys(d))) == [:v, :w, :x, :y, :z]
+        end
+    end
+
+    mixed_integer()
 end

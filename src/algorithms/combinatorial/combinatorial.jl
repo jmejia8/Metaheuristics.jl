@@ -4,5 +4,6 @@ include("BRKGA/BRKGA.jl")
 include("LocalSearch/LocalSearchUtils.jl")
 include("GRASP/GRASP.jl")
 include("VNS/VNS.jl")
+include("MixedInteger/MixedInteger.jl")
 
-export GRASP, VND, VNS
+export GRASP, VND, VNS, MixedInteger
