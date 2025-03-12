@@ -48,3 +48,11 @@ General Variable Neighborhood Search.
 VNS
 ```
 
+## Mixed integer 
+
+General Variable Neighborhood Search.
+
+```@docs
+MixedInteger
+```
+
