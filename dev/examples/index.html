@@ -34,7 +34,7 @@ Optimization Result
   Minimum:         1.98992
   Minimizer:       [4.9425e-09, -2.63681e-09, 5.26807e-10, …, -2.05997e-09]
   Function calls:  37800
-  Total time:      0.1244 s
+  Total time:      0.2230 s
   Stop reason:     Due to Convergence Termination criterion.
 </pre>
 <p>The minimum and minimizer:</p><pre><code class="language-julia hljs">minimum(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.9899181141865938</code></pre><pre><code class="language-julia hljs">minimizer(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{Float64}:
@@ -65,7 +65,7 @@ Optimization Result
   Minimizer:       [0.957093, 0.915803]
   Function calls:  20010
   Feasibles:       30 / 30 in final population
-  Total time:      0.9946 s
+  Total time:      0.9926 s
   Stop reason:     Maximum objective function calls exceeded.</code></pre><h2 id="Multiobjective-Optimization"><a class="docs-heading-anchor" href="#Multiobjective-Optimization">Multiobjective Optimization</a><a id="Multiobjective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multiobjective-Optimization" title="Permalink"></a></h2><p>To implement a multiobjective optimization problem and solve it, you can proceed as usual. Here, you need to provide constraints if they exist, otherwise put <code>gx = [0.0]; hx = [0.0];</code> to indicate an unconstrained multiobjective problem.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using UnicodePlots # to visualize in console (optional)</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Metaheuristics</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; function f(x)
            # objective functions
            v = 1.0 + sum(x .^ 2)
@@ -106,7 +106,7 @@ Optimization Result
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
   Function calls:  50100
   Feasibles:       100 / 100 in final population
-  Total time:      0.4190 s
+  Total time:      0.4129 s
   Stop reason:     Maximum objective function calls exceeded.</code></pre><h2 id="Bilevel-Optimization"><a class="docs-heading-anchor" href="#Bilevel-Optimization">Bilevel Optimization</a><a id="Bilevel-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Bilevel-Optimization" title="Permalink"></a></h2><p>Bilevel optimization problems can be solved by using the package <a href="https://github.com/jmejia8/BilevelHeuristics.jl">BilevelHeuristics.jl</a> which extends  <code>Metaheuristics.jl</code> for handling those hierarchical problems.</p><p>Defining objective functions corresponding to the BO problem.</p><p><strong>Upper level (leader problem):</strong></p><pre><code class="language-julia hljs">using BilevelHeuristics
 
 F(x, y) = sum(x.^2) + sum(y.^2)
@@ -147,7 +147,7 @@ julia&gt; sol = best_alternative(res, w, dm_method)
   Minimum:         5.8527e-47
   Minimizer:       [1.6089e-47, 3.31929e-47, 3.04058e-24]
   Function calls:  15280
-  Total time:      0.1478 s
+  Total time:      0.1397 s
   Stop reason:     Due to Convergence Termination criterion.</code></pre><h2 id="Batch-Evaluation"><a class="docs-heading-anchor" href="#Batch-Evaluation">Batch Evaluation</a><a id="Batch-Evaluation-1"></a><a class="docs-heading-anchor-permalink" href="#Batch-Evaluation" title="Permalink"></a></h2><p>Evaluating multiple solutions at the same time can reduce computational time. To do that, define your function on an input <code>N x D</code> matrix and function values into matrices with outcomes in rows for all <code>N</code> solutions. Also, you need to put <code>parallel_evaluation=true</code> in the <a href="../api/#Metaheuristics.Options"><code>Options</code></a> to indicate that your <code>f</code> is prepared for parallel evaluations.</p><pre><code class="language-julia hljs">f(X) = begin
     fx = sum(X.^2, dims=2)       # objective function ∑x²
     gx = sum(X.^2, dims=2) .-0.5 # inequality constraints ∑x² ≤ 0.5
@@ -208,4 +208,4 @@ optimize(f, bounds, ECA())
 
 julia&gt; optimize(f, bounds, Restart(ECA(), every=200))</code></pre><p><strong>Customization</strong></p><p>The restart condition can be updated by overloading the <code>restart_condition</code> method:</p><pre><code class="language-julia hljs">function Metaheuristics.restart_condition(status, restart::Restart, information, options)
     st.iteration % params.every == 0
-end</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/cbed542212c808700a9b69c2a4ff75ed6fbe7450/src/algorithms/singleobjective/Restart/Restart.jl#L8-L31">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/n-queens/">« N-Queens</a><a class="docs-footer-nextpage" href="../algorithms/">Index »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 14 March 2025 03:56">Friday 14 March 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/b5c4efdffe68e8297598555d6c0135cb0536b3a7/src/algorithms/singleobjective/Restart/Restart.jl#L8-L31">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/n-queens/">« N-Queens</a><a class="docs-footer-nextpage" href="../algorithms/">Index »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 14 March 2025 04:21">Friday 14 March 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
