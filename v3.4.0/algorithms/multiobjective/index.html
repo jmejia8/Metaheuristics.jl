@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Multi-objective · Metaheuristics.jl</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-184071594-1"></script><script>  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-184071594-1', {'page_path': location.pathname + location.search + location.hash});
+</script><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/><link href="../../assets/extra_styles.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img class="docs-light-only" src="../../assets/logo.png" alt="Metaheuristics.jl logo"/><img class="docs-dark-only" src="../../assets/logo-dark.png" alt="Metaheuristics.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">Metaheuristics.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Index</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox"/><label class="tocitem" for="menuitem-2"><span class="docs-label">Tutorials</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tutorials/simple-tutorial/">Getting Started</a></li><li><a class="tocitem" href="../../tutorials/create-metaheuristic/">Create Your Own Metaheuristic</a></li><li><a class="tocitem" href="../../tutorials/parallelization/">Parallelization</a></li><li><a class="tocitem" href="../../tutorials/n-queens/">N-Queens</a></li></ul></li><li><a class="tocitem" href="../../examples/">Examples</a></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox" checked/><label class="tocitem" for="menuitem-4"><span class="docs-label">Algorithms</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../">Index</a></li><li><a class="tocitem" href="../singleobjective/">Single-objective</a></li><li class="is-active"><a class="tocitem" href>Multi-objective</a><ul class="internal"><li><a class="tocitem" href="#MOEA/D-DE"><span>MOEA/D-DE</span></a></li><li><a class="tocitem" href="#NSGA-II"><span>NSGA-II</span></a></li><li><a class="tocitem" href="#NSGA-III"><span>NSGA-III</span></a></li><li><a class="tocitem" href="#SMS-EMOA"><span>SMS-EMOA</span></a></li><li><a class="tocitem" href="#SPEA2"><span>SPEA2</span></a></li><li><a class="tocitem" href="#CCMO"><span>CCMO</span></a></li></ul></li><li><a class="tocitem" href="../combinatorial/">Combinatorial</a></li></ul></li><li><a class="tocitem" href="../../problems/">Problems</a></li><li><a class="tocitem" href="../../indicators/">Performance Indicators</a></li><li><a class="tocitem" href="../../mcdm/">Multi-Criteria Decision Making</a></li><li><a class="tocitem" href="../../visualization/">Visualization</a></li><li><a class="tocitem" href="../../api/">API References</a></li><li><a class="tocitem" href="../../faq/">FAQ</a></li><li><a class="tocitem" href="../../contributing/">Contributing</a></li><li><a class="tocitem" href="../../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Algorithms</a></li><li class="is-active"><a href>Multi-objective</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Multi-objective</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jmejia8/Metaheuristics.jl/blob/master/docs/src/algorithms/multiobjective.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Multi-objective"><a class="docs-heading-anchor" href="#Multi-objective">Multi-objective</a><a id="Multi-objective-1"></a><a class="docs-heading-anchor-permalink" href="#Multi-objective" title="Permalink"></a></h1><h2 id="MOEA/D-DE"><a class="docs-heading-anchor" href="#MOEA/D-DE">MOEA/D-DE</a><a id="MOEA/D-DE-1"></a><a class="docs-heading-anchor-permalink" href="#MOEA/D-DE" title="Permalink"></a></h2><p>Multiobjective optimization problems with complicated Pareto sets by <a href="../../references/#LiZhang2008">(Li and Zhang, 2008)</a>.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.MOEAD_DE" href="#Metaheuristics.MOEAD_DE"><code>Metaheuristics.MOEAD_DE</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">MOEAD_DE(weights ;
+    F = 0.5,
+    CR = 1.0,
+    λ = Array{Vector{Float64}}[], # ref. points
+    η = 20,
+    p_m = -1.0,
+    T = round(Int, 0.2*length(weights)),
+    δ = 0.9,
+    n_r = round(Int, 0.02*length(weights)),
+    z = zeros(0),
+    B = Array{Int}[],
+    s1 = 0.01,
+    s2 = 20.0,
+    information = Information(),
+    options = Options())</code></pre><p><code>MOEAD_DE</code> implements the original version of MOEA/D-DE. It uses the contraint handling method based on the sum of violations (for constrained optimizaton): <code>g(x, λ, z) = max(λ .* abs.(fx - z)) + sum(max.(0, gx)) + sum(abs.(hx))</code></p><p>To use MOEAD_DE, the output from the objective function should be a 3-touple <code>(f::Vector, g::Vector, h::Vector)</code>, where <code>f</code> contains the objective functions, <code>g</code> and <code>h</code> are the equality and inequality constraints respectively.</p><p>A feasible solution is such that <code>g_i(x) ≤ 0 and h_j(x) = 0</code>.</p><p>Ref. Multiobjective Optimization Problems With Complicated Pareto Sets, MOEA/D and NSGA-II; Hui Li and Qingfu Zhang.</p><p><strong>Example</strong></p><p>Assume you want to solve the following optimizaton problem:</p><p>Minimize:</p><p><code>f(x) = (x_1, x_2)</code></p><p>subject to:</p><p><code>g(x) = x_1^2 + x_2^2 - 1 ≤ 0</code></p><p><code>x_1, x_2 ∈ [-1, 1]</code></p><p>A solution can be:</p><pre><code class="language-julia hljs">
+# Dimension
+D = 2
+
+# Objective function
+f(x) = ( x, [sum(x.^2) - 1], [0.0] )
+
+# bounds
+bounds = [-1 -1;
+           1  1.0
+        ]
+
+nobjectives = 2
+npartitions = 100
+
+# reference points (Das and Dennis&#39;s method)
+weights = gen_ref_dirs(nobjectives, npartitions)
+
+# define the parameters
+moead_de = MOEAD_DE(weights, options=Options(debug=false, iterations = 250))
+
+# optimize
+status_moead = optimize(f, bounds, moead_de)
+
+# show results
+display(status_moead)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/b5c4efdffe68e8297598555d6c0135cb0536b3a7/src/algorithms/multiobjective/MOEAD_DE/MOEAD_DE.jl#L21-L96">source</a></section></article><h2 id="NSGA-II"><a class="docs-heading-anchor" href="#NSGA-II">NSGA-II</a><a id="NSGA-II-1"></a><a class="docs-heading-anchor-permalink" href="#NSGA-II" title="Permalink"></a></h2><p>A fast and elitist multiobjective genetic algorithm: NSGA-II by <a href="../../references/#Deb2002">(Deb <em>et al.</em>, 2002)</a>.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.NSGA2" href="#Metaheuristics.NSGA2"><code>Metaheuristics.NSGA2</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">NSGA2(;
+    N = 100,
+    η_cr = 20,
+    p_cr = 0.9,
+    η_m = 20,
+    p_m = 1.0 / D,
+    information = Information(),
+    options = Options(),
+)</code></pre><p>Parameters for the metaheuristic NSGA-II.</p><p>Parameters:</p><ul><li><code>N</code> Population size.</li><li><code>η_cr</code>  η for the crossover.</li><li><code>p_cr</code> Crossover probability.</li><li><code>η_m</code>  η for the mutation operator.</li><li><code>p_m</code> Mutation probability (1/D for D-dimensional problem by default).</li></ul><p>To use NSGA2, the output from the objective function should be a 3-touple <code>(f::Vector, g::Vector, h::Vector)</code>, where <code>f</code> contains the objective functions, <code>g</code> and <code>h</code> are inequality, equality constraints respectively.</p><p>A feasible solution is such that <code>g_i(x) ≤ 0 and h_j(x) = 0</code>.</p><pre><code class="language-julia hljs">using Metaheuristics
+
+# Dimension
+D = 2
+
+# Objective function
+f(x) = ( x, [sum(x.^2) - 1], [0.0] ) 
+
+# bounds
+bounds = [-1 -1;
+           1  1.0
+        ]
+
+# define the parameters (use `NSGA2()` for using default parameters)
+nsga2 = NSGA2(N = 100, p_cr = 0.85)
+
+# optimize
+status = optimize(f, bounds, nsga2)
+
+# show results
+display(status)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/b5c4efdffe68e8297598555d6c0135cb0536b3a7/src/algorithms/multiobjective/NSGA2/NSGA2.jl#L14-L66">source</a></section></article><h2 id="NSGA-III"><a class="docs-heading-anchor" href="#NSGA-III">NSGA-III</a><a id="NSGA-III-1"></a><a class="docs-heading-anchor-permalink" href="#NSGA-III" title="Permalink"></a></h2><p>An Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based Nondominated Sorting Approach, Part I: Solving Problems With Box Constraints by <a href="../../references/#DebJain2014">(Deb and Jain, 2014)</a>.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.NSGA3" href="#Metaheuristics.NSGA3"><code>Metaheuristics.NSGA3</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">NSGA3(;
+    N = 100,
+    η_cr = 20,
+    p_cr = 0.9,
+    η_m = 20,
+    p_m = 1.0 / D,
+    partitions = 12,
+    reference_points = Vector{Float64}[],
+    information = Information(),
+    options = Options(),
+)</code></pre><p>Parameters for the metaheuristic NSGA-III.</p><p>Parameters:</p><ul><li><code>N</code> Population size.</li><li><code>η_cr</code>  η for the crossover.</li><li><code>p_cr</code> Crossover probability.</li><li><code>η_m</code>  η for the mutation operator.</li><li><code>p_m</code> Mutation probability (1/D for D-dimensional problem by default).</li><li><code>reference_points</code> reference points usually generated by <code>gen_ref_dirs</code>.</li><li><code>partitions</code> number of Das and Dennis&#39;s reference points if <code>reference_points</code> is empty.</li></ul><p>To use NSGA3, the output from the objective function should be a 3-touple <code>(f::Vector, g::Vector, h::Vector)</code>, where <code>f</code> contains the objective functions, <code>g</code> and <code>h</code> are inequality, equality constraints respectively.</p><p>A feasible solution is such that <code>g_i(x) ≤ 0 and h_j(x) = 0</code>.</p><pre><code class="language-julia hljs">using Metaheuristics
+
+
+# Objective function, bounds, and the True Pareto front
+f, bounds, pf = Metaheuristics.TestProblems.get_problem(:DTLZ2)
+
+
+# define the parameters (use `NSGA3()` for using default parameters)
+nsga3 = NSGA3(p_cr = 0.9)
+
+# optimize
+status = optimize(f, bounds, nsga3)
+
+# show results
+display(status)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/b5c4efdffe68e8297598555d6c0135cb0536b3a7/src/algorithms/multiobjective/NSGA3/NSGA3.jl#L12-L62">source</a></section></article><h2 id="SMS-EMOA"><a class="docs-heading-anchor" href="#SMS-EMOA">SMS-EMOA</a><a id="SMS-EMOA-1"></a><a class="docs-heading-anchor-permalink" href="#SMS-EMOA" title="Permalink"></a></h2><p>An EMO algorithm using the hypervolume measure as a selection criterion by <a href="../../references/#Emmerich2005">(Emmerich <em>et al.</em>, 2005)</a>.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.SMS_EMOA" href="#Metaheuristics.SMS_EMOA"><code>Metaheuristics.SMS_EMOA</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">SMS_EMOA(;
+    N = 100,
+    η_cr = 20,
+    p_cr = 0.9,
+    η_m = 20,
+    p_m = 1.0 / D,
+    n_samples = 10_000,
+    information = Information(),
+    options = Options(),
+)</code></pre><p>Parameters for the metaheuristic SMS-EMOA.</p><p>Parameters:</p><ul><li><code>N</code> Population size.</li><li><code>η_cr</code>  η for the crossover.</li><li><code>p_cr</code> Crossover probability.</li><li><code>η_m</code>  η for the mutation operator.</li><li><code>p_m</code> Mutation probability (1/D for D-dimensional problem by default).</li><li><code>n_samples</code> number of samples to approximate hypervolume in many-objective (M &gt; 2).</li></ul><p>To use SMS_EMOA, the output from the objective function should be a 3-touple <code>(f::Vector, g::Vector, h::Vector)</code>, where <code>f</code> contains the objective functions, <code>g</code> and <code>h</code> are inequality, equality constraints respectively.</p><p>A feasible solution is such that <code>g_i(x) ≤ 0 and h_j(x) = 0</code>.</p><pre><code class="language-julia hljs">using Metaheuristics
+
+# Dimension
+D = 2
+
+# Objective function
+f(x) = ( x, [sum(x.^2) - 1], [0.0] ) 
+
+# bounds
+bounds = [-1 -1;
+           1  1.0
+        ]
+
+# define the parameters (use `SMS_EMOA()` for using default parameters)
+sms_emoa = SMS_EMOA(N = 100, p_cr = 0.85)
+
+# optimize
+status = optimize(f, bounds, sms_emoa)
+
+# show results
+display(status)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/b5c4efdffe68e8297598555d6c0135cb0536b3a7/src/algorithms/multiobjective/SMS_EMOA/SMS_EMOA.jl#L13-L67">source</a></section></article><h2 id="SPEA2"><a class="docs-heading-anchor" href="#SPEA2">SPEA2</a><a id="SPEA2-1"></a><a class="docs-heading-anchor-permalink" href="#SPEA2" title="Permalink"></a></h2><p>Improved strength Pareto evolutionary algorithm by <a href="../../references/#Zitzler2001">(Zitzler <em>et al.</em>, 2001)</a>.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.SPEA2" href="#Metaheuristics.SPEA2"><code>Metaheuristics.SPEA2</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">SPEA2(;
+    N = 100,
+    η_cr = 20,
+    p_cr = 0.9,
+    η_m = 20,
+    p_m = 1.0 / D,
+    information = Information(),
+    options = Options(),
+)</code></pre><p>Parameters for the metaheuristic NSGA-II.</p><p>Parameters:</p><ul><li><code>N</code> Population size.</li><li><code>η_cr</code>  η for the crossover.</li><li><code>p_cr</code> Crossover probability.</li><li><code>η_m</code>  η for the mutation operator.</li><li><code>p_m</code> Mutation probability (1/D for D-dimensional problem by default).</li></ul><p>To use SPEA2, the output from the objective function should be a 3-touple <code>(f::Vector, g::Vector, h::Vector)</code>, where <code>f</code> contains the objective functions, <code>g</code> and <code>h</code> are inequality, equality constraints respectively.</p><p>A feasible solution is such that <code>g_i(x) ≤ 0 and h_j(x) = 0</code>.</p><pre><code class="language-julia hljs">using Metaheuristics
+
+# Dimension
+D = 2
+
+# Objective function
+f(x) = ( x, [sum(x.^2) - 1], [0.0] ) 
+
+# bounds
+bounds = [-1 -1;
+           1  1.0
+        ]
+
+# define the parameters (use `SPEA2()` for using default parameters)
+nsga2 = SPEA2(N = 100, p_cr = 0.85)
+
+# optimize
+status = optimize(f, bounds, nsga2)
+
+# show results
+display(status)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/b5c4efdffe68e8297598555d6c0135cb0536b3a7/src/algorithms/multiobjective/SPEA2/SPEA2.jl#L11-L63">source</a></section></article><h2 id="CCMO"><a class="docs-heading-anchor" href="#CCMO">CCMO</a><a id="CCMO-1"></a><a class="docs-heading-anchor-permalink" href="#CCMO" title="Permalink"></a></h2><p>A Coevolutionary Framework for Constrained Multiobjective Optimization Problems proposed by <a href="../../references/#Tian2020">(Tian <em>et al.</em>, 2021)</a>.</p><article class="docstring"><header><a class="docstring-binding" id="Metaheuristics.CCMO" href="#Metaheuristics.CCMO"><code>Metaheuristics.CCMO</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">CCMO(base_optimizer; infromation, options)</code></pre><p>Parameters for CCMO algorithm. <code>base_algorithm</code> only supports <code>NSGA2()</code>.</p><p>A feasible solution is such that <code>g_i(x) ≤ 0 and h_j(x) = 0</code>.</p><p><strong>Example</strong></p><pre><code class="language-julia-repl hljs">julia&gt; f, bounds, pf = Metaheuristics.TestProblems.MTP();
+
+julia&gt; ccmo = CCMO(NSGA2(N=100, p_m=0.001));
+
+julia&gt; optimize(f, bounds, ccmo)
++=========== RESULT ==========+
+  iteration: 500
+ population:        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+        ┌────────────────────────────────────────┐ 
+      2 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   f₂   │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⢧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠈⢢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠈⠢⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠈⠑⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⠤⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠒⠢⠤⡀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠁⠒⠒⠒⠄⠤⠤⢠⢀⣀⢀⣀⠀⣀⣀⡀⣀⡀│ 
+        └────────────────────────────────────────┘ 
+        ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀1⠀ 
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+non-dominated solution(s):
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀F space⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+        ┌────────────────────────────────────────┐ 
+      2 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   f₂   │⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⢧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠈⢢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠈⠢⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠈⠑⠦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠉⠒⠤⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠒⠢⠤⡀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+      0 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠁⠒⠒⠒⠄⠤⠤⢠⢀⣀⢀⣀⠀⣀⣀⡀⣀⡀│ 
+        └────────────────────────────────────────┘ 
+        ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀1⠀ 
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    f calls: 50000
+  feasibles: 100 / 100 in final population
+ total time: 7.0616 s
+stop reason: Maximum number of iterations exceeded.
++============================+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/jmejia8/Metaheuristics.jl/blob/b5c4efdffe68e8297598555d6c0135cb0536b3a7/src/algorithms/multiobjective/CCMO/CCMO.jl#L10-L75">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../singleobjective/">« Single-objective</a><a class="docs-footer-nextpage" href="../combinatorial/">Combinatorial »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Friday 14 March 2025 04:38">Friday 14 March 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
