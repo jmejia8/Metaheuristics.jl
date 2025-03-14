@@ -12,7 +12,7 @@ using Requires
 using Reexport
 
 @reexport import SearchSpaces
-@reexport import SearchSpaces: BoxConstrainedSpace, PermutationSpace, BitArraySpace
+@reexport import SearchSpaces: BoxConstrainedSpace, PermutationSpace, BitArraySpace, MixedSpace
 @reexport import SearchSpaces: cardinality
 using SearchSpaces
 import SearchSpaces: AbstractSearchSpace,getdim
