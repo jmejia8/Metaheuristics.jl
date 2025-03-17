@@ -10,6 +10,34 @@ end
 
 
 """
+    SHADE(;N=100, information = Information(), options = Options())
+
+Success-history based parameter adaptation for differential evolution.
+
+# Example
+
+```jldoctest
+julia> f(x) = sum(x.^2)
+f (generic function with 1 method)
+
+julia> result = optimize(f, [-1 -1 -1; 1 1 1.0], SHADE())
+Optimization Result
+===================
+  Iteration:       300
+  Minimum:         3.07974e-35
+  Minimizer:       [-1.73647e-18, 3.98654e-18, -3.44812e-18]
+  Function calls:  30000
+  Total time:      0.0647 s
+  Stop reason:     Maximum objective function calls exceeded.
+
+
+julia> minimizer(result)
+3-element Vector{Float64}:
+ -1.7364702000176986e-18
+  3.9865445738182325e-18
+ -3.448119784571527e-18
+```
+
 
 """
 function SHADE(; N::Int = 100, kargs...)
@@ -114,6 +142,11 @@ function reproduction(status, parameters::SHADE, problem)
     # compute offspring positions (matrix X)
     X = population |> positions
     X[mask] += F[mask] .* (Xpb[mask]-X[mask]+Xr1[mask]-Xr2[mask])
+
+    # repair solution
+    for x in eachrow(X)
+        reset_to_violated_bounds!(x, problem.search_space)
+    end
 
     X
 end
