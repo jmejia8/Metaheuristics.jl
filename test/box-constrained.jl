@@ -43,6 +43,7 @@ using Test
                    WOA(options = options, information = information),
                    MCCGA(options = options_3, information = information),
                    Restart(WOA(;options, information)),
+                   SHADE(options=Options(seed=1)),
                   ]
 
         # CGSA
