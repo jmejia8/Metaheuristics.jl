@@ -92,15 +92,10 @@ function update_state!(
             status.population[i] = sol
             if is_better(sol, status.best_sol)
                 status.best_sol = sol
-                xGBest = get_position(status.best_sol)
             end
         end
 
         parameters.flock[i] = sol
-
-        # stop condition
-        stop_criteria!(status, parameters, problem, information, options)
-        status.stop && break
     end
 
 end
@@ -139,7 +134,7 @@ function initialize!(
 
 
 
-    parameters.flock = status.population
+    parameters.flock = copy(status.population)
 
     status
 
