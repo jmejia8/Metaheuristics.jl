@@ -44,6 +44,7 @@ using Test
                    MCCGA(options = options_3, information = information),
                    Restart(WOA(;options, information)),
                    SHADE(options=Options(seed=1)),
+                   CSO(N=100, options=Options(seed=1)),
                   ]
 
         # CGSA

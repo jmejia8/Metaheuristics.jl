@@ -22,6 +22,8 @@ contributor's understanding of the algorithms detailed in the published paper.
 | CCMO      |  Multi     |      ✅     |   ➖        |   ✅        | [`CCMO`](@ref)         |
 | $\varepsilon$DE |  Single   | ✅     |   ➖        |   ✅        | [`εDE`](@ref)          |
 | BRKGA     |  Single    |      ✅     |   ➖        |   ✅        | [`BRKGA`](@ref)           |
+| SHADE     |  Single    |      ✅     |   ➖        |   ✅        | [`SHADE`](@ref)           |
+| CSO       |  Single    |      ✅     |   ✅        |   ✅        | [`CSO`](@ref)           |
 
 
 ✅ = supported,

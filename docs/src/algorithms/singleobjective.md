@@ -88,3 +88,16 @@ GA
 εDE
 ```
 
+## SHADE
+
+```@docs
+SHADE
+```
+
+## CSO
+
+
+```@docs
+CSO
+```
+

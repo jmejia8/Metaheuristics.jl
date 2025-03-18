@@ -29,7 +29,7 @@ export εDE, Restart
 export optimize!
 export set_user_solutions!
 export boxconstraints
-export SHADE
+export SHADE, CSO
 
 include("externals.jl")
 
