@@ -33,3 +33,5 @@ include("ABC/ABC.jl")
 include("MCCGA/MCCGA.jl")
 
 include("Restart/Restart.jl")
+include("SHADE/SHADE.jl")
+include("CSO/CSO.jl")
