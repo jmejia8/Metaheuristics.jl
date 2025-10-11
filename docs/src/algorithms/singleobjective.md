@@ -52,6 +52,13 @@ Physics-inspired algorithm for optimization by [Van1987](@cite).
 SA
 ```
 
+## Whale Optimization Algorithm
+
+WOA is a nature-inspired metaheuristic algorithm that mimics the social behavior of humpback whales.
+
+```@docs
+WOA
+```
 
 
 ## BCA
@@ -99,5 +106,13 @@ SHADE
 
 ```@docs
 CSO
+```
+
+## Restart
+
+Restart mechanism for metaheuristics that allows restarting the optimization process when stagnation is detected.
+
+```@docs
+Restart
 ```
 

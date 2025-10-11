@@ -22,6 +22,12 @@ Depth = 3
  Metaheuristics.PerformanceIndicators
 ```
 
+## Pareto Front Utilities
+
+```@docs
+pareto_front
+```
+
 ## Generational Distance
 
 ![Generational Distance in Julia](figs/gd.png)
