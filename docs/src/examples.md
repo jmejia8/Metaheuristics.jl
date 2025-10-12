@@ -369,7 +369,7 @@ population_size = 100
 ga = GA(
     N = population_size,
     initializer = RandomPermutation(N=population_size),
-    crossover = OrderCrossover(), # crossover for permuation encoding
+    crossover = OrderCrossover(), # crossover for permutation encoding
     mutation = SlightMutation()
 )
 
@@ -410,11 +410,11 @@ population_size = 100
 ga = GA(
     N = population_size,
     initializer = RandomPermutation(N=population_size),
-    crossover = OrderCrossover(), # crossover for permuation encoding
+    crossover = OrderCrossover(), # crossover for permutation encoding
     mutation = SlightMutation()
 )
 
-# Solve with GA for binary problems
+# Solve with GA
 result = optimize(f, search_space, ga)
 selected_items = minimizer(result)[1:findfirst(w -> w > capacity, cumsum(weight[minimizer(result)]))-1]
 

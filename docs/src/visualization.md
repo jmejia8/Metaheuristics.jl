@@ -542,7 +542,7 @@ gr()
 
 # 2D optimization problem
 f(x) = (x[1] - 1)^2 + (x[2] + 1)^2
-bounds = boxconstraints(lb = [-3.0, -3], ub = [3.0, 3])
+bounds = boxconstraints(lb = [-3.0, -3.0], ub = [3.0, 3.0])
 options = Options(store_convergence=true, iterations=50, seed=1)
 
 result = optimize(f, bounds, PSO(options=options))

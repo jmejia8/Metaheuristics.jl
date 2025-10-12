@@ -25,7 +25,7 @@ Metaheuristics.TestProblems.rastrigin
 
 ## Constrained Optimization
 
-Constrained test problems (mainly for testing alpha version of the package, but useful for testing constrained optimization).
+Constrained test problems used during alpha testing of the package. These are useful for testing constrained optimization algorithms.
 
 ```@docs
 Metaheuristics.TestProblems.constrained1
