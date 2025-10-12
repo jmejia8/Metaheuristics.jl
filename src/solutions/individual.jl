@@ -369,7 +369,11 @@ Get the equality constraints of a solution.
 """
 hval(solution::T) where T <: AbstractConstrainedSolution = solution.h
 
+"""
+    fvals(population)
 
+Returns the objective function values of a population.
+"""
 function fvals(population::AbstractArray{T}) where T <: AbstractMultiObjectiveSolution
     isempty(population) && (return zeros(0, 0))
     
@@ -379,7 +383,11 @@ end
 
 fvals(population::AbstractArray{T}) where T <: AbstractSolution = fval.(population)
 
+"""
+    gvals(population)
 
+Returns the inequality constraints of a population.
+"""
 function gvals(population::AbstractArray{T}) where T <: AbstractConstrainedSolution
     if isempty(population)
         return zeros(0, 0)
@@ -389,7 +397,11 @@ function gvals(population::AbstractArray{T}) where T <: AbstractConstrainedSolut
     [ gval(sol)[i] for sol in population, i in 1:M]
 end
 
+"""
+    hvals(population)
 
+Returns the equality constraints of a population.
+"""
 function hvals(population::AbstractArray{T}) where T <: AbstractConstrainedSolution
     if isempty(population)
         return zeros(0, 0)

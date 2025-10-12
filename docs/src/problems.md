@@ -25,6 +25,8 @@ Metaheuristics.TestProblems.rastrigin
 
 ## Constrained Optimization
 
+Constrained test problems (mainly for testing alpha version of the package, but useful for testing constrained optimization).
+
 ```@docs
 Metaheuristics.TestProblems.constrained1
 ```
