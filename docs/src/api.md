@@ -55,6 +55,12 @@ MixedSpace
 cardinality
 ```
 
+
+```@docs
+SearchSpaces.:×
+```
+
+
 ## Convergence and Results
 
 ```@docs

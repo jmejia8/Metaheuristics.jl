@@ -82,7 +82,7 @@ end
 result = Metaheuristics.get_result(method)
 ```
 
-See also [`optimize`](@docs).
+See also [`optimize`](@ref).
 """
 function optimize!(
         f::Function, # objective function

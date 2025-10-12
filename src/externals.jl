@@ -24,7 +24,6 @@ import SearchSpaces: AtomicSearchSpace, AbstractSampler, Sampler
 
 Define a box-constrained search space (alias for BoxConstrainedSpace).
 
-See [`SearchSpaces.BoxConstrainedSpace`](@ref) for more details.
 
 # Example
 

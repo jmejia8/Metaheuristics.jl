@@ -188,6 +188,3 @@ MCDMSetting
 dm
 ```
 
-```@docs
-summary(::Any)
-```

@@ -63,7 +63,7 @@ See [Parallelization](@ref) tutorial for details.
 ❌ = not supported,
 ➖ = can be supported by changing default parameters.
 
-- **Batch Evaluation** = Simultaneous evaluation of multiple solutions (batch) see "[Batch Evaluation](@ref)".
+- **Batch Evaluation** = Simultaneous evaluation of multiple solutions (batch) see "[Batch Evaluation](@ref batch_eval)".
 - **Constraints** = Equality and inequality constraints.
 - **Large Scale** = High dimensional problems (variables space).
 

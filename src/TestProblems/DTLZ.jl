@@ -298,7 +298,7 @@ end
 """
     C1_DTLZ1(m = 3, ref_dirs = gen_ref_dirs(m, 12))
 
-C1_DTLZ1 returns `(f::function, bounds::Matrix{Float64}, pareto_set::Array{xFgh_indiv})`
+`C1_DTLZ1` returns `(f::function, bounds::Matrix{Float64}, pareto_set::Array{xFgh_indiv})`
 where `f` is the objective function and `pareto_set` is an array with optimal Pareto solutions
 with `n_solutions`.
 
@@ -478,7 +478,7 @@ end
 """
     C3_DTLZ4(m = 3, ref_dirs = gen_ref_dirs(m, 12))
 
-C3_DTLZ4 returns `(f::function, bounds::Matrix{Float64}, pareto_set::Array{xFgh_indiv})`
+`C3_DTLZ4` returns `(f::function, bounds::Matrix{Float64}, pareto_set::Array{xFgh_indiv})`
 where `f` is the objective function and `pareto_set` is an array with optimal Pareto solutions
 with `n_solutions`.
 

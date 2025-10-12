@@ -58,7 +58,7 @@ Algorithm selection depends on your problem type:
 - **Combinatorial**: GA with appropriate operators, BRKGA
 - **Large-scale**: CSO (supports large-scale problems)
 
-See the [Algorithms Index](@ref) for a complete comparison table.
+See the [Algorithms Index](#) for a complete comparison table.
 
 ## How to set stopping criteria?
 

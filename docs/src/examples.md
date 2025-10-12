@@ -242,7 +242,7 @@ optimize(f, boxconstraints(lb = [0, 0, 0], ub = [1, 1, 1]), algo)
 ```
 
 
-## Batch Evaluation
+## [Batch Evaluation](@id batch_eval)
 
 Evaluating multiple solutions at the same time can reduce computational time. To do that,
 define your function on an input `N x D` matrix and function values into matrices with outcomes
@@ -331,11 +331,6 @@ optimize(f, bounds, ECA())
 ```
 
 
-## Restarting search
-
-```@docs
-Restart
-```
 
 ## Combinatorial Optimization Examples
 

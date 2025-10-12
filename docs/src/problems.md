@@ -115,6 +115,3 @@ Metaheuristics.TestProblems.C3_DTLZ4
 Metaheuristics.TestProblems.knapsack
 ```
 
-```@docs
-Metaheuristics.TestProblems.MTP
-```
