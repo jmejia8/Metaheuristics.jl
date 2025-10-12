@@ -23,6 +23,45 @@ Information
 Options
 ```
 
+## Problem Definition
+
+```@docs
+Problem
+```
+
+```@docs
+boxconstraints
+```
+
+## Search Spaces
+
+```@docs
+BoxConstrainedSpace
+```
+
+```@docs
+PermutationSpace
+```
+
+```@docs
+BitArraySpace
+```
+
+```@docs
+MixedSpace
+```
+
+```@docs
+cardinality
+```
+
+
+```@docs
+SearchSpaces.:×
+```
+
+
+## Convergence and Results
 
 ```@docs
 convergence
@@ -75,13 +114,25 @@ get_position
 fval
 ```
 
+## Constraint Violation Functions
+
 ```@docs
-Metaheuristics.gval
+gval
 ```
 
 ```@docs
-Metaheuristics.hval
+hval
 ```
+
+```@docs
+gvals
+```
+
+```@docs
+hvals
+```
+
+## Solution Feasibility and Comparison
 
 ```@docs
 Metaheuristics.is_feasible
@@ -225,6 +276,13 @@ nadir
 ideal
 ```
 
+## Multi-objective Utilities
+
+```@docs
+gen_ref_dirs
+```
+
+## Non-dominated Sorting
 
 ```@docs
 Metaheuristics.non_dominated_sort
@@ -280,20 +338,18 @@ Metaheuristics.var_stop_check
 ## Sampling
 
 ```@docs
-Metaheuristics.sample
+sample
 ```
 
 ```@docs
-Metaheuristics.RandomInBounds
+RandomInBounds
 ```
 
-
 ```@docs
-Metaheuristics.LatinHypercubeSampling
+LatinHypercubeSampling
 ```
 
-
 ```@docs
-Metaheuristics.Grid
+Grid
 ```
 

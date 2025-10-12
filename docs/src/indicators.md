@@ -22,7 +22,15 @@ Depth = 3
  Metaheuristics.PerformanceIndicators
 ```
 
+## Pareto Front Utilities
+
+```@docs
+pareto_front
+```
+
 ## Generational Distance
+
+These indicators are used to assess the accuracy of the Pareto front. They are defined as the average distance between a set of approximations of the Pareto front and a sample of the true Pareto front.
 
 ![Generational Distance in Julia](figs/gd.png)
 
@@ -69,6 +77,8 @@ Depth = 3
 
 ## Hypervolume
 
+This indicator is used to simultaneously assess the convergence and diversity of the Pareto front. It is defined as the volume between a set of approximations of the Pareto front and a reference point.
+
 ![Hypervolume Indicator in Julia](figs/hv.png)
 
 ```@docs
@@ -114,6 +124,8 @@ hv = hypervolume(approx_front, reference_point)
 
 
 ## $\Delta_p$ (Delta $p$)
+
+This indicator computes the average Hausdorff distance between a set of approximations of the Pareto front and a sample of the true Pareto front.
 
 ```@docs
  Metaheuristics.PerformanceIndicators.deltap

@@ -1,13 +1,52 @@
+"""
+    WeightedSum
+
+WeightedSum is a type for the weighted sum scalarizing function that sums the objective function values weighted by the weight vector.
+This is computed as 
+"""
 struct WeightedSum end
+"""
+    Tchebysheff
+
+Tchebysheff is a type for the Tchebysheff scalarizing function that takes the maximum of the absolute differences between the objective function values and the minimum objective function values weighted by the weight vector.
+"""
 struct Tchebysheff end
+"""
+    AchievementScalarization
+
+AchievementScalarization is a type for the achievement scalarizing function that takes the maximum of the absolute differences between the objective function values and the minimum objective function values weighted by the weight vector.
+"""
 struct AchievementScalarization end
 
+"""
+eval_scalatization(F, w, params::WeightedSum)
+
+Evalutes the weighted sum scalarizing function. Computed as
+```math
+f(x) = \\sum_{i=1}^n w_i f_i(x)
+```
+"""
 eval_scalatization(F, w, params::WeightedSum) = sum(F .* w', dims=2) |> vec
 
+"""
+eval_scalatization(F, w, params::Tchebysheff)
+
+Evalutes the Tchebysheff scalarizing function. Computed as
+```math
+f(x) = \\max_{i=1}^n |f_i(x) - \\min_{j=1}^n f_j(x)| w_i
+```
+"""
 function eval_scalatization(F, w, params::Tchebysheff)
     maximum(abs.(F .- minimum(F, dims=1)) .* w', dims=2) |> vec
 end
 
+"""
+eval_scalatization(F, w, params::AchievementScalarization)
+
+Evalutes the achievement scalarizing function. Computed as
+```math
+f(x) = \\max_{i=1}^n  |f_i(x) - \\min_{j=1}^n f_j(x)| / w_i
+"""
 function eval_scalatization(F, w, params::AchievementScalarization)
     w = copy(w)
     w[w .== zero(eltype(w))] .= eps()

@@ -152,3 +152,39 @@ can be found in [Ringuest1992](@cite)
 ```@docs
 CompromiseProgramming
 ```
+
+## Scalarization Methods
+
+Scalarization methods convert multi-objective problems into single-objective problems
+by combining multiple objectives into a single scalar value.
+
+### Weighted Sum
+
+```@docs
+WeightedSum
+```
+
+### Tchebysheff
+
+```@docs
+Tchebysheff
+```
+
+### Achievement Scalarization
+
+```@docs
+AchievementScalarization
+```
+
+## MCDM Configuration
+
+```@docs
+MCDMSetting
+```
+
+## Utility Functions
+
+```@docs
+dm
+```
+

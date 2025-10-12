@@ -4,7 +4,6 @@ using DocumenterCitations
 bib = CitationBibliography(joinpath(@__DIR__, "references.bib"), style=:authoryear)
 
 makedocs(
-         bib,
          format = Documenter.HTML(
                                   prettyurls = get(ENV, "CI", nothing) == "true",
                                   assets = ["assets/favicon.ico", "assets/extra_styles.css"],
@@ -14,6 +13,7 @@ makedocs(
                                  ),
          sitename="Metaheuristics.jl",
          authors = "Jesús Mejía",
+         repo = Documenter.Remotes.GitHub("jmejia8", "Metaheuristics.jl"),
          pages = [
                   "Index" => "index.md",
                   "Tutorials" => [
@@ -38,7 +38,8 @@ makedocs(
                   "FAQ" => "faq.md",
                   "Contributing" => "contributing.md",
                   "References" => "references.md",
-                 ]
+                 ],
+         plugins=[bib],
         )
 
 

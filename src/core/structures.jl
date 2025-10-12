@@ -26,7 +26,11 @@ function getdim(problem::Problem)
     return SearchSpaces.getdim(problem.search_space)
 end
 
+"""
+    Problem(f::Function, search_space::AbstractSearchSpace; parallel_evaluation=false)
 
+    Creates a new problem with the given function and search space. parallel_evaluation is a boolean flag to let the problem know if it should batch evaluate.
+"""
 function Problem(f::Function, search_space::AbstractSearchSpace; parallel_evaluation=false)
     Problem(f, search_space, 0, parallel_evaluation)
 end
