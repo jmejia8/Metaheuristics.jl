@@ -23,9 +23,10 @@ The search space (a.k.a. box-constraints) can be defined as follows:
 bounds = boxconstraints(lb = -5ones(10), ub = 5ones(10))
 ```
 
-!!! compat "boxconstraints in a Matrix format."
-    You can also define the bounds using `bounds = [-5ones(10) 5ones(10)]'`; however this
-    is not longer recommended.
+!!! note "Search Space Definition"
+    `boxconstraints` is an alias for `BoxConstrainedSpace`. The matrix format
+    `bounds = [-5ones(10) 5ones(10)]'` is also supported but using named parameters
+    is recommended for clarity.
 
 It is possible to provide some information on the minimization problem.
 Let's provide the true optimum to stop the optimizer when a tolerance `f_tol` is satisfied.
@@ -106,7 +107,7 @@ function f(x)
     return fx, gx, hx
 end
 
-bounds = [-2.0 -2; 2 2]
+bounds = boxconstraints(lb = [-2.0, -2.0], ub = [2.0, 2.0])
 
 optimize(f, bounds, ECA(N=30, K=3))
 ```
@@ -137,7 +138,7 @@ function f(x)
     return fx, gx, hx
 end
 
-bounds = [zeros(30) ones(30)]';
+bounds = boxconstraints(lb = zeros(30), ub = ones(30))
 
 optimize(f, bounds, NSGA2())
 ```
@@ -157,14 +158,14 @@ Defining objective functions corresponding to the BO problem.
 using BilevelHeuristics
 
 F(x, y) = sum(x.^2) + sum(y.^2)
-bounds_ul = [-ones(5) ones(5)] 
+bounds_ul = boxconstraints(lb = -ones(5), ub = ones(5)) 
 ```
 
 **Lower level (follower problem):**
 
 ```julia
 f(x, y) = sum((x - y).^2) + y[1]^2
-bounds_ll = [-ones(5) ones(5)];
+bounds_ll = boxconstraints(lb = -ones(5), ub = ones(5))
 ```
 **Approximate solution:**
 
@@ -237,7 +238,7 @@ set_user_solutions!(algo, x0, f);
 X0 = rand(30, 3); # 30 solutions with dim 3
 
 set_user_solutions!(algo, X0, f);
-optimize(f, [0 0 0; 1 1 1.0], algo)
+optimize(f, boxconstraints(lb = [0, 0, 0], ub = [1, 1, 1]), algo)
 ```
 
 
@@ -258,7 +259,7 @@ end
 
 options = Options(parallel_evaluation=true)
 
-res = optimize(f, [-10ones(5) 10ones(5)], ECA(options=options))
+res = optimize(f, boxconstraints(lb = -10ones(5), ub = 10ones(5)), ECA(options=options))
 ```
 
 See [Parallelization](@ref) tutorial for more details.
@@ -334,4 +335,174 @@ optimize(f, bounds, ECA())
 
 ```@docs
 Restart
+```
+
+## Combinatorial Optimization Examples
+
+### Traveling Salesman Problem (TSP)
+
+The TSP seeks the shortest route visiting all cities exactly once.
+
+```julia
+using Metaheuristics
+
+# Distance matrix for 5 cities
+distances = [
+    0.0  10.0  15.0  20.0  25.0;
+    10.0  0.0  35.0  25.0  30.0;
+    15.0 35.0   0.0  30.0  20.0;
+    20.0 25.0  30.0   0.0  15.0;
+    25.0 30.0  20.0  15.0   0.0
+]
+
+# Objective: minimize tour length
+function tsp_cost(tour)
+    n = length(tour)
+    total = sum(distances[tour[i], tour[i+1]] for i in 1:n-1)
+    total += distances[tour[end], tour[1]]  # return to start
+    return total
+end
+
+# Solve using GA with order crossover
+n_cities = 5
+population_size = 100
+ga = GA(
+    N = population_size,
+    initializer = RandomPermutation(N=population_size),
+    crossover = OrderCrossover(), # crossover for permuation encoding
+    mutation = SlightMutation()
+)
+
+result = optimize(tsp_cost, PermutationSpace(n_cities), ga)
+best_tour = minimizer(result)
+tour_length = minimum(result)
+
+println("Best tour: ", best_tour)
+println("Tour length: ", tour_length)
+```
+
+### Knapsack Problem
+
+```julia
+using Metaheuristics
+
+# define items and capacity
+items = Dict(
+    "gold" => (profit=1000, weight=1),
+    "silver" => (profit=500, weight=2),
+    "bronze" => (profit=250, weight=4),
+    "laptop" => (profit=800, weight=3),
+    "camera" => (profit=600, weight=2),
+    "necklace" => (profit=300, weight=1),
+    "watch" => (profit=400, weight=1)
+)
+capacity = 7
+
+names = collect(keys(items))
+profit = [items[k].profit for k in names]
+weight = [items[k].weight for k in names]
+
+# load the test problem using the provided parameters
+# by default, the problem is encoded as a permutation
+f, search_space, optimum = Metaheuristics.TestProblems.knapsack(profit, weight, capacity)
+
+population_size = 100
+ga = GA(
+    N = population_size,
+    initializer = RandomPermutation(N=population_size),
+    crossover = OrderCrossover(), # crossover for permuation encoding
+    mutation = SlightMutation()
+)
+
+# Solve with GA for binary problems
+result = optimize(f, search_space, ga)
+selected_items = minimizer(result)[1:findfirst(w -> w > capacity, cumsum(weight[minimizer(result)]))-1]
+
+# table with the selected items
+println("Item \t Weight \t Value")
+for i in selected_items
+    println("$(names[i]) \t $(weight[i]) \t $(profit[i])")
+end
+println("Total value: ", -minimum(result))  # negative because we minimize
+
+
+```
+
+
+## Comparing Multiple Algorithms
+
+Compare performance of different algorithms on the same problem:
+
+```julia
+using Metaheuristics
+
+# Define problem
+f(x) = sum(x.^2)
+bounds = boxconstraints(lb = -10ones(5), ub = 10ones(5))
+
+# Test multiple algorithms
+algorithms = [
+    ("ECA", ECA()),
+    ("DE", DE()),
+    ("PSO", PSO()),
+    ("ABC", ABC())
+]
+
+println("Algorithm Performance Comparison")
+println("-" ^ 50)
+
+for (name, algo) in algorithms
+    result = optimize(f, bounds, algo)
+    println("$name:")
+    println("  Minimum: $(minimum(result))")
+    println("  F-calls: $(result.f_calls)")
+    println("  Time: $(result.final_time - result.start_time) s")
+    println()
+end
+```
+
+## Custom Stopping Criteria Example
+
+Implement diversity-based stopping:
+
+```julia
+using Metaheuristics
+import LinearAlgebra: norm
+
+# Overwrite stop criteria for ECA
+function Metaheuristics.stop_criteria!(
+        status,
+        parameters::ECA,
+        problem,
+        information,
+        options,
+        args...;
+        kargs...
+    )
+    
+    if status.stop
+        return
+    end
+    
+    # Calculate population diversity
+    if length(status.population) > 1
+        positions = [sol.x for sol in status.population]
+        center = sum(positions) / length(positions)
+        avg_distance = sum(p -> norm(p - center), positions) / length(positions)
+        
+        # Stop when population converges
+        if avg_distance < 1e-4
+            status.stop = true
+            status.stop_msg = "Low population diversity"
+        end
+    end
+    
+    return
+end
+
+# Now use ECA with custom stopping
+f(x) = sum(x.^2)
+bounds = boxconstraints(lb = -5ones(10), ub = 5ones(10))
+result = optimize(f, bounds, ECA())
+println(result.stop_msg)
 ```

@@ -72,8 +72,10 @@ bounds = boxconstraints(lb = -5ones(D), ub = 5ones(D))
 nothing # hide
 ```
 
-Also, `bounds` can be a $2\times 10$ `Matrix` where the first row corresponds to the
-lower bounds whilst the second row corresponds to the upper bounds.
+!!! note "Search Space Definition"
+    `boxconstraints` is an alias for `BoxConstrainedSpace`. Both can be used interchangeably.
+    The matrix format `[-5ones(D) 5ones(D)]'` is also supported but using named parameters
+    (`lb` and `ub`) is recommended for clarity.
 
 Approximate the optimum using the function `optimize`.
 

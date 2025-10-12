@@ -33,6 +33,28 @@ Problem
 boxconstraints
 ```
 
+## Search Spaces
+
+```@docs
+BoxConstrainedSpace
+```
+
+```@docs
+PermutationSpace
+```
+
+```@docs
+BitArraySpace
+```
+
+```@docs
+MixedSpace
+```
+
+```@docs
+cardinality
+```
+
 ## Convergence and Results
 
 ```@docs
