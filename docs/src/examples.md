@@ -24,7 +24,7 @@ bounds = boxconstraints(lb = -5ones(10), ub = 5ones(10))
 ```
 
 !!! note "Search Space Definition"
-    `boxconstraints` is an alias for `BoxConstrainedSpace`. The matrix format
+    `boxconstraints` is an alias for [`BoxConstrainedSpace`](@ref). The matrix format
     `bounds = [-5ones(10) 5ones(10)]'` is also supported but using named parameters
     is recommended for clarity.
 
