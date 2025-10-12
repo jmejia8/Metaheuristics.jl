@@ -341,7 +341,7 @@ Restart
 
 ### Traveling Salesman Problem (TSP)
 
-The TSP seeks the shortest route visiting all cities exactly once.
+The TSP seeks the shortest route visiting all cities exactly once and returning to the starting city.
 
 ```julia
 using Metaheuristics
@@ -382,6 +382,20 @@ println("Tour length: ", tour_length)
 ```
 
 ### Knapsack Problem
+
+The knapsack problem is a classic combinatorial optimization problem where the goal is to maximize the value of items that can be carried in a knapsack with a limited capacity. For example, if you have a knapsack with a capacity of 7 kg and you have the following items in the table:
+
+| Item | Profit | Weight (kg) |
+|------|--------|--------|
+| gold | 1000 | 1 |
+| silver | 500 | 2 |
+| bronze | 250 | 4 |
+| laptop | 800 | 3 |
+| camera | 600 | 2 |
+| necklace | 300 | 1 |
+| watch | 400 | 1 |
+
+The knapsack problem is to find the items that maximize the profit while respecting the capacity constraint.
 
 ```julia
 using Metaheuristics
