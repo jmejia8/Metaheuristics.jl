@@ -16,11 +16,18 @@ SearchSpaces = "eb7571c6-2196-4f03-99b8-52a5a35b3163"
 SnoopPrecompile = "66db9d55-30c0-4569-8b51-7e840670fc0c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
+[weakdeps]
+MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+
+[extensions]
+MetaheuristicsMOIExt = "MathOptInterface"
+
 [compat]
 Aqua = "^0.8"
 Distances = "^0.10.7"
 JMcDM = "^0.7.1"
 LinearAlgebra = "1"
+MathOptInterface = "1.17"
 Pkg = "1"
 Printf = "1"
 Random = "1"
@@ -32,7 +39,7 @@ SnoopPrecompile = "1"
 Test = "1"
 UnicodePlots = "2.6, 3"
 
-julia = "^1.7"
+julia = "^1.9"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
@@ -40,4 +47,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["Aqua", "Test", "UnicodePlots"]
+test = ["Aqua", "Test", "UnicodePlots", "MathOptInterface"]
