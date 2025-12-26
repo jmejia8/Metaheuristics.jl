@@ -34,7 +34,7 @@ Optimization Result
   Minimum:         1.98992
   Minimizer:       [4.9425e-09, -2.63681e-09, 5.26807e-10, …, -2.05997e-09]
   Function calls:  37800
-  Total time:      0.1166 s
+  Total time:      0.1082 s
   Stop reason:     Due to Convergence Termination criterion.
 </pre>
 <p>The minimum and minimizer:</p><pre><code class="language-julia hljs">minimum(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.9899181141865938</code></pre><pre><code class="language-julia hljs">minimizer(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{Float64}:
@@ -63,7 +63,7 @@ Optimization Result
   Minimizer:       [0.957093, 0.915803]
   Function calls:  20010
   Feasibles:       30 / 30 in final population
-  Total time:      1.1499 s
+  Total time:      0.9819 s
   Stop reason:     Maximum objective function calls exceeded.</code></pre><h2 id="Multiobjective-Optimization"><a class="docs-heading-anchor" href="#Multiobjective-Optimization">Multiobjective Optimization</a><a id="Multiobjective-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Multiobjective-Optimization" title="Permalink"></a></h2><p>To implement a multiobjective optimization problem and solve it, you can proceed as usual. Here, you need to provide constraints if they exist, otherwise put <code>gx = [0.0]; hx = [0.0];</code> to indicate an unconstrained multiobjective problem.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using UnicodePlots # to visualize in console (optional)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Metaheuristics</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; function f(x)
            # objective functions
            v = 1.0 + sum(x .^ 2)
@@ -104,7 +104,7 @@ Optimization Result
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀f₁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
   Function calls:  50100
   Feasibles:       100 / 100 in final population
-  Total time:      0.4369 s
+  Total time:      0.4830 s
   Stop reason:     Maximum objective function calls exceeded.</code></pre><h2 id="Bilevel-Optimization"><a class="docs-heading-anchor" href="#Bilevel-Optimization">Bilevel Optimization</a><a id="Bilevel-Optimization-1"></a><a class="docs-heading-anchor-permalink" href="#Bilevel-Optimization" title="Permalink"></a></h2><p>Bilevel optimization problems can be solved by using the package <a href="https://github.com/jmejia8/BilevelHeuristics.jl">BilevelHeuristics.jl</a> which extends  <code>Metaheuristics.jl</code> for handling those hierarchical problems.</p><p>Defining objective functions corresponding to the BO problem.</p><p><strong>Upper level (leader problem):</strong></p><pre><code class="language-julia hljs">using BilevelHeuristics
 
 F(x, y) = sum(x.^2) + sum(y.^2)
@@ -340,4 +340,4 @@ end
 f(x) = sum(x.^2)
 bounds = boxconstraints(lb = -5ones(10), ub = 5ones(10))
 result = optimize(f, bounds, ECA())
-println(result.stop_msg)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/n-queens/">« N-Queens</a><a class="docs-footer-nextpage" href="../algorithms/">Index »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Friday 26 December 2025 02:19">Friday 26 December 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+println(result.stop_msg)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/n-queens/">« N-Queens</a><a class="docs-footer-nextpage" href="../algorithms/">Index »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Friday 26 December 2025 22:34">Friday 26 December 2025</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
