@@ -83,3 +83,18 @@ function show_status(status, parameters, options)
     @info msg
     display(status)
 end
+
+
+function _wrap_objective_function(objective)
+    # Check if the object is callable with an AbstractVector argument
+    # We check with Any as a representative type
+    if !hasmethod(objective, (Any,))
+        error("The objective function should be callable object.")
+    end
+    if objective isa Function
+        return objective
+    end
+
+    args -> objective(args)
+end
+
