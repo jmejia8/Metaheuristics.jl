@@ -18,21 +18,16 @@ include("RDEx/selection.jl")
 include("RDEx/types.jl")
 include("RDEx/mutation.jl")
 include("RDEx/adaptation.jl")
-include("RDEx/optimizer.jl")
-include("RDEx/optimize.jl")
-include("RDEx/api.jl")
 include("RDEx/metaheuristics.jl")
 
-# Re-export public API
-using .API: optimize
-using .Types: Optimizer, OptimizationResult
-
-# Import Metaheuristics API (avoid conflict by importing functions directly)
-import .MetaheuristicsAPI: RDEx as RDExAlgorithm, RDEx
 
 # Export public API
 export RDEx
 
+
+
+# Import Metaheuristics API (avoid conflict by importing functions directly)
+import .MetaheuristicsAPI: RDEx 
 # Note: RDExAlgorithm is the Metaheuristics-compatible algorithm constructor
 # Users can do: using RDEx: RDExAlgorithm; algo = RDExAlgorithm()
 # Or: import RDEx: RDExAlgorithm as RDEx; algo = RDEx()
