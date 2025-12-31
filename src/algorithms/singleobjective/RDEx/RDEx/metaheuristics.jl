@@ -20,7 +20,7 @@ import ..Constants
 """
     RDEx
 
-Parameters for the RDEx algorithm compatible with Metaheuristics.jl API.
+Parameters for the RDEx algorithm.
 
 # Fields
 - `N::Int`: Population size (calculated as population_size * dimension in initialize!)
@@ -98,7 +98,6 @@ An `Algorithm` object that can be used with `Metaheuristics.optimize`.
 
 # Example
 ```julia
-using RDEx
 using Metaheuristics
 
 f(x) = sum(x.^2)
@@ -170,18 +169,24 @@ function initialize!(
     D = getdim(problem)
     
     # Calculate population size
-    initial_pop_size = parameters.population_size * D
-    parameters.N = initial_pop_size
+    if parameters.N <= 4
+        initial_pop_size = max(4, parameters.population_size * D)
+        parameters.N = initial_pop_size
+    else
+        initial_pop_size = parameters.N
+    end
     parameters.n_inds_front = initial_pop_size
     parameters.n_inds_front_max = initial_pop_size
     
-    # Set default options if needed
-    if options.iterations == 0
-        options.iterations = 500
-    end
+
     
     if options.f_calls_limit == 0
-        options.f_calls_limit = options.iterations * parameters.N + 1
+        options.f_calls_limit = max(10_000 * D, parameters.N * options.iterations)
+    end
+
+    # Set default options if needed
+    if options.iterations == 0
+        options.iterations = max(4*options.f_calls_limit, 500)
     end
     
     # Initialize memory arrays
