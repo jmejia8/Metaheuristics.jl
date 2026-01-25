@@ -45,6 +45,7 @@ using Test
                    Restart(WOA(;options, information)),
                    SHADE(options=Options(seed=1)),
                    CSO(N=100, options=Options(seed=1)),
+                   RDEx(options=Options(seed=1), information = information),
                   ]
 
         # CGSA
