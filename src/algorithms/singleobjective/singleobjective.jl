@@ -35,6 +35,7 @@ include("MCCGA/MCCGA.jl")
 include("Restart/Restart.jl")
 include("SHADE/SHADE.jl")
 include("CSO/CSO.jl")
+include("L-SRTDE/LSRTDE.jl")
 
 include("RDEx/RDEx.jl")
 import .RDExModule: RDEx
