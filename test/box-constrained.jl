@@ -47,6 +47,7 @@ using Test
                    CSO(N=100, options=Options(seed=1)),
                    RDEx(options=Options(seed=1), information = information),
                    LSRTDE(options=Options(seed=1)),
+                   jSOaE(options=Options(seed=1)),
                   ]
 
         # CGSA

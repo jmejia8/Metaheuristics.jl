@@ -30,7 +30,7 @@ export optimize!
 export set_user_solutions!
 export boxconstraints
 export SHADE, CSO
-export RDEx, LSRTDE
+export RDEx, LSRTDE, jSOaE
 
 include("externals.jl")
 
