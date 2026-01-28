@@ -198,8 +198,8 @@ function update_state!(
         end
         
         # Resize F and CR arrays
-        parameters.F = zeros(parameters.N)
-        parameters.CR = zeros(parameters.N)
+        #parameters.F = zeros(parameters.N)
+        #parameters.CR = zeros(parameters.N)
     end
 end
 
