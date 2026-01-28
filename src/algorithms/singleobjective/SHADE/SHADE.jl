@@ -186,7 +186,7 @@ function environmental_selection(population, parameters::SHADE)
     w      = Δ ./ sum(Δ)
     MCR[k] = w'*CR[mask]
     MF[k]  = (w'*F[mask].^2) / (w'*F[mask])
-    k      = k % length(MCR) + 1
+    parameters.k  = k % length(MCR) + 1
 
     # update archive
     archive  = parameters.archive
