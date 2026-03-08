@@ -51,37 +51,36 @@ direct search algorithm is used.
 julia> f, bounds, solutions = Metaheuristics.TestProblems.rastrigin();
 
 julia> result = optimize(f, bounds, MCCGA())
-
-+=========== RESULT ==========+
-  iteration: 42833
-    minimum: 0
-  minimizer: [-5.677669786379456e-17, 2.7942451898022582e-39, -3.60925916059986e-33, -6.609510861086017e-34, 2.998586759675011e-32, -1.8825832500775007e-38, -3.0729484147585938e-31, 1.7675578057632446e-38, 5.127944874215823e-16, 1.9623770480857484e-19]
-    f calls: 86404
- total time: 3.2839 s
-+============================+
+Optimization Result
+===================
+  Iteration:       42833
+  Minimum:         0
+  Minimizer:       [-5.677669786379456e-17, 2.7942451898022582e-39, -3.60925916059986e-33, -6.609510861086017e-34, 2.998586759675011e-32, -1.8825832500775007e-38, -3.0729484147585938e-31, 1.7675578057632446e-38, 5.127944874215823e-16, 1.9623770480857484e-19]
+  Function calls:  86404
+  Total time:      3.2839 s
+  Stop reason:     Due to Convergence Termination criterion.
 ```
 
 ### Explicit Example 
 
 ```jldoctest
 
-julia> using Metaheuristics                                                                                         
-                                                              
+julia> using Metaheuristics                                                                                        
+                                                               
 julia> f(x::Vector{Float64})::Float64 = (x[1]-pi)^2 + (x[2]-exp(1))^2                                                                                
-                                                              
+                                                               
 julia> bounds = [ -500.0  -500.0;                                    
                    500.0  500.0]                                      
 
 julia> result = Metaheuristics.optimize(f, bounds, MCCGA())
-
-+=========== RESULT ==========+
-  iteration: 2974
-    minimum: 1.80997e-09
-  minimizer: [3.1416284249228976, 2.7183048585824263]
-    f calls: 6012
- total time: 1.5233 s
-stop reason: Other stopping criteria.
-+============================+
+Optimization Result
+===================
+  Iteration:       2957
+  Minimum:         1.78026e-10
+  Minimizer:       [3.1416, 2.71829]
+  Function calls:  6123
+  Total time:      0.1180 s
+  Stop reason:     Due to Convergence Termination criterion.
 ```
 """
 function MCCGA(;

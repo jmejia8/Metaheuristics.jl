@@ -26,14 +26,14 @@ julia> # providing multiple solutions
 julia> set_user_solutions!(algo, X0, f);
 
 julia> optimize(f, [0 0 0; 1 1 1.0], algo)
-+=========== RESULT ==========+
-  iteration: 413
-    minimum: 0
-  minimizer: [0.0, 0.0, 0.0]
-    f calls: 25132
- total time: 0.0856 s
-stop reason: Small difference of objective function values.
-+============================+
+Optimization Result
+===================
+  Iteration:       235
+  Minimum:         1.69759e-46
+  Minimizer:       [6.87417e-47, 7.75848e-47, 4.84071e-24]
+  Function calls:  14305
+  Total time:      0.1050 s
+  Stop reason:     Due to Convergence Termination criterion.
 ```
 
 """

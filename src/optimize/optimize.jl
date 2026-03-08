@@ -30,13 +30,14 @@ julia> bounds = [  -10.0 -10 -10; # lower bounds
   10.0   10.0   10.0
 
 julia> result = optimize(f, bounds)
-+=========== RESULT ==========+
-  iteration: 1429
-    minimum: 2.5354499999999998e-222
-  minimizer: [-1.5135301653303966e-111, 3.8688354844737692e-112, 3.082095708730726e-112]
-    f calls: 29989
- total time: 0.1543 s
-+============================+
+Optimization Result
+===================
+  Iteration:       308
+  Minimum:         2.29719e-49
+  Minimizer:       [1.52055e-25, 3.40463e-25, -3.01137e-25]
+  Function calls:  6468
+  Total time:      0.0360 s
+  Stop reason:     Due to Convergence Termination criterion.
 ```
 """
 function optimize(

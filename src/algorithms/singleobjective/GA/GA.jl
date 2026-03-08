@@ -45,14 +45,14 @@ f (generic function with 1 method)
 julia> dim = 10;
 
 julia> optimize(f, BitArraySpace(dim), GA())
-+=========== RESULT ==========+
-  iteration: 500
-    minimum: 0
-  minimizer: Bool[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    f calls: 50000
- total time: 0.0523 s
-stop reason: Maximum number of iterations exceeded.
-+============================+
+Optimization Result
+===================
+  Iteration:       6
+  Minimum:         0
+  Minimizer:       [0, 0, 0, …, 0]
+  Function calls:  600
+  Total time:      1.2172 s
+  Stop reason:     Due to Convergence Termination criterion.
 ```
 
 ### Example: Permutation Encoding
@@ -66,14 +66,14 @@ julia> perm_size = 10;
 julia> ga = GA(;initializer = RandomPermutation(N=100), crossover=OrderCrossover(), mutation=SlightMutation());
 
 julia> optimize(f, PermutationSpace(perm_size), ga)
-+=========== RESULT ==========+
-  iteration: 500
-    minimum: 0
-  minimizer: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-    f calls: 49900
- total time: 0.6230 s
-stop reason: Maximum number of iterations exceeded.
-+============================+
+Optimization Result
+===================
+  Iteration:       500
+  Minimum:         0
+  Minimizer:       [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+  Function calls:  49900
+  Total time:      0.6230 s
+  Stop reason:     Maximum number of iterations exceeded.
 ```
 
 ### Example: Integer Encoding
@@ -97,15 +97,15 @@ julia> ga = GA(;crossover=SBX(;bounds),
             );
 
 julia> result = optimize(f, bounds, ga)
-+=========== RESULT ==========+
-  iteration: 500
-    minimum: -76.9031
-  minimizer: [0, 10, 49, 100, 24, 0, 0, 0, 67, 76]
-    f calls: 50000
-  feasibles: 95 / 100 in final population
- total time: 0.6028 s
-stop reason: Maximum number of iterations exceeded.
-+============================+
+Optimization Result
+===================
+  Iteration:       500
+  Minimum:         -76.9031
+  Minimizer:       [0, 10, 49, 100, 24, 0, 0, 0, 67, 76]
+  Function calls:  50000
+  Feasibles:      95 / 100 in final population
+  Total time:      0.6028 s
+  Stop reason:     Maximum number of iterations exceeded.
 ```
 
 ### Example: Real Encoding
@@ -119,14 +119,14 @@ julia> ga = GA(;mutation=PolynomialMutation(;bounds),
                );
 
 julia> optimize(f, bounds, ga)
-+=========== RESULT ==========+
-  iteration: 500
-    minimum: 5.91136e-09
-  minimizer: [-5.446073166732363e-6, -1.7900876625850504e-7, 2.8548505431323723e-8, 2.1130514595980084e-8, -1.632381298278562e-8, 2.8216219650016283e-9, -3.2114953600427333e-7, 2.4222648522114125e-9, -5.5236545829928716e-9, -2.3479408274628334e-9]
-    f calls: 49900
- total time: 0.5775 s
-stop reason: Maximum number of iterations exceeded.
-+============================+
+Optimization Result
+===================
+  Iteration:       500
+  Minimum:         5.91136e-09
+  Minimizer:       [-5.446073166732363e-6, -1.7900876625850504e-7, 2.8548505431323723e-8, 2.1130514595980084e-8, -1.632381298278562e-8, 2.8216219650016283e-9, -3.2114953600427333e-7, 2.4222648522114125e-9, -5.5236545829928716e-9, -2.3479408274628334e-9]
+  Function calls:  49900
+  Total time:      0.5775 s
+  Stop reason:     Maximum number of iterations exceeded.
 ```
 """
 function GA(;
