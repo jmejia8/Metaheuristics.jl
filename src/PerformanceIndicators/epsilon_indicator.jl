@@ -10,7 +10,7 @@ the sets are translated to positive values.
 ### Interpretation
 
 - `epsilon_indicator(A, PF)` is unary if `PF` is the Pareto-optimal front.
-- `epsilon_indicator(A, B) == 1` none is better than the other.
+- `epsilon_indicator(A, B) == 1` neither is better than the other.
 - `epsilon_indicator(A, B) < 1` means that A is better than B.
 - `epsilon_indicator(A, B) > 1` means that B is better than A.
 - Values closer to 1 are preferable.

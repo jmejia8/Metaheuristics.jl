@@ -2,7 +2,6 @@
     WeightedSum
 
 WeightedSum is a type for the weighted sum scalarizing function that sums the objective function values weighted by the weight vector.
-This is computed as 
 """
 struct WeightedSum end
 """
@@ -21,7 +20,7 @@ struct AchievementScalarization end
 """
 eval_scalatization(F, w, params::WeightedSum)
 
-Evalutes the weighted sum scalarizing function. Computed as
+Evaluates the weighted sum scalarizing function. Computed as:
 ```math
 f(x) = \\sum_{i=1}^n w_i f_i(x)
 ```
@@ -31,7 +30,7 @@ eval_scalatization(F, w, params::WeightedSum) = sum(F .* w', dims=2) |> vec
 """
 eval_scalatization(F, w, params::Tchebysheff)
 
-Evalutes the Tchebysheff scalarizing function. Computed as
+Evaluates the Tchebysheff scalarizing function. Computed as:
 ```math
 f(x) = \\max_{i=1}^n |f_i(x) - \\min_{j=1}^n f_j(x)| w_i
 ```
@@ -43,9 +42,10 @@ end
 """
 eval_scalatization(F, w, params::AchievementScalarization)
 
-Evalutes the achievement scalarizing function. Computed as
+Evaluates the achievement scalarizing function. Computed as:
 ```math
 f(x) = \\max_{i=1}^n  |f_i(x) - \\min_{j=1}^n f_j(x)| / w_i
+```
 """
 function eval_scalatization(F, w, params::AchievementScalarization)
     w = copy(w)
@@ -58,7 +58,7 @@ end
     CompromiseProgramming(scalarizing)
 
 Perform compromise programming by using the `scalarizing` function provided.
-Current implemented scalarizing function are
+Currently implemented scalarizing functions are:
 
 * `WeightedSum`
 * `Tchebysheff`

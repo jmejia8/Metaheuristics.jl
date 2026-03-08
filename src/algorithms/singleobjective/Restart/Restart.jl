@@ -24,10 +24,9 @@ The restart condition can be updated by overloading the `restart_condition` meth
 
 ```julia
 function Metaheuristics.restart_condition(status, restart::Restart, information, options)
-    st.iteration % params.every == 0
+    status.iteration % restart.every == 0
 end
 ```
-
 """
 function Restart(base::Algorithm; every = 100)
     parameters = Restart(base.parameters, every)

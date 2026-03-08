@@ -6,7 +6,7 @@ Get default parameters for metaheuristic `H` regarding f and the search_space.
 ### Example
 
 ```julia
-ga = Metaheuristics.get_parameters(f, Permutations(10), GA)
+ga = Metaheuristics.get_parameters(f, Permutations(10), GA())
 ```
 """
 get_parameters(f, search_space, ::Type{T}) where T <: AbstractParameters = T()

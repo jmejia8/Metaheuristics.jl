@@ -1,6 +1,6 @@
 """
     TerminationStatusCode
-An Enum of possible => values for [`State`](@ref).
+An Enum of possible values for [`State`](@ref).
 Possible values:
 
 - `ITERATION_LIMIT`
@@ -48,6 +48,8 @@ See [`TerminationStatusCode`](@ref)
 julia> termination_status_message(Metaheuristics.ITERATION_LIMIT)
 "Maximum number of iterations exceeded."
 
+julia> f(x) = sum(x.^2); bounds = [-1 -1 -1; 1 1 1.0];
+
 julia> termination_status_message(optimize(f, bounds))
 "Maximum number of iterations exceeded."
 
@@ -62,7 +64,7 @@ function termination_status_message(status_code::TerminationStatusCode)
                  EVALUATIONS_LIMIT => "Maximum objective function calls exceeded.",
                  ACCURACY_LIMIT => "The desired accuracy was obtained.",
                  OBJECTIVE_VARIANCE_LIMIT => "Small variance of the objective function.",
-                 OBJECTIVE_DIFFERENCE_LIMIT =>"Small difference of objective function values.",
+                 OBJECTIVE_DIFFERENCE_LIMIT => "Small difference of objective function values.",
                  OTHER_LIMIT => "Other stopping criteria.",
                  UNKNOWN_STOP_REASON => "Unknown stop reason."
     )
