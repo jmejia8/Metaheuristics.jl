@@ -36,22 +36,24 @@ julia> f(x) = sum(x.^2)
 f (generic function with 1 method)
 
 julia> optimize(f, [-1 -1 -1; 1 1 1.0], DE())
-+=========== RESULT ==========+
-  iteration: 1000
-    minimum: 0
-  minimizer: [0.0, 0.0, 0.0]
-    f calls: 30000
- total time: 0.0437 s
-+============================+
+Optimization Result
+===================
+  Iteration:       430
+  Minimum:         1.43447e-49
+  Minimizer:       [-8.99799e-26, -2.40099e-25, 2.78753e-25]
+  Function calls:  12900
+  Total time:      0.0335 s
+  Stop reason:     Due to Convergence Termination criterion.
 
 julia> optimize(f, [-1 -1 -1; 1 1 1.0], DE(N=50, F=1.5, CR=0.8))
-+=========== RESULT ==========+
-  iteration: 600
-    minimum: 8.68798e-25
-  minimizer: [3.2777877981303293e-13, 3.7650459509488005e-13, -7.871487597385812e-13]
-    f calls: 30000
- total time: 0.0319 s
-+============================+
+Optimization Result
+===================
+  Iteration:       191
+  Minimum:         6.15187e-47
+  Minimizer:       [2.34741e-24, -1.56268e-24, -7.40867e-25]
+  Function calls:  9550
+  Total time:      0.0223 s
+  Stop reason:     Due to Convergence Termination criterion.
 ```
 
 """

@@ -27,23 +27,24 @@ julia> bounds = [  -10.0 -10 -10; # lower bounds
  -10.0  -10.0  -10.0
   10.0   10.0   10.0
 
-julia> state = optimize(f, bounds)
-+=========== RESULT ==========+
-| Iter.: 1009
-| f(x) = 7.16271e-163
-| solution.x = [-7.691251412064516e-83, 1.0826961235605951e-82, -8.358428300092186e-82]
-| f calls: 21190
-| Total time: 0.2526 s
-+============================+
+julia> state = optimize(f, bounds, ECA(options=Options(seed=1)))
+Optimization Result
+===================
+  Iteration:       303
+  Minimum:         7.02515e-49
+  Minimizer:       [7.93381e-25, -2.38145e-25, 1.27862e-25]
+  Function calls:  6363
+  Total time:      0.0349 s
+  Stop reason:     Due to Convergence Termination criterion.
 
 julia> minimum(state)
-7.162710802659093e-163
+7.025152289113865e-49
 
 julia> minimizer(state)
-3-element Array{Float64,1}:
- -7.691251412064516e-83
-  1.0826961235605951e-82
- -8.358428300092186e-82
+3-element Vector{Float64}:
+  7.933813096004835e-25
+ -2.381454635702266e-25
+  1.278624129134673e-25
 ```
 """
 mutable struct State{T}
@@ -134,7 +135,7 @@ nfes(s::State) = s.f_calls
 """
     convergence(state)
 get the data (touple with the number of function evaluations and fuction values) to plot
-the convergence graph. 
+the convergence graph.
 
 # Example
 
@@ -148,14 +149,15 @@ julia> bounds = [  -10.0 -10 -10; # lower bounds
  -10.0  -10.0  -10.0
   10.0   10.0   10.0
 
-julia> state = optimize(f, bounds, ECA(options=Options(store_convergence=true)))
-+=========== RESULT ==========+
-| Iter.: 1022
-| f(x) = 7.95324e-163
-| solution.x = [-7.782044850211721e-82, 3.590044165897827e-82, -2.4665318114710003e-82]
-| f calls: 21469
-| Total time: 0.3300 s
-+============================+
+julia> state = optimize(f, bounds, ECA(options=Options(seed=1, store_convergence=true)))
+Optimization Result
+===================
+  Iteration:       303
+  Minimum:         7.02515e-49
+  Minimizer:       [7.93381e-25, -2.38145e-25, 1.27862e-25]
+  Function calls:  6363
+  Total time:      0.0349 s
+  Stop reason:     Due to Convergence Termination criterion.
 
 julia> n_fes, fxs = convergence(state);
 ```

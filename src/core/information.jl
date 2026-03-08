@@ -34,17 +34,18 @@ julia> bounds = [  -10.0 -10 -10; # lower bounds
 julia> information = Information(f_optimum = 0.0)
 Information(0.0, Float64[])
 
-julia> options = Options(f_tol = 1e-3)
-Options(0.0, 0.001, 0.0, 0.0, 1000.0, 0.0, 0.0, 0, false, true, false, :minimize)
+julia> options = Options(f_tol = 1e-3, seed=1)
+Options(0.0, 0.001, 0.0, 0.0, 1000.0, 0.0, 0.0, 1, false, true, false, :minimize)
 
 julia> state = optimize(f, bounds, ECA(information=information, options=options))
-+=========== RESULT ==========+
-| Iter.: 22
-| f(x) = 0.000650243
-| solution.x = [0.022811671589729583, 0.007052331140376011, -0.008951836265056107]
-| f calls: 474
-| Total time: 0.0106 s
-+============================+
+Optimization Result
+===================
+  Iteration:       25
+  Minimum:         0.000450013
+  Minimizer:       [0.0142217, 0.010249, -0.0162118]
+  Function calls:  525
+  Total time:      0.0263 s
+  Stop reason:     The desired accuracy was obtained.
 ```
 """
 function Information(;#
