@@ -320,7 +320,7 @@ function reproduction(status, parameters::NSGA3, problem)
     @assert !isempty(status.population)
 
     I = randperm(parameters.N)
-    Q = zeros(parameters.N, getdim(problem))
+    Q = zeros(eltype(get_position(first(status.population))), parameters.N, getdim(problem))
     for i = 1:parameters.N ÷ 2
 
         pa = status.population[I[2i-1]]
