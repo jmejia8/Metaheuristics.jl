@@ -333,8 +333,8 @@ function reproduction(status, parameters::NSGA3, problem)
                                  p_cr = parameters.p_cr,
                                  η_m = parameters.η_m,
                                  p_m = parameters.p_m)
-        Q[i,:] = c1
-        Q[i+1,:] = c2       
+        Q[2i-1,:] = c1
+        Q[2i,:] = c2       
     end
 
     Q
