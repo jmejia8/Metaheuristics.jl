@@ -1,6 +1,6 @@
 name = "Metaheuristics"
 uuid = "bcdb8e00-2c21-11e9-3065-2b553b22f898"
-version = "3.4.2"
+version = "3.4.3"
 authors = ["Jesus Mejia <jesusmejded@gmail.com>"]
 
 [deps]
