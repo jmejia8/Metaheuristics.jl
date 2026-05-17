@@ -17,7 +17,7 @@ Optimization Result
   Minimum:         6.96471
   Minimizer:       [7.18572e-11, 3.85002e-09, 1.29255e-09, …, -4.24857e-09]
   Function calls:  90020
-  Total time:      0.2057 s
+  Total time:      0.2000 s
   Stop reason:     Maximum objective function calls exceeded.
 </pre>
 <h2 id="Get-the-Results"><a class="docs-heading-anchor" href="#Get-the-Results">Get the Results</a><a id="Get-the-Results-1"></a><a class="docs-heading-anchor-permalink" href="#Get-the-Results" title="Permalink"></a></h2><p>Once <a href="../../api/#Metaheuristics.optimize"><code>optimize</code></a> stops, we can get the approximate solutions.</p><p>Approximated minimum:</p><pre><code class="language-julia hljs">fx = minimum(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">6.964708361833942</code></pre><p>Approximated minimizer:</p><pre><code class="language-julia hljs">x = minimizer(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{Float64}:

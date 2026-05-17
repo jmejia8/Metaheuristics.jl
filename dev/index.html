@@ -11,7 +11,7 @@ Optimization Result
   Minimum:         0.994959
   Minimizer:       [-4.48345e-09, -9.30599e-10, 3.25831e-10, …, -0.994959]
   Function calls:  61810
-  Total time:      0.1645 s
+  Total time:      0.1696 s
   Stop reason:     Due to Convergence Termination criterion.
 </pre>
 <p>Optimize returns a <code>State</code> datatype which contains some information about the approximation. For instance, you may use mainly two functions to obtain such an approximation.</p><pre><code class="language-julia hljs">minimum(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.9949590570932969</code></pre><pre><code class="language-julia hljs">minimizer(result)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{Float64}:
