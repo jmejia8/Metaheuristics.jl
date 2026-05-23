@@ -59,6 +59,12 @@ end
 
             @test size(pf1, 1) == size(pf2,1) &&
                   Metaheuristics.PerformanceIndicators.igd(pf1, pf2) ≈ 0.0
+
+            if bounds isa Matrix
+                bounds = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
+            end
+
+            @test all(get_position(sol) in bounds for sol in result.population)
         end
     end
 
@@ -100,6 +106,13 @@ end
             result = optimize(f, bounds, method)
             # number of function evaluations should be reported correctly
             @test f_calls == result.f_calls
+
+            if bounds isa Matrix
+                bounds = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
+            end
+
+            @test all(get_position(sol) in bounds for sol in result.population)
+            
         end
     end
 
@@ -125,6 +138,12 @@ end
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
             # number of function evaluations should be reported correctly
             @test f_calls == result.f_calls
+
+            if bounds isa Matrix
+                bounds = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
+            end
+
+            @test all(get_position(sol) in bounds for sol in result.population)
         end
     end
     

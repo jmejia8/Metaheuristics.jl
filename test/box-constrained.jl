@@ -66,6 +66,12 @@ using Test
             # also count the mumber of function evaluations
             @test f_calls == nfes(res)
             @test termination_status_message(res) == termination_status_message(method)
+
+            if bounds isa Matrix
+                bounds = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
+            end
+
+            @test minimizer(res) in bounds
         end
     end
 
