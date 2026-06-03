@@ -66,6 +66,7 @@ using Test
             # also count the mumber of function evaluations
             @test f_calls == nfes(res)
             @test termination_status_message(res) == termination_status_message(method)
+            assert_box_constrained_result!(ff, res, bounds)
         end
     end
 
@@ -95,11 +96,13 @@ using Test
                    WOA(options = options),
                   ]
     
+        ff(x) = sum(x.^2)
         for method in methods
             f_calls = 0
             res = optimize(f, bounds, method)
             @test f_calls == nfes(res)
             @test res.termination_status_code isa Metaheuristics.TerminationStatusCode
+            assert_box_constrained_result!(ff, res, bounds)
         end
     end
 

@@ -40,8 +40,7 @@ using Test
             test_result(fitness, desired_accuracy)
             @test f_calls == res.f_calls
             @test fvals(res) == fvals(res.population)
-            @test sum(abs.(hval(res.best_sol))) < 1e-3
-            @test !any(gval(res.best_sol) .> 0)
+            assert_constrained_result!(ff, res, bounds)
             @test Metaheuristics.diff_check(res, method.information, method.options) isa Bool
             @test Metaheuristics.diversity_stop_check(res, method.information, method.options) isa Bool
         end

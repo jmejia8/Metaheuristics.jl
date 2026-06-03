@@ -35,7 +35,9 @@
 
                 res = optimize(f, bounds, algo)
 
-                @test length(res.population) == algo.parameters.N 
+                @test length(res.population) == algo.parameters.N
+                assert_population_size!(res, algo)
+                assert_minimizer_structure!(ff, res, bounds)
                 @test minimum(res) ≈ first(fvals(optimums))
                 @test sum(abs,minimizer(res)-x_optimum) ≈ 0
                 # TODO check the number of function evaluations
@@ -70,7 +72,9 @@
                 set_user_solutions!(algo, X, f)
 
                 res = optimize(f, bounds, algo)
-                @test length(res.population) == algo.parameters.N 
+                @test length(res.population) == algo.parameters.N
+                assert_population_size!(res, algo)
+                assert_multiobjective_result!(ff, res, bounds)
                 # check whether optimum was used by optimizer
                 v = sum(abs.(positions(res) .- x_optimum'), dims=2) |> minimum 
                 @test  v ≈ 0

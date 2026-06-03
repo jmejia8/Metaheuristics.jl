@@ -11,6 +11,7 @@ end
 
 for tests in [
               "common-methods.jl",
+              "invariants.jl",
               "box-constrained.jl",
               "optimize_api.jl",
               "constrained.jl",
