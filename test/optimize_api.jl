@@ -27,6 +27,7 @@
             res = optimize(f, space, ECA(;K = 3, options))
             res2 = optimize(f, space, ECA, K = 3, iterations = 10, seed = 1)
             @test minimum(res) == minimum(res2)
+            assert_minimizer_dimension!(res, Metaheuristics.getdim(Metaheuristics.Problem(f, space)))
         end
         for space in def_bounds
             p = Metaheuristics.Problem(sum, space)
@@ -35,6 +36,7 @@
                 x = minimizer(res)
                 @test x isa AbstractVector
                 @test length(x) == Metaheuristics.getdim(p)
+                assert_minimizer_dimension!(res, Metaheuristics.getdim(p))
             end
             for algo in [SPEA2, SMS_EMOA, NSGA2, NSGA3]
                 res = optimize(x->([0.0,0],[0.0],[0.0]),
@@ -79,6 +81,7 @@
         result = optimize(callable_object, bounds, algorithm)
 
         @test minimum(result) < 1e-4
+        assert_minimizer_structure!(callable_object, result, bounds)
     end
     
     test_optimize()
