@@ -198,6 +198,35 @@ function mutate(par, p, d)
 end
 
 
+function exploratory_search(
+    f::FType,
+    base::Vector{Float64},
+    step::Float64,
+) where {FType <: Function}
+    x = copy(base)
+    fx = f(x)
+
+    for i = 1:length(x)
+        xleft = mutate(x, i, -step)
+        fleft = f(xleft)
+        if fleft < fx
+            x = xleft
+            fx = fleft
+            continue
+        end
+
+        xright = mutate(x, i, step)
+        fright = f(xright)
+        if fright < fx
+            x = xright
+            fx = fright
+        end
+    end
+
+    return x, fx
+end
+
+
 function hj(
     f::FType,
     par::Vector{Float64};
@@ -205,34 +234,42 @@ function hj(
     startstep = 5.0,
     endstep = 0.0001,
 ) where {FType <: Function}
-    p = length(par)
     currentstep = startstep
+    base = copy(par)
+    fbase = f(base)
     iter::Int64 = 0
+
     while iter < maxiter
-        fold = f(par)
-        fnow = fold
-        for currentp = 1:p
-            mutateleft = mutate(par, currentp, -currentstep)
-            fleft = f(mutateleft)
-            mutateright = mutate(par, currentp, currentstep)
-            fright = f(mutateright)
-            if fleft < fold
-                par = mutateleft
-                fnow = fleft
-            elseif fright < fold
-                par = mutateright
-                fnow = fright
+        xnew, fnew = exploratory_search(f, base, currentstep)
+
+        if fnew < fbase
+            # Pattern move accelerates progress in promising directions.
+            while true
+                xpattern = xnew .+ (xnew .- base)
+                xtrial, ftrial = exploratory_search(f, xpattern, currentstep)
+
+                if ftrial < fnew
+                    base = xnew
+                    fbase = fnew
+                    xnew = xtrial
+                    fnew = ftrial
+                else
+                    base = xnew
+                    fbase = fnew
+                    break
+                end
             end
-        end
-        if fold <= fnow
+        else
             currentstep /= 2
         end
+
         if currentstep < endstep
             break
         end
+
         iter += 1
     end
 
-    return Dict("par" => par, "iter" => iter, "step" => currentstep)
+    return Dict("par" => base, "iter" => iter, "step" => currentstep)
 end
 
