@@ -1,0 +1,7 @@
+[deps]
+MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+Metaheuristics = "bcdb8e00-2c21-11e9-3065-2b553b22f898"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+MathOptInterface = "1.17"

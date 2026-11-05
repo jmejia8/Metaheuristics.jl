@@ -1,0 +1,222 @@
+# Tests for the MathOptInterface extension (MetaheuristicsMOIExt).
+#
+# Kept apart from test/ so `Pkg.test()` is unaffected. Run from the repo root:
+#
+#   julia --project=ext/MetaheuristicsMOIExt/test -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
+#   julia --project=ext/MetaheuristicsMOIExt/test ext/MetaheuristicsMOIExt/test/runtests.jl
+
+using Test
+using Metaheuristics
+import MathOptInterface as MOI
+
+const Ext = Base.get_extension(Metaheuristics, :MetaheuristicsMOIExt)
+
+# Small, seeded solver so tests are fast and reproducible.
+function _method(; seed = 1, iterations = 300)
+    options = Options(; seed, iterations, f_calls_limit = Inf)
+    MixedInteger(ECA(N = 30); options)
+end
+
+function _new_optimizer(; kwargs...)
+    opt = Ext.Optimizer()
+    MOI.set(opt, MOI.Silent(), true)
+    MOI.set(opt, MOI.RawOptimizerAttribute("method"), _method(; kwargs...))
+    opt
+end
+
+_sum_of_squares(xs, c = 0.0) = MOI.ScalarNonlinearFunction(
+    :+,
+    Any[MOI.ScalarNonlinearFunction(:^, Any[x - c, 2]) for x in xs]
+)
+
+@testset "MetaheuristicsMOIExt" begin
+
+    @testset "Extension loading" begin
+        @test Ext !== nothing
+        @test isdefined(Metaheuristics, :Optimizer)
+        @test Metaheuristics.Optimizer === Ext.Optimizer
+    end
+
+    @testset "Attributes" begin
+        opt = Ext.Optimizer()
+        @test opt isa MOI.AbstractOptimizer
+        @test opt isa Ext.Optimizer{Float64}
+        @test MOI.is_empty(opt)
+        @test MOI.get(opt, MOI.SolverName()) == "Metaheuristics"
+        @test MOI.get(opt, MOI.TerminationStatus()) == MOI.OPTIMIZE_NOT_CALLED
+        @test MOI.get(opt, MOI.ResultCount()) == 0
+        @test MOI.get(opt, MOI.PrimalStatus()) == MOI.NO_SOLUTION
+        @test MOI.get(opt, MOI.DualStatus()) == MOI.NO_SOLUTION
+
+        @test MOI.supports(opt, MOI.Silent())
+        MOI.set(opt, MOI.Silent(), true)
+        @test MOI.get(opt, MOI.Silent())
+
+        @test MOI.supports(opt, MOI.TimeLimitSec())
+        @test MOI.get(opt, MOI.TimeLimitSec()) === nothing
+        MOI.set(opt, MOI.TimeLimitSec(), 5)
+        @test MOI.get(opt, MOI.TimeLimitSec()) == 5.0
+        MOI.set(opt, MOI.TimeLimitSec(), nothing)
+        @test MOI.get(opt, MOI.TimeLimitSec()) === nothing
+
+        @test MOI.supports(opt, MOI.RawOptimizerAttribute("method"))
+        @test MOI.supports(opt, MOI.RawOptimizerAttribute("iterations"))
+        @test !MOI.supports(opt, MOI.RawOptimizerAttribute("not_an_option"))
+        MOI.set(opt, MOI.RawOptimizerAttribute("iterations"), 10)
+        @test MOI.get(opt, MOI.RawOptimizerAttribute("iterations")) == 10
+        @test_throws ErrorException MOI.get(opt, MOI.RawOptimizerAttribute("seed"))
+
+        # "method" getter: nothing until set, then the exact object that was set
+        @test MOI.get(opt, MOI.RawOptimizerAttribute("method")) === nothing
+        method = _method()
+        MOI.set(opt, MOI.RawOptimizerAttribute("method"), method)
+        @test MOI.get(opt, MOI.RawOptimizerAttribute("method")) === method
+    end
+
+    @testset "Supported constraints" begin
+        opt = Ext.Optimizer()
+        for S in (
+                MOI.LessThan{Float64},
+                MOI.GreaterThan{Float64},
+                MOI.EqualTo{Float64},
+                MOI.Interval{Float64},
+                MOI.ZeroOne,
+                MOI.Integer,
+            )
+            @test MOI.supports_constraint(opt, MOI.VariableIndex, S)
+        end
+        for S in (MOI.LessThan{Float64}, MOI.GreaterThan{Float64}, MOI.EqualTo{Float64})
+            @test MOI.supports_constraint(opt, MOI.ScalarNonlinearFunction, S)
+        end
+        @test !MOI.supports(opt, MOI.VariablePrimalStart(), MOI.VariableIndex)
+    end
+
+    @testset "Model building and empty!" begin
+        opt = _new_optimizer()
+        x = MOI.add_variables(opt, 2)
+        @test MOI.is_valid(opt, x[1])
+        MOI.add_constraint(opt, x[1], MOI.Interval(-1.0, 1.0))
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x),
+        )
+        @test !MOI.is_empty(opt)
+        MOI.empty!(opt)
+        @test MOI.is_empty(opt)
+    end
+
+    @testset "optimize! without objective errors" begin
+        opt = _new_optimizer()
+        x = MOI.add_variable(opt)
+        MOI.add_constraint(opt, x, MOI.Interval(-1.0, 1.0))
+        @test_throws Exception MOI.optimize!(opt)
+    end
+
+    @testset "Continuous, box constrained (min)" begin
+        opt = _new_optimizer()
+        x = MOI.add_variables(opt, 3)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-5.0, 5.0))
+        end
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x, 1.0),
+        )
+        MOI.optimize!(opt)
+
+        @test MOI.get(opt, MOI.ResultCount()) == 1
+        @test MOI.get(opt, MOI.PrimalStatus()) == MOI.FEASIBLE_POINT
+        @test MOI.get(opt, MOI.TerminationStatus()) in
+            (MOI.LOCALLY_SOLVED, MOI.ITERATION_LIMIT, MOI.OTHER_LIMIT)
+        @test MOI.get(opt, MOI.ObjectiveValue()) ≈ 0.0 atol = 1.0e-3
+        @test MOI.get.(opt, MOI.VariablePrimal(), x) ≈ ones(3) atol = 1.0e-2
+        @test MOI.get(opt, MOI.SolveTimeSec()) >= 0
+    end
+
+    @testset "Maximization sense" begin
+        opt = _new_optimizer()
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-2.0, 2.0))
+        end
+        # max 4 - x1^2 - x2^2  ->  optimum 4 at (0, 0)
+        obj = MOI.ScalarNonlinearFunction(:-, Any[4.0, _sum_of_squares(x)])
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MAX_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(), obj)
+        MOI.optimize!(opt)
+
+        @test MOI.get(opt, MOI.ObjectiveValue()) ≈ 4.0 atol = 1.0e-3
+        @test MOI.get.(opt, MOI.VariablePrimal(), x) ≈ zeros(2) atol = 1.0e-2
+    end
+
+    @testset "Unbounded variables (non-rigid space)" begin
+        opt = _new_optimizer(iterations = 500)
+        x = MOI.add_variables(opt, 2)
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x, 3.0),
+        )
+        MOI.optimize!(opt)
+
+        @test MOI.get.(opt, MOI.VariablePrimal(), x) ≈ fill(3.0, 2) atol = 1.0e-2
+    end
+
+    @testset "Nonlinear constraint" begin
+        opt = _new_optimizer(iterations = 500)
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-5.0, 5.0))
+        end
+        # min x1^2 + x2^2  s.t.  x1 + x2 >= 2  ->  optimum 2 at (1, 1)
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x),
+        )
+        g = MOI.ScalarNonlinearFunction(:+, Any[x[1], x[2]])
+        ci = MOI.add_constraint(opt, g, MOI.GreaterThan(2.0))
+        @test ci isa
+            MOI.ConstraintIndex{MOI.ScalarNonlinearFunction, MOI.GreaterThan{Float64}}
+        MOI.optimize!(opt)
+
+        xv = MOI.get.(opt, MOI.VariablePrimal(), x)
+        @test MOI.get(opt, MOI.PrimalStatus()) == MOI.FEASIBLE_POINT
+        @test sum(xv) >= 2 - 1.0e-6
+        @test MOI.get(opt, MOI.ObjectiveValue()) ≈ 2.0 atol = 1.0e-2
+    end
+
+    @testset "Mixed integer and binary variables" begin
+        opt = _new_optimizer(iterations = 500)
+        y = MOI.add_variable(opt) # continuous
+        z = MOI.add_variable(opt) # integer
+        b = MOI.add_variable(opt) # binary
+        MOI.add_constraint(opt, y, MOI.Interval(-5.0, 5.0))
+        MOI.add_constraint(opt, z, MOI.Interval(-5.0, 5.0))
+        MOI.add_constraint(opt, z, MOI.Integer())
+        MOI.add_constraint(opt, b, MOI.ZeroOne())
+        # min (y - 0.5)^2 + (z - 2)^2 + (b - 1)^2  ->  (0.5, 2, 1)
+        obj = MOI.ScalarNonlinearFunction(
+            :+,
+            Any[
+                MOI.ScalarNonlinearFunction(:^, Any[y - 0.5, 2]),
+                MOI.ScalarNonlinearFunction(:^, Any[z - 2.0, 2]),
+                MOI.ScalarNonlinearFunction(:^, Any[b - 1.0, 2]),
+            ],
+        )
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(), obj)
+        MOI.optimize!(opt)
+
+        yv, zv, bv = MOI.get.(opt, MOI.VariablePrimal(), (y, z, b))
+        @test yv ≈ 0.5 atol = 1.0e-2
+        @test isinteger(zv) && zv == 2
+        @test bv in (0, 1) && bv == 1
+    end
+end
