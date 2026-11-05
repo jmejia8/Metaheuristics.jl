@@ -633,7 +633,7 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
     multiobjective = _is_multiobjective(model)
     method = if isnothing(model.method) && multiobjective
         # NSGA2 picks its own budget (500 iterations) from these options
-        options = Options(verbose = !model.silent)
+        options = Options(verbose = !model.silent, iterations = 5_000, f_calls_limit = Inf)
         MixedInteger(Metaheuristics.NSGA2(); options)
     elseif isnothing(model.method)
         options = Options(verbose = !model.silent, iterations = 10_000, f_calls_limit = Inf)
@@ -750,9 +750,7 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
 
     if term isa _SETTLED
         # settled on an infeasible point: no feasible point was found
-        return _found_feasible(model) ?
-            MOI.LOCALLY_SOLVED :
-            MOI.LOCALLY_INFEASIBLE
+        return _found_feasible(model) ? MOI.LOCALLY_SOLVED : MOI.LOCALLY_INFEASIBLE
     elseif term isa Metaheuristics.IterationLimit
         return MOI.ITERATION_LIMIT
     elseif term isa Metaheuristics.EvaluationsLimit
@@ -762,9 +760,7 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
     else
         # For other termination reasons (e.g., OtherLimit, UnknownStopReason)
         isempty(model.results.population) && return MOI.OTHER_LIMIT
-        return _found_feasible(model) ?
-            MOI.LOCALLY_SOLVED :
-            MOI.LOCALLY_INFEASIBLE
+        return _found_feasible(model) ? MOI.LOCALLY_SOLVED : MOI.LOCALLY_INFEASIBLE
     end
 end
 

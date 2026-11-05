@@ -18,8 +18,11 @@ function _mixed_to_continous_space(mixed_space::MixedSpace)
             error("Only BoxConstrainedSpace and BitArraySpace are currently supported.")
         end
     end
-    lb = [v for v in promote(lower_bounds...)]
-    ub = [v for v in promote(upper_bounds...)]
+    # The relaxed space must be floating point: base algorithms (e.g. SBX and
+    # polynomial mutation in NSGA2) operate on continuous values, and
+    # `vec_to_dict` rounds/casts each block back to its original domain.
+    lb = [float(v) for v in promote(lower_bounds...)]
+    ub = [float(v) for v in promote(upper_bounds...)]
     BoxConstrainedSpace(lb, ub; rigid)
 end
 
