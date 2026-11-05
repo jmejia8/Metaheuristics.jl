@@ -384,12 +384,36 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
     model.search_space = search_space
     model.var_dist = var_dist
 
+    # Variable bounds that the search space does not enforce by itself, so they
+    # must be handled as constraints g(x) <= 0: the finite bound of semi-bounded
+    # variables (non-rigid spaces) and bounds on binary variables (BitArraySpace
+    # ignores them). Bounds of variables in rigid boxes are always satisfied.
     lb = model.variables.lower
     ub = model.variables.upper
+    bound_constraints = Tuple{Int, Symbol, T}[] # (variable index, :lower/:upper, bound)
+    for key in (:int_non_rigid, :bounds_non_rigid, :binary)
+        for vi in get(var_dist, key, ())
+            a, b = lb[vi.value], ub[vi.value]
+            is_bin = key === :binary
+            # [0, 1] bounds are implied for binary variables
+            isfinite(a) &&
+                (!is_bin || a > 0) &&
+                push!(bound_constraints, (vi.value, :lower, a))
+            isfinite(b) &&
+                (!is_bin || b < 1) &&
+                push!(bound_constraints, (vi.value, :upper, b))
+        end
+    end
+    has_constraints = nl_constrained || !isempty(bound_constraints)
 
     function constraints(x)
+        GV = Float64[
+            side === :lower ? bound - x[i] : x[i] - bound
+            for (i, side, bound) in bound_constraints
+        ]
+
         if !nl_constrained
-            return #zeros(1), zeros(1)
+            return GV, zeros(1)
         end
 
         lc = [b.lower for b in nlp_data.constraint_bounds]
@@ -405,13 +429,6 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
             H = zeros(1)
         else
             H = C[equality_mask] - uc[equality_mask]
-        end
-
-        # add variable bounds as constraints (due unbounded vars)
-        GV = Float64[]
-        for (a, b, xv) in zip(lb, ub, x)
-            isfinite(a) && push!(GV, a - xv)
-            isfinite(b) && push!(GV, xv - b)
         end
 
         # TODO: The following is hard coded, try to update improve it
@@ -448,29 +465,32 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
         x = _dict_to_values(solution, search_space, var_dist)
         fx = objective_scale * MOI.eval_objective(evaluator, x)
 
-        C = constraints(x)
-        if isnothing(C)
-            return fx
-        end
-        gx, hx = C
+        has_constraints || return fx
+        gx, hx = constraints(x)
         fx, gx, hx
     end
 
     !model.silent && @info "Load method"
 
-    if isnothing(model.method)
+    # Solve with a fresh copy: `Algorithm` is mutable and `optimize` continues
+    # from `method.status` (population and fitness from a previous solve, maybe
+    # of another objective or dimension), and it also mutates parameters and
+    # termination criteria. `model.method` is left exactly as the user set it.
+    method = if isnothing(model.method)
         # TODO add compat with multiobjective optimization
         options = Options(verbose = !model.silent, iterations = 10_000, f_calls_limit = Inf)
-        algo = Metaheuristics.ECA(adaptive = true)
-        model.method = MixedInteger(algo; options)
+        MixedInteger(Metaheuristics.ECA(adaptive = true); options)
+    else
+        deepcopy(model.method)
     end
+    method.status = Metaheuristics.State(nothing, [])
     model.f = f
     !model.silent && @info "Optimize"
 
     # TODO initial solutions
     #initial_x = starting_value.(model, eachindex(model.starting_values))
     #options = copy(model.options)
-    model.results = optimize(f, search_space, model.method)
+    model.results = optimize(f, search_space, method)
     # bounds for constraints
 
     return
@@ -515,8 +535,8 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
 end
 
 function MOI.get(model::Optimizer, ::MOI.RawStatusString)
-    sprint(show, model.method)
-    #return display(model.results)
+    isnothing(model.results) && return "optimize! not called"
+    return Metaheuristics.termination_status_message(model.results)
 end
 
 function MOI.get(model::Optimizer, ::MOI.ResultCount)
@@ -566,10 +586,15 @@ end
 function MOI.get(
     model::Optimizer{T},
     attr::MOI.ConstraintPrimal,
-    ci::MOI.ConstraintIndex{MOI.VariableIndex, <:BOUNDS{T}},
+    ci::MOI.ConstraintIndex{
+        MOI.VariableIndex,
+        <:Union{BOUNDS{T}, MOI.ZeroOne, MOI.Integer},
+    },
 ) where {T}
     MOI.check_result_index_bounds(model, attr)
     MOI.throw_if_not_valid(model, ci)
-    return Metaheuristics.minimizer(model.results)[ci.value]
+    # The minimizer is stored in the MixedSpace order; map back to MOI order.
+    vi = MOI.VariableIndex(ci.value)
+    return MOI.get(model, MOI.VariablePrimal(attr.result_index), vi)
 end
 end # module

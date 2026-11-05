@@ -219,4 +219,164 @@ _sum_of_squares(xs, c = 0.0) = MOI.ScalarNonlinearFunction(
         @test isinteger(zv) && zv == 2
         @test bv in (0, 1) && bv == 1
     end
+
+    # Regression tests for the review of 2026-11-05 (items 1 to 3).
+
+    @testset "Re-solve after objective change uses a fresh population" begin
+        opt = _new_optimizer(iterations = 200)
+        x = MOI.add_variable(opt)
+        MOI.add_constraint(opt, x, MOI.Interval(-5.0, 5.0))
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        F = MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}()
+        MOI.set(opt, F, _sum_of_squares([x], 1.0))
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.VariablePrimal(), x) ≈ 1.0 atol = 1.0e-2
+
+        MOI.set(opt, F, _sum_of_squares([x], -3.0))
+        MOI.optimize!(opt)
+        xv = MOI.get(opt, MOI.VariablePrimal(), x)
+        @test xv ≈ -3.0 atol = 1.0e-2
+        # reported objective must match the current objective at the minimizer
+        @test MOI.get(opt, MOI.ObjectiveValue()) ≈ (xv + 3)^2 atol = 1.0e-8
+    end
+
+    @testset "Re-solve after adding a variable" begin
+        opt = _new_optimizer(iterations = 200)
+        x = MOI.add_variable(opt)
+        MOI.add_constraint(opt, x, MOI.Interval(-5.0, 5.0))
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        F = MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}()
+        MOI.set(opt, F, _sum_of_squares([x]))
+        MOI.optimize!(opt)
+
+        y = MOI.add_variable(opt)
+        MOI.add_constraint(opt, y, MOI.Interval(-5.0, 5.0))
+        MOI.set(opt, F, _sum_of_squares([x, y], 1.0))
+        MOI.optimize!(opt)
+        @test MOI.get.(opt, MOI.VariablePrimal(), [x, y]) ≈ ones(2) atol = 1.0e-2
+    end
+
+    @testset "Method object is not mutated and can be shared" begin
+        method = _method(iterations = 100)
+        sols = map((2, 3)) do n
+            opt = Ext.Optimizer()
+            MOI.set(opt, MOI.Silent(), true)
+            MOI.set(opt, MOI.RawOptimizerAttribute("method"), method)
+            x = MOI.add_variables(opt, n)
+            for xi in x
+                MOI.add_constraint(opt, xi, MOI.Interval(-5.0, 5.0))
+            end
+            MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+            MOI.set(
+                opt,
+                MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+                _sum_of_squares(x),
+            )
+            MOI.optimize!(opt)
+            @test MOI.get(opt, MOI.RawOptimizerAttribute("method")) === method
+            MOI.get.(opt, MOI.VariablePrimal(), x)
+        end
+        @test length(sols[2]) == 3
+        @test sols[2] ≈ zeros(3) atol = 1.0e-2
+        @test isnothing(method.status.best_sol)
+        @test isempty(method.status.population)
+    end
+
+    @testset "Re-solving the same model is reproducible" begin
+        opt = _new_optimizer(iterations = 50, seed = 7)
+        x = MOI.add_variables(opt, 3)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-5.0, 5.0))
+        end
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x, 1.0),
+        )
+        MOI.optimize!(opt)
+        f1 = MOI.get(opt, MOI.ObjectiveValue())
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ObjectiveValue()) == f1
+    end
+
+    @testset "Semi-bounded variables without nonlinear constraints" begin
+        # min x1 - x2  s.t.  x1 >= 1, x2 <= -2  ->  (1, -2), unbounded without the bounds
+        for sense in (MOI.MIN_SENSE, MOI.MAX_SENSE)
+            opt = _new_optimizer(iterations = 500)
+            x = MOI.add_variables(opt, 2)
+            MOI.add_constraint(opt, x[1], MOI.GreaterThan(1.0))
+            MOI.add_constraint(opt, x[2], MOI.LessThan(-2.0))
+            s = sense == MOI.MIN_SENSE ? 1.0 : -1.0
+            obj = MOI.ScalarAffineFunction(
+                [MOI.ScalarAffineTerm(s, x[1]), MOI.ScalarAffineTerm(-s, x[2])],
+                0.0,
+            )
+            MOI.set(opt, MOI.ObjectiveSense(), sense)
+            MOI.set(opt, MOI.ObjectiveFunction{typeof(obj)}(), obj)
+            MOI.optimize!(opt)
+            @test MOI.get(opt, MOI.PrimalStatus()) == MOI.FEASIBLE_POINT
+            xv = MOI.get.(opt, MOI.VariablePrimal(), x)
+            @test xv[1] >= 1.0 && xv[2] <= -2.0
+            @test xv ≈ [1.0, -2.0] atol = 1.0e-2
+        end
+    end
+
+    @testset "Bounds on binary variables are enforced" begin
+        # fixed binary: b = 1, min b  ->  b = 1
+        opt = _new_optimizer()
+        b = MOI.add_variable(opt)
+        MOI.add_constraint(opt, b, MOI.EqualTo(1.0))
+        MOI.add_constraint(opt, b, MOI.ZeroOne())
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{MOI.VariableIndex}(), b)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.VariablePrimal(), b) == 1
+        @test MOI.get(opt, MOI.PrimalStatus()) == MOI.FEASIBLE_POINT
+
+        # b <= 0, max b  ->  b = 0
+        opt = _new_optimizer()
+        b = MOI.add_variable(opt)
+        MOI.add_constraint(opt, b, MOI.LessThan(0.0))
+        MOI.add_constraint(opt, b, MOI.ZeroOne())
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MAX_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{MOI.VariableIndex}(), b)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.VariablePrimal(), b) == 0
+        @test MOI.get(opt, MOI.PrimalStatus()) == MOI.FEASIBLE_POINT
+    end
+
+    @testset "ConstraintPrimal of variable constraints, mixed types" begin
+        opt = _new_optimizer()
+        y = MOI.add_variable(opt) # continuous, MOI index 1
+        b = MOI.add_variable(opt) # binary, MOI index 2 (first in MixedSpace order)
+        z = MOI.add_variable(opt) # integer, MOI index 3
+        c_ub = MOI.add_constraint(opt, y, MOI.LessThan(5.0))
+        c_lb = MOI.add_constraint(opt, y, MOI.GreaterThan(0.0))
+        c_bin = MOI.add_constraint(opt, b, MOI.ZeroOne())
+        c_int_box = MOI.add_constraint(opt, z, MOI.Interval(-3.0, 3.0))
+        c_int = MOI.add_constraint(opt, z, MOI.Integer())
+        # min (y - 4)^2 + (1 - b) + (z + 2)^2  ->  (4, 1, -2)
+        obj = MOI.ScalarNonlinearFunction(
+            :+,
+            Any[
+                MOI.ScalarNonlinearFunction(:^, Any[y - 4.0, 2]),
+                MOI.ScalarNonlinearFunction(:-, Any[1.0, b]),
+                MOI.ScalarNonlinearFunction(:^, Any[z + 2.0, 2]),
+            ],
+        )
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(), obj)
+        MOI.optimize!(opt)
+
+        yv, bv, zv = MOI.get.(opt, MOI.VariablePrimal(), (y, b, z))
+        @test yv ≈ 4.0 atol = 1.0e-2
+        @test bv == 1
+        @test zv == -2
+        @test MOI.get(opt, MOI.ConstraintPrimal(), c_ub) == yv
+        @test MOI.get(opt, MOI.ConstraintPrimal(), c_lb) == yv
+        @test MOI.get(opt, MOI.ConstraintPrimal(), c_bin) == bv
+        @test MOI.get(opt, MOI.ConstraintPrimal(), c_int_box) == zv
+        @test MOI.get(opt, MOI.ConstraintPrimal(), c_int) == zv
+    end
 end
