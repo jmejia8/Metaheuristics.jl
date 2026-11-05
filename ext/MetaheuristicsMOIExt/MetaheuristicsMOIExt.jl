@@ -16,6 +16,8 @@ mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     variables::MOI.Utilities.VariablesContainer{T}
     starting_values::Vector{Union{Nothing, T}}
     nlp_model::Union{MOI.Nonlinear.Model, Nothing}
+    # legacy nonlinear interface (`@NLobjective`, `@NLconstraint`)
+    nlp_block::Union{MOI.NLPBlockData, Nothing}
     sense::MOI.OptimizationSense
 
     # Parameters.
@@ -25,6 +27,8 @@ mutable struct Optimizer{T} <: MOI.AbstractOptimizer
 
     # Solution attributes.
     results::Union{Nothing, Metaheuristics.State}
+    # set when infeasibility is detected before solving (e.g. empty bounds)
+    infeasible_message::Union{Nothing, String}
     variable_type::Dict
     search_space
     var_dist
@@ -36,10 +40,12 @@ function Optimizer{T}() where {T}
         MOI.Utilities.VariablesContainer{T}(),
         Union{Nothing, T}[],
         nothing,
+        nothing,
         MOI.FEASIBILITY_SENSE,
         nothing,
         false,
         Dict{Symbol, Any}(),
+        nothing,
         nothing,
         Dict(),
         nothing,
@@ -50,7 +56,18 @@ end
 
 Optimizer() = Optimizer{Float64}()
 
+# Equality constraints h(x) = 0 are handled as |h(x)| - tol <= 0, where tol is
+# the `h_tol` of the method options, or this value when `h_tol` is zero.
+const DEFAULT_H_TOL = 1.0e-6
+
 MOI.supports(::Optimizer, ::MOI.NLPBlock) = true
+
+function MOI.set(model::Optimizer, ::MOI.NLPBlock, data::Union{Nothing, MOI.NLPBlockData})
+    model.nlp_block = data
+    return
+end
+
+MOI.get(model::Optimizer, ::MOI.NLPBlock) = model.nlp_block
 
 function MOI.supports(::Optimizer, ::Union{MOI.ObjectiveSense, MOI.ObjectiveFunction})
     return true
@@ -157,10 +174,28 @@ MOI.Utilities.map_indices(::Function, opt::Metaheuristics.AbstractAlgorithm) = o
 function MOI.set(model::Optimizer, p::MOI.RawOptimizerAttribute, value)
     if p.name == "method"
         model.method = value
-    else
-        model.options[Symbol(p.name)] = value
+        return
     end
+    MOI.supports(model, p) || throw(MOI.UnsupportedAttribute(p))
+    key = Symbol(p.name)
+    # convert now, so a wrong value fails here instead of inside `optimize!`
+    model.options[key] = convert(fieldtype(Metaheuristics.Options, key), value)
     return
+end
+
+# Copy the user options (`RawOptimizerAttribute`, `TimeLimitSec`, `Silent`)
+# into the options of the method used for solving.
+function _apply_options!(opts::Metaheuristics.Options, model::Optimizer)
+    for (key, value) in model.options
+        setfield!(opts, key, value)
+    end
+    # a new seed needs a new generator, unless the user also gave one
+    if haskey(model.options, :seed) && !haskey(model.options, :rng)
+        opts.rng = Metaheuristics.default_rng_mh(opts.seed)
+    end
+    # Silent = false keeps the verbosity chosen by the user
+    model.silent && (opts.verbose = false)
+    return opts
 end
 
 function MOI.get(model::Optimizer, p::MOI.RawOptimizerAttribute)
@@ -174,14 +209,22 @@ function MOI.get(model::Optimizer, p::MOI.RawOptimizerAttribute)
     error("RawOptimizerAttribute with name $(p.name) is not set.")
 end
 
-MOI.get(model::Optimizer, ::MOI.SolveTimeSec) = model.results.overall_time
+function MOI.get(model::Optimizer, ::MOI.SolveTimeSec)
+    isnothing(model.results) && return 0.0
+    return model.results.overall_time
+end
 
 function MOI.empty!(model::Optimizer)
     MOI.empty!(model.variables)
     empty!(model.starting_values)
     model.nlp_model = nothing
+    model.nlp_block = nothing
     model.sense = MOI.FEASIBILITY_SENSE
     model.results = nothing
+    model.infeasible_message = nothing
+    empty!(model.variable_type)
+    model.search_space = nothing
+    model.var_dist = nothing
     return
 end
 
@@ -189,6 +232,7 @@ function MOI.is_empty(model::Optimizer)
     return MOI.is_empty(model.variables) &&
         isempty(model.starting_values) &&
         isnothing(model.nlp_model) &&
+        isnothing(model.nlp_block) &&
         model.sense == MOI.FEASIBILITY_SENSE
 end
 
@@ -219,14 +263,15 @@ function MOI.add_constraint(
     vi::MOI.VariableIndex,
     set::BOUNDS{T},
 ) where {T}
-    model.variable_type[vi] = :bounds
-    # TODO: revise this part to get g(x) <= 0
+    # bounds do not change the variable type (it may already be :int or :binary)
     return MOI.add_constraint(model.variables, vi, set)
 end
 
 function MOI.add_constraint(model::Optimizer, vi::MOI.VariableIndex, set::MOI.Integer)
-    # Mark variable as integer
-    model.variable_type[vi] = :int
+    # Mark variable as integer (binary is stronger, keep it whatever the order)
+    if get(model.variable_type, vi, :bounds) !== :binary
+        model.variable_type[vi] = :int
+    end
     return MOI.add_constraint(model.variables, vi, set)
 end
 
@@ -299,6 +344,32 @@ function _dict_to_search_spaces(dict)
     MixedSpace(s...), var_dist
 end
 
+# Integer bounds at or beyond this value are treated as infinite in the search
+# space (an `Int` box cannot hold them, and floats lose integer precision).
+const INT_BOUND_LIMIT = 2.0^52
+
+# Return a message if the variable bounds admit no point, otherwise `nothing`.
+function _check_bounds(model)
+    lb = model.variables.lower
+    ub = model.variables.upper
+    for vi in MOI.get(model.variables, MOI.ListOfVariableIndices())
+        a, b = lb[vi.value], ub[vi.value]
+        k = get(model.variable_type, vi, :bounds)
+        if k === :binary
+            a, b = max(a, 0), min(b, 1)
+        end
+        if k !== :bounds
+            a, b = ceil(a), floor(b)
+        end
+        if a > b
+            kind = k === :bounds ? "" : k === :int ? "integer " : "binary "
+            return "Infeasible bounds: $(kind)variable $(vi.value) has no value " *
+                "in [$(lb[vi.value]), $(ub[vi.value])]."
+        end
+    end
+    return nothing
+end
+
 function _get_search_spaces(model)
 
     vars = MOI.get(model.variables, MOI.ListOfVariableIndices())
@@ -325,7 +396,18 @@ function _get_search_spaces(model)
             continue
         end
 
+        if k === :int
+            # Too large bounds cannot be stored as Int: handle them as infinite
+            # here (they are still enforced as penalty constraints).
+            abs(a) < INT_BOUND_LIMIT || (a = -Inf)
+            abs(b) < INT_BOUND_LIMIT || (b = Inf)
+        end
+
         if isfinite(a) && isfinite(b)
+            if k === :int
+                # fractional bounds: tightest integer box
+                a, b = ceil(Int, a), floor(Int, b)
+            end
             push!(spaces[k][:lb], a)
             push!(spaces[k][:ub], b)
             push!(spaces[k][:vars], i)
@@ -340,6 +422,9 @@ function _get_search_spaces(model)
             a = b - 2max(abs(b), 10)
         else
             b = a + 2max(abs(a), 10)
+        end
+        if k === :int
+            a, b = ceil(Int, a), floor(Int, b)
         end
         push!(spaces[:non_rigid][k][:lb], a)
         push!(spaces[:non_rigid][k][:ub], b)
@@ -359,23 +444,57 @@ function _dict_to_values(solution, search_space, var_dist)
     x
 end
 
-function MOI.optimize!(model::Optimizer{T}) where {T}
-    #backend = MOI.Nonlinear.ExprGraphOnly() #MOI.Nonlinear.SparseReverseMode()
-    backend = MOI.Nonlinear.SparseReverseMode()
-    vars = MOI.get(model.variables, MOI.ListOfVariableIndices())
-    evaluator = MOI.Nonlinear.Evaluator(model.nlp_model, backend, vars)
-    nlp_data = MOI.NLPBlockData(evaluator)
-    objective_scale = model.sense == MOI.MAX_SENSE ? -one(T) : one(T)
+# Nonlinear functions come from two places: the new interface
+# (`ScalarNonlinearFunction`, stored in `model.nlp_model`) and the legacy
+# `NLPBlock` (`@NLobjective`, `@NLconstraint`). Both evaluators take `x` in MOI
+# variable order. Only zero-order evaluations are needed here.
+function _nonlinear_sources(model::Optimizer, vars)
+    sources = Tuple{Any, Vector{MOI.NLPBoundsPair}}[]
+    objective = nothing
 
-    # load parameters
-    if isnothing(model.nlp_model)
-        error("An objective should be provided to Metaheuristics with `@objective`.")
+    if !isnothing(model.nlp_model)
+        backend = MOI.Nonlinear.SparseReverseMode()
+        evaluator = MOI.Nonlinear.Evaluator(model.nlp_model, backend, vars)
+        MOI.initialize(evaluator, Symbol[])
+        bounds = MOI.NLPBlockData(evaluator).constraint_bounds
+        isempty(bounds) || push!(sources, (evaluator, bounds))
+        isnothing(model.nlp_model.objective) || (objective = evaluator)
     end
 
-    nl_constrained = !isempty(nlp_data.constraint_bounds)
+    if !isnothing(model.nlp_block)
+        block = model.nlp_block
+        MOI.initialize(block.evaluator, Symbol[])
+        isempty(block.constraint_bounds) ||
+            push!(sources, (block.evaluator, block.constraint_bounds))
+        # as in other MOI solvers, an NLPBlock objective takes precedence
+        block.has_objective && (objective = block.evaluator)
+    end
 
-    used_features = [:ExprGraph]
-    MOI.initialize(evaluator, used_features)
+    # FEASIBILITY_SENSE ignores the objective; no objective means f(x) = 0
+    model.sense == MOI.FEASIBILITY_SENSE && (objective = nothing)
+    return objective, sources
+end
+
+function MOI.optimize!(model::Optimizer{T}) where {T}
+    model.results = nothing
+    model.infeasible_message = _check_bounds(model)
+    if !isnothing(model.infeasible_message)
+        !model.silent && @warn model.infeasible_message
+        return
+    end
+
+    vars = MOI.get(model.variables, MOI.ListOfVariableIndices())
+    objective_scale = model.sense == MOI.MAX_SENSE ? -one(T) : one(T)
+    obj_evaluator, nl_sources = _nonlinear_sources(model, vars)
+
+    # constraint bounds in the order of the concatenated constraint values
+    nl_bounds = reduce(vcat, (b for (_, b) in nl_sources); init = MOI.NLPBoundsPair[])
+    nl_constrained = !isempty(nl_bounds)
+    lc = [b.lower for b in nl_bounds]
+    uc = [b.upper for b in nl_bounds]
+    eq_idx = findall(lc .== uc)
+    up_idx = findall(i -> lc[i] != uc[i] && isfinite(uc[i]), eachindex(uc))
+    lo_idx = findall(i -> lc[i] != uc[i] && isfinite(lc[i]), eachindex(lc))
 
     !model.silent && @info "Load search space"
     search_space_dict = _get_search_spaces(model)
@@ -406,70 +525,6 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
     end
     has_constraints = nl_constrained || !isempty(bound_constraints)
 
-    function constraints(x)
-        GV = Float64[
-            side === :lower ? bound - x[i] : x[i] - bound
-            for (i, side, bound) in bound_constraints
-        ]
-
-        if !nl_constrained
-            return GV, zeros(1)
-        end
-
-        lc = [b.lower for b in nlp_data.constraint_bounds]
-        uc = [b.upper for b in nlp_data.constraint_bounds]
-
-        C = zeros(length(lc))
-        MOI.eval_constraint(evaluator, C, x)
-
-        equality_mask = uc .≈ lc
-        inequality_mask = .!equality_mask
-        if count(equality_mask) == 0
-            # no equality constraints
-            H = zeros(1)
-        else
-            H = C[equality_mask] - uc[equality_mask]
-        end
-
-        # TODO: The following is hard coded, try to update improve it
-        if count(inequality_mask) == 0
-            G = zeros(1)
-        else
-            mask = isfinite.(uc[inequality_mask])
-            if any(mask)
-                G1 = C[inequality_mask][mask] - uc[inequality_mask][mask] # <= 0
-            else
-                G1 = Float64[]
-            end
-
-            mask = isfinite.(lc[inequality_mask])
-            if any(mask)
-                G2 = lc[inequality_mask][mask] - C[inequality_mask][mask] # <= 0
-            else
-                G2 = Float64[]
-            end
-
-            G = [G1; G2]
-        end
-
-        HH = abs.(H) .- 1.0e-8
-
-        append!(G, GV)
-        append!(G, HH)
-
-        return G, zeros(1)
-    end
-
-    # TODO: add constraints, and multi-objective
-    function f(solution)
-        x = _dict_to_values(solution, search_space, var_dist)
-        fx = objective_scale * MOI.eval_objective(evaluator, x)
-
-        has_constraints || return fx
-        gx, hx = constraints(x)
-        fx, gx, hx
-    end
-
     !model.silent && @info "Load method"
 
     # Solve with a fresh copy: `Algorithm` is mutable and `optimize` continues
@@ -484,14 +539,57 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
         deepcopy(model.method)
     end
     method.status = Metaheuristics.State(nothing, [])
+    _apply_options!(method.options, model)
+
+    # Equalities are handled as |h(x)| - h_tol <= 0 inside g, since not every
+    # algorithm uses `options.h_tol` when it decides feasibility (ECA does not).
+    h_tol = method.options.h_tol > 0 ? method.options.h_tol : DEFAULT_H_TOL
+
+    C = zeros(length(nl_bounds))
+    function constraints(x)
+        GV = T[
+            side === :lower ? bound - x[i] : x[i] - bound
+            for (i, side, bound) in bound_constraints
+        ]
+        nl_constrained || return GV, zeros(1)
+
+        offset = 0
+        for (evaluator, bounds) in nl_sources
+            c = zeros(length(bounds))
+            MOI.eval_constraint(evaluator, c, x)
+            C[(offset + 1):(offset + length(c))] = c
+            offset += length(c)
+        end
+
+        G = [
+            C[up_idx] - uc[up_idx]                # g(x) <= u
+            lc[lo_idx] - C[lo_idx]                # g(x) >= l
+            GV                                    # variable bounds
+            abs.(C[eq_idx] - uc[eq_idx]) .- h_tol # h(x) = b
+        ]
+        return G, zeros(1)
+    end
+
+    # TODO: multi-objective
+    function f(solution)
+        x = _dict_to_values(solution, search_space, var_dist)
+        fx = if isnothing(obj_evaluator)
+            zero(T)
+        else
+            objective_scale * MOI.eval_objective(obj_evaluator, x)
+        end
+
+        has_constraints || return fx
+        gx, hx = constraints(x)
+        fx, gx, hx
+    end
+
     model.f = f
     !model.silent && @info "Optimize"
 
     # TODO initial solutions
     #initial_x = starting_value.(model, eachindex(model.starting_values))
-    #options = copy(model.options)
     model.results = optimize(f, search_space, method)
-    # bounds for constraints
 
     return
 end
@@ -500,41 +598,45 @@ function converged(res)
     res.termination_status_code isa Metaheuristics.ConvergenceTermination
 end
 
+_best_is_feasible(res) = !isempty(res.population) &&
+    Metaheuristics.is_feasible(res.best_sol)
+
+# Stops meaning "the search settled" (not "the budget ran out").
+const _SETTLED = Union{
+    Metaheuristics.ConvergenceTermination,
+    Metaheuristics.ObjectiveVarianceLimit,
+    Metaheuristics.ObjectiveDifferenceLimit,
+    Metaheuristics.AccuracyLimit,
+}
+
 function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
-    if isnothing(model.results)
-        return MOI.OPTIMIZE_NOT_CALLED
-    end
+    isnothing(model.infeasible_message) || return MOI.INFEASIBLE
+    isnothing(model.results) && return MOI.OPTIMIZE_NOT_CALLED
 
     term = model.results.termination_status_code
 
-    if term isa Metaheuristics.ConvergenceTermination
-        return MOI.LOCALLY_SOLVED
+    if term isa _SETTLED
+        # settled on an infeasible point: no feasible point was found
+        return _best_is_feasible(model.results) ?
+            MOI.LOCALLY_SOLVED :
+            MOI.LOCALLY_INFEASIBLE
     elseif term isa Metaheuristics.IterationLimit
         return MOI.ITERATION_LIMIT
     elseif term isa Metaheuristics.EvaluationsLimit
         return MOI.OTHER_LIMIT
     elseif term isa Metaheuristics.TimeLimit
         return MOI.TIME_LIMIT
-    elseif term isa Metaheuristics.ObjectiveVarianceLimit
-        return MOI.LOCALLY_SOLVED
-    elseif term isa Metaheuristics.ObjectiveDifferenceLimit
-        return MOI.LOCALLY_SOLVED
     else
         # For other termination reasons (e.g., OtherLimit, UnknownStopReason)
-        # Check if we have a feasible solution
-        if !isempty(model.results.population)
-            best = model.results.best_sol
-            if Metaheuristics.is_feasible(best)
-                return MOI.LOCALLY_SOLVED
-            else
-                return MOI.LOCALLY_INFEASIBLE
-            end
-        end
-        return MOI.OTHER_LIMIT
+        isempty(model.results.population) && return MOI.OTHER_LIMIT
+        return _best_is_feasible(model.results) ?
+            MOI.LOCALLY_SOLVED :
+            MOI.LOCALLY_INFEASIBLE
     end
 end
 
 function MOI.get(model::Optimizer, ::MOI.RawStatusString)
+    isnothing(model.infeasible_message) || return model.infeasible_message
     isnothing(model.results) && return "optimize! not called"
     return Metaheuristics.termination_status_message(model.results)
 end

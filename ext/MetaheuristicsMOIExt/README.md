@@ -68,4 +68,22 @@ set_attribute(model, "method", method)
 set_silent(model)
 ```
 
-Use `@objective(model, Max, ...)` for maximization.
+Any field of `Options` can also be set as an attribute. These values override the
+ones in the method options (the method object itself is never modified):
+
+```julia
+set_attribute(model, "iterations", 1000)
+set_attribute(model, "seed", 1)
+set_time_limit_sec(model, 10.0)  # same as set_attribute(model, "time_limit", 10.0)
+```
+
+Equality constraints $h(x) = 0$ are satisfied when $|h(x)| \leq$ `h_tol`. If `h_tol`
+is zero (the `Options` default), $10^{-6}$ is used instead:
+
+```julia
+set_attribute(model, "h_tol", 1e-4)
+```
+
+Use `@objective(model, Max, ...)` for maximization. Models without an objective are
+solved as feasibility problems. The legacy `@NLobjective` and `@NLconstraint` macros
+are also supported.
