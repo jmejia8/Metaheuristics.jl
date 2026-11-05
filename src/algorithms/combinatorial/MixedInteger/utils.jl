@@ -1,5 +1,4 @@
 function _mixed_to_continous_space(mixed_space::MixedSpace)
-    dim = getdim(mixed_space)
     lower_bounds = []
     upper_bounds = []
 
