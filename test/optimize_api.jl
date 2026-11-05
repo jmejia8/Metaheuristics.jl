@@ -1,6 +1,6 @@
 @testset "Optimize API" begin
     function test_optimize()
-        f, bounds, _ = Metaheuristics.TestProblems.sphere();
+        f, bounds, _ = Metaheuristics.TestProblems.sphere()
         method = ECA()
         while !Metaheuristics.should_stop(method)
             optimize!(f, bounds, method)
@@ -10,45 +10,52 @@
     end
 
     function search_space_optimize()
-        f, _, _ = Metaheuristics.TestProblems.sphere();
+        f, _, _ = Metaheuristics.TestProblems.sphere()
         lb = zeros(3)
         ub = ones(3)
         options = Options(iterations = 10, seed = 1)
         show(IOBuffer(), "text/plain", options)
         def_bounds = [
-                         (lb, ub),
-                         boxconstraints(lb, ub, rigid=false),
-                         [lb ub],
-                         [lb ub]',
-                         [-5; 5;;], # due to #83
-                        ]
-                        
+            (lb, ub),
+            boxconstraints(lb, ub, rigid = false),
+            [lb ub],
+            [lb ub]',
+            [-5; 5;;], # due to #83
+        ]
+
         for space in def_bounds
-            res = optimize(f, space, ECA(;K = 3, options))
+            res = optimize(f, space, ECA(; K = 3, options))
             res2 = optimize(f, space, ECA, K = 3, iterations = 10, seed = 1)
             @test minimum(res) == minimum(res2)
-            assert_minimizer_dimension!(res, Metaheuristics.getdim(Metaheuristics.Problem(f, space)))
+            assert_minimizer_dimension!(
+                res,
+                Metaheuristics.getdim(Metaheuristics.Problem(f, space)),
+            )
         end
         for space in def_bounds
             p = Metaheuristics.Problem(sum, space)
             for algo in [ABC, DE, PSO, WOA, CGSA, GA, SA]
-                res = optimize(f, space, algo, iterations=3, time_limit=0.1)
+                res = optimize(f, space, algo, iterations = 3, time_limit = 0.1)
                 x = minimizer(res)
                 @test x isa AbstractVector
                 @test length(x) == Metaheuristics.getdim(p)
                 assert_minimizer_dimension!(res, Metaheuristics.getdim(p))
             end
             for algo in [SPEA2, SMS_EMOA, NSGA2, NSGA3]
-                res = optimize(x->([0.0,0],[0.0],[0.0]),
-                               space, algo, iterations=3, time_limit=0.1
-                              )
+                res = optimize(
+                    x -> ([0.0, 0], [0.0], [0.0]),
+                    space,
+                    algo,
+                    iterations = 3,
+                    time_limit = 0.1,
+                )
                 @test size(positions(res), 2) == Metaheuristics.getdim(p)
                 @test eltype(positions(res)) <: eltype(p.search_space.lb)
             end
         end
 
         redirect_stdout(devnull) do
-            optimize(f, [lb ub], ECA, iterations=10, verbose = true)
+            optimize(f, [lb ub], ECA, iterations = 10, verbose = true)
         end
     end
 
@@ -59,7 +66,7 @@
     end
 
     function (A::CostFunc)(x)
-        return A.a*length(x) + sum( x.^2 - A.b*cos.(2π*x) )
+        return A.a * length(x) + sum(x.^2 - A.b * cos.(2π * x))
     end
     function test_callable_objects()
 
@@ -72,7 +79,7 @@
         information = Information(f_optimum = 0.0)
 
         # generic settings
-        options = Options(f_tol = 1e-5, seed = 5)
+        options = Options(f_tol = 1.0e-5, seed = 5)
 
         # metaheuristic used to optimize
         algorithm = ECA(information = information, options = options)
@@ -80,10 +87,10 @@
         # start the minimization process
         result = optimize(callable_object, bounds, algorithm)
 
-        @test minimum(result) < 1e-4
+        @test minimum(result) < 1.0e-4
         assert_minimizer_structure!(callable_object, result, bounds)
     end
-    
+
     test_optimize()
     search_space_optimize()
     test_callable_objects()

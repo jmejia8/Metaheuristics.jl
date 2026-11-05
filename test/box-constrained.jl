@@ -1,16 +1,13 @@
 using Metaheuristics
 using Test
 
-
-
 @testset "Box-constrained" begin
-
 
     function run_methods(problem)
 
-        desired_accuracy = 1e-4
+        desired_accuracy = 1.0e-4
 
-        ff, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
+        ff, bounds, _ = Metaheuristics.TestProblems.get_problem(problem)
 
         # number of function evaluations
         f_calls = 0
@@ -22,35 +19,45 @@ using Test
 
         information = Information(f_optimum = 0.0)
         options = Options(f_tol = desired_accuracy, seed = 1)
-        options_2 = Options(f_tol = desired_accuracy, seed = 1, store_convergence=true)
+        options_2 = Options(f_tol = desired_accuracy, seed = 1, store_convergence = true)
         options_3 = Options(f_tol = desired_accuracy, seed = 1)
 
         methods = [
-                   ABC(options = options, information = information), 
-
-                   # differential evolution
-                   DE(CR = 0.5, options = options_2, information = information),
-                   DE(CR = 0.4, strategy=:best1, options = options_2, information = information),
-                   DE(CR = 0.3, strategy=:rand2, options = options_2, information = information),
-                   DE(CR = 0.5, strategy=:randToBest1, options = options_2, information = information),
-                   DE(CR = 0.3, strategy=:best2, options = options_2, information = information),
-
-                   ECA(options = options, information = information),
-                   ECA(adaptive=true, resize_population=true, options = options, information = information),
-
-                   PSO(options = options, information = information),
-                   SA(options = options, information = information),
-                   WOA(options = options, information = information),
-                   MCCGA(options = options_3, information = information),
-                   Restart(WOA(;options, information)),
-                   SHADE(options=Options(seed=1)),
-                   CSO(N=100, options=Options(seed=1)),
-                   RDEx(options=Options(seed=1), information = information),
-                  ]
+            ABC(options = options, information = information),
+            # differential evolution
+            DE(CR = 0.5, options = options_2, information = information),
+            DE(CR = 0.4, strategy = :best1, options = options_2, information = information),
+            DE(CR = 0.3, strategy = :rand2, options = options_2, information = information),
+            DE(
+                CR = 0.5,
+                strategy = :randToBest1,
+                options = options_2,
+                information = information,
+            ),
+            DE(CR = 0.3, strategy = :best2, options = options_2, information = information),
+            ECA(options = options, information = information),
+            ECA(
+                adaptive = true,
+                resize_population = true,
+                options = options,
+                information = information,
+            ),
+            PSO(options = options, information = information),
+            SA(options = options, information = information),
+            WOA(options = options, information = information),
+            MCCGA(options = options_3, information = information),
+            Restart(WOA(; options, information)),
+            SHADE(options = Options(seed = 1)),
+            CSO(N = 100, options = Options(seed = 1)),
+            RDEx(options = Options(seed = 1), information = information),
+        ]
 
         # CGSA
-        for i = 1:10
-            push!(methods, CGSA(chaosIndex=i,options = options, information = information))
+        for i in 1:10
+            push!(
+                methods,
+                CGSA(chaosIndex = i, options = options, information = information),
+            )
         end
 
         for method in methods
@@ -60,7 +67,7 @@ using Test
             show(IOBuffer(), "text/plain", res.population)
             show(IOBuffer(), "text/html", res.population)
             show(IOBuffer(), res.population[1])
-            fitness = minimum( res ) 
+            fitness = minimum(res)
             test_result(fitness, desired_accuracy)
 
             # also count the mumber of function evaluations
@@ -70,32 +77,32 @@ using Test
         end
     end
 
-
     function run_methods_parallel_eval(problem)
 
-        desired_accuracy = 1e-4
+        desired_accuracy = 1.0e-4
 
         f_calls = 0
         f(X) = begin
-            f_calls += size(X,1)
-            sum(X.^2,dims=2)
+            f_calls += size(X, 1)
+            sum(X.^2, dims = 2)
         end
         bounds = [-ones(5)'; ones(5)']
-        options = Options(f_tol = desired_accuracy,
-                          f_calls_limit=1000,
-                          seed = 1,
-                          parallel_evaluation=true,
-                          iterations = 1000,
-                         )
+        options = Options(
+            f_tol = desired_accuracy,
+            f_calls_limit = 1000,
+            seed = 1,
+            parallel_evaluation = true,
+            iterations = 1000,
+        )
 
         methods = [
-                   CGSA(options = options),
-                   DE(options = options),
-                   ECA(options = options),
-                   PSO(options = options),
-                   WOA(options = options),
-                  ]
-    
+            CGSA(options = options),
+            DE(options = options),
+            ECA(options = options),
+            PSO(options = options),
+            WOA(options = options),
+        ]
+
         ff(x) = sum(x.^2)
         for method in methods
             f_calls = 0
@@ -107,7 +114,7 @@ using Test
     end
 
     function test_result(fitness, tol)
-        @test ≈(fitness, 0.0, atol=tol)
+        @test ≈(fitness, 0.0, atol = tol)
     end
 
     for problem in [:sphere]
