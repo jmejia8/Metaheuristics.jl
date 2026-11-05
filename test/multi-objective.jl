@@ -53,12 +53,7 @@ end
             @test f_calls == result.f_calls
 
 
-            # test obtaining non-dominated solutions
-            pf1 = pareto_front(result)
-            pf2 = pareto_front(result.population)
-
-            @test size(pf1, 1) == size(pf2,1) &&
-                  Metaheuristics.PerformanceIndicators.igd(pf1, pf2) ≈ 0.0
+            assert_multiobjective_result!(ff, result, bounds)
         end
     end
 
@@ -100,6 +95,7 @@ end
             result = optimize(f, bounds, method)
             # number of function evaluations should be reported correctly
             @test f_calls == result.f_calls
+            assert_multiobjective_result!(ff, result, bounds)
         end
     end
 
@@ -125,6 +121,7 @@ end
             @test Metaheuristics.PerformanceIndicators.igd(result.population, pf) <= 0.2
             # number of function evaluations should be reported correctly
             @test f_calls == result.f_calls
+            assert_multiobjective_result!(ff, result, bounds)
         end
     end
     

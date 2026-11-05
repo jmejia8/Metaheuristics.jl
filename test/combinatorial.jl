@@ -20,6 +20,7 @@
 
         result = optimize(f, bounds, method)
         @test isapprox(minimum(result), 0, atol=1e-3)
+        assert_combinatorial_minimizer!(ff, result, bounds)
         test_results(result)
         result
     end
@@ -50,6 +51,7 @@
 
         result = optimize(f, bounds, ga)
         @test minimum(result) ≈ f(1:n)
+        assert_permutation_population!(result, n)
         test_results(result)
     end
 
@@ -60,8 +62,10 @@
         decode(rk) = sortperm(rk);
         # objective function
         f(rk) = sum(abs.(decode(rk) - target_perm));
-        res = optimize(f, [zeros(n) ones(n)], BRKGA(num_elites=50))
+        bounds = [zeros(n) ones(n)]
+        res = optimize(f, bounds, BRKGA(num_elites=50))
         @test decode(minimizer(res)) == target_perm
+        assert_combinatorial_minimizer!(f, res, bounds)
     end
 
     function grasp_vns()
@@ -199,9 +203,7 @@ end
             res = optimize(f, search_space, MixedInteger(algo; options))
             @test minimum(res) isa Number
             @test minimizer(res) isa AbstractVector
-            d = Metaheuristics.vec_to_dict(minimizer(res), search_space) 
-            @test d isa Dict
-            @test sort(collect(keys(d))) == [:v, :w, :x, :y, :z]
+            assert_mixed_integer_result!(res, search_space)
         end
     end
 

@@ -65,6 +65,19 @@ function optimize(
     status
 end
 
+# Handle callable objects (non-Function types) with algorithm instances
+function optimize(
+        f,
+        search_space,
+        method::AbstractAlgorithm;
+        logger::Function = (status) -> nothing,
+    )
+    # Wrap callable object into a function
+    wrapped_f = _wrap_objective_function(f)
+    # Call the standard optimize function with the wrapped function
+    optimize(wrapped_f, search_space, method; logger)
+end
+
 
 """
     optimize!(f, search_space, method;logger)
@@ -133,6 +146,19 @@ function optimize!(
     return method
 end
 
+# Handle callable objects (non-Function types) with optimize!
+function optimize!(
+        f,
+        search_space,
+        method::AbstractAlgorithm;
+        logger::Function = (status) -> nothing,
+    )
+    # Wrap callable object into a function
+    wrapped_f = _wrap_objective_function(f)
+    # Call the standard optimize! function with the wrapped function
+    optimize!(wrapped_f, search_space, method; logger)
+end
+
 
 function optimize(
         f::Function,
@@ -148,4 +174,18 @@ function optimize(
     set_user_parameters!(algo; kargs...)
     # call optimize api
     optimize(f, problem.search_space, algo; logger)
+end
+
+function optimize(
+        f,
+        _search_space,
+        ::Type{T};
+        logger::Function = (status) -> nothing,
+        kargs...
+    ) where T <: AbstractParameters
+
+    # Wrap callable object into a function
+    wrapped_f = _wrap_objective_function(f)
+    # Call the standard optimize function with the wrapped function
+    optimize(wrapped_f, _search_space, T; logger, kargs...)
 end

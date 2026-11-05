@@ -30,6 +30,7 @@ export optimize!
 export set_user_solutions!
 export boxconstraints
 export SHADE, CSO
+export RDEx
 
 include("externals.jl")
 

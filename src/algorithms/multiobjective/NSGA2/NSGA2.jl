@@ -266,7 +266,7 @@ function reproduction(status, parameters::AbstractNSGA, problem, options)
     @assert !isempty(status.population)
 
     N_half = parameters.N
-    Q = zeros(2N_half, getdim(problem))
+    Q = zeros(eltype(get_position(first(status.population))), 2N_half, getdim(problem)) 
 
     for i in 1:N_half
         pa = tournament_selection(status.population, options)

@@ -216,12 +216,12 @@ function create_child(X::AbstractMatrix,
     #&& error("Error in parallel evaluation: size(X,1) != size(G(X),1).")
     #&& error("Error in parallel evaluation: size(X,1) != size(H(X),1).")
 
-    population = xFgh_indiv[]
+    population = xFgh_solution{Vector{eltype(X)}}[]
 
     for i in 1:size(X,1)
         g = isempty(G) ? zeros(0) : G[i,:]
         h = isempty(H) ? zeros(0) : H[i,:]
-        push!(population, xFgh_indiv(X[i,:], F[i,:], g, h;ε=ε))
+        push!(population, xFgh_solution(X[i,:], F[i,:], g, h, 0, 0.0, violationsSum(g,h;ε=ε), violationsSum(g,h;ε=ε)==0.0))
     end
     population
 end

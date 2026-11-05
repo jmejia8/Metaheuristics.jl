@@ -27,6 +27,7 @@
             res = optimize(f, space, ECA(;K = 3, options))
             res2 = optimize(f, space, ECA, K = 3, iterations = 10, seed = 1)
             @test minimum(res) == minimum(res2)
+            assert_minimizer_dimension!(res, Metaheuristics.getdim(Metaheuristics.Problem(f, space)))
         end
         for space in def_bounds
             p = Metaheuristics.Problem(sum, space)
@@ -35,6 +36,7 @@
                 x = minimizer(res)
                 @test x isa AbstractVector
                 @test length(x) == Metaheuristics.getdim(p)
+                assert_minimizer_dimension!(res, Metaheuristics.getdim(p))
             end
             for algo in [SPEA2, SMS_EMOA, NSGA2, NSGA3]
                 res = optimize(x->([0.0,0],[0.0],[0.0]),
@@ -49,6 +51,40 @@
             optimize(f, [lb ub], ECA, iterations=10, verbose = true)
         end
     end
+
+    # test callable objects (issue #112)
+    struct CostFunc{T}
+        a::T
+        b::T
+    end
+
+    function (A::CostFunc)(x)
+        return A.a*length(x) + sum( x.^2 - A.b*cos.(2π*x) )
+    end
+    function test_callable_objects()
+
+        callable_object = CostFunc(2.0, 2.0)
+
+        # limits/bounds
+        bounds = BoxConstrainedSpace(lb = -5ones(2), ub = 5ones(2))
+
+        # information on the minimization problem
+        information = Information(f_optimum = 0.0)
+
+        # generic settings
+        options = Options(f_tol = 1e-5, seed = 5)
+
+        # metaheuristic used to optimize
+        algorithm = ECA(information = information, options = options)
+
+        # start the minimization process
+        result = optimize(callable_object, bounds, algorithm)
+
+        @test minimum(result) < 1e-4
+        assert_minimizer_structure!(callable_object, result, bounds)
+    end
+    
     test_optimize()
     search_space_optimize()
+    test_callable_objects()
 end

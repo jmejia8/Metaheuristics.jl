@@ -162,7 +162,7 @@ or the citation string
 
 > Mejía-de-Dios et al., (2022). Metaheuristics: A Julia Package for Single- and Multi-Objective Optimization. Journal of Open Source Software, 7(78), 4723, https://doi.org/10.21105/joss.04723
 
-in your scientific paper if you use `Metaheristics.jl`. 
+in your scientific paper if you use `Metaheuristics.jl`. 
 
 
 ## Contributing
