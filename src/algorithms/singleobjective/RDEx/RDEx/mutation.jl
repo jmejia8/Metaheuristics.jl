@@ -31,17 +31,23 @@ Order three positions by fitness for elite-based mutation.
 Returns the archive ordering.
 """
 function elite_based_order(
-    pos1::Vector{Float64}, pos1_fit::Float64,
-    pos3::Vector{Float64}, pos3_fit::Float64,
-    pos4::Vector{Float64}, pos4_fit::Float64
+    pos1::Vector{Float64},
+    pos1_fit::Float64,
+    pos3::Vector{Float64},
+    pos3_fit::Float64,
+    pos4::Vector{Float64},
+    pos4_fit::Float64,
 )::EliteBasedOrdering
     return _order_three(pos1, pos1_fit, pos3, pos3_fit, pos4, pos4_fit)
 end
 
 function _order_three(
-    pos1::Vector{Float64}, pos1_fit::Float64,
-    pos3::Vector{Float64}, pos3_fit::Float64,
-    pos4::Vector{Float64}, pos4_fit::Float64
+    pos1::Vector{Float64},
+    pos1_fit::Float64,
+    pos3::Vector{Float64},
+    pos3_fit::Float64,
+    pos4::Vector{Float64},
+    pos4_fit::Float64,
 )::EliteBasedOrdering
     if pos1_fit <= pos3_fit && pos1_fit <= pos4_fit
         best = pos1
@@ -57,7 +63,8 @@ function _order_three(
         else
             return EliteBasedOrdering(best, pos4, pos1)
         end
-    else  # pos4_fit <= pos1_fit && pos4_fit <= pos3_fit
+    else
+        # pos4_fit <= pos1_fit && pos4_fit <= pos3_fit
         best = pos4
         if pos1_fit <= pos3_fit
             return EliteBasedOrdering(best, pos1, pos3)
@@ -88,20 +95,20 @@ function create_elite_based_trial(
     Cr::Float64,
     lower_bounds::Vector{Float64},
     upper_bounds::Vector{Float64},
-    rng::AbstractRNG
+    rng::AbstractRNG,
 )::Tuple{Vector{Float64}, Float64}
     D = length(x_chosen)
     trial = zeros(D)
-    will_crossover = rand(rng, 0:(D-1))
+    will_crossover = rand(rng, 0:(D - 1))
     perturbation = rand(rng) < 0.4
     actual_cr = 0.0
-    
-    for j = 1:D
+
+    for j in 1:D
         if rand(rng) < Cr || will_crossover == j - 1
             trial[j] = x_chosen[j] +
-                      F * (ordering.best[j] - x_chosen[j]) +
-                      F * (ordering.medium[j] - ordering.worst[j])
-            
+                F * (ordering.best[j] - x_chosen[j]) +
+                F * (ordering.medium[j] - ordering.worst[j])
+
             # Boundary handling
             if trial[j] < lower_bounds[j]
                 trial[j] = rand(rng) * (upper_bounds[j] - lower_bounds[j]) + lower_bounds[j]
@@ -110,12 +117,10 @@ function create_elite_based_trial(
             end
             actual_cr += 1.0
         else
-            trial[j] = perturbation ? 
-                rand(rng, Cauchy(x_chosen[j], 0.1)) :
-                x_chosen[j]
+            trial[j] = perturbation ? rand(rng, Cauchy(x_chosen[j], 0.1)) : x_chosen[j]
         end
     end
-    
+
     return (trial, actual_cr / D)
 end
 
@@ -144,20 +149,20 @@ function create_standard_trial(
     Cr::Float64,
     lower_bounds::Vector{Float64},
     upper_bounds::Vector{Float64},
-    rng::AbstractRNG
+    rng::AbstractRNG,
 )::Tuple{Vector{Float64}, Float64}
     D = length(x_chosen)
     trial = zeros(D)
-    will_crossover = rand(rng, 0:(D-1))
+    will_crossover = rand(rng, 0:(D - 1))
     perturbation = rand(rng) < 0.4
     actual_cr = 0.0
-    
-    for j = 1:D
+
+    for j in 1:D
         if rand(rng) < Cr || will_crossover == j - 1
             trial[j] = x_chosen[j] +
-                      F * (x_prand[j] - x_chosen[j]) +
-                      F * (x_rand1[j] - x_rand2[j])
-            
+                F * (x_prand[j] - x_chosen[j]) +
+                F * (x_rand1[j] - x_rand2[j])
+
             # Boundary handling
             if trial[j] < lower_bounds[j]
                 trial[j] = rand(rng) * (upper_bounds[j] - lower_bounds[j]) + lower_bounds[j]
@@ -166,14 +171,11 @@ function create_standard_trial(
             end
             actual_cr += 1.0
         else
-            trial[j] = perturbation ?
-                rand(rng, Cauchy(x_chosen[j], 0.1)) :
-                x_chosen[j]
+            trial[j] = perturbation ? rand(rng, Cauchy(x_chosen[j], 0.1)) : x_chosen[j]
         end
     end
-    
+
     return (trial, actual_cr / D)
 end
 
 end # module MutationUtils
-

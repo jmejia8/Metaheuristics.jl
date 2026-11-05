@@ -57,7 +57,7 @@ import Random: seed!
 
         # single-objective
         for problem in [:sphere, :discus, :rastrigin]
-            f, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
+            f, _, optimums = Metaheuristics.TestProblems.get_problem(problem)
             for opt in optimums
                 @test f(opt.x) == opt.f == 0.0
             end
@@ -65,7 +65,7 @@ import Random: seed!
 
         # single-objective constrained
         for problem in [:constrained1, :constrained2, :constrained3]
-            f, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
+            f, _, optimums = Metaheuristics.TestProblems.get_problem(problem)
             for opt in optimums
                 fx, gx, hx = f(opt.x)
                 @test fx == opt.f && sum(max.(gx, 0.0)) ≈ 0.0 && sum(abs.(hx)) ≈ 0.0
@@ -96,7 +96,7 @@ import Random: seed!
             @test length(pf) == length(optimums)
 
             # test dimensions
-            fx, gx, hx = f(bounds[1, :])
+            fx, _, _ = f(bounds[1, :])
             @test length(fx) == length(optimums[1].f)
 
             # test performance indicators
@@ -167,7 +167,7 @@ import Random: seed!
         @test nadir(front) == nadir(Array(hcat(front...)')) == [2.0, 3, 2]
         @test isempty(nadir(empty(front))) && isempty(ideal(empty(front)))
 
-        f, bounds, front2 = Metaheuristics.TestProblems.get_problem(:DTLZ2)
+        _, _, front2 = Metaheuristics.TestProblems.get_problem(:DTLZ2)
         @test Metaheuristics.PerformanceIndicators.hypervolume(front2, nadir(front2)) > 0
         @test ideal(front2) != nadir(front2)
         @test isempty(nadir(empty(front2))) && isempty(ideal(empty(front2)))
@@ -182,7 +182,7 @@ import Random: seed!
     end
 
     function test_prev_pop()
-        f, bounds, optimums = Metaheuristics.TestProblems.get_problem(:sphere)
+        f, bounds, _ = Metaheuristics.TestProblems.get_problem(:sphere)
 
         options = Options(f_calls_limit = 10000, seed = 1)
 

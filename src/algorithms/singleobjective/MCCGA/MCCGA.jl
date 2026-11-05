@@ -4,8 +4,6 @@
 ##################################################################
 include("utils.jl")
 
-
-
 mutable struct MCCGA <: AbstractParameters
     N::Int # population size
     maxsamples::Int
@@ -85,27 +83,27 @@ stop reason: Other stopping criteria.
 ```
 """
 function MCCGA(;
-        N = 100,
-        maxsamples = 10_000,
-        mutation = 1 / N,
-        use_local_search = true,
-        kargs...
-    )
+    N = 100,
+    maxsamples = 10_000,
+    mutation = 1 / N,
+    use_local_search = true,
+    kargs...,
+)
 
     parameters = MCCGA(N, maxsamples, mutation, [], use_local_search)
 
-    Algorithm(parameters;kargs...)
+    Algorithm(parameters; kargs...)
 end
 
 function initialize!(
-        status,
-        parameters::MCCGA,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::MCCGA,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     if options.iterations == 0
         options.iterations = 100_000_000
@@ -114,25 +112,30 @@ function initialize!(
     if options.f_calls_limit == 0
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
-    
+
     lower = problem.search_space.lb
     upper = problem.search_space.ub
 
-    parameters.probvector = initialprobs(lower, upper, options.rng, maxsamples = parameters.maxsamples)
+    parameters.probvector = initialprobs(
+        lower,
+        upper,
+        options.rng,
+        maxsamples = parameters.maxsamples,
+    )
 
     # sample vectors to create an initial State
-    return gen_initial_state(problem,parameters,information,options,status)
+    return gen_initial_state(problem, parameters, information, options, status)
 end
 
 function update_state!(
-        status,
-        parameters::MCCGA,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::MCCGA,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     probvector = parameters.probvector
     chsize = length(probvector)
@@ -147,7 +150,7 @@ function update_state!(
 
     sol_winner = sol1
     winner = ch1
-    loser  = ch2
+    loser = ch2
 
     # check if ch2 (sol2) is better that ch1 (sol1)
     if is_better(sol2, sol1)
@@ -161,9 +164,9 @@ function update_state!(
     status.population[1 + status.iteration % parameters.N] = sol_winner
 
     # save best solution found so far
-    is_better(sol_winner, status.best_sol) &&  (status.best_sol = sol_winner)
+    is_better(sol_winner, status.best_sol) && (status.best_sol = sol_winner)
 
-    for i = 1:chsize
+    for i in 1:chsize
         if winner[i] != loser[i]
             if winner[i] == 1
                 probvector[i] += parameters.mutation
@@ -190,8 +193,9 @@ function final_stage!(
     )
 
     status.final_time = time()
-    !parameters.use_local_search &&  (return)
-    if status.stop && status.termination_status_code ∈ [EVALUATIONS_LIMIT, TIME_LIMIT, ACCURACY_LIMIT]
+    !parameters.use_local_search && (return)
+    if status.stop &&
+            status.termination_status_code ∈ [EVALUATIONS_LIMIT, TIME_LIMIT, ACCURACY_LIMIT]
         return
     end
 
@@ -223,7 +227,6 @@ function final_stage!(
     return
 end
 
-
 function stop_criteria!(status, parameters::MCCGA, problem, information, options)
     # check budget limitation
     if status.stop
@@ -232,7 +235,6 @@ function stop_criteria!(status, parameters::MCCGA, problem, information, options
 
     mutation = parameters.mutation
     status.stop = all(x -> (x <= mutation) || (x >= 1.0 - mutation), parameters.probvector)
-    
+
     status.stop && (status.termination_status_code = OTHER_LIMIT)
 end
-

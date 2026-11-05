@@ -37,7 +37,7 @@ stop reason: Small difference of objective function values.
 ```
 
 """
-function set_user_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution;kargs...)
+function set_user_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution; kargs...)
     status = algo.status
     if !isnothing(status.best_sol) && !isempty(status.population)
         push!(status.population, solution)
@@ -47,17 +47,25 @@ function set_user_solutions!(algo::AbstractAlgorithm, solution::AbstractSolution
     algo
 end
 
-
-function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, fx;kargs...)
+function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, fx; kargs...)
     set_user_solutions!(algo, create_child(x, fx); kargs...)
 end
 
-function set_user_solutions!(algo::AbstractAlgorithm, x::AbstractVector, f::Function;kargs...)
+function set_user_solutions!(
+    algo::AbstractAlgorithm,
+    x::AbstractVector,
+    f::Function;
+    kargs...,
+)
     set_user_solutions!(algo, x, f(x); kargs...)
 end
 
-
-function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::AbstractVector;verbose=true)
+function set_user_solutions!(
+    algo::AbstractAlgorithm,
+    X::AbstractMatrix,
+    fX::AbstractVector;
+    verbose = true,
+)
     n = size(X, 1)
     m = length(fX)
 
@@ -72,7 +80,7 @@ function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::Abs
 
     # TODO: this part can be parallelized
     for i in 1:n
-        set_user_solutions!(algo, X[i,:], fX[i])
+        set_user_solutions!(algo, X[i, :], fX[i])
     end
 
     # TODO check population size provided in algo.parameters.N
@@ -80,7 +88,11 @@ function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, fX::Abs
     algo
 end
 
-function set_user_solutions!(algo::AbstractAlgorithm, X::AbstractMatrix, f::Function;kargs...)
-    set_user_solutions!(algo, X, [f(X[i,:]) for i in 1:size(X,1)];kargs...)
+function set_user_solutions!(
+    algo::AbstractAlgorithm,
+    X::AbstractMatrix,
+    f::Function;
+    kargs...,
+)
+    set_user_solutions!(algo, X, [f(X[i, :]) for i in 1:size(X, 1)]; kargs...)
 end
-

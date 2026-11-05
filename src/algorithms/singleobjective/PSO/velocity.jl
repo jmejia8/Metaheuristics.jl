@@ -7,4 +7,3 @@ end
 function velocity(x, v, pbest, gbest, parameters, rng)
     PSO_velocity(x, v, pbest, gbest, parameters.C1, parameters.C2, parameters.ω, rng)
 end
-

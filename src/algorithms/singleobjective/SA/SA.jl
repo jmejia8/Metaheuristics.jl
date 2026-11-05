@@ -1,7 +1,6 @@
 # Based on MATLAB code of Héctor Corte
 # B.Sc. in physics 2010
 
-
 include("new_solution.jl")
 
 mutable struct SA <: AbstractParameters
@@ -61,18 +60,12 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], SA(N = 100, x_initial = [1, 0.5, -1]))
 
 
 """
-function SA(;
-        x_initial::Vector = zeros(0),
-        N::Int = 500,
-        tol_fun::Real= 1e-4,
-        kargs...
-    )
-    
+function SA(; x_initial::Vector = zeros(0), N::Int = 500, tol_fun::Real = 1.0e-4, kargs...)
+
     parameters = SA(N, x_initial, tol_fun, zeros(0), Inf)
 
-    Algorithm( parameters; kargs...)
+    Algorithm(parameters; kargs...)
 
-    
 end
 
 function initialize!(
@@ -82,9 +75,8 @@ function initialize!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-   )
-
+    kargs...,
+)
 
     l = problem.search_space.lb
     u = problem.search_space.ub
@@ -92,7 +84,7 @@ function initialize!(
 
     if isempty(parameters.x_initial)
         parameters.x_initial = l .+ (u .- l) .* rand(rng, length(u))
-	end
+    end
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000length(u)
@@ -102,10 +94,10 @@ function initialize!(
         options.iterations = options.f_calls_limit ÷ parameters.N
     end
 
-	# the current point and fx=f(x)
-	x = parameters.x_initial
+    # the current point and fx=f(x)
+    x = parameters.x_initial
     best_sol = create_solution(x, problem)
-	fx = best_sol.f
+    fx = best_sol.f
     status = State(best_sol, [best_sol])
     parameters.x = x
     parameters.fx = fx
@@ -115,7 +107,6 @@ function initialize!(
 
 end
 
-
 function update_state!(
     status::State{xf_indiv},
     parameters::SA,
@@ -123,8 +114,8 @@ function update_state!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
 
     nevals = status.f_calls
     max_evals = options.f_calls_limit
@@ -133,41 +124,40 @@ function update_state!(
     rng = options.rng
 
     # T is the inverse of temperature.
-    T = nevals / max_evals 
-    μ = 10.0 ^( 100T )    
+    T = nevals / max_evals
+    μ = 10.0^(100T)
 
     l = problem.search_space.lb
     u = problem.search_space.ub
 
     # For each temperature we take 500 test points to simulate reach termal
     # equilibrium.
-    for i = 1:N        
-        # We generate new test point using newSol function      
-        dx = newSol(2rand(rng, length(parameters.x)) .- 1.0 , μ) .* (u-l)
+    for i in 1:N
+        # We generate new test point using newSol function
+        dx = newSol(2rand(rng, length(parameters.x)) .- 1.0, μ) .* (u - l)
 
         # the test point and fx1=f(x1)
         x1 = parameters.x + dx
 
         # Next step is to keep solution within bounds
-        #x1 = (x1 .< l).*l+(l .<= x1).*(x1 .<= u).*x1+(u .< x1).*u			
+        #x1 = (x1 .< l).*l+(l .<= x1).*(x1 .<= u).*x1+(u .< x1).*u
         reset_to_violated_bounds!(x1, problem.search_space)
         fx1 = evaluate(x1, problem)
 
         status.f_calls += 1
 
-
-        df  = fx1 - parameters.fx
+        df = fx1 - parameters.fx
 
         # If the function variation,df, is <0 we take test point as current
         # point. And if df>0 we use Metropolis condition to accept or
         # reject the test point as current point.
-        if (df < 0 || rand(rng) < exp(-T*df/(abs(parameters.fx)) / TolFun))
+        if (df < 0 || rand(rng) < exp(-T * df / (abs(parameters.fx)) / TolFun))
             parameters.x = x1
-            parameters.fx= fx1
-        end        
+            parameters.fx = fx1
+        end
 
         # If the current point is better than current solution, we take
-        # current point as cuyrrent solution.       
+        # current point as cuyrrent solution.
         if fx1 < status.best_sol.f
             status.best_sol.x = x1
             status.best_sol.f = fx1
@@ -180,9 +170,7 @@ function update_state!(
         end
     end
 
-
 end
-
 
 function final_stage!(
     status::State,
@@ -191,9 +179,8 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
     status.final_time = time()
     status.population = [status.best_sol]
 end
-

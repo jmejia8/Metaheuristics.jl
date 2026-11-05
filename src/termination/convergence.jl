@@ -2,13 +2,11 @@ abstract type ConvergenceTermination <: AbstractTermination end
 
 include("moo_convergence.jl")
 
-
-
 function termination_status_message(criterion::ConvergenceTermination)
     "Due to Convergence Termination criterion."
 end
 
-function stop_check(status::State, criterion::ConvergenceTermination; report=true)
+function stop_check(status::State, criterion::ConvergenceTermination; report = true)
     population = status.population
     # nothing to do for empty populations
     isempty(population) && return false
@@ -20,9 +18,8 @@ function stop_check(status::State, criterion::ConvergenceTermination; report=tru
 
     stop = stop_check(population[feasible], criterion)
 
-    
     report && stop && (status.termination_status_code = criterion)
-    
+
     stop
 end
 
@@ -35,7 +32,6 @@ current population with the largest and smallest function values.
 Base.@kwdef struct RelativeFunctionConvergence <: ConvergenceTermination
     ftol::Float64 = eps()
 end
-
 
 function stop_check(population::AbstractVector, criterion::RelativeFunctionConvergence)
 
@@ -50,7 +46,7 @@ Termination requires a small standard deviation of the function values of
 the population.
 """
 Base.@kwdef struct SmallStandardDeviation <: ConvergenceTermination
-    ftol::Float64 = 1e-6
+    ftol::Float64 = 1.0e-6
 end
 
 function stop_check(population::AbstractVector, criterion::SmallStandardDeviation)
@@ -80,18 +76,18 @@ Termination requires a small relative parameter difference between the
 vertices with the largest and smallest function values.
 """
 Base.@kwdef struct RelativeParameterConvergence <: ConvergenceTermination
-    xtol::Float64 = 1e-8
+    xtol::Float64 = 1.0e-8
 end
 
 function stop_check(population::AbstractVector, criterion::RelativeParameterConvergence)
-    
+
     fx = fvals(population)
     xhi = population[argmax(fx)] |> get_position
     xlo = population[argmin(fx)] |> get_position
     # check for numerical representation
     if eltype(xhi) <: Number
         a = max(abs.(xlo), abs.(xhi))
-        return maximum(abs.(xhi -xlo))/max(maximum(a), eps()) <= criterion.xtol
+        return maximum(abs.(xhi - xlo)) / max(maximum(a), eps()) <= criterion.xtol
     end
     xhi == xlo
 end
@@ -101,16 +97,16 @@ struct CheckConvergence <: ConvergenceTermination
 end
 
 function CheckConvergence(;
-        f_tol_rel = eps(),
-        f_tol_abs = 0.0,
-        x_tol = 1e-8,
-        criteria = [
-                    AbsoluteFunctionConvergence(f_tol_abs),
-                    RelativeFunctionConvergence(f_tol_rel),
-                    SmallStandardDeviation(),
-                    RelativeParameterConvergence(x_tol),
-                   ]
-    )
+    f_tol_rel = eps(),
+    f_tol_abs = 0.0,
+    x_tol = 1.0e-8,
+    criteria = [
+        AbsoluteFunctionConvergence(f_tol_abs),
+        RelativeFunctionConvergence(f_tol_rel),
+        SmallStandardDeviation(),
+        RelativeParameterConvergence(x_tol),
+    ],
+)
     CheckConvergence(criteria)
 end
 

@@ -1,4 +1,3 @@
-
 """
 	igd(front, true_pareto_front; p = 1)
 
@@ -13,8 +12,12 @@ Returns the Inverted Generational Distance.
 - `Array{xFgh_indiv}` (usually `State.population`)
 
 """
-igd(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, inverted=true, p=p)
-
+igd(front, true_pareto_front; p = 1) = generational_distance(
+    front,
+    true_pareto_front,
+    inverted = true,
+    p = p,
+)
 
 """
 	igd_plus(front, true_pareto_front; p = 1)
@@ -30,5 +33,10 @@ Returns the Inverted Generational Distance Plus.
 - `Array{xFgh_indiv}` (usually `State.population`)
 
 """
-igd_plus(front, true_pareto_front; p = 1) = generational_distance(front, true_pareto_front, inverted=true, p=p, plus=true)
-
+igd_plus(front, true_pareto_front; p = 1) = generational_distance(
+    front,
+    true_pareto_front,
+    inverted = true,
+    p = p,
+    plus = true,
+)

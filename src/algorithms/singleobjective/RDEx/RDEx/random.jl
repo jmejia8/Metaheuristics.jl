@@ -20,6 +20,4 @@ struct RNGState
     rng::MersenneTwister
 end
 
-
 end # module RandomUtils
-

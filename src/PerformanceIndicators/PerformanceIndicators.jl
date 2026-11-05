@@ -1,4 +1,3 @@
-
 """
 	PerformanceIndicators
 
@@ -75,7 +74,4 @@ include("hypervolume.jl")
 include("deltap.jl")
 include("epsilon_indicator.jl")
 
-
-
 end
-

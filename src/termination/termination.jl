@@ -23,5 +23,3 @@ function stop_check(status, termination::Termination)
     # check if any other does
     any(stop_check(status, c) for c in termination.checkany)
 end
-
-

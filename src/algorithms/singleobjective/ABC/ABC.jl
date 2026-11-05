@@ -49,36 +49,28 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], ABC(N = 80,  No = 20, Ne = 50, limit=5))
 ```
 
 """
-function ABC(;
-        N = 50,
-        Ne = div(N+1, 2),
-        No = div(N+1, 2),
-        limit=10,
-        kargs...
-    )
-    
+function ABC(; N = 50, Ne = div(N + 1, 2), No = div(N + 1, 2), limit = 10, kargs...)
+
     parameters = ABC(N, Ne, No, limit)
 
-    Algorithm(
-        parameters;
-        kargs...
-    )
+    Algorithm(parameters; kargs...)
 
-    
 end
 
 function initialize!(
-        status,
-        parameters::ABC,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::ABC,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     options.parallel_evaluation &&
-        error("ABC is not supporting parallel evaluation. Put `options.parallel_evaluation=false`")
+        error(
+            "ABC is not supporting parallel evaluation. Put `options.parallel_evaluation=false`",
+        )
 
     D = getdim(problem)
 
@@ -88,8 +80,7 @@ function initialize!(
         options.debug && @info "Increasing f calls limit to $(options.f_calls_limit)"
     end
 
-
-    _st = gen_initial_state(problem,parameters,information,options,status)
+    _st = gen_initial_state(problem, parameters, information, options, status)
     bees = [Bee(sol) for sol in _st.population]
 
     nevals = length(bees)
@@ -120,10 +111,10 @@ function update_state!(
     a = bounds.lb
     b = bounds.ub
 
-    employedPhase!(bees,problem,  Ne, options.rng)
-    outlookerPhase!(bees,problem, No, options.rng)
+    employedPhase!(bees, problem, Ne, options.rng)
+    outlookerPhase!(bees, problem, No, options.rng)
 
-    @inline genPos(D=D, a=a, b=b) = a + (b - a) .* rand(options.rng, D)
+    @inline genPos(D = D, a = a, b = b) = a + (b - a) .* rand(options.rng, D)
     best = chooseBest(bees, status.best_sol)
 
     status.f_calls += Ne + No + scoutPhase!(bees, problem, genPos, parameters.limit)
@@ -131,7 +122,6 @@ function update_state!(
     stop_criteria!(status, parameters, problem, information, options)
 
 end
-
 
 function final_stage!(
         status,#::State{Bee{xf_indiv}},
@@ -150,8 +140,8 @@ end
 is_better_abc(bee1, bee2) = is_better(bee1.sol, bee2.sol)
 
 function accuracy_stop_check(status::State{Bee}, information, options)
-    cond =  !isnan(information.f_optimum) && abs(fval(status.best_sol) - information.f_optimum) < options.f_tol
+    cond = !isnan(information.f_optimum) &&
+        abs(fval(status.best_sol) - information.f_optimum) < options.f_tol
     cond && (status.termination_status_code = ACCURACY_LIMIT)
     cond
 end
-

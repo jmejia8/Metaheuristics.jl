@@ -130,72 +130,66 @@ stop reason: Maximum number of iterations exceeded.
 ```
 """
 function GA(;
-        N = 100,
-        p_mutation  = 1e-5,
-        p_crossover = 0.5,
-        initializer = RandomInBounds(;N),
-        selection   = TournamentSelection(;N),
-        crossover   = UniformCrossover(p = p_crossover),
-        mutation    = BitFlipMutation(p = p_mutation),
-        environmental_selection = ElitistReplacement(),
-        kargs...
-    )
+    N = 100,
+    p_mutation = 1.0e-5,
+    p_crossover = 0.5,
+    initializer = RandomInBounds(; N),
+    selection = TournamentSelection(; N),
+    crossover = UniformCrossover(p = p_crossover),
+    mutation = BitFlipMutation(p = p_mutation),
+    environmental_selection = ElitistReplacement(),
+    kargs...,
+)
 
-    parameters = GA(initializer,
-                    selection,
-                    crossover,
-                    mutation,
-                    environmental_selection
-                   )
+    parameters = GA(initializer, selection, crossover, mutation, environmental_selection)
 
-    Algorithm( parameters; kargs...)
+    Algorithm(parameters; kargs...)
 end
 
 # this method is called in src/optimize.jl
 function get_parameters(
-        f,
-        search_space::BoxConstrainedSpace, # real/integer encoding
-        ::Type{T}
-    ) where T <: GA 
-    
+    f,
+    search_space::BoxConstrainedSpace, # real/integer encoding
+    ::Type{T},
+) where {T <: GA}
+
     N = 100
     GA(;
         N = N,
-        initializer = RandomInBounds(;N),
-        selection   = TournamentSelection(;N),
-        crossover   = SBX(;bounds=search_space),
-        mutation    = PolynomialMutation(;bounds=search_space),
-        environmental_selection = ElitistReplacement()
-      )
+        initializer = RandomInBounds(; N),
+        selection = TournamentSelection(; N),
+        crossover = SBX(; bounds = search_space),
+        mutation = PolynomialMutation(; bounds = search_space),
+        environmental_selection = ElitistReplacement(),
+    )
 end
 
-
 function get_parameters(
-        f,
-        search_space::PermutationSpace, # permutation-based encoding
-        ::Type{T}
-    ) where T <: GA
+    f,
+    search_space::PermutationSpace, # permutation-based encoding
+    ::Type{T},
+) where {T <: GA}
 
     N = 100
     GA(;
-       N = N,
-       initializer = RandomPermutation(;N),
-       selection   = TournamentSelection(;N),
-       crossover   = OrderCrossover(),
-       mutation    = SlightMutation(),
-       environmental_selection = ElitistReplacement()
+        N = N,
+        initializer = RandomPermutation(; N),
+        selection = TournamentSelection(; N),
+        crossover = OrderCrossover(),
+        mutation = SlightMutation(),
+        environmental_selection = ElitistReplacement(),
     )
 end
 
 function initialize!(
-        status,
-        parameters::AbstractGA,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::AbstractGA,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     @assert parameters.initializer.N > 0
 
@@ -206,21 +200,27 @@ function initialize!(
     if options.f_calls_limit == 0
         options.f_calls_limit = 2options.iterations * parameters.initializer.N
     end
-    
 
-    initialize!(status,parameters.initializer,problem,information,options,args...;kargs...)
-end
-
-
-function update_state!(
+    initialize!(
         status,
-        parameters::AbstractGA,
+        parameters.initializer,
         problem,
         information,
         options,
         args...;
-        kargs...
+        kargs...,
     )
+end
+
+function update_state!(
+    status,
+    parameters::AbstractGA,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     population = status.population
 
@@ -239,34 +239,31 @@ function update_state!(
         # save elite solution
         status.best_sol = cb
     end
-    
+
 end
 
-
-
 function final_stage!(
-        status,
-        parameters::AbstractGA,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::AbstractGA,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
     status.final_time = time()
     return
 end
 
 function stop_criteria!(
-        status,
-        parameters::AbstractGA,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::AbstractGA,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     return
 end
-

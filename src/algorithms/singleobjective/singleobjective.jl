@@ -24,10 +24,8 @@ include("CGSA/CGSA.jl")
 # Simulated Annealing. _Science, 220_, 671-680.
 include("SA/SA.jl")
 
-
 # Aritifical Bee colony
 include("ABC/ABC.jl")
-
 
 # genetic algorithm
 include("MCCGA/MCCGA.jl")

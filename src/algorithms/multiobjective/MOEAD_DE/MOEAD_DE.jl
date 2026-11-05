@@ -94,28 +94,26 @@ display(status_moead)
 ```
 
 """
-function MOEAD_DE(weights ;
+function MOEAD_DE(
+    weights;
     F = 0.5,
     CR = 1.0,
     λ = Array{Vector{Float64}}[],
     η = 20,
     p_m = -1.0,
-    T = round(Int, 0.2*length(weights)),
+    T = round(Int, 0.2 * length(weights)),
     δ = 0.9,
-    n_r = round(Int, 0.02*length(weights)),
+    n_r = round(Int, 0.02 * length(weights)),
     z::Vector{Float64} = zeros(0),
     B = Array{Int}[],
     s1 = 0.01,
     s2 = 20.0,
-    kargs...
+    kargs...,
 )
-
 
     if isempty(weights)
         error("Provide weights points")
     end
-
-
 
     nobjectives = length(weights[1])
     N = length(weights)
@@ -124,13 +122,27 @@ function MOEAD_DE(weights ;
         z = fill(Inf, nobjectives)
     end
 
-
-    parameters = MOEAD_DE(nobjectives, N, F, CR, weights, η, p_m, T, δ, n_r, z, B, s1, s2, 0.0)
-
+    parameters = MOEAD_DE(
+        nobjectives,
+        N,
+        F,
+        CR,
+        weights,
+        η,
+        p_m,
+        T,
+        δ,
+        n_r,
+        z,
+        B,
+        s1,
+        s2,
+        0.0,
+    )
 
     initialize_closest_weight_vectors!(parameters)
 
-    Algorithm(parameters;kargs...)
+    Algorithm(parameters; kargs...)
 
 end
 
@@ -141,10 +153,8 @@ function initialize!(
     information::Information,
     options::Options,
     args...;
-    kargs...
+    kargs...,
 )
-
-
 
     if options.iterations == 0
         options.iterations = 500
@@ -154,19 +164,15 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-
-
-    status = gen_initial_state(problem,parameters,information,options,status)
+    status = gen_initial_state(problem, parameters, information, options, status)
     D = getdim(problem)
     parameters.nobjectives = length(status.population[1].f)
     parameters.p_m = parameters.p_m < 0.0 ? 1.0 / D : parameters.p_m
-
 
     update_reference_point!(parameters.z, status.population)
     return status
 
 end
-
 
 function update_state!(
     status::State,
@@ -175,17 +181,13 @@ function update_state!(
     information::Information,
     options::Options,
     args...;
-    kargs...
+    kargs...,
 )
-
-
-
 
     F = parameters.F
     CR = parameters.CR
 
     D = getdim(problem)
-
 
     N = parameters.N
 
@@ -207,10 +209,9 @@ function update_state!(
         # update z
         update_reference_point!(parameters.z, h)
 
-
         Vmin = minimum(sum_violations.(population[P_idx]))
         Vmax = maximum(sum_violations.(population[P_idx]))
-        parameters.τ = Vmin + 0.3*(Vmax - Vmin)
+        parameters.τ = Vmin + 0.3 * (Vmax - Vmin)
 
         # update solutions
         c = 0
@@ -234,7 +235,6 @@ function update_state!(
     end
 
 end
-
 
 """
     MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds) 
@@ -275,10 +275,9 @@ function MOEAD_DE_reproduction(a, b, c, F, CR, p_m, η, bounds::BoxConstrainedSp
     v
 end
 
-
 function MOEAD_DE_reproduction(i, P_idx, population, parameters::MOEAD_DE, problem)
     # select participats
-    r1 = i 
+    r1 = i
     r2 = rand(P_idx)
     while r1 == r2
         r2 = rand(P_idx)
@@ -289,21 +288,24 @@ function MOEAD_DE_reproduction(i, P_idx, population, parameters::MOEAD_DE, probl
         r3 = rand(P_idx)
     end
 
-
-    a = get_position(population[r1])# population[r1].x
-    b = get_position(population[r2])# population[r2].x
-    c = get_position(population[r3])# population[r3].x
+    a = get_position(population[r1]) # population[r1].x
+    b = get_position(population[r2]) # population[r2].x
+    c = get_position(population[r3]) # population[r3].x
 
     # see /common/mutation.jl
-    MOEAD_DE_reproduction(a, b, c,
-                          parameters.F,
-                          parameters.CR,
-                          parameters.p_m,
-                          parameters.η,
-                          problem.search_space)
+    MOEAD_DE_reproduction(
+        a,
+        b,
+        c,
+        parameters.F,
+        parameters.CR,
+        parameters.p_m,
+        parameters.η,
+        problem.search_space,
+    )
 end
 
-g_te_ap(gx, V, τ, s1, s2) = V < τ ? gx + s1*V^2 : gx + s1*τ^2 + s2*(V - τ)
+g_te_ap(gx, V, τ, s1, s2) = V < τ ? gx + s1 * V^2 : gx + s1 * τ^2 + s2 * (V - τ)
 
 function is_better_constrained_MOEAD_DE(g1, g2, sol1, sol2, parameters)
     CV1 = sum_violations(sol1)
@@ -323,7 +325,6 @@ function is_better_constrained_MOEAD_DE(g1, g2, sol1, sol2, parameters)
     return g_te_ap(g1, CV1, τ, s1, s2) <= g_te_ap(g2, CV2, τ, s1, s2)
 end
 
-
 function final_stage!(
     status::State,
     parameters::MOEAD_DE,
@@ -331,8 +332,8 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
 
     status.final_time = time()
 end

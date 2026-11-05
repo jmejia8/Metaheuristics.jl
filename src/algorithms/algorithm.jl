@@ -7,13 +7,13 @@ mutable struct Algorithm{T} <: AbstractAlgorithm
 end
 
 function Algorithm(
-        parameters;
-        initial_state::State = State(nothing, []),
-        information::Information = Information(),
-        options::Options = Options(),
-        termination = Termination(),
-        kargs...
-    )
+    parameters;
+    initial_state::State = State(nothing, []),
+    information::Information = Information(),
+    options::Options = Options(),
+    termination = Termination(),
+    kargs...,
+)
     if !isempty(kargs)
         _pp = collect(kargs)
         p = string.(first.(_pp)) .* " = " .* string.(last.(_pp))
@@ -24,7 +24,6 @@ function Algorithm(
     if !(termination isa Termination)
         termination = Termination(checkany = [termination])
     end
-    
 
     Algorithm(parameters, initial_state, information, options, termination)
 
@@ -32,8 +31,8 @@ end
 
 function _print_title(io, title)
     decor = join(repeat('=', length(title)))
-    printstyled(io, title, "\n", color=:blue, bold=true)
-    printstyled(io, decor, "\n", color=:gray)
+    printstyled(io, title, "\n", color = :blue, bold = true)
+    printstyled(io, decor, "\n", color = :gray)
 end
 
 function Base.show(io::IO, alg::Algorithm)
@@ -64,11 +63,9 @@ function get_result(algorithm::AbstractAlgorithm)
     if isnothing(algorithm.status.best_sol)
         error("First optimize a function: `optimize!(f, bounds, method)`")
     end
-    
+
     algorithm.status
 end
-
-
 
 iscompatible(search_space, algorithm) = false
 iscompatible(search_space::BoxConstrainedSpace, algorithm::AbstractParameters) = true
@@ -78,9 +75,10 @@ function check_compat(search_space, algorithm::AbstractParameters)
     if iscompatible(search_space, algorithm)
         return
     end
-    
+
     a = typeof(algorithm)
     s = typeof(search_space)
-    error("Implemented metaheuristic `$a` is not compatible with search space `$s`. Try using bounds.")
+    error(
+        "Implemented metaheuristic `$a` is not compatible with search space `$s`. Try using bounds.",
+    )
 end
-

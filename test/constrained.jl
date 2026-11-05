@@ -10,7 +10,7 @@ using Test
     function run_methods_cop(problem)
         desired_accuracy = 1.0e-4
 
-        ff, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
+        ff, bounds, _ = Metaheuristics.TestProblems.get_problem(problem)
 
         # number of function evaluations
         f_calls = 0

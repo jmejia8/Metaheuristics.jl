@@ -13,7 +13,6 @@ end
     function run_methods(problem)
 
         ff, bounds, pf = Metaheuristics.TestProblems.get_problem(problem)
-        D = size(bounds, 2)
 
         # number of function evaluations
         f_calls = 0
@@ -65,8 +64,7 @@ end
     end
 
     function run_methods_parallel_eval(problem)
-        ff, bounds, pf = Metaheuristics.TestProblems.get_problem(problem)
-        D = size(bounds, 2)
+        ff, bounds, _ = Metaheuristics.TestProblems.get_problem(problem)
 
         # number of function evaluations
         f_calls = 0
@@ -124,8 +122,6 @@ end
             f_calls += 1
             ff(x)
         end
-
-        options = Options(seed = 1, iterations = 10000, f_calls_limit = 25000)
 
         methods = [CCMO(NSGA2(N = 50, p_cr = 0.9, p_m = 1 / D))]
 

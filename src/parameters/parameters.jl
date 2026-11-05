@@ -7,15 +7,14 @@ function set_user_parameters!(algo::AbstractAlgorithm; kargs...)
         # set algorithm parameters
         if ismutable(parameters) && hasfield(T, field)
             setproperty!(parameters, field, value)
-        # set optional parameters
+            # set optional parameters
         elseif ismutable(options) && hasfield(Options, field)
             setproperty!(options, field, value)
-        # TODO elseif ismutable(information) && hasfield(Information, field)
-        # TODO     setproperty!(information, field, value)
+            # TODO elseif ismutable(information) && hasfield(Information, field)
+            # TODO     setproperty!(information, field, value)
         else
             @warn "Parameter `$field = $value` never used."
         end
     end
     algo
 end
-

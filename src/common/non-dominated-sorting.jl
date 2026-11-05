@@ -6,17 +6,19 @@ Return a vector of integers `r` containing in `r[i]` the rank for `population[i]
 function non_dominated_sort(pop)
     n = length(pop)
 
-    dom_list = [ Int[] for i in 1:n ]
+    dom_list = [Int[] for i in 1:n]
     rank = zeros(Int, n)
     dom_count = zeros(Int, n)
 
     for i in 1:n
-        for j in i+1:n
+        for j in i + 1:n
             comparison = compare(pop[i], pop[j])
-            if comparison == 1 #is_better(pop[i], pop[j])
+            if comparison == 1
+                #is_better(pop[i], pop[j])
                 push!(dom_list[i], j)
                 dom_count[j] += 1
-            elseif comparison == 2 #is_better(pop[j], pop[i])
+            elseif comparison == 2
+                #is_better(pop[j], pop[i])
                 push!(dom_list[j], i)
                 dom_count[i] += 1
             end
@@ -27,9 +29,10 @@ function non_dominated_sort(pop)
     end
 
     k = UInt16(2)
-    while any(==(k-one(UInt16)), (rank[p] for p in 1:n)) #ugly workaround for #15276
+    while any(==(k - one(UInt16)), (rank[p] for p in 1:n))
+        #ugly workaround for #15276
         for p in 1:n
-            if rank[p] == k-one(UInt16)
+            if rank[p] == k - one(UInt16)
                 for q in dom_list[p]
                     dom_count[q] -= one(UInt16)
                     if dom_count[q] == zero(UInt16)
@@ -66,7 +69,6 @@ function get_fronts(population, computed_ranks = true)
     return fronts
 end
 
-
 """
     fast_non_dominated_sort!(population)
 
@@ -84,7 +86,6 @@ function fast_non_dominated_sort!(pop)
     pop
 end
 
-
 """
     get_non_dominated_solutions_perm(population)
 
@@ -100,10 +101,12 @@ function get_non_dominated_solutions_perm(population)
         while j <= length(ids)
             jj = ids[j]
             relation = compare(population[i], population[jj])
- 
-            if relation == 2 # j dominates i
+
+            if relation == 2
+                # j dominates i
                 break
-            elseif relation == 1 # i dominates j
+            elseif relation == 1
+                # i dominates j
                 deleteat!(ids, j)
                 continue
             end
@@ -114,12 +117,11 @@ function get_non_dominated_solutions_perm(population)
         if j > length(ids)
             push!(ids, i)
         end
-        
+
     end
 
     return ids
 end
-
 
 """
     get_non_dominated_solutions(population)

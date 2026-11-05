@@ -1,12 +1,12 @@
 function update_state!(
-        status::State{xfgh_indiv},
-        parameters::ECA,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status::State{xfgh_indiv},
+    parameters::ECA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     I = randperm(options.rng, parameters.N)
     N = parameters.N
@@ -16,16 +16,16 @@ function update_state!(
 
     if parameters.ε > 0.0
         p = status.f_calls / options.f_calls_limit
-        ε = parameters.ε * (1-p)^4
+        ε = parameters.ε * (1 - p)^4
     end
 
-    feasible_solutions = findall( s->s.is_feasible, population )
+    feasible_solutions = findall(s -> s.is_feasible, population)
     weights = compute_weights(population)
 
     X_next = zeros(parameters.N, getdim(problem))
 
     # For each elements in Population
-    for i = 1:parameters.N
+    for i in 1:parameters.N
         # current
         x = population[i].x
 
@@ -48,15 +48,15 @@ function update_state!(
 
         # current-to-center/bin
         y = x .+ η .* (c .- u)
-        
+
         mask = rand(options.rng, length(y)) .< 1.0 / length(y)
         y[mask] = v[mask]
 
         evo_boundary_repairer!(y, c, problem.search_space, options.rng)
-        X_next[i,:] = y
+        X_next[i, :] = y
     end
 
-    for sol in create_solutions(X_next, problem, ε=ε)
+    for sol in create_solutions(X_next, problem, ε = ε)
         if is_better(sol, status.best_sol)
             status.best_sol = sol
         end
@@ -65,36 +65,35 @@ function update_state!(
         status.stop = stop_check(status, information, options)
         status.stop && break
     end
-    
+
     if length(status.population) == N
         # no resize population
         return
     end
 
     # replacement step
-    sort!(status.population, lt = is_better, alg=QuickSort)
-    deleteat!(status.population, N+1:length(status.population))
+    sort!(status.population, lt = is_better, alg = QuickSort)
+    deleteat!(status.population, N + 1:length(status.population))
 end
 
 function compute_weights(population)
     fs = fvals(population)
-    fx_max = maximum( abs.(fs) )
+    fx_max = maximum(abs.(fs))
     vios = map(sum_violations, population)
-    fs += 2.0*fx_max*vios
-    γ = maximum( abs.(fs) )
+    fs += 2.0 * fx_max * vios
+    γ = maximum(abs.(fs))
     2.0γ .- fs
 end
 
 function final_stage!(
-        status::State{xfgh_indiv},
-        parameters::ECA,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status::State{xfgh_indiv},
+    parameters::ECA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
     status.final_time = time()
 
 end
-

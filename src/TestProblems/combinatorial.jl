@@ -1,11 +1,11 @@
-import ..PermutationSpace,  ..BitArraySpace
+import ..PermutationSpace, ..BitArraySpace
 
 """
     knapsack(profit, weight, capacity; encoding=:permutation)
 
 Return the Knapsack problem regarding the provided parameters. 
 """
-function knapsack(profit, weight, capacity; encoding=:permutation)
+function knapsack(profit, weight, capacity; encoding = :permutation)
     function _f(items)
         p = w = 0.0
         for item in items

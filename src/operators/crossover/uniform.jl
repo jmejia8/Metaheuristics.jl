@@ -8,13 +8,13 @@ struct UniformCrossover
     rng
 end
 
-UniformCrossover(;p=0.5, rng = default_rng_mh()) = UniformCrossover(p, rng)
+UniformCrossover(; p = 0.5, rng = default_rng_mh()) = UniformCrossover(p, rng)
 
 function crossover(population, parameters::UniformCrossover)
     n = length(population) ÷ 2
     rng = parameters.rng
     offspring_A = positions(population[1:n])
-    offspring_B = positions(population[n+1:2n])
+    offspring_B = positions(population[n + 1:2n])
     mask = rand(rng, size(offspring_A)...) .<= parameters.p
     # swapping genes
     tmp = copy(offspring_A[mask])
@@ -22,7 +22,6 @@ function crossover(population, parameters::UniformCrossover)
     offspring_B[mask] = tmp
     [offspring_A; offspring_B]
 end
-
 
 """
     DE_crossover(x, u, CR)
@@ -37,7 +36,7 @@ function DE_crossover(x, u, CR)
     j_rand = rand(1:D)
 
     # binomial crossover
-    for j = 1:D
+    for j in 1:D
         if rand() < CR || j == j_rand
             v[j] = u[j]
         else
@@ -47,4 +46,3 @@ function DE_crossover(x, u, CR)
 
     return v
 end
-

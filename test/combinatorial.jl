@@ -188,7 +188,6 @@ end
             α = 0.95,
         )
         local_search = Metaheuristics.BestImproveSearch()
-        neighborhood = Metaheuristics.TwoOptNeighborhood()
         grasp = GRASP(; constructor, local_search)
 
         # optimize and display results

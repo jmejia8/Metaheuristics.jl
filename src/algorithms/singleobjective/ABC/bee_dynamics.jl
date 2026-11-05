@@ -4,11 +4,9 @@ mutable struct Bee{T}
     t::Int
 end
 
-
 Bees = Array{Bee, 1}
 
 Bee(solution) = Bee(solution, fit(solution.f), 0)
-
 
 """
     get_position(bee)
@@ -25,7 +23,6 @@ Get the fitness of a bee when optimize using ABC algorithm.
 fval(bee::Bee) = bee.sol.f
 fvals(bees::Vector{<:Bee}) = fval.(bees)
 is_feasible(bee::Bee) = is_feasible(bee.sol)
-
 
 minimum(st::State{Bee{xf_indiv}}) = st.best_sol.sol.f
 minimum(st::State{Bee{xfgh_indiv}}) = st.best_sol.sol.f
@@ -44,9 +41,9 @@ end
 
 function fit(fx)
     if fx >= 0.0
-        return 1.0/(1.0+fx)
+        return 1.0 / (1.0 + fx)
     end
-    
+
     1.0 + abs(fx)
 end
 
@@ -54,14 +51,15 @@ function updateBee!(bee, bee2, problem, rng)
     D = length(bee.sol.x)
     ϕ = -1.0 + 2.0rand(rng)
 
-    v = ϕ*(bee.sol.x - bee2.sol.x)
+    v = ϕ * (bee.sol.x - bee2.sol.x)
 
     x_new = bee.sol.x + v
     replace_with_random_in_bounds!(x_new, problem.search_space, rng)
 
     new_sol = create_solution(x_new, problem)
 
-    if is_better(new_sol, bee.sol) #fx < bee.sol.f
+    if is_better(new_sol, bee.sol)
+        #fx < bee.sol.f
         bee.sol = new_sol
         bee.fit = fit(new_sol.f)
         bee.t = 0
@@ -85,7 +83,6 @@ function employedPhase!(bees, problem, Ne, rng)
     end
 end
 
-
 function roulettSelect(bees, sum_f)
     r = rand()
     rs = 0.0
@@ -101,16 +98,16 @@ end
 
 function outlookerPhase!(bees, problem, No::Int, rng)
     N = length(bees)
-    sum_f = sum(map(x->x.fit, bees))
+    sum_f = sum(map(x -> x.fit, bees))
 
-    for i=1:No
+    for i in 1:No
         j = roulettSelect(bees, sum_f)
         updateBee!(bees[j], bees[getK(j, N, rng)], problem, rng)
     end
 end
 
 function scoutPhase!(bees, problem, genPos::Function, limit::Int)
-    bees_scout = filter(x->x.t >= limit, bees)
+    bees_scout = filter(x -> x.t >= limit, bees)
     for i in 1:length(bees_scout)
         bees_scout[i].sol = create_solution(genPos(), problem)
         bees_scout[i].t = 0
@@ -126,12 +123,12 @@ function getBestBee(bees)
             best = bee
         end
     end
- 
+
     return best
 end
 
 function chooseBest(bees, best)
-    bee_cand = getBestBee(bees) 
+    bee_cand = getBestBee(bees)
     if bee_cand.sol.f < best.sol.f
         return deepcopy(bee_cand)
     end

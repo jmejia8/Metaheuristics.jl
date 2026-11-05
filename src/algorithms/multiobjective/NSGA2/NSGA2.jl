@@ -64,21 +64,12 @@ display(status)
 ```
 
 """
-function NSGA2(;
-    N = 100,
-    η_cr = 20,
-    p_cr = 0.9,
-    η_m = 20,
-    p_m = -1,
-    kargs...
-)
+function NSGA2(; N = 100, η_cr = 20, p_cr = 0.9, η_m = 20, p_m = -1, kargs...)
 
-    parameters = NSGA2(N, promote( Float64(η_cr), p_cr, η_m, p_m )...)
-    Algorithm( parameters; kargs...)
+    parameters = NSGA2(N, promote(Float64(η_cr), p_cr, η_m, p_m)...)
+    Algorithm(parameters; kargs...)
 
 end
-
-
 
 function update_state!(
     status::State,
@@ -87,9 +78,8 @@ function update_state!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
-
+    kargs...,
+)
 
     Q = reproduction(status, parameters, problem, options)
 
@@ -99,7 +89,6 @@ function update_state!(
     environmental_selection!(status.population, parameters)
 
 end
-
 
 """
     GA_reproduction(pa::AbstractVector{T},
@@ -113,16 +102,16 @@ end
 Crate two solutions by applying SBX to parents pa and pb and polynomial mutation to
 offspring. Return two vectors.
 """
-function GA_reproduction(pa::AbstractVector{T},
-        pb::AbstractVector{T},
-        bounds::BoxConstrainedSpace;
-        η_cr = 20,
-        η_m  = 15,
-        p_cr = 0.9,
-        p_m  = 0.1,
-        rng  = default_rng_mh()
-    ) where T <: AbstractFloat
-
+function GA_reproduction(
+    pa::AbstractVector{T},
+    pb::AbstractVector{T},
+    bounds::BoxConstrainedSpace;
+    η_cr = 20,
+    η_m = 15,
+    p_cr = 0.9,
+    p_m = 0.1,
+    rng = default_rng_mh(),
+) where {T <: AbstractFloat}
 
     # crossover
     c1, c2 = SBX_crossover(pa, pb, bounds, η_cr, p_cr, rng)
@@ -138,7 +127,6 @@ function GA_reproduction(pa::AbstractVector{T},
     return c1, c2
 end
 
-
 """
     GA_reproduction_half(pa::AbstractVector{T},
                     pb::AbstractVector{T},
@@ -150,16 +138,16 @@ end
 
 Same that `GA_reproduction` but only returns one offspring.
 """
-function GA_reproduction_half(pa::AbstractVector{T},
-        pb::AbstractVector{T},
-        bounds::BoxConstrainedSpace;
-        η_cr = 20,
-        η_m  = 15,
-        p_cr = 0.9,
-        p_m  = 0.1,
-        rng  = default_rng_mh()
-    ) where T <: AbstractFloat
-
+function GA_reproduction_half(
+    pa::AbstractVector{T},
+    pb::AbstractVector{T},
+    bounds::BoxConstrainedSpace;
+    η_cr = 20,
+    η_m = 15,
+    p_cr = 0.9,
+    p_m = 0.1,
+    rng = default_rng_mh(),
+) where {T <: AbstractFloat}
 
     # crossover
     _, c = SBX_crossover(pa, pb, bounds, η_cr, p_cr, rng)
@@ -173,30 +161,33 @@ function GA_reproduction_half(pa::AbstractVector{T},
     return c
 end
 
-function GA_reproduction_half(pa::AbstractVector{T},
-        pb::AbstractVector{T},
-        bounds::AbstractMatrix;
-        kargs...
-    ) where T <: AbstractFloat
+function GA_reproduction_half(
+    pa::AbstractVector{T},
+    pb::AbstractVector{T},
+    bounds::AbstractMatrix;
+    kargs...,
+) where {T <: AbstractFloat}
 
-    b = BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:])
+    b = BoxConstrainedSpace(lb = bounds[1, :], ub = bounds[2, :])
     GA_reproduction_half(pa, pb, b; kargs...)
 
 end
 
 function reproduction(pa, pb, parameters::AbstractNSGA, problem, options)
     # crossover and mutation
-    c1, c2 = GA_reproduction(get_position(pa),
-                             get_position(pb),
-                             problem.search_space;
-                             η_cr = parameters.η_cr,
-                             p_cr = parameters.p_cr,
-                             η_m = parameters.η_m,
-                             p_m = parameters.p_m,
-                             rng = options.rng)
+    c1, c2 = GA_reproduction(
+        get_position(pa),
+        get_position(pb),
+        problem.search_space;
+        η_cr = parameters.η_cr,
+        p_cr = parameters.p_cr,
+        η_m = parameters.η_m,
+        p_m = parameters.p_m,
+        rng = options.rng,
+    )
 
     # evaluate offspring
-    create_solution(c1, problem), create_solution(c2, problem) 
+    create_solution(c1, problem), create_solution(c2, problem)
 end
 
 function environmental_selection!(population, parameters::AbstractNSGA)
@@ -210,7 +201,7 @@ function initialize!(
     information::Information,
     options::Options,
     args...;
-    kargs...
+    kargs...,
 )
     D = getdim(problem)
 
@@ -226,7 +217,7 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-    status = gen_initial_state(problem,parameters,information,options,status)
+    status = gen_initial_state(problem, parameters, information, options, status)
 
     status
 
@@ -239,25 +230,25 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
     status.final_time = time()
 
 end
 
-
-function tournament_selection(P, options, a=-1)
+function tournament_selection(P, options, a = -1)
     (a < 0) && (a = rand(options.rng, 1:length(P)))
     # chose two different solutions at random
     b = rand(options.rng, 1:length(P))
-    while a == b 
+    while a == b
         b = rand(options.rng, 1:length(P))
     end
 
     # perform selection
-    P[a].rank < P[b].rank || (P[a].rank == P[b].rank && P[a].crowding > P[b].crowding ) ? P[a] : P[b]
+    P[a].rank < P[b].rank || (P[a].rank == P[b].rank && P[a].crowding > P[b].crowding) ?
+        P[a] :
+        P[b]
 end
-
 
 ###########################################
 ## generic GA reproduction
@@ -266,22 +257,24 @@ function reproduction(status, parameters::AbstractNSGA, problem, options)
     @assert !isempty(status.population)
 
     N_half = parameters.N
-    Q = zeros(eltype(get_position(first(status.population))), 2N_half, getdim(problem)) 
+    Q = zeros(eltype(get_position(first(status.population))), 2N_half, getdim(problem))
 
     for i in 1:N_half
         pa = tournament_selection(status.population, options)
         pb = tournament_selection(status.population, options)
 
-        c1, c2 = GA_reproduction(get_position(pa),
-                                 get_position(pb),
-                                 problem.search_space;
-                                 η_cr = parameters.η_cr,
-                                 p_cr = parameters.p_cr,
-                                 η_m = parameters.η_m,
-                                 p_m = parameters.p_m,
-                                 options.rng)
-        Q[2i-1,:] = c1
-        Q[2i,:] = c2
+        c1, c2 = GA_reproduction(
+            get_position(pa),
+            get_position(pb),
+            problem.search_space;
+            η_cr = parameters.η_cr,
+            p_cr = parameters.p_cr,
+            η_m = parameters.η_m,
+            p_m = parameters.p_m,
+            options.rng,
+        )
+        Q[2i - 1, :] = c1
+        Q[2i, :] = c2
     end
 
     Q

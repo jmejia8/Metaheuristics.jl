@@ -26,7 +26,7 @@ Evalutes the weighted sum scalarizing function. Computed as
 f(x) = \\sum_{i=1}^n w_i f_i(x)
 ```
 """
-eval_scalatization(F, w, params::WeightedSum) = sum(F .* w', dims=2) |> vec
+eval_scalatization(F, w, params::WeightedSum) = sum(F .* w', dims = 2) |> vec
 
 """
 eval_scalatization(F, w, params::Tchebysheff)
@@ -37,7 +37,7 @@ f(x) = \\max_{i=1}^n |f_i(x) - \\min_{j=1}^n f_j(x)| w_i
 ```
 """
 function eval_scalatization(F, w, params::Tchebysheff)
-    maximum(abs.(F .- minimum(F, dims=1)) .* w', dims=2) |> vec
+    maximum(abs.(F .- minimum(F, dims = 1)) .* w', dims = 2) |> vec
 end
 
 """
@@ -50,9 +50,8 @@ f(x) = \\max_{i=1}^n  |f_i(x) - \\min_{j=1}^n f_j(x)| / w_i
 function eval_scalatization(F, w, params::AchievementScalarization)
     w = copy(w)
     w[w .== zero(eltype(w))] .= eps()
-    maximum((F .- minimum(F, dims=1)) ./ w', dims=2) |> vec
+    maximum((F .- minimum(F, dims = 1)) ./ w', dims = 2) |> vec
 end
-
 
 """
     CompromiseProgramming(scalarizing)
@@ -91,10 +90,9 @@ mutable struct CompromiseProgramming{T, V} <: AbstractDecisionMakingMethod
     values::Vector{V}
 end
 
-function CompromiseProgramming(scalarizing; values=zeros(0))
+function CompromiseProgramming(scalarizing; values = zeros(0))
     CompromiseProgramming(scalarizing, values)
 end
-
 
 function decisionmaking(population::AbstractMatrix, w, method::CompromiseProgramming)
     values = eval_scalatization(population, w, method.scalarizing)
@@ -102,6 +100,9 @@ function decisionmaking(population::AbstractMatrix, w, method::CompromiseProgram
     argmin(values)
 end
 
-function decisionmaking(population::AbstractArray{<: AbstractMultiObjectiveSolution}, args...)
+function decisionmaking(
+    population::AbstractArray{<:AbstractMultiObjectiveSolution},
+    args...,
+)
     decisionmaking(fvals(population), args...)
 end

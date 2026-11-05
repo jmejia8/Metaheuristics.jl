@@ -21,4 +21,3 @@ Possible values:
 See also [`termination_status_message`](@ref).
 """
 const TerminationStatusCode = AbstractTermination
-

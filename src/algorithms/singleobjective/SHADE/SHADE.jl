@@ -8,7 +8,6 @@ mutable struct SHADE <: AbstractDifferentialEvolution
     k::Int
 end
 
-
 """
     SHADE(;N=100, information = Information(), options = Options())
 
@@ -41,26 +40,24 @@ julia> minimizer(result)
 
 """
 function SHADE(; N::Int = 100, kargs...)
-    parameters = SHADE(N, [], zeros(0), zeros(0),zeros(0), zeros(0), 1)
+    parameters = SHADE(N, [], zeros(0), zeros(0), zeros(0), zeros(0), 1)
     Algorithm(parameters; kargs...)
 end
 
 function initialize!(
-        status,
-        parameters::SHADE,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::SHADE,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
     D = getdim(problem)
-
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
-        options.debug &&
-        @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        options.debug && @warn("f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
@@ -71,30 +68,28 @@ function initialize!(
     parameters.MCR = fill(0.5, parameters.N)
     parameters.MF = fill(0.5, parameters.N)
 
-    return gen_initial_state(problem,parameters,information,options,status)
+    return gen_initial_state(problem, parameters, information, options, status)
 end
 
-
 function update_state!(
-        status,
-        parameters::SHADE,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::SHADE,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     new_vectors = reproduction(status, parameters, problem)
 
     # evaluate solutions
-    new_solutions = create_solutions(new_vectors, problem,ε=options.h_tol)
+    new_solutions = create_solutions(new_vectors, problem, ε = options.h_tol)
     append!(status.population, new_solutions)
 
     environmental_selection!(status.population, parameters)
     status.best_sol = get_best(status.population)
 end
-
 
 function reproduction(status, parameters::SHADE, problem)
     population = status.population
@@ -110,23 +105,25 @@ function reproduction(status, parameters::SHADE, problem)
     N = parameters.N
     # number of decisions
     D = getdim(problem)
-    sort!(population, lt=(a, b) -> is_better(a, b, parameters))
+    sort!(population, lt = (a, b) -> is_better(a, b, parameters))
 
-    Xpb = population[[rand(max.(2, ceil.(Int, rand(N)*0.2*N))) for _ = 1:N]] |> positions
+    Xpb = population[[rand(max.(2, ceil.(Int, rand(N) * 0.2 * N))) for _ in 1:N]] |>
+        positions
     Xr1 = population[rand(1:N, N)] |> positions
-    P   = eltype(population)[population ; archive]
+    P = eltype(population)[population; archive]
     Xr2 = P[rand(1:N, N)] |> positions
 
     # crossover rate
-    CR  = randn(N).*sqrt(0.1) + MCR[rand(1:N, N)]
-    CR  = clamp.(CR, 0, 1)
+    CR = randn(N) .* sqrt(0.1) + MCR[rand(1:N, N)]
+    CR = clamp.(CR, 0, 1)
     # step size
-    F = randc(N).*sqrt(0.1) + MF[rand(1:N, N)]
+    F = randc(N) .* sqrt(0.1) + MF[rand(1:N, N)]
 
-    for _ in 1:100 # regenerate F when <= 0 using 100 tries (to avoid infinity loop)
+    for _ in 1:100
+        # regenerate F when <= 0 using 100 tries (to avoid infinity loop)
         m = F .<= 0
         if any(m)
-            F[m] = min.(1, randc(count(m)).*sqrt(0.1) + MF[rand(1:N, count(m))])
+            F[m] = min.(1, randc(count(m)) .* sqrt(0.1) + MF[rand(1:N, count(m))])
         else
             break
         end
@@ -141,7 +138,7 @@ function reproduction(status, parameters::SHADE, problem)
 
     # compute offspring positions (matrix X)
     X = population |> positions
-    X[mask] += F[mask] .* (Xpb[mask]-X[mask]+Xr1[mask]-Xr2[mask])
+    X[mask] += F[mask] .* (Xpb[mask] - X[mask] + Xr1[mask] - Xr2[mask])
 
     # repair solution
     for x in eachrow(X)
@@ -151,9 +148,8 @@ function reproduction(status, parameters::SHADE, problem)
     X
 end
 
-
 function environmental_selection(population, parameters::SHADE)
-    @assert  length(population) == 2*parameters.N
+    @assert length(population) == 2 * parameters.N
 
     N = parameters.N
     k = parameters.k
@@ -161,7 +157,7 @@ function environmental_selection(population, parameters::SHADE)
     MF = parameters.MF
     CR = parameters.CR
     F = parameters.F
-    new_solutions = population[N+1:end]
+    new_solutions = population[N + 1:end]
     #population = population[1:N]
 
     survivals = Int[]
@@ -183,17 +179,15 @@ function environmental_selection(population, parameters::SHADE)
 
     mask = filter(>(N), survivals) .- N
 
-    w      = Δ ./ sum(Δ)
-    MCR[k] = w'*CR[mask]
-    MF[k]  = (w'*F[mask].^2) / (w'*F[mask])
-    k      = k % length(MCR) + 1
+    w = Δ ./ sum(Δ)
+    MCR[k] = w' * CR[mask]
+    MF[k] = (w' * F[mask].^2) / (w' * F[mask])
+    k = k % length(MCR) + 1
 
     # update archive
-    archive  = parameters.archive
+    archive = parameters.archive
     append!(archive, new_solutions[mask])
     length(archive) > N && deleteat!(archive, sort(randperm(length(archive))[1:N]))
-    
 
     return survivals
 end
-

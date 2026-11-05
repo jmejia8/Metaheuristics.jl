@@ -1,6 +1,5 @@
 include("velocity.jl")
 
-
 mutable struct PSO <: AbstractParameters
     N::Int
     C1::Float64
@@ -9,7 +8,6 @@ mutable struct PSO <: AbstractParameters
     v::Array{Float64} # velocity
     flock::Array
 end
-
 
 """
     PSO(;
@@ -50,29 +48,29 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], PSO(N = 100, C1=1.5, C2=1.5, ω = 0.7))
 
 """
 function PSO(;
-        N::Int = 0,
-        C1 = 2.0,
-        C2 = 2.0,
-        ω = 0.8,
-        v = Float64[],
-        flock = xf_indiv[],
-        kargs...
-    )
+    N::Int = 0,
+    C1 = 2.0,
+    C2 = 2.0,
+    ω = 0.8,
+    v = Float64[],
+    flock = xf_indiv[],
+    kargs...,
+)
 
     parameters = PSO(N, promote(Float64(C1), C2, ω)..., v, flock)
 
-    Algorithm( parameters; kargs...)
+    Algorithm(parameters; kargs...)
 end
 
 function update_state!(
-        status,
-        parameters::PSO,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::PSO,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
     xGBest = get_position(status.best_sol)
 
     X_new = zeros(parameters.N, getdim(problem))
@@ -81,13 +79,20 @@ function update_state!(
     for i in 1:parameters.N
         x = get_position(parameters.flock[i])
         xPBest = get_position(status.population[i])
-        parameters.v[i, :] = velocity(x, parameters.v[i, :], xPBest, xGBest, parameters, options.rng)
+        parameters.v[i, :] = velocity(
+            x,
+            parameters.v[i, :],
+            xPBest,
+            xGBest,
+            parameters,
+            options.rng,
+        )
         x += parameters.v[i, :]
         reset_to_violated_bounds!(x, problem.search_space)
-        X_new[i,:] = x
+        X_new[i, :] = x
     end
 
-    for (i, sol) in enumerate(create_solutions(X_new, problem;ε = options.h_tol))
+    for (i, sol) in enumerate(create_solutions(X_new, problem; ε = options.h_tol))
         if is_better(sol, status.population[i])
             status.population[i] = sol
             if is_better(sol, status.best_sol)
@@ -107,10 +112,9 @@ function initialize!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-       )
+    kargs...,
+)
     D = getdim(problem)
-
 
     if parameters.N == 0
         parameters.N = 10 * D
@@ -118,21 +122,16 @@ function initialize!(
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
-        options.debug &&
-        @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        options.debug && @warn("f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-
-
-    status = gen_initial_state(problem,parameters,information,options,status)
+    status = gen_initial_state(problem, parameters, information, options, status)
 
     parameters.v = zeros(parameters.N, D)
-
-
 
     parameters.flock = copy(status.population)
 
@@ -147,8 +146,8 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
     status.final_time = time()
 
 end

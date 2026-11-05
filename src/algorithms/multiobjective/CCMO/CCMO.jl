@@ -73,24 +73,22 @@ stop reason: Maximum number of iterations exceeded.
 ```
 
 """
-function CCMO(base_algorithm;
-        kargs...
-    )
+function CCMO(base_algorithm; kargs...)
 
-    parameters = CCMO(base_algorithm.parameters, xFgh_indiv[],Float64[],Float64[])
+    parameters = CCMO(base_algorithm.parameters, xFgh_indiv[], Float64[], Float64[])
 
     Algorithm(parameters; kargs...)
 end
 
 function initialize!(
-        status,
-        parameters::CCMO,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::CCMO,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     if options.iterations == 0
         options.iterations = 500
@@ -100,11 +98,10 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.base.N + 1
     end
 
-    status = gen_initial_state(problem,parameters.base,information,options,status)
-
+    status = gen_initial_state(problem, parameters.base, information, options, status)
 
     #Generating population based on the helper problem (problem without constraints)
-    parameters.phelper = generate_population(parameters.base.N, problem,ε=options.h_tol)
+    parameters.phelper = generate_population(parameters.base.N, problem, ε = options.h_tol)
 
     # used to compute fitness
     environmental_selection!(status.population, parameters)
@@ -114,14 +111,14 @@ function initialize!(
 end
 
 function update_state!(
-        status::State,
-        parameters::CCMO,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status::State,
+    parameters::CCMO,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     Q_a, Q_b = reproduction(status, parameters, problem)
     Off1 = create_solutions(Q_a, problem)
@@ -133,7 +130,7 @@ function update_state!(
     # copy Off1 and Off2 (copy objects not pointers)
     append!(parameters.phelper, deepcopy(Off1))
     append!(parameters.phelper, deepcopy(Off2))
-    
+
     # reduce population
     environmental_selection!(status.population, parameters)
     environmental_selection!(parameters.phelper, parameters, false)
@@ -147,26 +144,25 @@ function reproduction(status, parameters::CCMO{NSGA2}, problem)
     base = parameters.base
 
     # selection
-    _s = TournamentSelection(;N=base.N ÷ 2)
+    _s = TournamentSelection(; N = base.N ÷ 2)
     # crossover
-    _c = SBX(η=base.η_cr, p = base.p_cr, bounds = problem.search_space)
+    _c = SBX(η = base.η_cr, p = base.p_cr, bounds = problem.search_space)
     # mutation
-    base.p_m < 0.0 && (base.p_m = 1/getdim(problem)) 
-    _m = PolynomialMutation(η=base.η_m, p = base.p_m, bounds = problem.search_space)
+    base.p_m < 0.0 && (base.p_m = 1 / getdim(problem))
+    _m = PolynomialMutation(η = base.η_m, p = base.p_m, bounds = problem.search_space)
 
     # population 1
-    parent_mask = selection(population, _s, fitness=fitness1)
+    parent_mask = selection(population, _s, fitness = fitness1)
     Q_a = crossover(population[parent_mask], _c)
     mutation!(Q_a, _m)
 
     # population 2
-    parent_mask = selection(phelper, _s, fitness=fitness2)
+    parent_mask = selection(phelper, _s, fitness = fitness2)
     Q_b = crossover(population[parent_mask], _c)
     mutation!(Q_b, _m)
 
     Q_a, Q_b
 end
-
 
 function final_stage!(
     status::State,
@@ -175,18 +171,21 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
+    kargs...,
 )
-    
+
     status.final_time = time()
 end
 
-
-function environmental_selection!(population, parameters::CCMO, consider_constraints::Bool=true)
+function environmental_selection!(
+    population,
+    parameters::CCMO,
+    consider_constraints::Bool = true,
+)
     spea2 = SPEA2().parameters
     spea2.N = parameters.base.N
     if consider_constraints
-        environmental_selection!(population,spea2)
+        environmental_selection!(population, spea2)
         parameters.fitness = spea2.fitness
         return
     end
@@ -199,15 +198,12 @@ function environmental_selection!(population, parameters::CCMO, consider_constra
         s.sum_violations = 0
     end
 
-    environmental_selection!(parameters.phelper,spea2)
+    environmental_selection!(parameters.phelper, spea2)
     #truncate_population!(parameters.phelper, parameters.N)
     # restore constraint violation values
-    for (i,s) in enumerate(tmp)
+    for (i, s) in enumerate(tmp)
         s.sum_violations = CV[i]
     end
     parameters.fitness_helper = spea2.fitness
 
-    
 end
-
-

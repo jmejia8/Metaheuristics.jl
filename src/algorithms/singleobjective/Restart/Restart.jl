@@ -32,16 +32,20 @@ end
 function Restart(base::Algorithm; every = 100)
     parameters = Restart(base.parameters, every)
 
-    Algorithm(
-        parameters,
-        information = base.information,
-        options = base.options
-    )
+    Algorithm(parameters, information = base.information, options = base.options)
 end
 
 restart_condition(st, params::Restart, args...) = st.iteration % params.every == 0
 
-function restart_population!(st, params::AbstractRestart, problem, info, opts, args...; kargs...)
+function restart_population!(
+    st,
+    params::AbstractRestart,
+    problem,
+    info,
+    opts,
+    args...;
+    kargs...,
+)
 
     if !restart_condition(st, params, info, opts)
         return
@@ -59,7 +63,6 @@ function restart_population!(st, params::AbstractRestart, problem, info, opts, a
     opts.debug && @info "Restarted population."
 end
 
-
 function update_state!(st, params::AbstractRestart, problem, info, opts, args...; kargs...)
 
     # restart population if necessary
@@ -68,7 +71,6 @@ function update_state!(st, params::AbstractRestart, problem, info, opts, args...
     # perform the optimization step at current population
     update_state!(st, params.alg, problem, info, opts, args...; kargs...)
 end
-
 
 #########################################
 # implement each step for AbstractRestart
@@ -79,12 +81,10 @@ function initialize!(st, params::AbstractRestart, problem, info, opts, args...; 
     initialize!(st, params.alg, problem, info, opts, args...; kargs...)
 end
 
-
 function final_stage!(st, params::AbstractRestart, problem, info, opts, args...; kargs...)
 
     final_stage!(st, params.alg, problem, info, opts, args...; kargs...)
 end
-
 
 function stop_criteria!(st, params::AbstractRestart, problem, info, opts, args...; kargs...)
 

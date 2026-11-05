@@ -5,9 +5,8 @@ mutable struct NSGA3 <: AbstractParameters
     η_m::Float64
     p_m::Float64
     partitions::Int
-    reference_points::Array{Vector{Float64},1}
+    reference_points::Array{Vector{Float64}, 1}
 end
-
 
 """
     NSGA3(;
@@ -66,18 +65,20 @@ function NSGA3(;
     p_cr = 0.9,
     η_m = 20,
     p_m = -1,
-    partitions=12,
-    reference_points=Vector{Float64}[],
-    kargs...
+    partitions = 12,
+    reference_points = Vector{Float64}[],
+    kargs...,
 )
 
-    parameters = NSGA3(N, promote( Float64(η_cr), p_cr, η_m, p_m )..., partitions,
-                      reference_points)
+    parameters = NSGA3(
+        N,
+        promote(Float64(η_cr), p_cr, η_m, p_m)...,
+        partitions,
+        reference_points,
+    )
     Algorithm(parameters; kargs...)
 
 end
-
-
 
 function update_state!(
     status::State,
@@ -86,25 +87,24 @@ function update_state!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
 
     Q = reproduction(status, parameters, problem)
 
     append!(status.population, create_solutions(Q, problem))
-    
+
     # non-dominated sort, elitist removing via niching
     environmental_selection!(status.population, parameters)
 end
 
-
 function environmental_selection!(population, parameters::NSGA3)
-    truncate_population_nsga3!(population,parameters.reference_points,parameters.N)
+    truncate_population_nsga3!(population, parameters.reference_points, parameters.N)
 end
 
 function truncate_population_nsga3!(population, reference_points, N)
     fast_non_dominated_sort!(population)
-    
+
     k = 1
     l = 1
     while l <= N
@@ -114,21 +114,21 @@ function truncate_population_nsga3!(population, reference_points, N)
 
     let k = k
         l = findlast(sol -> sol.rank == k, population)
-        deleteat!(population, l+1:length(population))
+        deleteat!(population, l + 1:length(population))
     end
 
     l = findfirst(sol -> sol.rank == k, population)
     niching!(population, reference_points, N, l)
 end
 
-distance_point_to_rect(s, w) = @fastmath norm(s - (dot(w,s) / dot(w, w))*w  )
+distance_point_to_rect(s, w) = @fastmath norm(s - (dot(w, s) / dot(w, w)) * w)
 
-function associate!(nich, nich_freq, distance, F, reference_points, l) 
+function associate!(nich, nich_freq, distance, F, reference_points, l)
     N = length(F)
 
     # find closest nich to corresponding solution
-    for i = 1:N
-        for j = 1:length(reference_points)
+    for i in 1:N
+        for j in 1:length(reference_points)
             d = distance_point_to_rect(F[i], reference_points[j])
 
             distance[i] < d && continue
@@ -141,11 +141,11 @@ function associate!(nich, nich_freq, distance, F, reference_points, l)
         if i < l
             nich_freq[nich[i]] += 1
         end
-        
+
     end
 end
 
-function hyperplane_normalization(population) 
+function hyperplane_normalization(population)
     M = length(fval(population[1]))
 
     ideal_point = ideal(population)
@@ -155,15 +155,16 @@ function hyperplane_normalization(population)
 
     # identify extreme points
     extreme_points = zeros(Int, M)
-    w = LinearAlgebra.I + fill(1e-6, M, M)
+    w = LinearAlgebra.I + fill(1.0e-6, M, M)
 
     for i in 1:M
-        extreme_points[i] = argmin(nadir(Fx' ./ w[i,:]))
+        extreme_points[i] = argmin(nadir(Fx' ./ w[i, :]))
     end
 
     # check if intercepts can be obtained
-    S = Fx[extreme_points,:]
-    if LinearAlgebra.det(S) ≈ 0 # check if soluble matrix
+    S = Fx[extreme_points, :]
+    if LinearAlgebra.det(S) ≈ 0
+        # check if soluble matrix
         nadir_point = nadir(population)
     else
         hyperplane = S \ ones(M)
@@ -171,12 +172,10 @@ function hyperplane_normalization(population)
         nadir_point = ideal_point + intercepts
     end
 
-
     ideal_point, nadir_point
 end
 
-
-function normalize(population) 
+function normalize(population)
     ideal_point, nadir_point = hyperplane_normalization(population)
 
     b = nadir_point - ideal_point
@@ -185,20 +184,19 @@ function normalize(population)
     mask = b .< eps()
     b[mask] .= eps()
 
-    return [ (sol.f - ideal_point) ./ b for sol in population ]
+    return [(sol.f - ideal_point) ./ b for sol in population]
 end
 
 # get_last_front(id, population) = findall(s -> s.rank == id, population)
 
 pick_random(itr, item) = rand(findall(i -> i == item, itr))
-find_item(itr, item)  = findall(i -> i == item, itr)
-
+find_item(itr, item) = findall(i -> i == item, itr)
 
 function niching!(population, reference_points, N, l)
     if length(population) == N
         return
     end
-    
+
     F = normalize(population)
     k = l
 
@@ -212,14 +210,14 @@ function niching!(population, reference_points, N, l)
     associate!(nich, nich_freq, distance, F, reference_points, l)
 
     # keep last front
-    last_front_id = k:length(population)#get_last_front(population[end].rank, population)
+    last_front_id = k:length(population) #get_last_front(population[end].rank, population)
     last_front = population[last_front_id]
     deleteat!(population, last_front_id)
 
     # last front niches information
     niches_last_front = nich[last_front_id]
     distance_last_front = distance[last_front_id]
-    
+
     # save survivors
     i = 1
     while k <= N
@@ -227,8 +225,8 @@ function niching!(population, reference_points, N, l)
         # nich to be assigned
         j_hat = pick_random(nich_freq, mini)
 
-        # candidate solutions 
-        I_j_hat = find_item( niches_last_front, j_hat )
+        # candidate solutions
+        I_j_hat = find_item(niches_last_front, j_hat)
         if isempty(I_j_hat)
             available_niches[j_hat] = false
             continue
@@ -249,15 +247,11 @@ function niching!(population, reference_points, N, l)
         deleteat!(distance_last_front, s)
 
         k += 1
-        
-        
-    end
 
+    end
 
     nothing
 end
-
-
 
 function initialize!(
     status,
@@ -266,8 +260,8 @@ function initialize!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
 
     D = getdim(problem)
 
@@ -283,7 +277,7 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-    status = gen_initial_state(problem, parameters, information, options,status)
+    status = gen_initial_state(problem, parameters, information, options, status)
 
     if isempty(parameters.reference_points)
         options.debug && @info "Initializing reference points..."
@@ -305,13 +299,11 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
     status.final_time = time()
 
-
 end
-
 
 ###########################################
 ## NSGA3 reproduction
@@ -321,20 +313,22 @@ function reproduction(status, parameters::NSGA3, problem)
 
     I = randperm(parameters.N)
     Q = zeros(eltype(get_position(first(status.population))), parameters.N, getdim(problem))
-    for i = 1:parameters.N ÷ 2
+    for i in 1:parameters.N ÷ 2
 
-        pa = status.population[I[2i-1]]
+        pa = status.population[I[2i - 1]]
         pb = status.population[I[2i]]
 
-        c1, c2 = GA_reproduction(get_position(pa),
-                                 get_position(pb),
-                                 problem.search_space;
-                                 η_cr = parameters.η_cr,
-                                 p_cr = parameters.p_cr,
-                                 η_m = parameters.η_m,
-                                 p_m = parameters.p_m)
-        Q[2i-1,:] = c1
-        Q[2i,:] = c2       
+        c1, c2 = GA_reproduction(
+            get_position(pa),
+            get_position(pb),
+            problem.search_space;
+            η_cr = parameters.η_cr,
+            p_cr = parameters.p_cr,
+            η_m = parameters.η_m,
+            p_m = parameters.p_m,
+        )
+        Q[2i - 1, :] = c1
+        Q[2i, :] = c2
     end
 
     Q

@@ -69,12 +69,10 @@ function ECA(;
     ε::Float64 = 0.0,
     adaptive::Bool = false,
     resize_population::Bool = false,
-    kargs...
+    kargs...,
 )
 
-
     N_init = N
-
 
     parameters = ECA(
         η_max,
@@ -110,7 +108,7 @@ function eca_solution(status, parameters, options, problem, I, i, rng = default_
         y = get_position(status.population[i]) .+ η .* (c .- u)
     else
         # current-to-best/bin
-        y = get_position(status.population[i]) .+ η .*(minimizer(status) .- c)
+        y = get_position(status.population[i]) .+ η .* (minimizer(status) .- c)
     end
     # binary crossover
     y, M_current = crossover(U[u_best].x, y, parameters.p_cr, options.rng)
@@ -118,16 +116,15 @@ function eca_solution(status, parameters, options, problem, I, i, rng = default_
     y, M_current
 end
 
-
 function update_state!(
-        status,
-        parameters::ECA,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::ECA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     I = randperm(options.rng, parameters.N)
     D = getdim(problem)
@@ -140,13 +137,13 @@ function update_state!(
 
     # For each elements in Population
     for i in 1:parameters.N
-        y, M_current = eca_solution(status, parameters, options,problem,I,i, options.rng)
+        y, M_current = eca_solution(status, parameters, options, problem, I, i, options.rng)
 
         if options.parallel_evaluation
-            X_next[i,:] = y
+            X_next[i, :] = y
             continue
         end
-        
+
         sol = create_solution(y, problem)
 
         # replace worst element
@@ -168,8 +165,11 @@ function update_state!(
     end
 
     if parameters.adaptive
-        parameters.p_cr =
-            adaptCrossover(parameters.p_cr, Mcr_fail / parameters.N, options.rng)
+        parameters.p_cr = adaptCrossover(
+            parameters.p_cr,
+            Mcr_fail / parameters.N,
+            options.rng,
+        )
     end
 
     resize_population!(status, parameters, options)
@@ -194,12 +194,10 @@ function resize_population!(status, parameters::ECA, options)
     status.population = resizePop!(status.population, parameters.N, K)
 end
 
-
-
 function environmental_selection(population, parameters::ECA)
-    @assert length(population) == 2*parameters.N
+    @assert length(population) == 2 * parameters.N
 
-    new_solutions = population[parameters.N+1:end]
+    new_solutions = population[parameters.N + 1:end]
     population = population[1:parameters.N]
 
     survivals = collect(1:length(population))
@@ -215,7 +213,6 @@ function environmental_selection(population, parameters::ECA)
     return survivals
 end
 
-
 function environmental_selection!(population, parameters::ECA)
     I = environmental_selection(population, parameters)
     ignored = ones(Bool, length(population))
@@ -224,23 +221,21 @@ function environmental_selection!(population, parameters::ECA)
 end
 
 function initialize!(
-        status,
-        parameters::ECA,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::ECA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
-    if  !(problem.search_space isa BoxConstrainedSpace)
+    if !(problem.search_space isa BoxConstrainedSpace)
         s = string(typeof(problem.search_space))
-        error("ECA only works on box-contrained spaces but "*s*" was given.")
+        error("ECA only works on box-contrained spaces but " * s * " was given.")
     end
-    
 
     D = getdim(problem)
-
 
     if parameters.N <= parameters.K
         parameters.N = min(parameters.K * D, 1000)
@@ -248,8 +243,7 @@ function initialize!(
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
-        options.debug &&
-            @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        options.debug && @warn("f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
@@ -258,15 +252,13 @@ function initialize!(
 
     N_init = parameters.N
 
-
     if parameters.adaptive
         parameters.p_cr = rand(options.rng, D)
     else
         parameters.p_cr = parameters.p_bin .* ones(D)
     end
 
-
-    st = gen_initial_state(problem,parameters,information,options, status)
+    st = gen_initial_state(problem, parameters, information, options, status)
     st
 
 end
@@ -278,11 +270,10 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
     status.final_time = time()
 end
-
 
 ###########################################
 ## ECA
@@ -293,15 +284,17 @@ function reproduction(status, parameters::ECA, problem)
     N = parameters.N
     D = length(get_position(status.population[1]))
 
-    X = zeros(N,D)
+    X = zeros(N, D)
 
     for i in 1:N
-        X[i,:] = ECA_operator(status.population,
-                              parameters.K,
-                              parameters.η_max;
-                              i=i,
-                             bounds = problem.search_space)
+        X[i, :] = ECA_operator(
+            status.population,
+            parameters.K,
+            parameters.η_max;
+            i = i,
+            bounds = problem.search_space,
+        )
     end
 
-    X 
+    X
 end

@@ -20,19 +20,18 @@ Perform weighted random sampling from a discrete distribution.
 function weighted_sample(rng::AbstractRNG, weights::Vector{Float64})::Int
     total = sum(weights)
     if total == 0.0 || isempty(weights)
-        return rand(rng, 0:(length(weights)-1))
+        return rand(rng, 0:(length(weights) - 1))
     end
-    
+
     r = rand(rng) * total
     cumsum = 0.0
     for (i, w) in enumerate(weights)
         cumsum += w
         if r <= cumsum
-            return i - 1  # 0-indexed
+            return i - 1 # 0-indexed
         end
     end
     return length(weights) - 1
 end
 
 end # module SelectionUtils
-

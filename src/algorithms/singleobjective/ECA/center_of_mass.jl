@@ -9,7 +9,7 @@ function fitnessToMass(fitness::Vector{<:Real})
     if m < 0
         fitness = 2 * abs(m) .+ fitness
     end
-    
+
     fitness = 2 * maximum(fitness) .- fitness
 
     return fitness
@@ -20,18 +20,18 @@ end
     get the mass in a vector `m[i] = f[i] + 2*max_fitness*sum_vio[i] `, tolerance
     in equality constraints are given by `epsilon`
 """
-getMass(U::Array{xf_solution{Vector{T}},1}) where T <: Real = fitnessToMass(fvals(U))
+getMass(U::Array{xf_solution{Vector{T}}, 1}) where {T <: Real} = fitnessToMass(fvals(U))
 
-function getMass(U::Array{xfgh_solution{Vector{T}},1}) where T <: Real
+function getMass(U::Array{xfgh_solution{Vector{T}}, 1}) where {T <: Real}
     fitness = fvals(U)
     M = 2maximum(abs.(fitness))
-    fitnessToMass(fitness + max(M, 100)*sum_violations.(U))
+    fitnessToMass(fitness + max(M, 100) * sum_violations.(U))
 end
 
-function getMass(U::Array{xFgh_solution{Vector{T}},1}) where T <: Real
-    fitness = sum(fvals(U), dims=2) |> vec
+function getMass(U::Array{xFgh_solution{Vector{T}}, 1}) where {T <: Real}
+    fitness = sum(fvals(U), dims = 2) |> vec
     M = 2maximum(abs.(fitness))
-    fitnessToMass(fitness + max(M, 100)*sum_violations.(U))
+    fitnessToMass(fitness + max(M, 100) * sum_violations.(U))
 end
 
 function center(U, mass)
@@ -47,49 +47,53 @@ function center(U::Array)
 
     return center(U, mass),
     argworst(U), # worst
-    argbest(U)  # best
+    argbest(U) # best
 end
 
 function getU(P::Array, K::Int, I::Vector{Int}, i::Int, N::Int)
     if i <= N - K
-        U_ids = I[i:K+i]
+        U_ids = I[i:K + i]
     else
-        j = (i:K+i) .% N
-        U_ids = I[j.+1]
+        j = (i:K + i) .% N
+        U_ids = I[j .+ 1]
     end
 
     return P[U_ids]
 end
 
-
 function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int)
     if i <= N - K
-        U_ids = I[i:K+i]
+        U_ids = I[i:K + i]
     else
-        j = (i:K+i) .% N
-        U_ids = I[j.+1]
+        j = (i:K + i) .% N
+        U_ids = I[j .+ 1]
     end
 
     return U_ids
 end
 
-
-
-function getU_ids(K::Int, I::Vector{Int}, i::Int, N::Int, feasible_solutions, rng = default_rng_mh())
+function getU_ids(
+    K::Int,
+    I::Vector{Int},
+    i::Int,
+    N::Int,
+    feasible_solutions,
+    rng = default_rng_mh(),
+)
     # at least half of the population is feasible to generate random centers
     if length(feasible_solutions) >= 0.5N || length(feasible_solutions) == 0
         return getU_ids(K, I, i, N)
     end
-    
+
     # center of mass is generated with at least one feasible solution
     K -= 1
     if i <= N - K
-        U_ids = I[i:K+i]
+        U_ids = I[i:K + i]
     else
-        j = (i:K+i) .% N
-        U_ids = I[j.+1]
+        j = (i:K + i) .% N
+        U_ids = I[j .+ 1]
     end
-    
+
     push!(U_ids, rand(rng, feasible_solutions))
 
     return U_ids
@@ -99,11 +103,11 @@ function crossover(
     x::Vector{<:Real},
     y::Vector{<:Real},
     p_cr::Vector{Float64},
-    rng = default_rng_mh()
+    rng = default_rng_mh(),
 )
     D = length(x)
     tmp2 = zeros(D)
-    for j = 1:D
+    for j in 1:D
         if rand(rng) < p_cr[j]
             y[j] = x[j]
             tmp2[j] += 1
@@ -113,7 +117,6 @@ function crossover(
     return y, tmp2
 end
 
-
 """
     ECA_operator(population, K, η_max)
 
@@ -121,11 +124,14 @@ Compute a solution using ECA variation operator, `K` is the number of solutions 
 calculate the center of mass and `η_max` is the maximum stepsize.
 """
 function ECA_operator(
-        population, K, η_max, rng = default_rng_mh();
-        i = rand(rng, 1:length(population)),
-        U = rand(rng, population, K),
-        bounds = nothing
-    )
+    population,
+    K,
+    η_max,
+    rng = default_rng_mh();
+    i = rand(rng, 1:length(population)),
+    U = rand(rng, population, K),
+    bounds = nothing,
+)
 
     x = get_position(population[i])
 
@@ -147,4 +153,3 @@ function ECA_operator(
 
     return y
 end
-
