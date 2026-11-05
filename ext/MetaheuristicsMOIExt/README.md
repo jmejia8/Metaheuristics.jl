@@ -54,6 +54,38 @@ JuMP.optimize!(model)
 @show value(y), value(z), value(b)
 ```
 
+## Multi-Objective Optimization
+
+A vector objective is solved as a multi-objective problem (by default, NSGA-II
+within `MixedInteger`). Each non-dominated solution found is one result, in the
+style of [MultiObjectiveAlgorithms](https://github.com/jump-dev/MultiObjectiveAlgorithms.jl):
+feasible points only (when any was found), without repeated objective vectors,
+sorted by objective vector (in decreasing order for `Max`).
+
+```julia
+model = Model(Metaheuristics.Optimizer)
+@variable(model, 0 <= x[1:2] <= 1)
+@variable(model, 0 <= k <= 3, Int)
+@constraint(model, x[1] + x[2] >= 0.5)
+@objective(model, Min, [x[1]^2 + x[2]^2 + k, (x[1] - 1)^2 + (3 - k)])
+
+JuMP.optimize!(model)
+
+for i in 1:result_count(model)
+    @show objective_value(model; result = i) value.(x; result = i)
+end
+@show objective_bound(model)  # ideal point of the reported solutions
+```
+
+The sense applies to every objective. To maximize some of them, negate those
+components, e.g. `[f1, -f2]` to minimize $f_1$ and maximize $f_2$ (the reported value
+of the second objective is then $-f_2$). Calling `@objective` twice does not add an
+objective, it replaces the first one.
+
+Any multi-objective algorithm can be used through the `"method"` attribute, e.g.
+`MixedInteger(SMS_EMOA(N = 100); options)`. A single-objective method with a vector
+objective (or the opposite) raises an `ArgumentError`.
+
 ## Solver Options
 
 By default, `ECA` is used within `MixedInteger`. Use the `"method"` attribute to choose

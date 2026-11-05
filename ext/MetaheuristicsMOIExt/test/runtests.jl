@@ -655,4 +655,172 @@ _sum_of_squares(xs, c = 0.0) = MOI.ScalarNonlinearFunction(
         @test isnothing(MOI.get(opt, MOI.NLPBlock()))
         @test MOI.is_empty(opt)
     end
+
+    @testset "Multi-objective (vector objective)" begin
+        _mo_optimizer(; seed = 1, iterations = 100) = begin
+            opt = Ext.Optimizer()
+            MOI.set(opt, MOI.Silent(), true)
+            options = Options(; seed, iterations)
+            MOI.set(
+                opt,
+                MOI.RawOptimizerAttribute("method"),
+                MixedInteger(NSGA2(N = 40); options),
+            )
+            opt
+        end
+        _sq(f) = MOI.ScalarNonlinearFunction(:^, Any[f, 2])
+        _dominates(a, b) = all(a .<= b) && any(a .< b)
+        _results(opt) = [
+            MOI.get(opt, MOI.ObjectiveValue(i))
+            for i in 1:MOI.get(opt, MOI.ResultCount())
+        ]
+
+        # min [x1^2 + x2^2, (x1 - 1)^2 + x2^2], x in [-2, 2]^2: the Pareto set
+        # is x1 in [0, 1], x2 = 0
+        opt = _mo_optimizer()
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-2.0, 2.0))
+        end
+        F = MOI.VectorNonlinearFunction([
+            MOI.ScalarNonlinearFunction(:+, Any[_sq(x[1]), _sq(x[2])]),
+            MOI.ScalarNonlinearFunction(:+, Any[_sq(x[1] - 1.0), _sq(x[2])]),
+        ])
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(F)}(), F)
+        MOI.optimize!(opt)
+
+        n = MOI.get(opt, MOI.ResultCount())
+        @test n > 1
+        ys = _results(opt)
+        @test all(length(y) == 2 for y in ys)
+        @test issorted(ys)
+        @test !any(_dominates(a, b) for a in ys, b in ys)
+        @test allunique(ys)
+        @test all(MOI.get(opt, MOI.PrimalStatus(i)) == MOI.FEASIBLE_POINT for i in 1:n)
+        @test MOI.get(opt, MOI.PrimalStatus(n + 1)) == MOI.NO_SOLUTION
+        for i in 1:n
+            xv = MOI.get.(opt, MOI.VariablePrimal(i), x)
+            @test -0.15 <= xv[1] <= 1.15
+            @test abs(xv[2]) <= 0.15
+            @test ys[i] ≈ [xv[1]^2 + xv[2]^2, (xv[1] - 1)^2 + xv[2]^2]
+        end
+        @test MOI.get(opt, MOI.ObjectiveBound()) ≈ [0.0, 0.0] atol = 1.0e-2
+        @test MOI.get(opt, MOI.TerminationStatus()) in
+            (MOI.LOCALLY_SOLVED, MOI.ITERATION_LIMIT, MOI.OTHER_LIMIT)
+        @test occursin("Found $n solution(s)", MOI.get(opt, MOI.RawStatusString()))
+
+        # an affine vector objective, max sense: values keep their true sign
+        # and results are sorted in decreasing order
+        opt = _mo_optimizer()
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(0.0, 1.0))
+        end
+        G = MOI.Utilities.operate(vcat, Float64, 1.0 * x[1], 1.0 - 1.0 * x[1])
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MAX_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(G)}(), G)
+        MOI.optimize!(opt)
+        ys = _results(opt)
+        @test length(ys) > 1
+        @test issorted(ys; rev = true)
+        @test all(y -> sum(y) ≈ 1 && all(0 .<= y .<= 1), ys)
+        @test MOI.get(opt, MOI.ObjectiveBound()) ≈ [1.0, 1.0] atol = 1.0e-2
+
+        # mixed integer with a nonlinear constraint
+        opt = _mo_optimizer()
+        x = MOI.add_variable(opt)
+        MOI.add_constraint(opt, x, MOI.Interval(0.0, 1.0))
+        z = MOI.add_variable(opt)
+        MOI.add_constraint(opt, z, MOI.Interval(0.0, 3.0))
+        MOI.add_constraint(opt, z, MOI.Integer())
+        H = MOI.VectorNonlinearFunction([
+            MOI.ScalarNonlinearFunction(:+, Any[x, z]),
+            MOI.ScalarNonlinearFunction(:+, Any[_sq(1.0 - 1.0 * x), 3.0 - 1.0 * z]),
+        ])
+        # x + z >= 0.5
+        MOI.add_constraint(
+            opt,
+            MOI.ScalarNonlinearFunction(:+, Any[x, z]),
+            MOI.GreaterThan(0.5),
+        )
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(H)}(), H)
+        MOI.optimize!(opt)
+        n = MOI.get(opt, MOI.ResultCount())
+        @test n > 1
+        for i in 1:n
+            @test MOI.get(opt, MOI.PrimalStatus(i)) == MOI.FEASIBLE_POINT
+            xv = MOI.get(opt, MOI.VariablePrimal(i), x)
+            zv = MOI.get(opt, MOI.VariablePrimal(i), z)
+            @test isinteger(zv) && 0 <= zv <= 3
+            @test xv + zv >= 0.5 - 1.0e-8
+        end
+
+        # the default method (NSGA2) is used for vector objectives
+        opt = Ext.Optimizer()
+        MOI.set(opt, MOI.Silent(), true)
+        MOI.set(opt, MOI.RawOptimizerAttribute("seed"), 1)
+        MOI.set(opt, MOI.RawOptimizerAttribute("iterations"), 50)
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-2.0, 2.0))
+        end
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(F)}(), F)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ResultCount()) > 1
+        @test isnothing(MOI.get(opt, MOI.RawOptimizerAttribute("method")))
+
+        # same model, back to a scalar objective
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x),
+        )
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ResultCount()) == 1
+        @test MOI.get(opt, MOI.ObjectiveValue()) isa Real
+        @test_throws MOI.GetAttributeNotAllowed MOI.get(opt, MOI.ObjectiveBound())
+
+        # and to a vector one again
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(F)}(), F)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ResultCount()) > 1
+
+        # FEASIBILITY_SENSE ignores the vector objective
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ResultCount()) == 1
+        @test MOI.get(opt, MOI.ObjectiveValue()) == 0
+
+        # method and objective must match
+        opt = _new_optimizer() # ECA
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-2.0, 2.0))
+        end
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(F)}(), F)
+        @test_throws ArgumentError MOI.optimize!(opt)
+
+        opt = _mo_optimizer()
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-2.0, 2.0))
+        end
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x),
+        )
+        @test_throws ArgumentError MOI.optimize!(opt)
+
+        # empty! clears the vector objective
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(F)}(), F)
+        @test !MOI.is_empty(opt)
+        MOI.empty!(opt)
+        @test MOI.is_empty(opt)
+    end
 end

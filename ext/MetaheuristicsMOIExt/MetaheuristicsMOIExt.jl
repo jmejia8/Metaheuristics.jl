@@ -11,6 +11,14 @@ function __init__()
     println("Extension was loaded!")
 end
 
+# One reported solution of a multi-objective solve: `x` in MOI variable order and
+# `y` the objective vector with its true sign (as in MultiObjectiveAlgorithms).
+struct SolutionPoint{T}
+    x::Vector{T}
+    y::Vector{T}
+    feasible::Bool
+end
+
 mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     # Problem data.
     variables::MOI.Utilities.VariablesContainer{T}
@@ -18,6 +26,9 @@ mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     nlp_model::Union{MOI.Nonlinear.Model, Nothing}
     # legacy nonlinear interface (`@NLobjective`, `@NLconstraint`)
     nlp_block::Union{MOI.NLPBlockData, Nothing}
+    # vector objective (multi-objective): one constraint row per objective
+    obj_model::Union{MOI.Nonlinear.Model, Nothing}
+    n_objectives::Int
     sense::MOI.OptimizationSense
 
     # Parameters.
@@ -27,6 +38,8 @@ mutable struct Optimizer{T} <: MOI.AbstractOptimizer
 
     # Solution attributes.
     results::Union{Nothing, Metaheuristics.State}
+    # non-dominated solutions of a multi-objective solve (`nothing` otherwise)
+    pareto::Union{Nothing, Vector{SolutionPoint{T}}}
     # set when infeasibility is detected before solving (e.g. empty bounds)
     infeasible_message::Union{Nothing, String}
     variable_type::Dict
@@ -41,10 +54,13 @@ function Optimizer{T}() where {T}
         Union{Nothing, T}[],
         nothing,
         nothing,
+        nothing,
+        0,
         MOI.FEASIBILITY_SENSE,
         nothing,
         false,
         Dict{Symbol, Any}(),
+        nothing,
         nothing,
         nothing,
         Dict(),
@@ -137,13 +153,34 @@ function MOI.set(model::Optimizer, ::MOI.ObjectiveSense, sense::MOI.Optimization
 end
 
 function MOI.set(model::Optimizer, ::MOI.ObjectiveFunction{F}, func::F) where {F}
-    # TODO add compat with MOI.VectorNonlinearFunction
     nl = convert(MOI.ScalarNonlinearFunction, func)
 
     if isnothing(model.nlp_model)
         model.nlp_model = MOI.Nonlinear.Model()
     end
     MOI.Nonlinear.set_objective(model.nlp_model, nl)
+    # a scalar objective replaces a previous vector one
+    model.obj_model = nothing
+    model.n_objectives = 0
+    nothing
+end
+
+# Vector objective (`@objective(model, Min, [f1, f2])`): multi-objective problem.
+# As in MultiObjectiveAlgorithms, `ObjectiveSense` applies to every component.
+# Each component is stored as a free constraint row, so one `eval_constraint`
+# call gives the whole objective vector.
+function MOI.set(model::Optimizer, ::MOI.ObjectiveFunction{F}, func::F) where {F <:
+    MOI.AbstractVectorFunction}
+    obj_model = MOI.Nonlinear.Model()
+    rows = MOI.Utilities.scalarize(func)
+    for fi in rows
+        nl = convert(MOI.ScalarNonlinearFunction, fi)
+        MOI.Nonlinear.add_constraint(obj_model, nl, MOI.Interval(-Inf, Inf))
+    end
+    # a vector objective replaces a previous scalar one
+    isnothing(model.nlp_model) || MOI.Nonlinear.set_objective(model.nlp_model, nothing)
+    model.obj_model = obj_model
+    model.n_objectives = length(rows)
     nothing
 end
 
@@ -219,8 +256,11 @@ function MOI.empty!(model::Optimizer)
     empty!(model.starting_values)
     model.nlp_model = nothing
     model.nlp_block = nothing
+    model.obj_model = nothing
+    model.n_objectives = 0
     model.sense = MOI.FEASIBILITY_SENSE
     model.results = nothing
+    model.pareto = nothing
     model.infeasible_message = nothing
     empty!(model.variable_type)
     model.search_space = nothing
@@ -233,6 +273,7 @@ function MOI.is_empty(model::Optimizer)
         isempty(model.starting_values) &&
         isnothing(model.nlp_model) &&
         isnothing(model.nlp_block) &&
+        isnothing(model.obj_model) &&
         model.sense == MOI.FEASIBILITY_SENSE
 end
 
@@ -475,8 +516,66 @@ function _nonlinear_sources(model::Optimizer, vars)
     return objective, sources
 end
 
+# Algorithms that need a vector objective.
+const _MO_PARAMETERS = Union{
+    Metaheuristics.NSGA2,
+    Metaheuristics.NSGA3,
+    Metaheuristics.SMS_EMOA,
+    Metaheuristics.SPEA2,
+    Metaheuristics.MOEAD_DE,
+    Metaheuristics.CCMO,
+}
+
+_base_parameters(p) = p isa MixedInteger ? _base_parameters(p.base) : p
+_is_mo_method(method) = _base_parameters(method.parameters) isa _MO_PARAMETERS
+
+# A vector objective is solved as a multi-objective problem, unless the sense is
+# FEASIBILITY_SENSE or a legacy `@NLobjective` takes precedence.
+function _is_multiobjective(model::Optimizer)
+    isnothing(model.obj_model) && return false
+    model.sense == MOI.FEASIBILITY_SENSE && return false
+    nlp_obj = !isnothing(model.nlp_block) && model.nlp_block.has_objective
+    return !nlp_obj
+end
+
+function _check_method(method, multiobjective::Bool)
+    name = nameof(typeof(_base_parameters(method.parameters)))
+    if multiobjective && !_is_mo_method(method)
+        throw(ArgumentError(
+            "The objective is a vector, but $name is a single-objective " *
+                "algorithm. Use a multi-objective one, e.g. MixedInteger(NSGA2()).",
+        ))
+    elseif !multiobjective && _is_mo_method(method)
+        throw(ArgumentError(
+            "$name is a multi-objective algorithm, but the objective is scalar. " *
+                "Use a vector objective, e.g. @objective(model, Min, [f1, f2]).",
+        ))
+    end
+    return
+end
+
+# Non-dominated solutions of the final population, MultiObjectiveAlgorithms
+# style: feasible points only (when there is any), duplicated objective vectors
+# removed, and sorted lexicographically by objective vector (reversed for Max).
+function _pareto_points(model::Optimizer{T}, res, objective_scale) where {T}
+    front = Metaheuristics.get_non_dominated_solutions(res.population)
+    feasible = filter(Metaheuristics.is_feasible, front)
+    isempty(feasible) || (front = feasible)
+
+    points = SolutionPoint{T}[]
+    for sol in front
+        y = objective_scale .* Metaheuristics.fval(sol)
+        any(p -> isapprox(p.y, y; atol = 1.0e-6), points) && continue
+        d = Metaheuristics.vec_to_dict(Metaheuristics.get_position(sol), model.search_space)
+        x = _dict_to_values(d, model.search_space, model.var_dist)
+        push!(points, SolutionPoint{T}(x, y, Metaheuristics.is_feasible(sol)))
+    end
+    return sort!(points; by = p -> p.y, rev = model.sense == MOI.MAX_SENSE)
+end
+
 function MOI.optimize!(model::Optimizer{T}) where {T}
     model.results = nothing
+    model.pareto = nothing
     model.infeasible_message = _check_bounds(model)
     if !isnothing(model.infeasible_message)
         !model.silent && @warn model.infeasible_message
@@ -531,11 +630,16 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
     # from `method.status` (population and fitness from a previous solve, maybe
     # of another objective or dimension), and it also mutates parameters and
     # termination criteria. `model.method` is left exactly as the user set it.
-    method = if isnothing(model.method)
-        # TODO add compat with multiobjective optimization
+    multiobjective = _is_multiobjective(model)
+    method = if isnothing(model.method) && multiobjective
+        # NSGA2 picks its own budget (500 iterations) from these options
+        options = Options(verbose = !model.silent)
+        MixedInteger(Metaheuristics.NSGA2(); options)
+    elseif isnothing(model.method)
         options = Options(verbose = !model.silent, iterations = 10_000, f_calls_limit = Inf)
         MixedInteger(Metaheuristics.ECA(adaptive = true); options)
     else
+        _check_method(model.method, multiobjective)
         deepcopy(model.method)
     end
     method.status = Metaheuristics.State(nothing, [])
@@ -570,8 +674,7 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
         return G, zeros(1)
     end
 
-    # TODO: multi-objective
-    function f(solution)
+    function f_single(solution)
         x = _dict_to_values(solution, search_space, var_dist)
         fx = if isnothing(obj_evaluator)
             zero(T)
@@ -584,12 +687,36 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
         fx, gx, hx
     end
 
+    f = if multiobjective
+        mo_evaluator = MOI.Nonlinear.Evaluator(
+            model.obj_model,
+            MOI.Nonlinear.SparseReverseMode(),
+            vars,
+        )
+        MOI.initialize(mo_evaluator, Symbol[])
+        F = zeros(T, model.n_objectives)
+        function f_multi(solution)
+            x = _dict_to_values(solution, search_space, var_dist)
+            MOI.eval_constraint(mo_evaluator, F, x)
+            fx = objective_scale .* F # new vector: F is reused
+            # multi-objective algorithms expect (f, g, h)
+            has_constraints || return fx, zeros(1), zeros(1)
+            gx, hx = constraints(x)
+            fx, gx, hx
+        end
+    else
+        f_single
+    end
+
     model.f = f
     !model.silent && @info "Optimize"
 
     # TODO initial solutions
     #initial_x = starting_value.(model, eachindex(model.starting_values))
     model.results = optimize(f, search_space, method)
+    if multiobjective
+        model.pareto = _pareto_points(model, model.results, objective_scale)
+    end
 
     return
 end
@@ -600,6 +727,12 @@ end
 
 _best_is_feasible(res) = !isempty(res.population) &&
     Metaheuristics.is_feasible(res.best_sol)
+
+# Multi-objective: a feasible point was found when any reported point is feasible.
+function _found_feasible(model::Optimizer)
+    isnothing(model.pareto) || return any(p -> p.feasible, model.pareto)
+    return _best_is_feasible(model.results)
+end
 
 # Stops meaning "the search settled" (not "the budget ran out").
 const _SETTLED = Union{
@@ -617,7 +750,7 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
 
     if term isa _SETTLED
         # settled on an infeasible point: no feasible point was found
-        return _best_is_feasible(model.results) ?
+        return _found_feasible(model) ?
             MOI.LOCALLY_SOLVED :
             MOI.LOCALLY_INFEASIBLE
     elseif term isa Metaheuristics.IterationLimit
@@ -629,7 +762,7 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
     else
         # For other termination reasons (e.g., OtherLimit, UnknownStopReason)
         isempty(model.results.population) && return MOI.OTHER_LIMIT
-        return _best_is_feasible(model.results) ?
+        return _found_feasible(model) ?
             MOI.LOCALLY_SOLVED :
             MOI.LOCALLY_INFEASIBLE
     end
@@ -638,19 +771,25 @@ end
 function MOI.get(model::Optimizer, ::MOI.RawStatusString)
     isnothing(model.infeasible_message) || return model.infeasible_message
     isnothing(model.results) && return "optimize! not called"
-    return Metaheuristics.termination_status_message(model.results)
+    msg = Metaheuristics.termination_status_message(model.results)
+    isnothing(model.pareto) && return msg
+    return "$msg Found $(length(model.pareto)) solution(s)."
 end
 
 function MOI.get(model::Optimizer, ::MOI.ResultCount)
     isnothing(model.results) && return 0
-    # TODO: check for multi-objective case
-    # return length(model.results.population)
+    isnothing(model.pareto) || return length(model.pareto)
     1
 end
 
 function MOI.get(model::Optimizer, attr::MOI.PrimalStatus)
     if !(1 <= attr.result_index <= MOI.get(model, MOI.ResultCount()))
         return MOI.NO_SOLUTION
+    end
+
+    if !isnothing(model.pareto)
+        point = model.pareto[attr.result_index]
+        return point.feasible ? MOI.FEASIBLE_POINT : MOI.INFEASIBLE_POINT
     end
 
     # Check if the best solution is feasible
@@ -669,6 +808,7 @@ MOI.get(::Optimizer, ::MOI.DualStatus) = MOI.NO_SOLUTION
 
 function MOI.get(model::Optimizer, attr::MOI.ObjectiveValue)
     MOI.check_result_index_bounds(model, attr)
+    isnothing(model.pareto) || return copy(model.pareto[attr.result_index].y)
     val = minimum(model.results)
     if model.sense == MOI.MAX_SENSE
         val = -val
@@ -679,10 +819,24 @@ end
 function MOI.get(model::Optimizer, attr::MOI.VariablePrimal, vi::MOI.VariableIndex)
     MOI.check_result_index_bounds(model, attr)
     MOI.throw_if_not_valid(model, vi)
+    isnothing(model.pareto) || return model.pareto[attr.result_index].x[vi.value]
     solution = Metaheuristics.vec_to_dict(minimizer(model.results), model.search_space)
 
     x = _dict_to_values(solution, model.search_space, model.var_dist)
     x[vi.value]
+end
+
+# Multi-objective: the ideal point of the reported solutions (best value of each
+# objective). As with MultiObjectiveAlgorithms, it is not a proven bound here.
+function MOI.get(model::Optimizer, attr::MOI.ObjectiveBound)
+    if isnothing(model.pareto) || isempty(model.pareto)
+        throw(MOI.GetAttributeNotAllowed(
+            attr,
+            "ObjectiveBound is only available after a multi-objective solve.",
+        ))
+    end
+    best = model.sense == MOI.MAX_SENSE ? max : min
+    return reduce((a, b) -> best.(a, b), (p.y for p in model.pareto))
 end
 
 function MOI.get(
