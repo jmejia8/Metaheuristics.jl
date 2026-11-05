@@ -2,7 +2,6 @@ module MetaheuristicsMOIExt
 
 using Metaheuristics
 using SearchSpaces
-#using Metaheuristics.LinearAlgebra
 import MathOptInterface as MOI
 
 function __init__()
@@ -30,7 +29,6 @@ mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     search_space
     var_dist
     f
-    #Union{Nothing,Metaheuristics.MultivariateOptimizationResults}
 end
 
 function Optimizer{T}() where {T}
@@ -167,7 +165,7 @@ end
 
 function MOI.get(model::Optimizer, p::MOI.RawOptimizerAttribute)
     if p.name == "method"
-        return p.method
+        return model.method
     end
     key = Symbol(p.name)
     if haskey(model.options, key)
