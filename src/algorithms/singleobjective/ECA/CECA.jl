@@ -62,8 +62,6 @@ function update_state!(
         end
         # stored but not used until replacement step
         push!(status.population, sol)
-        status.stop = stop_check(status, information, options)
-        status.stop && break
     end
 
     if length(status.population) == N
