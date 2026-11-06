@@ -35,6 +35,8 @@ mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     method::Union{Metaheuristics.AbstractAlgorithm, Nothing}
     silent::Bool
     options::Dict{Symbol, Any}
+    # number of initial solutions built from the start values (`nothing`: default)
+    start_seeds::Union{Nothing, Int}
 
     # Solution attributes.
     results::Union{Nothing, Metaheuristics.State}
@@ -60,6 +62,7 @@ function Optimizer{T}() where {T}
         nothing,
         false,
         Dict{Symbol, Any}(),
+        nothing,
         nothing,
         nothing,
         nothing,
@@ -89,13 +92,17 @@ function MOI.supports(::Optimizer, ::Union{MOI.ObjectiveSense, MOI.ObjectiveFunc
     return true
 end
 MOI.supports(::Optimizer, ::MOI.Silent) = true
+const START_SEEDS = "start_seeds"
+
 function MOI.supports(::Optimizer, p::MOI.RawOptimizerAttribute)
-    return p.name == "method" || hasfield(Metaheuristics.Options, Symbol(p.name))
+    return p.name == "method" ||
+        p.name == START_SEEDS ||
+        hasfield(Metaheuristics.Options, Symbol(p.name))
 end
 
+# Start values may be partial: see `_start_solutions`.
 function MOI.supports(::Optimizer, ::MOI.VariablePrimalStart, ::Type{MOI.VariableIndex})
-    # TODO: starting solution
-    return false
+    return true
 end
 
 # TODO: add ZeroOne constraints, and integer one
@@ -213,6 +220,13 @@ function MOI.set(model::Optimizer, p::MOI.RawOptimizerAttribute, value)
         model.method = value
         return
     end
+    if p.name == START_SEEDS
+        if !(isnothing(value) || (value isa Integer && value >= 1))
+            throw(ArgumentError("\"$START_SEEDS\" must be a positive integer or nothing."))
+        end
+        model.start_seeds = value
+        return
+    end
     MOI.supports(model, p) || throw(MOI.UnsupportedAttribute(p))
     key = Symbol(p.name)
     # convert now, so a wrong value fails here instead of inside `optimize!`
@@ -238,6 +252,9 @@ end
 function MOI.get(model::Optimizer, p::MOI.RawOptimizerAttribute)
     if p.name == "method"
         return model.method
+    end
+    if p.name == START_SEEDS && !isnothing(model.start_seeds)
+        return model.start_seeds
     end
     key = Symbol(p.name)
     if haskey(model.options, key)
@@ -328,15 +345,6 @@ function MOI.add_constraint(
     MOI.ConstraintIndex{typeof(f), typeof(s)}(index.value)
 end
 
-function starting_value(optimizer::Optimizer{T}, i) where {T}
-    if optimizer.starting_values[i] !== nothing
-        return optimizer.starting_values[i]
-    else
-        v = optimizer.variables
-        return min(max(zero(T), v.lower[i]), v.upper[i])
-    end
-end
-
 function MOI.set(
     model::Optimizer,
     ::MOI.VariablePrimalStart,
@@ -345,6 +353,85 @@ function MOI.set(
 )
     MOI.throw_if_not_valid(model, vi)
     model.starting_values[vi.value] = value
+    return
+end
+
+function MOI.get(model::Optimizer, ::MOI.VariablePrimalStart, vi::MOI.VariableIndex)
+    MOI.throw_if_not_valid(model, vi)
+    return model.starting_values[vi.value]
+end
+
+# Default number of initial solutions built from a partial start, as a fraction of
+# the population size N (N is estimated as 10 D when the method chooses it later).
+const START_SEEDS_FRACTION = 0.1
+
+# Population size of `method`, or `nothing` when it is chosen in `initialize!`
+# (e.g. ECA, DE and PSO with the default N = 0).
+function _population_size(method)
+    p = _base_parameters(method.parameters)
+    N = hasproperty(p, :N) ? p.N : 0
+    return N isa Integer && N > 0 ? Int(N) : nothing
+end
+
+function _n_start_seeds(model::Optimizer, method, D, partial::Bool)
+    partial || return 1 # every value is given: more copies would be duplicates
+    N = _population_size(method)
+    k = something(model.start_seeds, ceil(Int, START_SEEDS_FRACTION * something(N, 10D)))
+    # keep the population size (MOEA/D and NSGA-III tie it to their weights)
+    return isnothing(N) ? k : clamp(k, 1, N)
+end
+
+_is_given(v) = !isnothing(v) && isfinite(v)
+
+# `k` positions in the MixedSpace order used by `MixedInteger`, built from the start
+# values. Given values are kept (rounded for integer and binary variables, clamped
+# to rigid bounds), and missing ones are sampled uniformly in the search space. A
+# partial start thus defines a subspace, and each position is a different point of
+# it. Also returns how many given values had to be rounded or clamped.
+function _start_positions(model::Optimizer, search_space, var_dist, k, rng)
+    X = [Float64[] for _ in 1:k]
+    n_changed = 0
+    for key in search_space.key_order
+        space = search_space.domain[key]
+        binary = space isa BitArraySpace
+        discrete = binary || eltype(space.lb) <: Integer
+        for (j, vi) in enumerate(var_dist[key])
+            a, b = binary ? (0.0, 1.0) : (Float64(space.lb[j]), Float64(space.ub[j]))
+            v = model.starting_values[vi.value]
+            if _is_given(v)
+                w = discrete ? round(Float64(v)) : Float64(v)
+                (binary || space.rigid) && (w = clamp(w, a, b))
+                n_changed += w != v
+                foreach(x -> push!(x, w), X)
+            elseif discrete
+                foreach(x -> push!(x, Float64(rand(rng, Int(a):Int(b)))), X)
+            else
+                foreach(x -> push!(x, a + (b - a) * rand(rng)), X)
+            end
+        end
+    end
+    return X, n_changed
+end
+
+# Add the solutions built from the start values (if any) to the initial state of
+# `method`; the base algorithm completes the population with random solutions.
+function _set_start_solutions!(method, model::Optimizer, f, search_space, var_dist)
+    starts = model.starting_values
+    any(_is_given, starts) || return
+    partial = !all(_is_given, starts)
+    D = Metaheuristics.getdim(search_space)
+    k = _n_start_seeds(model, method, D, partial)
+    rng = method.options.rng
+    X, n_changed = _start_positions(model, search_space, var_dist, k, rng)
+    if n_changed > 0 && !model.silent
+        @warn "$n_changed start value(s) rounded or clamped to the variable type and bounds."
+    end
+    for x in X
+        # `vec_to_dict` also writes the rounded values back into `x`
+        fx = f(Metaheuristics.vec_to_dict(x, search_space))
+        sol = Metaheuristics.create_child(x, fx; ε = method.options.h_tol)
+        Metaheuristics.set_user_solutions!(method, sol)
+    end
     return
 end
 
@@ -709,10 +796,10 @@ function MOI.optimize!(model::Optimizer{T}) where {T}
     end
 
     model.f = f
-    !model.silent && @info "Optimize"
+    # after resetting `method.status`, which would discard them
+    _set_start_solutions!(method, model, f, search_space, var_dist)
 
-    # TODO initial solutions
-    #initial_x = starting_value.(model, eachindex(model.starting_values))
+    !model.silent && @info "Optimize"
     model.results = optimize(f, search_space, method)
     if multiobjective
         model.pareto = _pareto_points(model, model.results, objective_scale)

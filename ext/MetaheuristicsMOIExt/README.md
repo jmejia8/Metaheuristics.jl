@@ -116,6 +116,32 @@ is zero (the `Options` default), $10^{-6}$ is used instead:
 set_attribute(model, "h_tol", 1e-4)
 ```
 
+## Initial Solutions
+
+Start values (`set_start_value` or `@variable(..., start = v)`) are added to the
+initial population. They may be given for only some of the variables: the given
+values are kept and the missing ones are sampled uniformly in the search space, so
+a partial start produces several different initial solutions (by default 10% of the
+population size, at most the population size). The rest of the population is random,
+as usual.
+
+```julia
+model = Model(Metaheuristics.Optimizer)
+@variable(model, -5 <= y <= 5)
+@variable(model, 0 <= z <= 10, Int, start = 3)  # y has no start value
+@objective(model, Min, (y - 1.5)^2 + (z - 3)^2)
+
+set_attribute(model, "start_seeds", 20)  # initial solutions built from the start
+JuMP.optimize!(model)
+```
+
+When every variable has a start value, a single initial solution is added. Start
+values of integer and binary variables are rounded, and values outside bounded
+variables are clamped to the bounds (with a warning). Each initial solution is
+evaluated once, so it counts toward the evaluation budget.
+
+## Other Notes
+
 Use `@objective(model, Max, ...)` for maximization. Models without an objective are
 solved as feasibility problems. The legacy `@NLobjective` and `@NLconstraint` macros
 are also supported.

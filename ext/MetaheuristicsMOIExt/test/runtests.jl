@@ -88,7 +88,7 @@ _sum_of_squares(xs, c = 0.0) = MOI.ScalarNonlinearFunction(
         for S in (MOI.LessThan{Float64}, MOI.GreaterThan{Float64}, MOI.EqualTo{Float64})
             @test MOI.supports_constraint(opt, MOI.ScalarNonlinearFunction, S)
         end
-        @test !MOI.supports(opt, MOI.VariablePrimalStart(), MOI.VariableIndex)
+        @test MOI.supports(opt, MOI.VariablePrimalStart(), MOI.VariableIndex)
     end
 
     @testset "Model building and empty!" begin
@@ -822,5 +822,124 @@ _sum_of_squares(xs, c = 0.0) = MOI.ScalarNonlinearFunction(
         @test !MOI.is_empty(opt)
         MOI.empty!(opt)
         @test MOI.is_empty(opt)
+    end
+
+    @testset "Start values (VariablePrimalStart), full and partial" begin
+        opt = _new_optimizer()
+        x = MOI.add_variables(opt, 2)
+        @test MOI.get(opt, MOI.VariablePrimalStart(), x[1]) === nothing
+        MOI.set(opt, MOI.VariablePrimalStart(), x[1], 3.0)
+        @test MOI.get(opt, MOI.VariablePrimalStart(), x[1]) == 3.0
+        MOI.set(opt, MOI.VariablePrimalStart(), x[1], nothing)
+        @test MOI.get(opt, MOI.VariablePrimalStart(), x[1]) === nothing
+
+        # "start_seeds" attribute
+        @test MOI.supports(opt, MOI.RawOptimizerAttribute("start_seeds"))
+        @test_throws ErrorException MOI.get(opt, MOI.RawOptimizerAttribute("start_seeds"))
+        MOI.set(opt, MOI.RawOptimizerAttribute("start_seeds"), 5)
+        @test MOI.get(opt, MOI.RawOptimizerAttribute("start_seeds")) == 5
+        @test_throws ArgumentError MOI.set(opt, MOI.RawOptimizerAttribute("start_seeds"), 0)
+        MOI.set(opt, MOI.RawOptimizerAttribute("start_seeds"), nothing)
+
+        # number of seeds: 10% of N, capped at N, one for a full start, and
+        # N estimated as 10 D when the method chooses it (ECA with N = 0)
+        m30 = _method() # ECA(N = 30)
+        @test Ext._n_start_seeds(opt, m30, 4, true) == 3
+        @test Ext._n_start_seeds(opt, m30, 4, false) == 1
+        MOI.set(opt, MOI.RawOptimizerAttribute("start_seeds"), 100)
+        @test Ext._n_start_seeds(opt, m30, 4, true) == 30
+        MOI.set(opt, MOI.RawOptimizerAttribute("start_seeds"), nothing)
+        @test Ext._n_start_seeds(opt, MixedInteger(ECA()), 4, true) == 4
+    end
+
+    @testset "A full start at the optimum is kept" begin
+        # 2 iterations from a random population do not reach f = 0 exactly
+        opt = _new_optimizer(iterations = 2)
+        x = MOI.add_variables(opt, 3)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(-5.0, 5.0))
+        end
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(
+            opt,
+            MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(),
+            _sum_of_squares(x, 1.5),
+        )
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ObjectiveValue()) > 1.0e-8
+
+        MOI.set.(opt, MOI.VariablePrimalStart(), x, 1.5)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ObjectiveValue()) == 0
+        @test MOI.get.(opt, MOI.VariablePrimal(), x) == [1.5, 1.5, 1.5]
+    end
+
+    @testset "A partial start fixes the given values, samples the rest" begin
+        opt = _new_optimizer(iterations = 2)
+        y = MOI.add_variable(opt) # continuous, no start
+        z = MOI.add_variable(opt) # integer, start 2.7 -> 3
+        b = MOI.add_variable(opt) # binary, no start
+        u = MOI.add_variable(opt) # unbounded (non-rigid), start 40 (outside its box)
+        MOI.add_constraint(opt, y, MOI.Interval(-5.0, 5.0))
+        MOI.add_constraint(opt, z, MOI.Interval(-5.0, 5.0))
+        MOI.add_constraint(opt, z, MOI.Integer())
+        MOI.add_constraint(opt, b, MOI.ZeroOne())
+        MOI.set(opt, MOI.VariablePrimalStart(), z, 2.7)
+        MOI.set(opt, MOI.VariablePrimalStart(), u, 40.0)
+        # only z and u matter, so every seed is optimal
+        obj = MOI.ScalarNonlinearFunction(
+            :+,
+            Any[
+                MOI.ScalarNonlinearFunction(:^, Any[z - 3.0, 2]),
+                MOI.ScalarNonlinearFunction(:^, Any[u - 40.0, 2]),
+            ],
+        )
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(), obj)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ObjectiveValue()) == 0
+        @test MOI.get(opt, MOI.VariablePrimal(), z) == 3
+        @test MOI.get(opt, MOI.VariablePrimal(), u) == 40
+
+        ss, vd = opt.search_space, opt.var_dist
+        rng = Metaheuristics.default_rng_mh(1)
+        X, n_changed = Ext._start_positions(opt, ss, vd, 20, rng)
+        @test length(X) == 20
+        @test n_changed == 1 # z rounded; u is kept (non-rigid)
+        P = [Ext._dict_to_values(Metaheuristics.vec_to_dict(x, ss), ss, vd) for x in X]
+        @test all(p -> p[z.value] == 3 && p[u.value] == 40, P)
+        @test all(p -> -5 <= p[y.value] <= 5 && p[b.value] in (0, 1), P)
+        @test length(unique(p[y.value] for p in P)) == 20
+        @test length(unique(p[b.value] for p in P)) == 2
+    end
+
+    @testset "Start values: rounding warning and multi-objective" begin
+        opt = Ext.Optimizer()
+        MOI.set(opt, MOI.RawOptimizerAttribute("method"), _method(iterations = 2))
+        z = MOI.add_variable(opt)
+        MOI.add_constraint(opt, z, MOI.Interval(0.0, 3.0))
+        MOI.add_constraint(opt, z, MOI.Integer())
+        MOI.set(opt, MOI.VariablePrimalStart(), z, 7.0) # clamped to 3
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{MOI.ScalarNonlinearFunction}(), _sum_of_squares([z]))
+        @test_logs (:warn, r"rounded or clamped") match_mode = :any MOI.optimize!(opt)
+
+        opt = Ext.Optimizer()
+        MOI.set(opt, MOI.Silent(), true)
+        options = Options(seed = 1, iterations = 5)
+        MOI.set(opt, MOI.RawOptimizerAttribute("method"), MixedInteger(NSGA2(N = 20); options))
+        x = MOI.add_variables(opt, 2)
+        for xi in x
+            MOI.add_constraint(opt, xi, MOI.Interval(0.0, 1.0))
+        end
+        MOI.set(opt, MOI.VariablePrimalStart(), x[1], 0.0)
+        F = MOI.Utilities.operate(vcat, Float64, 1.0 * x[1], 1.0 - x[1] + 0.0 * x[2])
+        MOI.set(opt, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(opt, MOI.ObjectiveFunction{typeof(F)}(), F)
+        MOI.optimize!(opt)
+        @test MOI.get(opt, MOI.ResultCount()) > 0
+        # the start gives the extreme point (0, 1) of the front
+        @test any(i -> MOI.get(opt, MOI.ObjectiveValue(i)) ≈ [0.0, 1.0],
+            1:MOI.get(opt, MOI.ResultCount()))
     end
 end
