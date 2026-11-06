@@ -129,11 +129,14 @@ function reproduction(status, parameters::SHADE, problem)
         end
     end
 
-    # save F and CR to update history in environmental_selection
+    # truncate F to [0, 1] (SHADE truncates F > 1; F <= 0 left after the retries goes to 0)
+    F = clamp.(F, 0, 1)
+
+    # save the F and CR actually used, to update history in environmental_selection
     parameters.CR = CR
     parameters.F = F
 
-    F = repeat(clamp.(F, 0, 1), 1, D)
+    F = repeat(F, 1, D)
     mask = rand(N, D) .< CR
 
     # compute offspring positions (matrix X)
@@ -146,6 +149,18 @@ function reproduction(status, parameters::SHADE, problem)
     end
 
     X
+end
+
+_shade_violation(s::AbstractConstrainedSolution) = sum_violations(s)
+_shade_violation(s) = zero(fval(s))
+
+# Improvement of the trial `child` over its `parent`, measured on the same criterion
+# that made the child win under the feasibility rules: constraint violation when the
+# violations differ, objective value otherwise. Positive for every successful trial.
+function _shade_improvement(parent, child)
+    vp, vc = _shade_violation(parent), _shade_violation(child)
+    vp != vc && return vp - vc
+    fval(parent) - fval(child)
 end
 
 function environmental_selection(population, parameters::SHADE)
@@ -167,7 +182,7 @@ function environmental_selection(population, parameters::SHADE)
     for (i, h) in enumerate(new_solutions)
         if is_better(h, population[i], parameters)
             push!(survivals, N + i)
-            push!(Δ, fval(population[i]) - fval(h))
+            push!(Δ, _shade_improvement(population[i], h))
         else
             push!(survivals, i)
         end
@@ -179,10 +194,16 @@ function environmental_selection(population, parameters::SHADE)
 
     mask = filter(>(N), survivals) .- N
 
-    w = Δ ./ sum(Δ)
-    MCR[k] = w' * CR[mask]
-    MF[k] = (w' * F[mask].^2) / (w' * F[mask])
-    k = k % length(MCR) + 1
+    # update the success history only with well-defined improvements
+    valid = isfinite.(Δ) .& (Δ .> 0) .& (F[mask] .> 0)
+    if any(valid)
+        w = Δ[valid] ./ sum(Δ[valid])
+        S_CR = CR[mask[valid]]
+        S_F = F[mask[valid]]
+        MCR[k] = w' * S_CR
+        MF[k] = (w' * S_F.^2) / (w' * S_F) # weighted Lehmer mean
+        parameters.k = k % length(MCR) + 1
+    end
 
     # update archive
     archive = parameters.archive
