@@ -1,8 +1,14 @@
-mutable struct BinomialCrossover
+struct BinomialCrossover{R}
     p::Float64
     n_offsprings::Int
-    rng
+    rng::R
 end
+
+BinomialCrossover(p, n_offsprings, rng) = BinomialCrossover{typeof(rng)}(
+    p,
+    n_offsprings,
+    rng,
+)
 
 function BinomialCrossover(; p = 0.5, n_offsprings = 2, rng = default_rng_mh())
     BinomialCrossover(p, n_offsprings, rng)

@@ -3,10 +3,12 @@
 
 Flip each bit with probability `p`.
 """
-struct BitFlipMutation
+struct BitFlipMutation{R}
     p::Float64
-    rng
+    rng::R
 end
+
+BitFlipMutation(p, rng) = BitFlipMutation{typeof(rng)}(p, rng)
 
 BitFlipMutation(; p = 1.0e-2, rng = default_rng_mh()) = BitFlipMutation(p, rng)
 

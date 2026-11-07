@@ -171,6 +171,10 @@ Metaheuristics.SBX
 Metaheuristics.SBX_crossover
 ```
 
+```@docs
+Metaheuristics.SBX_crossover!
+```
+
 
 ```@docs
 Metaheuristics.ECA_operator

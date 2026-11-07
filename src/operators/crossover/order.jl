@@ -3,8 +3,8 @@
 Order crossover for representation where order is important. Suitable for permutation
 representation.
 """
-struct OrderCrossover
-    rng
+struct OrderCrossover{R}
+    rng::R
 end
 
 OrderCrossover(; rng = default_rng_mh()) = OrderCrossover(rng)

@@ -3,10 +3,12 @@
 
 Uniform crossover a.k.a. Binomial crossover. Suitable for binary representation.
 """
-struct UniformCrossover
+struct UniformCrossover{R}
     p::Float64
-    rng
+    rng::R
 end
+
+UniformCrossover(p, rng) = UniformCrossover{typeof(rng)}(p, rng)
 
 UniformCrossover(; p = 0.5, rng = default_rng_mh()) = UniformCrossover(p, rng)
 

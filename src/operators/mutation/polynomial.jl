@@ -3,12 +3,19 @@
 
 Polynomial mutation.
 """
-struct PolynomialMutation
+struct PolynomialMutation{B, R}
     η::Float64
     p::Float64
-    bounds
-    rng
+    bounds::B
+    rng::R
 end
+
+PolynomialMutation(η, p, bounds, rng) = PolynomialMutation{typeof(bounds), typeof(rng)}(
+    η,
+    p,
+    bounds,
+    rng,
+)
 
 function PolynomialMutation(;
     η = 15.0,
@@ -43,28 +50,36 @@ function polynomial_mutation!(
     rng = default_rng_mh(),
 )
 
-    do_mutation = rand(rng, length(vector)) .< prob
+    xu = bounds.ub
+    xl = bounds.lb
+    n = length(vector)
+    if getdim(bounds) != n
+        throw(DimensionMismatch("vector and bounds must have the same dimension $n"))
+    end
 
-    xu = view(bounds.ub, do_mutation)
-    xl = view(bounds.lb, do_mutation)
-    x = view(vector, do_mutation)
+    # Random numbers are drawn in bulk (same order as previous versions), so seeded runs
+    # are reproducible across versions.
+    u = rand(rng, n)
+    R = rand(rng, count(<(prob), u))
 
-    δ1 = (x - xl) ./ (xu - xl)
-    δ2 = (xu - x) ./ (xu - xl)
-
-    D = length(xu)
-    R = rand(rng, D)
-    mask = R .< 0.5
     s = η + 1
     mut_pow = 1 / (η + 1)
-    δq = [
-        mask[i] ?
-            ^(2R[i] + (1.0 - 2R[i]) * ^(1 - δ1[i], s), mut_pow) - 1 :
-            1 - (2 * (1 - R[i]) + 2 * (R[i] - 0.5) * ^(1 - δ2[i], s))^mut_pow
-        for i in 1:D
-    ]
-
-    vector[do_mutation] = _to_int_if_necessary(eltype(vector), x + δq .* (xu - xl))
+    k = 0
+    @inbounds for j in 1:n
+        u[j] < prob || continue
+        k += 1
+        x = vector[j]
+        Δ = xu[j] - xl[j]
+        δ1 = (x - xl[j]) / Δ
+        δ2 = (xu[j] - x) / Δ
+        r = R[k]
+        δq = if r < 0.5
+            ^(2r + (1.0 - 2r) * ^(1 - δ1, s), mut_pow) - 1
+        else
+            1 - (2 * (1 - r) + 2 * (r - 0.5) * ^(1 - δ2, s))^mut_pow
+        end
+        vector[j] = _to_int_if_necessary(eltype(vector), x + δq * Δ)
+    end
     vector
 end
 
