@@ -185,11 +185,19 @@ Metaheuristics.DE_crossover
 ```
 
 ```@docs
+Metaheuristics.DE_crossover!
+```
+
+```@docs
 Metaheuristics.polynomial_mutation!
 ```
 
 ```@docs
 Metaheuristics.DE_mutation
+```
+
+```@docs
+Metaheuristics.DE_mutation!
 ```
 
 ```@docs
