@@ -13,7 +13,7 @@ end
 
 Parameters for ε Differential Evolution for constrained optimization.
 
-See [DE](@ref) for more details about DE parameters (`DE_kargs`).
+See [`DE`](@ref) for more details about DE parameters (`DE_kargs`).
 
 This implementation is not implementing the gradient-based repair method.
 """
