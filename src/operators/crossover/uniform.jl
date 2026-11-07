@@ -14,37 +14,49 @@ UniformCrossover(; p = 0.5, rng = default_rng_mh()) = UniformCrossover(p, rng)
 
 function crossover(population, parameters::UniformCrossover)
     n = length(population) ÷ 2
-    rng = parameters.rng
-    offspring_A = positions(population[1:n])
-    offspring_B = positions(population[n + 1:2n])
-    mask = rand(rng, size(offspring_A)...) .<= parameters.p
-    # swapping genes
-    tmp = copy(offspring_A[mask])
-    offspring_A[mask] = offspring_B[mask]
-    offspring_B[mask] = tmp
-    [offspring_A; offspring_B]
+    # rows 1:n are the first parents, rows n+1:2n the second ones
+    O = positions(view(population, 1:2n))
+    R = rand(parameters.rng, n, size(O, 2))
+    p = parameters.p
+    # swapping genes (branchless: R is random, so a branch is mispredicted often)
+    @inbounds for j in axes(R, 2), i in 1:n
+        swap = R[i, j] <= p
+        a, b = O[i, j], O[n + i, j]
+        O[i, j] = ifelse(swap, b, a)
+        O[n + i, j] = ifelse(swap, a, b)
+    end
+    O
 end
 
 """
-    DE_crossover(x, u, CR)
+    DE_crossover(x, u, CR; rng)
 
 Binomial crossover between x and u for Differential Evolution with probability CR, i.e.,
 `v[j] = u[j]` if `rand() < CR`, otherwise `v[j] = x[j]`. Return `v`.
 """
-function DE_crossover(x, u, CR)
+function DE_crossover(x, u, CR; rng = default_rng_mh())
+    v = zeros(length(x))
+    v .= u
+    DE_crossover!(v, x, CR; rng)
+end
+
+"""
+    DE_crossover!(u, x, CR; rng)
+
+In-place version of [`DE_crossover`](@ref): `u[j]` is replaced by `x[j]` for the genes
+that are not crossed. Return `u`.
+"""
+function DE_crossover!(u, x, CR; rng = default_rng_mh())
     D = length(x)
-    # binomial crossover
-    v = zeros(D)
-    j_rand = rand(1:D)
+    j_rand = rand(rng, 1:D)
 
     # binomial crossover
-    for j in 1:D
-        if rand() < CR || j == j_rand
-            v[j] = u[j]
-        else
-            v[j] = x[j]
+    @inbounds for j in 1:D
+        if rand(rng) < CR || j == j_rand
+            continue
         end
+        u[j] = x[j]
     end
 
-    return v
+    return u
 end
