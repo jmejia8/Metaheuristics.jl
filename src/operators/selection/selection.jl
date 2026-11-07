@@ -33,7 +33,11 @@ end
 """
     RouletteWheelSelection(;N=0)
 
-Perform Roulette Wheel Selection and return N elements.
+Perform Roulette Wheel Selection (minimization) and return N elements.
+
+Solution `i` is chosen with probability proportional to `1 / fitness[i]`. If some fitness
+value is ≤ 0, the values are shifted first so the smallest becomes 1, i.e., the weights are
+`1 / (fitness[i] - minimum(fitness) + 1)`.
 """
 struct RouletteWheelSelection
     N::Int # solutions required
@@ -46,7 +50,9 @@ function selection(
     fitness = get_fitness(population),
     rng = default_rng_mh(),
 )
-    shift = min(minimum(fitness), zero(eltype(fitness))) + eps()
+    # positive weights: the smallest fitness maps to 1 when it is not positive
+    fmin = minimum(fitness)
+    shift = fmin > 0 ? eps() : fmin - 1
     p = 1 ./ (fitness .- shift)
     # cumulative sum, normalized
     @inbounds for i in 2:length(p)
@@ -90,7 +96,8 @@ end
 function selection(population, parameters::BiasedSelection)
     elites = 1:parameters.num_elites
     no_elites = parameters.num_elites + 1:length(population)
-    n = parameters.num_offsprings ÷ 2
+    # one (elite, non-elite) pair per offspring
+    n = parameters.num_offsprings
 
     parent = ones(Int, 2n)
     parent[1:2:end] = rand(elites, n)
