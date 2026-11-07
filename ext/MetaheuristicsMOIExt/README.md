@@ -14,11 +14,14 @@ julia> import Pkg; Pkg.add(["Metaheuristics", "JuMP"])
 
 ## Quick Start
 
+Assume the aim is solving the following single-objective non-linear constrained problem.
+
 Minimize:
 
 $$f(x) = x_1^2 + x_2^2$$
 
 subject to $x_1 + x_2 \geq 2$, where $x\in [-5, 5]^2$. The optimum is $f(1, 1) = 2$.
+An implementation could be as follows.
 
 ```julia
 using JuMP, Metaheuristics
@@ -33,6 +36,10 @@ JuMP.optimize!(model)
 @show objective_value(model)
 @show value.(x)
 ```
+
+Since both JuMP and Metaheuristics both export `optimize!`, use `JuMP.optimize!`. Otherwise,
+you can use `optimize!(model)` and `using JuMP; import Metaheuristics`.
+
 
 ## Mixed-Integer Constraints
 
@@ -57,10 +64,19 @@ JuMP.optimize!(model)
 ## Multi-Objective Optimization
 
 A vector objective is solved as a multi-objective problem (by default, NSGA-II
-within `MixedInteger`). Each non-dominated solution found is one result, in the
+within [`MixedInteger`](https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/combinatorial/#Metaheuristics.MixedInteger). Each non-dominated solution found is one result, in the
 style of [MultiObjectiveAlgorithms](https://github.com/jump-dev/MultiObjectiveAlgorithms.jl):
-feasible points only (when any was found), without repeated objective vectors,
+feasible points (lexicographical order) only (when any was found), without repeated objective vectors,
 sorted by objective vector (in decreasing order for `Max`).
+
+Consider the following bi-objective mixed-integer problem.
+
+Minimize:
+
+$$F(x, k) = \left(x_1^2 + x_2^2 + k,\ (x_1 - 1)^2 + 3 - k\right)$$
+
+subject to $x_1 + x_2 \geq 0.5$, where $x \in [0, 1]^2$ and $k \in \{0, 1, 2, 3\}$.
+The Pareto front is disconnected, with one piece for each value of $k$.
 
 ```julia
 model = Model(Metaheuristics.Optimizer)
@@ -88,7 +104,7 @@ objective (or the opposite) raises an `ArgumentError`.
 
 ## Solver Options
 
-By default, `ECA` is used within `MixedInteger`. Use the `"method"` attribute to choose
+By default, `ECA` is used within [`MixedInteger`](https://jmejia8.github.io/Metaheuristics.jl/stable/algorithms/combinatorial/#Metaheuristics.MixedInteger). Use the `"method"` attribute to choose
 another algorithm and its options:
 
 ```julia
@@ -100,7 +116,7 @@ set_attribute(model, "method", method)
 set_silent(model)
 ```
 
-Any field of `Options` can also be set as an attribute. These values override the
+Any field of [`Options`](https://jmejia8.github.io/Metaheuristics.jl/stable/api/#Metaheuristics.Options) can also be set as an attribute. These values override the
 ones in the method options (the method object itself is never modified):
 
 ```julia
