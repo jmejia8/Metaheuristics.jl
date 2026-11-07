@@ -4,13 +4,13 @@ using Test
 @testset "Constrained" begin
 
     function test_result(fitness, tol)
-        @test ≈(fitness, 0.0, atol=tol)
+        @test ≈(fitness, 0.0, atol = tol)
     end
 
     function run_methods_cop(problem)
-        desired_accuracy = 1e-4
+        desired_accuracy = 1.0e-4
 
-        ff, bounds, optimums = Metaheuristics.TestProblems.get_problem(problem)
+        ff, bounds, _ = Metaheuristics.TestProblems.get_problem(problem)
 
         # number of function evaluations
         f_calls = 0
@@ -21,12 +21,18 @@ using Test
         end
 
         information = Information(f_optimum = 0.0)
-        options = Options(f_tol = desired_accuracy, h_tol=1e-5, seed = 2, debug=false, store_convergence=true)
+        options = Options(
+            f_tol = desired_accuracy,
+            h_tol = 1.0e-5,
+            seed = 2,
+            debug = false,
+            store_convergence = true,
+        )
 
         methods = [
-                   ECA(ε=0.5, options = options, information = information),
-                   εDE(options = options, information = information),
-                  ]
+            ECA(ε = 0.5, options = options, information = information),
+            εDE(options = options, information = information),
+        ]
 
         for method in methods
             f_calls = 0
@@ -36,13 +42,19 @@ using Test
             show(IOBuffer(), "text/html", res.population)
             show(IOBuffer(), res.population[1])
             show(IOBuffer(), method)
-            fitness = minimum( res ) 
+            fitness = minimum(res)
             test_result(fitness, desired_accuracy)
             @test f_calls == res.f_calls
             @test fvals(res) == fvals(res.population)
             assert_constrained_result!(ff, res, bounds)
-            @test Metaheuristics.diff_check(res, method.information, method.options) isa Bool
-            @test Metaheuristics.diversity_stop_check(res, method.information, method.options) isa Bool
+            @test Metaheuristics.diff_check(res, method.information, method.options) isa
+                Bool
+            @test Metaheuristics.diversity_stop_check(
+                res,
+                method.information,
+                method.options,
+            ) isa
+                Bool
         end
     end
 

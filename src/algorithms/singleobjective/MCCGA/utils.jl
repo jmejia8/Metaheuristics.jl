@@ -4,42 +4,43 @@
 ##################################################################
 
 function initialprobs(
-        lower::Array{T,1},
-        upper::Array{T,1},
-        rng;
-        maxsamples = 10000,
-    ) where {T<:Number}
+    lower::Array{T, 1},
+    upper::Array{T, 1},
+    rng;
+    maxsamples = 10000,
+) where {T <: Number}
 
     p = length(lower)
     @assert p == length(upper)
 
     bitlen = p * 32
-    mat = Array{Int8,2}(undef, maxsamples, bitlen)
-    for tries = 1:maxsamples
+    mat = Array{Int8, 2}(undef, maxsamples, bitlen)
+    for tries in 1:maxsamples
         randvalues = map((x, y) -> x + rand(rng) * (y - x), lower, upper)
         mat[tries, :] .= bits(randvalues)
     end
     return colmeans(mat)
 end
 
-function sample(probs::Array{T,1}, rng) where {T<:Number}
-    return map(x -> if rand(rng) < x
-        1
-    else
-        0
-    end, probs)
+function sample(probs::Array{T, 1}, rng) where {T <: Number}
+    return map(
+        x -> if rand(rng) < x
+            1
+        else
+            0
+        end,
+        probs,
+    )
 end
 
-
-function colmeans(mat::Array{T,2})::Array{Float64,1} where {T<:Number}
+function colmeans(mat::Array{T, 2})::Array{Float64, 1} where {T <: Number}
     _, p = size(mat)
-    means = Array{Float64,1}(undef, p)
-    for i = 1:p
+    means = Array{Float64, 1}(undef, p)
+    for i in 1:p
         means[i] = mean(mat[:, i])
     end
     return means
 end
-
 
 """
         bits(value)
@@ -91,10 +92,10 @@ for Real Parameter Optimization Problems." Alphanumeric Journal 8.1 (2020): 43-5
 Satman, Mehmet Hakan, and Emre Akadal. "Makine Kodlu Hibrit Kompakt Genetik Algoritmalar 
 Optimizasyon Yöntemi", TR Patent 2018-GE-510,239    
 """
-function bits(f::T)::Array{Int8,1} where {T<:Number}
+function bits(f::T)::Array{Int8, 1} where {T <: Number}
     newf = Float32(f)
     casted = reinterpret(Int32, newf)
-    return map(i-> casted >> i & 1, 31:(-1):0)
+    return map(i -> casted >> i & 1, 31:(-1):0)
 end
 
 """
@@ -126,10 +127,9 @@ for Real Parameter Optimization Problems." Alphanumeric Journal 8.1 (2020): 43-5
 Satman, Mehmet Hakan, and Emre Akadal. "Makine Kodlu Hibrit Kompakt Genetik Algoritmalar 
 Optimizasyon Yöntemi", TR Patent 2018-GE-510,239    
 """
-function bits(fs::Array{T,1})::Array{Int8,1} where {T<:Number}
+function bits(fs::Array{T, 1})::Array{Int8, 1} where {T <: Number}
     return map(x -> bits(x), fs) |> x -> vcat(x...)
 end
-
 
 """
         floats(bitarray)
@@ -170,9 +170,9 @@ for Real Parameter Optimization Problems." Alphanumeric Journal 8.1 (2020): 43-5
 Satman, Mehmet Hakan, and Emre Akadal. "Makine Kodlu Hibrit Kompakt Genetik Algoritmalar 
 Optimizasyon Yöntemi", TR Patent 2018-GE-510,239    
 """
-function floats(bitarray::Array{T,1})::Array{Float64,1} where {T<:Integer}
+function floats(bitarray::Array{T, 1})::Array{Float64, 1} where {T <: Integer}
     numbits = length(bitarray)
-    values = Array{Float64,1}(undef, 0)
+    values = Array{Float64, 1}(undef, 0)
     starting = 1
     while true
         ending = starting + 32 - 1
@@ -189,24 +189,18 @@ function floats(bitarray::Array{T,1})::Array{Float64,1} where {T<:Integer}
     return values
 end
 
-
-
 function mutate(par, p, d)
     newpar = copy(par)
     newpar[p] += d
     return newpar
 end
 
-
-function exploratory_search(
-    f::FType,
-    base::Vector{Float64},
-    step::Float64,
-) where {FType <: Function}
+function exploratory_search(f::FType, base::Vector{Float64}, step::Float64) where {FType <:
+    Function}
     x = copy(base)
     fx = f(x)
 
-    for i = 1:length(x)
+    for i in 1:length(x)
         xleft = mutate(x, i, -step)
         fleft = f(xleft)
         if fleft < fx
@@ -225,7 +219,6 @@ function exploratory_search(
 
     return x, fx
 end
-
 
 function hj(
     f::FType,
@@ -272,4 +265,3 @@ function hj(
 
     return Dict("par" => base, "iter" => iter, "step" => currentstep)
 end
-

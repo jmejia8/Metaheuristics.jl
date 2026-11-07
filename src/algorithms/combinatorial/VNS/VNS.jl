@@ -73,17 +73,28 @@ end
 main()
 ```
 """
-function VNS(;initial=nothing,neighborhood_shaking=nothing, neighborhood_local=nothing,
-        local_search=FirstImproveSearch(), neighborhood_change=SequentialChange(),
-        options=Options(), information=Information())
+function VNS(;
+    initial = nothing,
+    neighborhood_shaking = nothing,
+    neighborhood_local = nothing,
+    local_search = FirstImproveSearch(),
+    neighborhood_change = SequentialChange(),
+    options = Options(),
+    information = Information(),
+)
 
     # TODO
-    if isnothing(neighborhood_shaking) && isnothing(neighborhood_local) 
+    if isnothing(neighborhood_shaking) && isnothing(neighborhood_local)
         error("Provide neighborhood_shaking and neighborhood_local.")
     end
 
-    parameters = VNS(initial, neighborhood_shaking, neighborhood_local,
-                     local_search, neighborhood_change)
+    parameters = VNS(
+        initial,
+        neighborhood_shaking,
+        neighborhood_local,
+        local_search,
+        neighborhood_change,
+    )
 
     Algorithm(parameters; options, information)
 end
@@ -108,7 +119,15 @@ function neighborhood_change(old, new, k, ::CyclicChange)
     k, old
 end
 
-function update_state!(status, parameters::VNS, problem, information, options, args...; kargs...)
+function update_state!(
+    status,
+    parameters::VNS,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
     # current solution
     sol = first(status.population)
     k = 1
@@ -120,8 +139,11 @@ function update_state!(status, parameters::VNS, problem, information, options, a
 
         # perform local search around xp using VND
         # TODO: update this for considering other VNS variants (for the local search)
-        vnd = VND(;initial=xp, neighborhood=parameters.neighborhood_local,
-                  local_search = parameters.local_search)
+        vnd = VND(;
+            initial = xp,
+            neighborhood = parameters.neighborhood_local,
+            local_search = parameters.local_search,
+        )
         _res_local = optimize(problem.f, problem.search_space, vnd)
         sol_new = _res_local.best_sol
 
@@ -138,4 +160,3 @@ function update_state!(status, parameters::VNS, problem, information, options, a
     # save sol (x) for the next iteration of VNS
     status.population = [sol]
 end
-

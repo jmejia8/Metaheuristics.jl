@@ -1,14 +1,14 @@
 # GSA code v0.1.
-# Coded by Jesús Mejía. 
-# Based on MATLAB code of Esmat Rashedi, 2010. 
-# Adopted from 
+# Coded by Jesús Mejía.
+# Based on MATLAB code of Esmat Rashedi, 2010.
+# Adopted from
 # https://la.mathworks.com/matlcgsaentral/fileexchange/61116-gsa-+-chaotic-gravitational-constant
 # " E. Rashedi, H. Nezamabadi-pour and S. Saryazdi,
 # “GSA: A Gravitational Search Algorithm”, Information sciences, vol. 179,
 # no. 13, pp. 2232-2248, 2009."
 # ------------------------------------------
-# Mirjalili, Seyedali, and Amir H. Gandomi. 
-# "Chaotic gravitational constants for the gravitational search algorithm." 
+# Mirjalili, Seyedali, and Amir H. Gandomi.
+# "Chaotic gravitational constants for the gravitational search algorithm."
 # Applied Soft Computing 53 (2017): 407-419.
 # ------------------------------------------
 
@@ -16,14 +16,14 @@ include("physics.jl")
 include("chaos.jl")
 
 mutable struct CGSA <: AbstractParameters
-    N::Int    
-    chValueInitial::Real   
-    chaosIndex::Real   
-    ElitistCheck::Int    
-    Rpower::Int    
-    Rnorm::Int    
-    wMax::Real   
-    wMin::Real   
+    N::Int
+    chValueInitial::Real
+    chaosIndex::Real
+    ElitistCheck::Int
+    Rpower::Int
+    Rnorm::Int
+    wMax::Real
+    wMin::Real
     X::Matrix{Float64}
     V::Matrix{Float64}
     fitness::Vector{Float64}
@@ -88,45 +88,51 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], CGSA(N = 80, chaosIndex = 1))
 
 """
 function CGSA(;
-        N::Int    = 30,
-        chValueInitial::Real   = 20,
-        chaosIndex::Real   = 8,
-        ElitistCheck::Int    = 1,
-        Rpower::Int    = 1,
-        Rnorm::Int    = 2,
-        wMax::Real   = chValueInitial,
-        wMin::Real   = 1e-10,
-        X::Matrix{Float64} = zeros(0,0),
-        V::Matrix{Float64} = zeros(0,0),
-        fitness::Vector{Float64} = zeros(0),
-        kargs...
+    N::Int = 30,
+    chValueInitial::Real = 20,
+    chaosIndex::Real = 8,
+    ElitistCheck::Int = 1,
+    Rpower::Int = 1,
+    Rnorm::Int = 2,
+    wMax::Real = chValueInitial,
+    wMin::Real = 1.0e-10,
+    X::Matrix{Float64} = zeros(0, 0),
+    V::Matrix{Float64} = zeros(0, 0),
+    fitness::Vector{Float64} = zeros(0),
+    kargs...,
+)
+
+    parameters = CGSA(
+        N,
+        chValueInitial,
+        chaosIndex,
+        ElitistCheck,
+        Rpower,
+        Rnorm,
+        wMax,
+        wMin,
+        X,
+        V,
+        fitness,
     )
 
-    parameters = CGSA(N, chValueInitial, chaosIndex, ElitistCheck, Rpower, Rnorm, wMax, wMin, X, V, fitness)
-
-
-    Algorithm(
-        parameters;
-        kargs...
-    )
+    Algorithm(parameters; kargs...)
 end
 
 function initialize!(
-        status,
-        parameters::CGSA,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-       )
-
+    status,
+    parameters::CGSA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     Rnorm = parameters.Rnorm
     N = parameters.N
     D = getdim(problem)
     fobj = problem.f
-
 
     # bounds vectors
     low = problem.search_space.lb
@@ -136,34 +142,34 @@ function initialize!(
     options.iterations = options.iterations == 0 ? max_it : options.iterations
 
     # random initialization for agents.
-    status = gen_initial_state(problem,parameters,information,options,status)
+    status = gen_initial_state(problem, parameters, information, options, status)
     N = parameters.N
-    options.f_calls_limit = options.f_calls_limit == 0 ? options.iterations * N : options.f_calls_limit
+    options.f_calls_limit = options.f_calls_limit == 0 ?
+        options.iterations * N :
+        options.f_calls_limit
 
     # Velocity
-    parameters.V = isempty(parameters.V) ? zeros(N,D) : parameters.V
+    parameters.V = isempty(parameters.V) ? zeros(N, D) : parameters.V
     # Postions
     parameters.X = isempty(parameters.X) ? positions(status) : parameters.X
     # function values
     if isempty(parameters.fitness)
         parameters.fitness = fvals(status.population)
     end
-    
 
     return status
 
 end
 
 function update_state!(
-        status,
-        parameters::CGSA,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-        )
-
+    status,
+    parameters::CGSA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     wMax = parameters.wMax
     N = parameters.N
@@ -171,7 +177,7 @@ function update_state!(
     max_it = options.iterations
     iteration = status.iteration
     searchType = :minimize
-    chaosIndex = parameters.chaosIndex	
+    chaosIndex = parameters.chaosIndex
     Rnorm = parameters.Rnorm
     Rpower = parameters.Rpower
     ElitistCheck = parameters.ElitistCheck
@@ -184,32 +190,30 @@ function update_state!(
     theBest = status.best_sol
 
     # iteration
-    chValue = wMax-iteration*((wMax-wMin)/max_it)
+    chValue = wMax - iteration * ((wMax - wMin) / max_it)
 
     #Calculation of M. eq.14-20
-    M = massCalculation(fitness,searchType)
+    M = massCalculation(fitness, searchType)
 
     #Calculation of Gravitational constant. eq.13.
     G = Gconstant(iteration, max_it)
 
     if 1 <= chaosIndex <= 10
-        G += chaos(chaosIndex,iteration,max_it,chValue)
+        G += chaos(chaosIndex, iteration, max_it, chValue)
     end
 
-
     #Calculation of accelaration in gravitational field. eq.7-10,21.
-    a = Gfield(M,X,G,Rnorm,Rpower,ElitistCheck,iteration,max_it, options.rng)
+    a = Gfield(M, X, G, Rnorm, Rpower, ElitistCheck, iteration, max_it, options.rng)
 
     #Agent movement. eq.11-12
-    X, V = move(X,a,V, options.rng)
-
+    X, V = move(X, a, V, options.rng)
 
     #
-    # Checking allowable range. 
+    # Checking allowable range.
     # X = correctPop(X, low, up)
-    for i = 1:N
-        x = reset_to_violated_bounds!(X[i,:], problem.search_space)
-        X[i,:] = x
+    for i in 1:N
+        x = reset_to_violated_bounds!(X[i, :], problem.search_space)
+        X[i, :] = x
     end
 
     status.population = create_solutions(X, problem)
@@ -218,7 +222,7 @@ function update_state!(
     parameters.fitness = fvals(status.population)
     parameters.V = V
 
-    #Evaluation of agents. 
+    #Evaluation of agents.
     currentBest = get_best(status.population)
 
     if is_better(currentBest, theBest)
@@ -229,16 +233,14 @@ function update_state!(
 
 end
 
-
 function final_stage!(
-        status,
-        parameters::CGSA,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::CGSA,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
     status.final_time = time()
 end
-

@@ -10,15 +10,15 @@ Aqua.test_all(Metaheuristics, ambiguities = false)
 end
 
 for tests in [
-              "common-methods.jl",
-              "invariants.jl",
-              "box-constrained.jl",
-              "optimize_api.jl",
-              "constrained.jl",
-              "multi-objective.jl",
-              "combinatorial.jl",
-              "decisionmaking.jl",
-              "initial_solution.jl",
-             ]
+        "common-methods.jl",
+        "invariants.jl",
+        "box-constrained.jl",
+        "optimize_api.jl",
+        "constrained.jl",
+        "multi-objective.jl",
+        "combinatorial.jl",
+        "decisionmaking.jl",
+        "initial_solution.jl",
+    ]
     include(tests)
 end

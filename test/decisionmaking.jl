@@ -1,11 +1,11 @@
 @testset "DecisionMaking: Compromise Programming" begin
     function test_cp()
-        _, _, pf = Metaheuristics.TestProblems.ZDT1();
+        _, _, pf = Metaheuristics.TestProblems.ZDT1()
         res = State(pf[1], pf)
 
         w = [0.1, 0.9]
 
-        scalarizing_funcs = [WeightedSum(), Tchebysheff(), AchievementScalarization() ]
+        scalarizing_funcs = [WeightedSum(), Tchebysheff(), AchievementScalarization()]
 
         for fn in scalarizing_funcs
             method = CompromiseProgramming(fn)
@@ -16,15 +16,15 @@
             @test Metaheuristics.compare(fval(sol), fval(res.population[idx])) == 0
         end
     end
-    
-    test_cp() 
+
+    test_cp()
 end
 
 @testset "DecisionMaking: ROI" begin
-    function test_roi(w = [0.1 0.9; 0.9 0.1], δ = [0.1,0.1])
-        _, _, pf = Metaheuristics.TestProblems.ZDT1();
+    function test_roi(w = [0.1 0.9; 0.9 0.1], δ = [0.1, 0.1])
+        _, _, pf = Metaheuristics.TestProblems.ZDT1()
         res = State(pf[1], pf)
-        
+
         method = ROIArchiving(δ)
         idx = decisionmaking(res, w, method)
         @test !isempty(idx)
@@ -32,30 +32,41 @@ end
         @test length(sols) == length(idx)
     end
 
-    
-    test_roi() 
-    test_roi([0.0 1; 1 0; 0.5 0.5], [0.1, 0.2, 0.3]) 
+    test_roi()
+    test_roi([0.0 1; 1 0; 0.5 0.5], [0.1, 0.2, 0.3])
 end
 
 @testset "DecisionMaking: JMcDM" begin
     function test_jmcdm()
-        _, _, pf = Metaheuristics.TestProblems.ZDT1();
+        _, _, pf = Metaheuristics.TestProblems.ZDT1()
         res = State(pf[1], pf)
 
         w = [0.5, 0.5]
 
         methods = [
-                   ArasMethod, CocosoMethod, CodasMethod, CoprasMethod, 
-                   EdasMethod, ElectreMethod, GreyMethod, MabacMethod, MaircaMethod,
-                   MooraMethod, SawMethod, TopsisMethod, VikorMethod, WPMMethod,
-                   WaspasMethod, MarcosMethod
-                  ]
+            ArasMethod,
+            CocosoMethod,
+            CodasMethod,
+            CoprasMethod,
+            EdasMethod,
+            ElectreMethod,
+            GreyMethod,
+            MabacMethod,
+            MaircaMethod,
+            MooraMethod,
+            SawMethod,
+            TopsisMethod,
+            VikorMethod,
+            WPMMethod,
+            WaspasMethod,
+            MarcosMethod,
+        ]
 
         for method in methods
             res_dm = mcdm(res, w, method())
             res_dm2 = mcdm(MCDMSetting(res, w), method())
             @test res_dm.bestIndex == res_dm2.bestIndex
-            
+
             # bestIndex can be touple and needs to be handled...
             idx = res_dm.bestIndex isa Tuple ? res_dm.bestIndex[1] : res_dm.bestIndex
             ref_sol = res.population[idx]
@@ -74,4 +85,3 @@ end
     test_jmcdm()
 
 end
-

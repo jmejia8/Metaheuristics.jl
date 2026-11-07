@@ -1,5 +1,11 @@
-function _after_optimization!(status, parameters, problem, information, options, convergence)
-    
+function _after_optimization!(
+    status,
+    parameters,
+    problem,
+    information,
+    options,
+    convergence,
+)
 
     t = time()
     final_stage!(status, parameters, problem, information, options)
@@ -7,5 +13,5 @@ function _after_optimization!(status, parameters, problem, information, options,
 
     options.debug && @info "Termination reason: " * termination_status_message(status)
     # save convergence
-    status.convergence = convergence;
+    status.convergence = convergence
 end

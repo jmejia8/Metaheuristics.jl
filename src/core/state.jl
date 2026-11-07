@@ -66,27 +66,24 @@ mutable struct State{T}
 
 end
 
-function State(
-        best_sol,
-        population;
-
-        # upper level parameters
-        f_calls = 0,
-        g_calls = 0,
-        h_calls = 0,
-        iteration = 1,
-        success_rate = 0,
-        convergence = State[],
-        start_time = 0.0,
-        final_time = 0.0,
-        stop = false,
-    )
+function State(best_sol, population;
+    
+    # upper level parameters
+    f_calls = 0,
+    g_calls = 0,
+    h_calls = 0,
+    iteration = 1,
+    success_rate = 0,
+    convergence = State[],
+    start_time = 0.0,
+    final_time = 0.0,
+    stop = false,
+)
 
     termination_status_code = UNKNOWN_STOP_REASON
-    State(#
+    State( #
         best_sol,
         Array(population),
-
         # upper level parameters
         promote(f_calls, g_calls, h_calls, iteration)...,
         Float64(success_rate),
@@ -95,7 +92,7 @@ function State(
         final_time,
         final_time - start_time,
         stop,
-        termination_status_code
+        termination_status_code,
     )
 
 end
@@ -123,7 +120,7 @@ positions(s::State) = positions(s.population)
 If `state.population` has `N` solutions, then returns a `Vector` with the 
 objective function values from items in `state.population`.
 """
-fvals(s::State{T}) where T <: AbstractSolution = fvals(s.population)
+fvals(s::State{T}) where {T <: AbstractSolution} = fvals(s.population)
 
 """
     nfes(state)
@@ -166,10 +163,10 @@ function convergence(s::State)
     isempty(sc) ? (zeros(Int, 0), zeros(0)) : (map(nfes, sc), map(minimum, sc))
 end
 
-
 function update_convergence!(convergence, status)
     push!(convergence, deepcopy(status))
 end
 
-
-termination_status_message(status::State) = termination_status_message(status.termination_status_code)
+termination_status_message(status::State) = termination_status_message(
+    status.termination_status_code,
+)

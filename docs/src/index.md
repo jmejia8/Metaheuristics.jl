@@ -96,6 +96,14 @@ minimum(result)
 minimizer(result)
 ```
 
+## Using Metaheuristics with JuMP
+
+Metaheuristics can also be used as a solver in [JuMP](https://github.com/jump-dev/JuMP.jl)
+via `Model(Metaheuristics.Optimizer)`. The extension loads automatically when JuMP (or
+MathOptInterface) is available, and supports nonlinear constraints, integer and binary
+variables, multi-objective problems, and start values. See the
+[JuMP extension README](https://github.com/jmejia8/Metaheuristics.jl/blob/master/ext/MetaheuristicsMOIExt/README.md)
+for examples and solver options.
 
 ## Contents
 

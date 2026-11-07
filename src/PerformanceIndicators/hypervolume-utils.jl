@@ -11,23 +11,25 @@ Computation, pages 1157-1163, Vancouver, Canada, July 2006.
 
 mutable struct Node
     cargo::Vector
-    next::Vector{Union{Nothing,Node}}
-    prev::Vector{Union{Nothing,Node}}
+    next::Vector{Union{Nothing, Node}}
+    prev::Vector{Union{Nothing, Node}}
     ignore::Int
     area::Vector{Float64}
     volume::Vector{Float64}
 end
 
-function Node(numberLists, cargo = zeros(0);
-        next   = fill(nothing, numberLists),
-        prev   = fill(nothing, numberLists),
-        ignore = 0,
-        area   = zeros(numberLists),
-        volume = zeros(numberLists),
-    )
+function Node(
+    numberLists,
+    cargo = zeros(0);
+    next = fill(nothing, numberLists),
+    prev = fill(nothing, numberLists),
+    ignore = 0,
+    area = zeros(numberLists),
+    volume = zeros(numberLists),
+)
 
     Node(cargo, next, prev, ignore, area, volume)
-    
+
 end
 
 function extend!(sentinel::Node, nodes, index)
@@ -41,13 +43,11 @@ function extend!(sentinel::Node, nodes, index)
     end
 end
 
-
-
 """
     Removes and returns 'node' from all lists in 1,2,..., 'index'.
 """
 function remove!(node::Node, index, bounds)
-    for i in 1:index-1
+    for i in 1:index - 1
         predecessor = node.prev[i]
         successor = node.next[i]
         predecessor.next[i] = successor
@@ -59,7 +59,6 @@ function remove!(node::Node, index, bounds)
     end
     return node
 end
-
 
 """
 Inserts 'node' at the position it had in all lists in [1, 'index']
@@ -78,5 +77,3 @@ function reinsert!(node::Node, index, bounds)
 
     node
 end
-
-

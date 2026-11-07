@@ -1,29 +1,33 @@
 #in julia 1.11 and above, compute_itspace was removed.
-if isdefined(Base,:compute_itspace)
-    compute_itspace(A,v) = Base.compute_itspace(A,v)
+if isdefined(Base, :compute_itspace)
+    compute_itspace(A, v) = Base.compute_itspace(A, v)
 else
     # Works around inference's lack of ability to recognize partial constness
     struct DimSelector{dims, T}
         A::T
     end
-    
+
     DimSelector{dims}(x::T) where {dims, T} = DimSelector{dims, T}(x)
     (ds::DimSelector{dims, T})(i) where {dims, T} = i in dims ? axes(ds.A, i) : (:,)
 
     function compute_itspace(A, ::Val{dims}) where {dims}
-        negdims = filter(i->!(i in dims), 1:ndims(A))
+        negdims = filter(i -> !(i in dims), 1:ndims(A))
         axs = Iterators.product(ntuple(DimSelector{dims}(A), ndims(A))...)
         vec(permutedims(collect(axs), (dims..., negdims...)))
     end
 end
 
-function sortslicesperm(A::AbstractArray; dims::Union{Integer, Tuple{Vararg{Integer}}}, kws...)
+function sortslicesperm(
+    A::AbstractArray;
+    dims::Union{Integer, Tuple{Vararg{Integer}}},
+    kws...,
+)
     _sortslicesperm(A, Val{dims}(); kws...)
 end
 
-function _sortslicesperm(A::AbstractArray, d::Val{dims}; kws...) where dims
+function _sortslicesperm(A::AbstractArray, d::Val{dims}; kws...) where {dims}
     itspace = compute_itspace(A, d)
-    vecs = map(its->view(A, its...), itspace)
+    vecs = map(its -> view(A, its...), itspace)
     p = sortperm(vecs; kws...)
     if ndims(A) == 2 && isa(dims, Integer) && isa(A, Array)
         # At the moment, the performance of the generic version is subpar
@@ -40,7 +44,6 @@ function _sortslicesperm(A::AbstractArray, d::Val{dims}; kws...) where dims
     end
 end
 
-
 function calculate_hv(points, bounds, k, n_sample)
 
     # This function is modified from the code in
@@ -49,27 +52,27 @@ function calculate_hv(points, bounds, k, n_sample)
     N, M = size(points)
     if M > 2
         # Use the estimated method for three or more objectives
-        alpha = zeros(1,N); 
-        for i = 1:k 
-            J = 1:i-1
-            alpha[i] = prod((k .- J)./(N .- J ))./i
+        alpha = zeros(1, N)
+        for i in 1:k
+            J = 1:i - 1
+            alpha[i] = prod((k .- J) ./ (N .- J)) ./ i
         end
 
         f_min = ideal(points)
         S = f_min' .+ (bounds - f_min)' .* rand(n_sample, M)
 
-        PdS  = zeros(Bool, N,n_sample)
-        dS   = zeros(Int, n_sample)
-        for i = 1:N
-            x = sum(points[i,:]' .- S .<= 0, dims = 2) .== M
-            mask = view(x, :,1)
+        PdS = zeros(Bool, N, n_sample)
+        dS = zeros(Int, n_sample)
+        for i in 1:N
+            x = sum(points[i, :]' .- S .<= 0, dims = 2) .== M
+            mask = view(x, :, 1)
             PdS[i, mask] .= true
-            dS[mask]    = dS[mask] .+ 1
+            dS[mask] = dS[mask] .+ 1
         end
 
         F = zeros(N)
-        for i = 1:N
-            mask = view(dS, view(PdS, i,:))
+        for i in 1:N
+            mask = view(dS, view(PdS, i, :))
             F[i] = sum(alpha[mask])
         end
 

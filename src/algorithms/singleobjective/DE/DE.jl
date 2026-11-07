@@ -13,8 +13,6 @@ end
 
 include("epsilonDE.jl")
 
-
-
 """
     DE(;
         N  = 0,
@@ -56,17 +54,16 @@ julia> optimize(f, [-1 -1 -1; 1 1 1.0], DE(N=50, F=1.5, CR=0.8))
 
 """
 function DE(;
-        N::Int = 0,
-        F = 0.7,
-        CR = 0.5,
-        CR_min = CR,
-        CR_max = CR,
-        F_min = F,
-        F_max = F,
-        strategy::Symbol = :rand1,
-        kargs...
-    )
-
+    N::Int = 0,
+    F = 0.7,
+    CR = 0.5,
+    CR_min = CR,
+    CR_max = CR,
+    F_min = F,
+    F_max = F,
+    strategy::Symbol = :rand1,
+    kargs...,
+)
 
     parameters = DE(N, promote(F, CR, CR_min, CR_max, F_min, F_max)..., strategy)
 
@@ -74,42 +71,41 @@ function DE(;
 
 end
 
-
 function update_state!(
-        status,
-        parameters::AbstractDifferentialEvolution,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
-
+    status,
+    parameters::AbstractDifferentialEvolution,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
 
     # stepsize
     if parameters.F_min < parameters.F_max
-        parameters.F = parameters.F_min + (parameters.F_max - parameters.F_min) * rand(options.rng)
+        parameters.F = parameters.F_min +
+            (parameters.F_max - parameters.F_min) * rand(options.rng)
     end
 
     if parameters.CR_min < parameters.CR_max
-        parameters.CR = parameters.CR_min + (parameters.CR_max - parameters.CR_min) * rand(options.rng)
+        parameters.CR = parameters.CR_min +
+            (parameters.CR_max - parameters.CR_min) * rand(options.rng)
     end
 
     new_vectors = reproduction(status, parameters, problem)
 
     # evaluate solutions
-    new_solutions = create_solutions(new_vectors, problem,ε=options.h_tol)
+    new_solutions = create_solutions(new_vectors, problem, ε = options.h_tol)
     append!(status.population, new_solutions)
 
     environmental_selection!(status.population, parameters)
     status.best_sol = get_best(status.population)
 end
 
-
 function environmental_selection(population, parameters::AbstractDifferentialEvolution)
-    @assert length(population) == 2*parameters.N
+    @assert length(population) == 2 * parameters.N
 
-    new_solutions = population[parameters.N+1:end]
+    new_solutions = population[parameters.N + 1:end]
     population = population[1:parameters.N]
 
     survivals = Int[]
@@ -125,7 +121,6 @@ function environmental_selection(population, parameters::AbstractDifferentialEvo
     return survivals
 end
 
-
 function environmental_selection!(population, parameters::AbstractDifferentialEvolution)
     mask = environmental_selection(population, parameters)
     ignored = ones(Bool, length(population))
@@ -136,17 +131,15 @@ function environmental_selection!(population, parameters::AbstractDifferentialEv
 end
 
 function initialize!(
-        status,
-        parameters::AbstractDifferentialEvolution,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::AbstractDifferentialEvolution,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
     D = getdim(problem)
-
-
 
     if parameters.N <= 5
         parameters.N = 10 * D
@@ -154,35 +147,32 @@ function initialize!(
 
     if parameters.CR < 0 || parameters.CR > 1
         parameters.CR = 0.5
-        options.debug &&
-        @warn("CR should be from interval [0,1]; set to default value 0.5")
+        options.debug && @warn("CR should be from interval [0,1]; set to default value 0.5")
     end
 
     if options.f_calls_limit == 0
         options.f_calls_limit = 10000D
-        options.debug &&
-        @warn( "f_calls_limit increased to $(options.f_calls_limit)")
+        options.debug && @warn("f_calls_limit increased to $(options.f_calls_limit)")
     end
 
     if options.iterations == 0
         options.iterations = div(options.f_calls_limit, parameters.N) + 1
     end
 
-    return gen_initial_state(problem,parameters,information,options,status)
+    return gen_initial_state(problem, parameters, information, options, status)
 end
 
 function final_stage!(
-        status,
-        parameters::AbstractDifferentialEvolution,
-        problem::AbstractProblem,
-        information::Information,
-        options::Options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::AbstractDifferentialEvolution,
+    problem::AbstractProblem,
+    information::Information,
+    options::Options,
+    args...;
+    kargs...,
+)
     status.final_time = time()
 end
-
 
 function reproduction(status, parameters::AbstractDifferentialEvolution, problem)
     population = status.population
@@ -203,10 +193,10 @@ function reproduction(status, parameters::AbstractDifferentialEvolution, problem
         u = DE_mutation(population, F, strategy, 1)
         v = DE_crossover(x, u, CR)
         evo_boundary_repairer!(v, xBest, problem.search_space)
-        X[i,:] .= _fix_type(v, problem.search_space)
+        X[i, :] .= _fix_type(v, problem.search_space)
     end
 
-    X 
+    X
 end
 
 is_better(a, b, parameters::AbstractDifferentialEvolution) = is_better(a, b)

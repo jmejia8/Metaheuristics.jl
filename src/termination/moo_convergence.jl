@@ -1,8 +1,7 @@
 abstract type MOOConvergenceTermination <: AbstractTermination end
 
-
 Base.@kwdef mutable struct RobustConvergence <: ConvergenceTermination
-    ftol::Float64 = 1e-3
+    ftol::Float64 = 1.0e-3
     period::Int = 10
     _last_population = []
     _iter::Int = 0
@@ -20,13 +19,11 @@ function stop_check(f_current, f_last, criterion::RobustConvergence)
     # normalization denominator
     Δ = fmax - fmin
     Δ[Δ .≈ 0] .= one(eltype(Δ))
-    
+
     # if extrema are not in tolerance, then don't stop
     !_check_extremas(fmin ./ Δ, ideal(f_last) ./ Δ, tol) && return false
-    !_check_extremas(fmax ./ Δ, nadir(f_last) ./ Δ, tol) && return false 
-    
-    
-    
+    !_check_extremas(fmax ./ Δ, nadir(f_last) ./ Δ, tol) && return false
+
     # normalize fronts
     f_current = (f_current .- fmin') ./ Δ'
     f_last = (f_last .- fmin') ./ Δ'
@@ -48,4 +45,3 @@ function stop_check(population::AbstractVector, criterion::RobustConvergence)
     criterion._last_population = deepcopy(population)
     stop
 end
-

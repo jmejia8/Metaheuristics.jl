@@ -37,7 +37,7 @@ struct LatinHypercubeSampling <: AbstractInitializer
     N::Int
     dim::Int
     iterations::Int
-    LatinHypercubeSampling(nsamples, dim;iterations=25) = new(nsamples,dim,iterations)
+    LatinHypercubeSampling(nsamples, dim; iterations = 25) = new(nsamples, dim, iterations)
 end
 
 """
@@ -77,7 +77,7 @@ julia> sample(LatinHypercubeSampling(10,2), [-10 -10;10 10.0])
  -4.71696    5.0381
 ```
 """
-function sample(method::LatinHypercubeSampling, bounds = zeros(0,0))
+function sample(method::LatinHypercubeSampling, bounds = zeros(0, 0))
     X = _lhs(method.N, method.dim)
     score = _score_lhs(X)
     # sample improving
@@ -101,10 +101,9 @@ end
 
 _score_lhs(M) = minimum(pairwise_distances(M))
 function _scale_sample(X, bounds)
-    a = view(bounds, 1,:)'
-    b = view(bounds, 2,:)'
-    @assert length(a) == size(X,2)
+    a = view(bounds, 1, :)'
+    b = view(bounds, 2, :)'
+    @assert length(a) == size(X, 2)
     # scale sample
     a .+ (b - a) .* X
 end
-

@@ -18,7 +18,8 @@
         methods = [ABC, DE, ECA, PSO, WOA, MCCGA, CGSA]
 
         for method in methods
-            for N in [5, 10, 20] # vary the population size
+            for N in [5, 10, 20]
+                # vary the population size
                 algo = method(N = N, options = options, information = information)
                 # one solution
                 set_user_solutions!(algo, x_optimum, f)
@@ -28,10 +29,12 @@
 
                 # check if size of x and f is defferent
                 X = ones(4, size(bounds, 2))
-                set_user_solutions!(algo,
-                                    X,
-                                    f.([ones(size(bounds, 2)) for i in 1:5]),
-                                    verbose = false)
+                set_user_solutions!(
+                    algo,
+                    X,
+                    f.([ones(size(bounds, 2)) for i in 1:5]),
+                    verbose = false,
+                )
 
                 res = optimize(f, bounds, algo)
 
@@ -39,7 +42,7 @@
                 assert_population_size!(res, algo)
                 assert_minimizer_structure!(ff, res, bounds)
                 @test minimum(res) ≈ first(fvals(optimums))
-                @test sum(abs,minimizer(res)-x_optimum) ≈ 0
+                @test sum(abs, minimizer(res) - x_optimum) ≈ 0
                 # TODO check the number of function evaluations
                 #@test f_calls == nfes(res)
             end
@@ -64,11 +67,12 @@
         methods = [SPEA2, SMS_EMOA, NSGA2, NSGA3]
 
         for method in methods
-            for N in [5, 10, 20] # vary the population size
+            for N in [5, 10, 20]
+                # vary the population size
                 algo = method(N = N, options = options, information = information)
                 # initial solutions
                 X = rand(10, size(bounds, 2))
-                X[1,:] = x_optimum
+                X[1, :] = x_optimum
                 set_user_solutions!(algo, X, f)
 
                 res = optimize(f, bounds, algo)
@@ -76,8 +80,8 @@
                 assert_population_size!(res, algo)
                 assert_multiobjective_result!(ff, res, bounds)
                 # check whether optimum was used by optimizer
-                v = sum(abs.(positions(res) .- x_optimum'), dims=2) |> minimum 
-                @test  v ≈ 0
+                v = sum(abs.(positions(res) .- x_optimum'), dims = 2) |> minimum
+                @test v ≈ 0
             end
         end
     end

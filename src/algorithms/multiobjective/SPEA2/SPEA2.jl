@@ -61,20 +61,11 @@ display(status)
 ```
 
 """
-function SPEA2(;
-    N = 100,
-    η_cr = 20,
-    p_cr = 0.9,
-    η_m = 20,
-    p_m = -1,
-    kargs...
-)
+function SPEA2(; N = 100, η_cr = 20, p_cr = 0.9, η_m = 20, p_m = -1, kargs...)
 
-    parameters = SPEA2(N, promote( Float64(η_cr), p_cr, η_m, p_m )...,[])
+    parameters = SPEA2(N, promote(Float64(η_cr), p_cr, η_m, p_m)..., [])
     Algorithm(parameters; kargs...)
 end
-
-
 
 function update_state!(
     status::State,
@@ -83,8 +74,8 @@ function update_state!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
 
     if isempty(parameters.fitness)
         parameters.fitness = compute_fitness(status.population)
@@ -98,8 +89,6 @@ function update_state!(
     environmental_selection!(status.population, parameters)
 end
 
-
-
 function environmental_selection!(population, parameters::SPEA2)
     Distance = pairwise_distances(population)
     fitness = compute_fitness(population, Distance)
@@ -111,7 +100,7 @@ function environmental_selection!(population, parameters::SPEA2)
         rank = sortperm(fitness)
         next[rank[1:N]] .= true
     elseif K > N
-        del  = truncation(population[next], K-N, Distance[next,next])
+        del = truncation(population[next], K - N, Distance[next, next])
         temp = findall(next)
         next[temp[del]] .= false
     end
@@ -126,10 +115,10 @@ end
 function truncation(population, K, distance = pairwise_distances(population))
     del = zeros(Bool, length(population))
     while count(del) < K
-        remain   = findall(.!del)
+        remain = findall(.!del)
         #temp     = sortperm(distance[remain,remain], dims = 2)
         # rank     = sortslicesperm(temp, dims=1)
-        nn = argmin(distance[remain,remain])
+        nn = argmin(distance[remain, remain])
         del[remain[nn.I[1]]] = true
     end
 
@@ -138,23 +127,20 @@ end
 
 function compute_fitness(population, Distance = pairwise_distances(population))
     N = length(population)
-    dominate = zeros(Bool,N, N)
+    dominate = zeros(Bool, N, N)
     for i in 1:N
-        for j in i+1:N
+        for j in i + 1:N
             k = compare(population[i], population[j])
-            dominate[i,j] = k == 1
-            dominate[j,i] = k == 2
+            dominate[i, j] = k == 1
+            dominate[j, i] = k == 2
         end
     end
 
-    S = sum(dominate,dims=2)[:,1]
-    R = [ sum(S[dominate[:,i]]) for i in 1:N]
+    S = sum(dominate, dims = 2)[:, 1]
+    R = [sum(S[dominate[:, i]]) for i in 1:N]
 
-    distance = sort(Distance,dims=2)
+    distance = sort(Distance, dims = 2)
 
-
-    D = 1 ./ (distance[:,floor(Int,sqrt(N))] .+ 2)
+    D = 1 ./ (distance[:, floor(Int, sqrt(N))] .+ 2)
     return R + D
 end
-
-

@@ -1,7 +1,7 @@
 name = "Metaheuristics"
 uuid = "bcdb8e00-2c21-11e9-3065-2b553b22f898"
-version = "3.5.0"
-authors = ["Jesus Mejia <jesusmejded@gmail.com>"]
+version = "3.6.0"
+authors = ["Jesus Adolfo Mejia <jesusmejded@gmail.com>"]
 
 [deps]
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
@@ -16,12 +16,19 @@ SearchSpaces = "eb7571c6-2196-4f03-99b8-52a5a35b3163"
 SnoopPrecompile = "66db9d55-30c0-4569-8b51-7e840670fc0c"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
+[weakdeps]
+MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+
+[extensions]
+MetaheuristicsMOIExt = "MathOptInterface"
+
 [compat]
 Aqua = "^0.8"
 Distances = "^0.10.7"
 Distributions = "^0.25"
 JMcDM = "^0.7.1"
 LinearAlgebra = "1"
+MathOptInterface = "1.17"
 Printf = "1"
 Random = "1"
 Reexport = "^1"
@@ -39,4 +46,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["Aqua", "Test", "UnicodePlots"]
+test = ["Aqua", "Test", "UnicodePlots", "MathOptInterface"]

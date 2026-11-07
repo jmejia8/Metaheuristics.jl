@@ -2,12 +2,12 @@ function initialize_closest_weight_vectors!(parameters)
     distances = zeros(parameters.N, parameters.N)
     λ = parameters.λ
     for i in 1:parameters.N
-        for j in (i+1):parameters.N
+        for j in (i + 1):parameters.N
             distances[i, j] = norm(λ[i] - λ[j])
             distances[j, i] = distances[i, j]
         end
         I = sortperm(distances[i, :])
-        push!(parameters.B, I[2:parameters.T+1])
+        push!(parameters.B, I[2:parameters.T + 1])
     end
 end
 
@@ -29,7 +29,7 @@ function update_reference_point!(z::Vector{Float64}, population)
     end
 end
 
-function g(fx, λ, z) 
+function g(fx, λ, z)
     m = -Inf
     for i in eachindex(z)
         v = λ[i] * abs(fx[i] - z[i])
@@ -37,7 +37,6 @@ function g(fx, λ, z)
             m = v
         end
     end
-    
+
     return m
 end
-

@@ -58,12 +58,12 @@ function construct(constructor::GreedyRandomizedConstructor)
         cmin = minimum(cost)
         cmax = maximum(cost)
         # compute restricted candidate list
-        RCL = [i for i in eachindex(candidates) if cost[i] <= cmin + α*(cmax - cmin) ]
+        RCL = [i for i in eachindex(candidates) if cost[i] <= cmin + α * (cmax - cmin)]
         if isempty(RCL)
             @error "RCL is empty. Try increasing α or check your `compute_cost` method."
             return
         end
-        
+
         # select candidate at random and insert into solution
         s = rand(constructor.rng, RCL)
         push!(S, candidates[s])

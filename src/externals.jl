@@ -12,10 +12,14 @@ using Requires
 using Reexport
 
 @reexport import SearchSpaces
-@reexport import SearchSpaces: BoxConstrainedSpace, PermutationSpace, BitArraySpace, MixedSpace
+@reexport import SearchSpaces:
+    BoxConstrainedSpace,
+    PermutationSpace,
+    BitArraySpace,
+    MixedSpace
 @reexport import SearchSpaces: cardinality
 using SearchSpaces
-import SearchSpaces: AbstractSearchSpace,getdim
+import SearchSpaces: AbstractSearchSpace, getdim
 import SearchSpaces: AtomicSearchSpace, AbstractSampler, Sampler
 
 """
@@ -40,4 +44,3 @@ function __init__()
         include("common/show_plots.jl")
     end
 end
-

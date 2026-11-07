@@ -7,7 +7,6 @@ mutable struct SMS_EMOA <: AbstractNSGA
     n_samples::Int
 end
 
-
 include("update-population.jl")
 
 """
@@ -72,15 +71,13 @@ function SMS_EMOA(;
     η_m = 20,
     p_m = -1,
     n_samples = 10_000,
-    kargs...
+    kargs...,
 )
 
-    parameters = SMS_EMOA(N, promote( Float64(η_cr), p_cr, η_m, p_m)..., n_samples)
+    parameters = SMS_EMOA(N, promote(Float64(η_cr), p_cr, η_m, p_m)..., n_samples)
     Algorithm(parameters; kargs...)
 
 end
-
-
 
 function update_state!(
     status::State,
@@ -89,42 +86,43 @@ function update_state!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
-
+    kargs...,
+)
 
     I = randperm(parameters.N)
     J = randperm(parameters.N)
 
     if options.parallel_evaluation
         Q = zeros(parameters.N, getdim(problem))
-    end 
+    end
 
-    for i = 1:parameters.N
+    for i in 1:parameters.N
         pa = tournament_selection(status.population, options, I[i])
         pb = tournament_selection(status.population, options, J[i])
 
         # crossover
-        _, c = SBX_crossover(get_position(pa),
-                             get_position(pb),
-                             problem.search_space,
-                             parameters.η_cr,
-                             parameters.p_cr)
-       
+        _, c = SBX_crossover(
+            get_position(pa),
+            get_position(pb),
+            problem.search_space,
+            parameters.η_cr,
+            parameters.p_cr,
+        )
+
         # mutation
         polynomial_mutation!(c, problem.search_space, parameters.η_m, parameters.p_m)
-       
+
         # repair solutions if necesary
         reset_to_violated_bounds!(c, problem.search_space)
 
         if options.parallel_evaluation
-            Q[i,:] = c
+            Q[i, :] = c
             continue
         end
 
         # evaluate offspring
         offspring = create_solution(c, problem)
-       
+
         # Reduce: save offspring in population and reduce population according to
         # front contribution
         update_population!(status.population, offspring, parameters.n_samples)
@@ -137,13 +135,12 @@ function update_state!(
     environmental_selection!(status.population, parameters)
 end
 
-
 function environmental_selection!(population, parameters::SMS_EMOA)
     if length(population) <= parameters.N
         return
     end
 
-    new_solutions = population[parameters.N+1:end]
+    new_solutions = population[parameters.N + 1:end]
     population = population[1:parameters.N]
 
     for (i, offspring) in enumerate(new_solutions)
@@ -160,7 +157,8 @@ function initialize!(
     information::Information,
     options::Options,
     args...;
-    kargs...)
+    kargs...,
+)
 
     D = getdim(problem)
 
@@ -176,7 +174,7 @@ function initialize!(
         options.f_calls_limit = options.iterations * parameters.N + 1
     end
 
-    status = gen_initial_state(problem,parameters,information,options,status)
+    status = gen_initial_state(problem, parameters, information, options, status)
 
     status
 
@@ -189,11 +187,10 @@ function final_stage!(
     information::Information,
     options::Options,
     args...;
-    kargs...
-    )
+    kargs...,
+)
     status.final_time = time()
 
     #status.best_sol = get_pareto_front(status.population, is_better)
 
 end
-

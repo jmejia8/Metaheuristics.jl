@@ -4,7 +4,7 @@ function _before_optimization!(f, search_space, method, logger)
     information = method.information
     options = method.options
     parameters = method.parameters
-    problem = Problem(f, search_space; parallel_evaluation=options.parallel_evaluation)
+    problem = Problem(f, search_space; parallel_evaluation = options.parallel_evaluation)
     # check whether optimizer is compatible with search_space
     check_compat(problem.search_space, method.parameters)
     seed!(options.seed)
@@ -26,20 +26,21 @@ function _before_optimization!(f, search_space, method, logger)
     if isempty(termination.checkall) && isempty(termination.checkany)
         if fval(first(status.population)) isa Array
             # multi-objective termination criterion
-            c = RobustConvergence(ftol=options.f_tol)
+            c = RobustConvergence(ftol = options.f_tol)
             options.debug && @info("Set termination criteria: RobustConvergence")
         else
             # single-objective criteria (convergence based)
-            c = CheckConvergence(f_tol_abs = options.f_tol,
-                                 f_tol_rel = options.f_tol_rel,
-                                 x_tol = options.x_tol)
+            c = CheckConvergence(
+                f_tol_abs = options.f_tol,
+                f_tol_rel = options.f_tol_rel,
+                x_tol = options.x_tol,
+            )
             options.debug && @info("Set termination criteria: convergence indicators")
         end
-        
+
         push!(termination.checkany, c)
     end
-    
-    
+
     # show status if necessary
     show_status(status, parameters, options)
 
@@ -58,4 +59,3 @@ function _before_optimization!(f, search_space, method, logger)
 
     status, parameters, problem, information, options, convergence
 end
-

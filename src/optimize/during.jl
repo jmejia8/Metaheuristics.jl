@@ -1,4 +1,13 @@
-function _during_optimization!(status, parameters, problem, information, options, convergence, logger, termination)
+function _during_optimization!(
+    status,
+    parameters,
+    problem,
+    information,
+    options,
+    convergence,
+    logger,
+    termination,
+)
     status.iteration += 1
     t = time()
     # perform one optimization step

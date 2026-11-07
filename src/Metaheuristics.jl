@@ -24,7 +24,7 @@ export TournamentSelection, RouletteWheelSelection
 export UniformCrossover, OrderCrossover, SBX
 export BitFlipMutation, SlightMutation, PolynomialMutation
 export GenerationalReplacement, ElitistReplacement, RankAndCrowding
-export sample, LatinHypercubeSampling, Grid 
+export sample, LatinHypercubeSampling, Grid
 export εDE, Restart
 export optimize!
 export set_user_solutions!
@@ -34,13 +34,11 @@ export RDEx
 
 include("externals.jl")
 
-
 include("core/abstracts.jl")
 include("core/information.jl")
 include("core/options.jl")
 include("core/state.jl")
 include("core/structures.jl")
-
 
 include("solutions/individual.jl")
 include("solutions/constrained.jl")
@@ -58,11 +56,8 @@ include("common/compare.jl")
 include("common/non-dominated-sorting.jl")
 include("common/set_user_solutions.jl")
 
-
-
 include("TestProblems/TestProblems.jl")
 include("PerformanceIndicators/PerformanceIndicators.jl")
-
 
 include("algorithms/algorithm.jl")
 include("parameters/parameters.jl")
@@ -85,6 +80,9 @@ include("algorithms/combinatorial/combinatorial.jl")
 include("algorithms/stop_criteria.jl")
 include("DecisionMaking/DecisionMaking.jl")
 include("precompile/precompile.jl")
+
+# for MOI preload symbol
+global Optimizer
 
 #######################################################
 #                                                     #

@@ -14,32 +14,31 @@ function neighborhood_structure(x, s, i)
     # The i-th neighbour in the k-th neighborhood around x
     n = nameof(typeof(s))
 
-    error("""
+    error(
+        """
             Define your neighborhood as follows:
 
             function neighborhood_structure(x, s::$n, i)
                 # ...
             end
-            """
-           )
+            """,
+    )
 end
 
-
 function neighborhood_structure(permutation, s::TwoOptNeighborhood, i)
-    k = s.k-1
+    k = s.k - 1
     if i isa Integer
-        if !(1 <= i <= length(permutation)-k && 1 <= k <= length(permutation))
+        if !(1 <= i <= length(permutation) - k && 1 <= k <= length(permutation))
             return nothing
         end
     else
-        i = rand(i, 1:length(permutation)-k)
+        i = rand(i, 1:length(permutation) - k)
     end
-    reverse!(view(permutation, i:i+k))
+    reverse!(view(permutation, i:i + k))
     permutation
 end
 
-
-function Base.iterate(iter::NeighborhoodIterator, state=(copy(iter.x), 1))
+function Base.iterate(iter::NeighborhoodIterator, state = (copy(iter.x), 1))
     # reuse same x from state
     x, i = state
     x .= iter.x
@@ -48,6 +47,5 @@ function Base.iterate(iter::NeighborhoodIterator, state=(copy(iter.x), 1))
         return v
     end
     # return to current solution
-    v, (x, i+1)
+    v, (x, i + 1)
 end
-

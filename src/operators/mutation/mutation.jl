@@ -1,6 +1,5 @@
 include("insert_random.jl")
 
-
 """
     DE_mutation(population, F = 1.0, strategy = :rand1)
 
@@ -8,11 +7,7 @@ Generate a `Vector` computed from population used in Differential Evolution.
 Parameters: `F` is the stepsize, `strategy` can be one the following `:best1`, `:rand2`,
 `:randToBest1` or `:best2`.
 """
-function DE_mutation(population,
-                    F::Float64 = 1.0,
-                    strategy::Symbol=:rand1,
-                    best_ind=0
-    )
+function DE_mutation(population, F::Float64 = 1.0, strategy::Symbol = :rand1, best_ind = 0)
 
     N = length(population)
 
@@ -28,15 +23,14 @@ function DE_mutation(population,
         r2 = rand(1:N)
     end
 
-
-    x = get_position(population[i] )
+    x = get_position(population[i])
     a = get_position(population[r1])
     b = get_position(population[r2])
 
     # strategy is selected here
     if strategy == :rand1
         # DE/rand/1
-        return  x + F * (a - b)
+        return x + F * (a - b)
     end
 
     r3 = rand(1:N)
@@ -87,4 +81,3 @@ function DE_mutation(population,
 
     return u
 end
-

@@ -1,10 +1,9 @@
 abstract type AbstractVNS <: AbstractParameters end
 
-
 struct VND{I, N, L} <: AbstractVNS
-    initial::I 
+    initial::I
     neighborhood::N # neighborhood structures
-    local_search::L  # local search strategy
+    local_search::L # local search strategy
 end
 
 """
@@ -57,19 +56,31 @@ end
 main()
 ```
 """
-function VND(;initial = nothing, neighborhood = nothing, local_search = BestImproveSearch(),
-        options=Options(), information=Information())
+function VND(;
+    initial = nothing,
+    neighborhood = nothing,
+    local_search = BestImproveSearch(),
+    options = Options(),
+    information = Information(),
+)
 
     parameters = VND(initial, neighborhood, local_search)
-    
+
     Algorithm(parameters; options, information)
 end
-
 
 iscompatible(::BitArraySpace, ::AbstractVNS) = true
 iscompatible(::PermutationSpace, ::AbstractVNS) = true
 
-function initialize!(status, parameters::AbstractVNS, problem, information, options, args...; kargs...)
+function initialize!(
+    status,
+    parameters::AbstractVNS,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     if isnothing(parameters.initial)
         x0 = rand(options.rng, problem.search_space)
@@ -81,23 +92,23 @@ function initialize!(status, parameters::AbstractVNS, problem, information, opti
     if options.iterations <= 0
         options.iterations = 500
     end
-    
+
     sol = create_solution(x0, problem)
-	# TODO
-	State(sol, [sol])
+    # TODO
+    State(sol, [sol])
 end
 
 function update_state!(
-        status,
-        parameters::VND,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::VND,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
-    improvement = false 
+    improvement = false
     l = 1
 
     #  check if movement is required
@@ -129,6 +140,12 @@ function update_state!(
     status.stop = !improvement
 end
 
-
-function final_stage!(status, parameters::AbstractVNS, problem, information, options, args...; kargs...)
-end
+function final_stage!(
+    status,
+    parameters::AbstractVNS,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+) end

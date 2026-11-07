@@ -41,7 +41,7 @@ end
 
 function _point_in_bounds(x, space)
     if space isa BoxConstrainedSpace && eltype(space.lb) <: AbstractFloat
-        return all(space.lb .- 1e-6 .<= x .<= space.ub .+ 1e-6)
+        return all(space.lb .- 1.0e-6 .<= x .<= space.ub .+ 1.0e-6)
     end
     return x in space
 end
@@ -140,7 +140,7 @@ function assert_multiobjective_result!(ff, res, bounds)
     pf1 = pareto_front(res)
     pf2 = pareto_front(res.population)
     @test size(pf1, 1) == size(pf2, 1) &&
-          Metaheuristics.PerformanceIndicators.igd(pf1, pf2) ≈ 0.0
+        Metaheuristics.PerformanceIndicators.igd(pf1, pf2) ≈ 0.0
     return nothing
 end
 
@@ -149,7 +149,12 @@ end
 
 Check constraint metadata and feasibility of solutions in `res`.
 """
-function assert_constrained_feasibility!(res; h_tol=1e-3, g_tol=0.0, vio_atol=1e-2)
+function assert_constrained_feasibility!(
+    res;
+    h_tol = 1.0e-3,
+    g_tol = 0.0,
+    vio_atol = 1.0e-2,
+)
     for sol in res.population
         @test Metaheuristics.is_feasible(sol) == (Metaheuristics.sum_violations(sol) == 0.0)
         expected_vio = Metaheuristics.violationsSum(gval(sol), hval(sol))
@@ -157,7 +162,7 @@ function assert_constrained_feasibility!(res; h_tol=1e-3, g_tol=0.0, vio_atol=1e
             # ε-constraint methods may mark tiny violations as feasible
             @test expected_vio < vio_atol
         else
-            @test Metaheuristics.sum_violations(sol) ≈ expected_vio atol=vio_atol
+            @test Metaheuristics.sum_violations(sol) ≈ expected_vio atol = vio_atol
         end
     end
     best = res.best_sol
@@ -171,7 +176,7 @@ end
 
 Bounds, stored objectives, and constraint metadata for constrained problems.
 """
-function assert_constrained_result!(ff, res, bounds; h_tol=1e-3, g_tol=0.0)
+function assert_constrained_result!(ff, res, bounds; h_tol = 1.0e-3, g_tol = 0.0)
     space = normalize_bounds(bounds)
     for sol in res.population
         _assert_solution_structure!(ff, sol, space)
@@ -179,7 +184,7 @@ function assert_constrained_result!(ff, res, bounds; h_tol=1e-3, g_tol=0.0)
     @test _point_in_bounds(minimizer(res), space)
     @test fval(res.best_sol) == minimum(res)
     @test minimum(res) <= minimum(fvals(res.population))
-    assert_constrained_feasibility!(res; h_tol=h_tol, g_tol=g_tol)
+    assert_constrained_feasibility!(res; h_tol = h_tol, g_tol = g_tol)
     return nothing
 end
 

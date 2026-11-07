@@ -1,4 +1,4 @@
-_epsilon(A, B, j) = [maximum(A[i,:] ./ (B[j,:])) for i in 1:size(A, 1)]
+_epsilon(A, B, j) = [maximum(A[i, :] ./ (B[j, :])) for i in 1:size(A, 1)]
 
 """
     epsilon_indicator(A, B)
@@ -43,16 +43,15 @@ function epsilon_indicator(A::AbstractMatrix, B::AbstractMatrix)
     ma = minimum(A)
     mb = minimum(B)
     _c = min(ma, mb)
-    
+
     mb == zero(typeof(mb)) && error("Second argument contains zeros.")
- 
+
     if _c < zero(typeof(_c))
         A = A .- 2_c
         B = B .- 2_c
     end
 
-    return maximum([minimum(_epsilon(A, B, j)) for j in 1:size(B,1)])
+    return maximum([minimum(_epsilon(A, B, j)) for j in 1:size(B, 1)])
 end
 
 epsilon_indicator(A, B) = epsilon_indicator(fvals(A), fvals(B))
-

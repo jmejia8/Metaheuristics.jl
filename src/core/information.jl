@@ -47,7 +47,7 @@ julia> state = optimize(f, bounds, ECA(information=information, options=options)
 +============================+
 ```
 """
-function Information(;#
+function Information(; #
     f_optimum = NaN,
     x_optimum::Array{Float64} = Float64[],
 )
@@ -55,4 +55,3 @@ function Information(;#
     Information(Float64(f_optimum), x_optimum)
 
 end
-

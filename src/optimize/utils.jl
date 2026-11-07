@@ -9,16 +9,12 @@ Get default parameters for metaheuristic `H` regarding f and the search_space.
 ga = Metaheuristics.get_parameters(f, Permutations(10), GA)
 ```
 """
-get_parameters(f, search_space, ::Type{T}) where T <: AbstractParameters = T()
-
+get_parameters(f, search_space, ::Type{T}) where {T <: AbstractParameters} = T()
 
 function show_status_oneline(status, parameters, options)
     # sorry of the hard code :-)
     !options.verbose && (return)
-    d = Any[
-         "Iteration" => status.iteration,
-         "Num. Evals" => nfes(status),
-        ]
+    d = Any["Iteration" => status.iteration, "Num. Evals" => nfes(status)]
     # show header
 
     t = status.iteration
@@ -30,7 +26,7 @@ function show_status_oneline(status, parameters, options)
         n = length(get_non_dominated_solutions(status.population))
         s = sprint(print, "$n/$(length(status.population))")
         push!(d, "    NDS   " => s)
-        # 
+        #
     end
     # feas = count(is_feasible.(status.population)) ÷ length(status.population)
     try
@@ -41,17 +37,19 @@ function show_status_oneline(status, parameters, options)
     push!(d, "   Time   " => @sprintf("%.4f s", status.overall_time))
 
     if m isa Number
-        v = stop_check(status,
-                       CheckConvergence(
-                                        f_tol_abs = options.f_tol,
-                                        f_tol_rel = options.f_tol_rel,
-                                        x_tol =options.x_tol
-                                       ),
-                       report = false
-                      ) ? "Yes" : "No"
+        v = stop_check(
+            status,
+            CheckConvergence(
+                f_tol_abs = options.f_tol,
+                f_tol_rel = options.f_tol_rel,
+                x_tol = options.x_tol,
+            ),
+            report = false,
+        ) ?
+            "Yes" :
+            "No"
         push!(d, "Converged " => @sprintf("%10s", v))
     end
-    
 
     if status.iteration <= 1 || status.iteration % 1000 == 0
         nm = first.(d)
@@ -69,7 +67,7 @@ function show_status_oneline(status, parameters, options)
             @printf("% 10s | ", v)
         elseif v isa AbstractFloat
             @printf("%1.4e | ", v)
-        else 
+        else
             print(v, " | ")
         end
     end
@@ -84,7 +82,6 @@ function show_status(status, parameters, options)
     display(status)
 end
 
-
 function _wrap_objective_function(objective)
     # Check if the object is callable with an AbstractVector argument
     # We check with Any as a representative type
@@ -97,4 +94,3 @@ function _wrap_objective_function(objective)
 
     args -> objective(args)
 end
-

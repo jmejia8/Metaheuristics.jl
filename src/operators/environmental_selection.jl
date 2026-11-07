@@ -5,7 +5,11 @@ Generational replacement.
 """
 struct GenerationalReplacement end
 
-function environmental_selection!(population, offsprings, parameters::GenerationalReplacement)
+function environmental_selection!(
+    population,
+    offsprings,
+    parameters::GenerationalReplacement,
+)
     @assert length(population) == length(offsprings)
     population[:] = offsprings
 end
@@ -18,18 +22,17 @@ Offspring is inserted in population to keep the best individuals (keep populatio
 struct ElitistReplacement end
 
 function environmental_selection!(
-        population,
-        offsprings,
-        parameters::ElitistReplacement;
-        is_better = is_better
-    )
+    population,
+    offsprings,
+    parameters::ElitistReplacement;
+    is_better = is_better,
+)
 
     N = length(population)
     append!(population, offsprings)
-    sort!(population, lt=is_better)
-    deleteat!(population, N+1:length(population))
+    sort!(population, lt = is_better)
+    deleteat!(population, N + 1:length(population))
 end
-
 
 """
     RankAndCrowding()
@@ -40,11 +43,11 @@ distance.
 struct RankAndCrowding end
 
 function environmental_selection!(
-        population,
-        offsprings,
-        parameters::RankAndCrowding;
-        is_better = is_better
-    )
+    population,
+    offsprings,
+    parameters::RankAndCrowding;
+    is_better = is_better,
+)
 
     N = length(population)
     append!(population, offsprings)
@@ -58,9 +61,14 @@ function environmental_selection!(
             f += 1
             indnext = findlast(x -> x.rank == f, population)
         end
-        isnothing(indnext) && (indnext = length(population)) 
-        update_crowding_distance!(view(population, ind+1:indnext))
-        sort!(view(population, ind+1:indnext), by = x -> x.crowding, rev = true, alg = PartialQuickSort(N-ind))
+        isnothing(indnext) && (indnext = length(population))
+        update_crowding_distance!(view(population, ind + 1:indnext))
+        sort!(
+            view(population, ind + 1:indnext),
+            by = x -> x.crowding,
+            rev = true,
+            alg = PartialQuickSort(N - ind),
+        )
     end
-    deleteat!(population, N+1:length(population))
+    deleteat!(population, N + 1:length(population))
 end

@@ -36,10 +36,10 @@ struct Grid <: AbstractInitializer
     dim::Int
 end
 
-function sample(method::Grid, bounds = zeros(0,0))
+function sample(method::Grid, bounds = zeros(0, 0))
     v = range(0, 1, length = method.npartitions)
     vals = Iterators.product((v for _ in 1:method.dim)...)
-    
+
     # fill values in the grid
     _X = reshape([x for val in vals for x in val], method.dim, length(vals))
     X = Array(_X')
@@ -47,5 +47,3 @@ function sample(method::Grid, bounds = zeros(0,0))
     isempty(bounds) && (return X)
     _scale_sample(X, bounds)
 end
-
-

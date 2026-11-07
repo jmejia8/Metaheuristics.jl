@@ -4,7 +4,7 @@ function update_population!(population, offspring, n_samples)
     push!(population, offspring)
 
     # FIXME performance improvement required (yep, it is fast but could be faster)
-    fast_non_dominated_sort!(population) 
+    fast_non_dominated_sort!(population)
 
     last_front = get_last_front(population)
 
@@ -17,11 +17,10 @@ function update_population!(population, offspring, n_samples)
     deleteat!(population, last_front[worst])
 end
 
-
 function compute_contribution(population, n_samples = 10_000)
     if isempty(population)
         # nothing to do
-        return 
+        return
     end
 
     M = length(fval(population[1]))
@@ -29,17 +28,18 @@ function compute_contribution(population, n_samples = 10_000)
     # objetive function values
     Fs = fvals(population)
     N = size(Fs, 1)
-    ΔS = fill(Inf, N) 
+    ΔS = fill(Inf, N)
 
     if M == 2
-        rank = sortslicesperm(Fs, dims=1)
+        rank = sortslicesperm(Fs, dims = 1)
 
-        for i = 2 : N-1
-            ΔS[rank[i]] = (Fs[rank[i+1],1] - Fs[rank[i],1]) .* (Fs[rank[i-1],2] - Fs[rank[i],2]);
+        for i in 2:N - 1
+            ΔS[rank[i]] = (Fs[rank[i + 1], 1] - Fs[rank[i], 1]) .*
+                (Fs[rank[i - 1], 2] - Fs[rank[i], 2])
         end
 
     elseif N > 1
-        ΔS = calculate_hv(Fs, nadir(population)*1.1, 1, n_samples)
+        ΔS = calculate_hv(Fs, nadir(population) * 1.1, 1, n_samples)
     end
 
     return ΔS
@@ -79,8 +79,7 @@ function get_last_front(population, N = length(population) - 1)
 
         indnext == 0 && (indnext = length(population))
 
-        return ind+1:indnext
+        return ind + 1:indnext
     end
-    
-end
 
+end

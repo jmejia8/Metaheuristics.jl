@@ -8,36 +8,36 @@ include("multiobjective.jl")
 include("combinatorial.jl")
 
 const _problems_dict = Dict(
-                      :sphere => sphere,
-                      :discus => discus,
-                      :rastrigin => rastrigin,
-                      #################################
-                      :ZDT1 => ZDT1,
-                      :ZDT2 => ZDT2,
-                      :ZDT3 => ZDT3,
-                      :ZDT4 => ZDT4,
-                      :ZDT6 => ZDT6,
-                      #################################
-                      :constrained1 => constrained1,
-                      :constrained2 => constrained2,
-                      :constrained3 => constrained3,
-                      #################################
-                      :MTP => MTP,
-                      #################################
-                      :DTLZ1 => DTLZ1,
-                      :DTLZ2 => DTLZ2,
-                      :DTLZ3 => DTLZ3,
-                      :DTLZ4 => DTLZ4,
-                      :DTLZ5 => DTLZ5,
-                      :DTLZ6 => DTLZ6,
-                      #################################
-                      :C1_DTLZ1 => C1_DTLZ1,
-                      :C1_DTLZ3 => C1_DTLZ3,
-                      :C2_DTLZ2 => C2_DTLZ2,
-                      :C3_DTLZ4 => C3_DTLZ4,
-                      #################################
-                      :knapsack => knapsack,
-                     )
+    :sphere => sphere,
+    :discus => discus,
+    :rastrigin => rastrigin,
+    #################################
+    :ZDT1 => ZDT1,
+    :ZDT2 => ZDT2,
+    :ZDT3 => ZDT3,
+    :ZDT4 => ZDT4,
+    :ZDT6 => ZDT6,
+    #################################
+    :constrained1 => constrained1,
+    :constrained2 => constrained2,
+    :constrained3 => constrained3,
+    #################################
+    :MTP => MTP,
+    #################################
+    :DTLZ1 => DTLZ1,
+    :DTLZ2 => DTLZ2,
+    :DTLZ3 => DTLZ3,
+    :DTLZ4 => DTLZ4,
+    :DTLZ5 => DTLZ5,
+    :DTLZ6 => DTLZ6,
+    #################################
+    :C1_DTLZ1 => C1_DTLZ1,
+    :C1_DTLZ3 => C1_DTLZ3,
+    :C2_DTLZ2 => C2_DTLZ2,
+    :C3_DTLZ4 => C3_DTLZ4,
+    #################################
+    :knapsack => knapsack,
+)
 
 """
     get_problem(problem)

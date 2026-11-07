@@ -1,4 +1,4 @@
-default_rng_mh(seed=1223334444) = Random.default_rng(Int(seed))
+default_rng_mh(seed = 1223334444) = Random.default_rng(Int(seed))
 
 #####################################################
 #
@@ -80,42 +80,40 @@ julia> state = optimize(f, bounds, ECA(options=options));
 
 """
 function Options(;
-        x_tol = 1e-8,
-        f_tol = 1e-12,
-        g_tol = 0.0,
-        h_tol = 0.0,
-        f_tol_rel = eps(),
-        f_tol_abs = 0.0,
-        f_calls_limit = 0.0,
-        g_calls_limit = 0.0,
-        h_calls_limit = 0.0,
-        iterations::Int = 0,
-        time_limit::Float64 = Inf,
-        store_convergence = false,
-        show_results = true,
-        debug = false,
-        search_type = :minimize,
-        parallel_evaluation = false,
-        verbose = false,
-        seed = rand(UInt32),
-        rng  = default_rng_mh(seed),
-    )
-
+    x_tol = 1.0e-8,
+    f_tol = 1.0e-12,
+    g_tol = 0.0,
+    h_tol = 0.0,
+    f_tol_rel = eps(),
+    f_tol_abs = 0.0,
+    f_calls_limit = 0.0,
+    g_calls_limit = 0.0,
+    h_calls_limit = 0.0,
+    iterations::Int = 0,
+    time_limit::Float64 = Inf,
+    store_convergence = false,
+    show_results = true,
+    debug = false,
+    search_type = :minimize,
+    parallel_evaluation = false,
+    verbose = false,
+    seed = rand(UInt32),
+    rng = default_rng_mh(seed),
+)
 
     Options(
-            promote(x_tol, f_tol, g_tol, h_tol, f_tol_rel)...,
-            promote(f_calls_limit, time_limit)...,
-            promote(iterations)...,
-            # Results options
-            promote(store_convergence, debug)...,
-            UInt(seed),
-            Bool(parallel_evaluation),
-            Bool(verbose),
-            rng
-           )
+        promote(x_tol, f_tol, g_tol, h_tol, f_tol_rel)...,
+        promote(f_calls_limit, time_limit)...,
+        promote(iterations)...,
+        # Results options
+        promote(store_convergence, debug)...,
+        UInt(seed),
+        Bool(parallel_evaluation),
+        Bool(verbose),
+        rng,
+    )
 
 end
-
 
 function Base.show(io::IO, options::Options)
     _print_title(io, "Options")

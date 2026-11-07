@@ -1,9 +1,7 @@
-
 # Base.@kwdef struct Termination
 #     criteria_all::Vector = Any[]
 #     criteria_any::Vector = Any[]
 # end
-
 
 mutable struct Problem{S} <: AbstractProblem
     f::Function
@@ -17,7 +15,8 @@ function Base.getproperty(obj::Problem, sym::Symbol)
         @warn "`bounds` property is deprecated. Use `search_space` instead"
         se = obj.search_space
         return Array([se.lb se.ub]')
-    else # fallback to getfield
+    else
+        # fallback to getfield
         return getfield(obj, sym)
     end
 end
@@ -31,24 +30,27 @@ end
 
     Creates a new problem with the given function and search space. parallel_evaluation is a boolean flag to let the problem know if it should batch evaluate.
 """
-function Problem(f::Function, search_space::AbstractSearchSpace; parallel_evaluation=false)
+function Problem(
+    f::Function,
+    search_space::AbstractSearchSpace;
+    parallel_evaluation = false,
+)
     Problem(f, search_space, 0, parallel_evaluation)
 end
 
-function Problem(f::Function, _bounds::AbstractMatrix{T}; kargs...) where T <: Number
+function Problem(f::Function, _bounds::AbstractMatrix{T}; kargs...) where {T <: Number}
     # old problem definition
     bounds = Array(_bounds)
 
-    if size(bounds,1) > 2 && size(bounds,2) == 2
+    if size(bounds, 1) > 2 && size(bounds, 2) == 2
         bounds = Array(bounds')
     end
 
-    Problem(f, BoxConstrainedSpace(lb = bounds[1,:], ub = bounds[2,:]); kargs...)
+    Problem(f, BoxConstrainedSpace(lb = bounds[1, :], ub = bounds[2, :]); kargs...)
 end
 
-
-function Problem(f::Function, bounds::Array{Bool,2}; kargs...)
-    Problem(f, BitArraySpace(size(bounds,2)); kargs...)
+function Problem(f::Function, bounds::Array{Bool, 2}; kargs...)
+    Problem(f, BitArraySpace(size(bounds, 2)); kargs...)
 end
 
 function Problem(f::Function, b::Tuple{AbstractVector, AbstractVector}; kargs...)
@@ -59,4 +61,3 @@ function evaluate(x, problem::Problem)
     problem.f_calls += 1
     return problem.f(x)
 end
-

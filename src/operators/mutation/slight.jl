@@ -8,7 +8,7 @@ struct SlightMutation
     rng
 end
 
-SlightMutation(;rng = default_rng_mh()) = SlightMutation(rng)
+SlightMutation(; rng = default_rng_mh()) = SlightMutation(rng)
 
 function mutation!(Q, parameters::SlightMutation)
     N, D = size(Q)
@@ -17,12 +17,12 @@ function mutation!(Q, parameters::SlightMutation)
     for i in 1:N
         s[i] == k[i] && continue
         if s[i] < k[i]
-            c = vcat(1:s[i]-1, k[i], s[i]:k[i]-1, k[i]+1:D)
-        else s[i] > k[i]
-            c = vcat(1:k[i]-1, k[i]+1:s[i]-1, k[i], s[i]:D)
+            c = vcat(1:s[i] - 1, k[i], s[i]:k[i] - 1, k[i] + 1:D)
+        else
+            s[i] > k[i]
+            c = vcat(1:k[i] - 1, k[i] + 1:s[i] - 1, k[i], s[i]:D)
         end
-        Q[i,:] = Q[i, c]
+        Q[i, :] = Q[i, c]
     end
     Q
 end
-

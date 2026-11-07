@@ -20,14 +20,11 @@ include("RDEx/mutation.jl")
 include("RDEx/adaptation.jl")
 include("RDEx/metaheuristics.jl")
 
-
 # Export public API
 export RDEx
 
-
-
 # Import Metaheuristics API (avoid conflict by importing functions directly)
-import .MetaheuristicsAPI: RDEx 
+import .MetaheuristicsAPI: RDEx
 # Note: RDExAlgorithm is the Metaheuristics-compatible algorithm constructor
 # Users can do: using RDEx: RDExAlgorithm; algo = RDExAlgorithm()
 # Or: import RDEx: RDExAlgorithm as RDEx; algo = RDEx()

@@ -3,7 +3,6 @@ include("before.jl")
 include("during.jl")
 include("after.jl")
 
-
 """
       optimize(
             f::Function, # objective function
@@ -46,18 +45,24 @@ function optimize(
         logger::Function = (status) -> nothing,
     )
 
-    status, parameters, problem, information, options, convergence = _before_optimization!(f, search_space, method, logger)
+    status, parameters, problem, information, options, convergence = _before_optimization!(
+        f,
+        search_space,
+        method,
+        logger,
+    )
 
     while !status.stop
-        _during_optimization!(status,
-                              parameters,
-                              problem,
-                              information,
-                              options,
-                              convergence,
-                              logger,
-                              method.termination
-                             )
+        _during_optimization!(
+            status,
+            parameters,
+            problem,
+            information,
+            options,
+            convergence,
+            logger,
+            method.termination,
+        )
     end
 
     _after_optimization!(status, parameters, problem, information, options, convergence)
@@ -67,17 +72,16 @@ end
 
 # Handle callable objects (non-Function types) with algorithm instances
 function optimize(
-        f,
-        search_space,
-        method::AbstractAlgorithm;
-        logger::Function = (status) -> nothing,
-    )
+    f,
+    search_space,
+    method::AbstractAlgorithm;
+    logger::Function = (status) -> nothing,
+)
     # Wrap callable object into a function
     wrapped_f = _wrap_objective_function(f)
     # Call the standard optimize function with the wrapped function
     optimize(wrapped_f, search_space, method; logger)
 end
-
 
 """
     optimize!(f, search_space, method;logger)
@@ -112,61 +116,60 @@ function optimize!(
     end
 
     options = method.options
-    problem = Problem(f, search_space;
-                      parallel_evaluation=options.parallel_evaluation)
+    problem = Problem(f, search_space; parallel_evaluation = options.parallel_evaluation)
     problem.f_calls = status.f_calls
 
     # main optimization step
     _during_optimization!(
-                          status,
-                          method.parameters,
-                          problem,
-                          method.information,
-                          options,
-                          empty(status.population), # convergence
-                          logger,
-                          method.termination
-                         )
+        status,
+        method.parameters,
+        problem,
+        method.information,
+        options,
+        empty(status.population), # convergence
+        logger,
+        method.termination,
+    )
 
     if status.stop
         options.debug && @info "Performing final stage due to stop criteria."
         _after_optimization!(
-                             status,
-                             method.parameters,
-                             problem,
-                             method.information,
-                             options,
-                             empty(status.population), # convergence
-                            )
+            status,
+            method.parameters,
+            problem,
+            method.information,
+            options,
+            empty(status.population), # convergence
+        )
     end
-    
 
-    options.debug && status.stop && @info "Should stop because: " * termination_status_message(status)
+    options.debug &&
+        status.stop &&
+        @info "Should stop because: " * termination_status_message(status)
 
     return method
 end
 
 # Handle callable objects (non-Function types) with optimize!
 function optimize!(
-        f,
-        search_space,
-        method::AbstractAlgorithm;
-        logger::Function = (status) -> nothing,
-    )
+    f,
+    search_space,
+    method::AbstractAlgorithm;
+    logger::Function = (status) -> nothing,
+)
     # Wrap callable object into a function
     wrapped_f = _wrap_objective_function(f)
     # Call the standard optimize! function with the wrapped function
     optimize!(wrapped_f, search_space, method; logger)
 end
 
-
 function optimize(
-        f::Function,
-        _search_space,
-        ::Type{T};
-        logger::Function = (status) -> nothing,
-        kargs...
-    ) where T <: AbstractParameters
+    f::Function,
+    _search_space,
+    ::Type{T};
+    logger::Function = (status) -> nothing,
+    kargs...,
+) where {T <: AbstractParameters}
 
     problem = Problem(f, _search_space)
     # configure parameters depending on the search_space
@@ -177,12 +180,12 @@ function optimize(
 end
 
 function optimize(
-        f,
-        _search_space,
-        ::Type{T};
-        logger::Function = (status) -> nothing,
-        kargs...
-    ) where T <: AbstractParameters
+    f,
+    _search_space,
+    ::Type{T};
+    logger::Function = (status) -> nothing,
+    kargs...,
+) where {T <: AbstractParameters}
 
     # Wrap callable object into a function
     wrapped_f = _wrap_objective_function(f)

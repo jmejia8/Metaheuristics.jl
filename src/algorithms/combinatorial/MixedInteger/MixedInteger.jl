@@ -51,23 +51,18 @@ Dict{Symbol, Vector} with 2 entries:
 function MixedInteger(base; information = Information(), options = Options())
     parameters = MixedInteger(base.parameters, nothing)
 
-    Algorithm(
-        parameters,
-        information = information,
-        options = options,
-    )
+    Algorithm(parameters, information = information, options = options)
 end
 
-
 function initialize!(
-        status,
-        parameters::MixedInteger,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
+    status,
+    parameters::MixedInteger,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
 
     # introduce a helper objective function that translates vectors into dictionaries
     f(v) = begin
@@ -79,8 +74,15 @@ function initialize!(
     bounds = _mixed_to_continous_space(problem.search_space)
     parameters.problem = Problem(f, bounds)
 
-
-    status = initialize!(status, parameters.base, parameters.problem, information, options, args...; kargs...)
+    status = initialize!(
+        status,
+        parameters.base,
+        parameters.problem,
+        information,
+        options,
+        args...;
+        kargs...,
+    )
 
     #st = gen_initial_state(parameters.problem,parameters.base,information,options,status)
 
@@ -89,32 +91,37 @@ function initialize!(
     status
 end
 
-
 function update_state!(
+    status,
+    parameters::MixedInteger,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
+
+    update_state!(
         status,
-        parameters::MixedInteger,
-        problem,
+        parameters.base,
+        parameters.problem,
         information,
         options,
         args...;
-        kargs...
+        kargs...,
     )
-
-    update_state!(status, parameters.base, parameters.problem, information, options, args...; kargs...)
     problem.f_calls = parameters.problem.f_calls
 end
 
 function final_stage!(
-        status,
-        parameters::MixedInteger,
-        problem,
-        information,
-        options,
-        args...;
-        kargs...
-    )
-    
+    status,
+    parameters::MixedInteger,
+    problem,
+    information,
+    options,
+    args...;
+    kargs...,
+)
+
     # TODO: convert vectors in population into dictionaries
 end
-
-
