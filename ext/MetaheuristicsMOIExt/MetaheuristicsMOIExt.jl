@@ -8,7 +8,6 @@ function __init__()
     @static if isdefined(Base, :get_extension)
         setglobal!(Metaheuristics, :Optimizer, Optimizer)
     end
-    println("Extension was loaded!")
 end
 
 include("constants.jl")
