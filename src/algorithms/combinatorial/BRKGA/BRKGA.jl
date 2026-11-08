@@ -26,11 +26,11 @@ julia> f(rk) = sum(abs.(decode(rk) - target_perm));
 julia> res = optimize(f, [zeros(10) ones(10)], BRKGA(num_elites=70))
 Optimization Result
 ===================
-  Iteration:       22
+  Iteration:       25
   Minimum:         0
-  Minimizer:       [0.938595, 0.851247, 0.823736, …, 0.375321]
-  Function calls:  2200
-  Total time:      0.0238 s
+  Minimizer:       [0.896777, 0.822567, 0.806874, …, 0.259814]
+  Function calls:  1830
+  Total time:      0.0166 s
   Stop reason:     Due to Convergence Termination criterion.
 
 julia> decode(minimizer(res))

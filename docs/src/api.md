@@ -171,6 +171,10 @@ Metaheuristics.SBX
 Metaheuristics.SBX_crossover
 ```
 
+```@docs
+Metaheuristics.SBX_crossover!
+```
+
 
 ```@docs
 Metaheuristics.ECA_operator
@@ -181,11 +185,19 @@ Metaheuristics.DE_crossover
 ```
 
 ```@docs
+Metaheuristics.DE_crossover!
+```
+
+```@docs
 Metaheuristics.polynomial_mutation!
 ```
 
 ```@docs
 Metaheuristics.DE_mutation
+```
+
+```@docs
+Metaheuristics.DE_mutation!
 ```
 
 ```@docs

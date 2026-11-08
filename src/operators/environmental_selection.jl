@@ -10,8 +10,10 @@ function environmental_selection!(
     offsprings,
     parameters::GenerationalReplacement,
 )
-    @assert length(population) == length(offsprings)
-    population[:] = offsprings
+    if length(population) != length(offsprings)
+        throw(DimensionMismatch("population and offsprings must have the same length."))
+    end
+    copyto!(population, offsprings)
 end
 
 """
@@ -51,24 +53,46 @@ function environmental_selection!(
 
     N = length(population)
     append!(population, offsprings)
-    fast_non_dominated_sort!(population)
+    truncate_population!(population, N)
+end
 
-    let f::Int = 1
-        ind = 0
-        indnext = findlast(x -> x.rank == f, population)
-        while !isnothing(indnext) && 0 < indnext <= N
-            ind = indnext
-            f += 1
-            indnext = findlast(x -> x.rank == f, population)
-        end
-        isnothing(indnext) && (indnext = length(population))
-        update_crowding_distance!(view(population, ind + 1:indnext))
-        sort!(
-            view(population, ind + 1:indnext),
-            by = x -> x.crowding,
-            rev = true,
-            alg = PartialQuickSort(N - ind),
-        )
+"""
+    truncate_population!(population, N)
+
+Keep the best `N` solutions in `population` according to non-dominated ranking and
+crowding distance (as in NSGA-II).
+"""
+function truncate_population!(population, N)
+    fast_non_dominated_sort!(population)
+    L = length(population)
+    L == 0 && return population
+
+    # population is sorted by rank: find the last front that fits in N (ends at ind)
+    # and the end of the next front (indnext)
+    ind = 0
+    indnext = _front_end(population, 1)
+    while indnext <= N && indnext < L
+        ind = indnext
+        indnext = _front_end(population, ind + 1)
     end
+    indnext <= N && (ind = indnext) # every solution fits
+
+    update_crowding_distance!(view(population, ind + 1:indnext))
+    sort!(
+        view(population, ind + 1:indnext),
+        by = x -> x.crowding,
+        rev = true,
+        alg = PartialQuickSort(N - ind),
+    )
     deleteat!(population, N + 1:length(population))
+end
+
+# last index of the front that starts at `start` (population sorted by rank)
+function _front_end(population, start)
+    r = population[start].rank
+    e = start
+    @inbounds while e < length(population) && population[e + 1].rank == r
+        e += 1
+    end
+    e
 end

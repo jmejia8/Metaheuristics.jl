@@ -1,6 +1,6 @@
 function rank_solutions(solutions::Array{<:AbstractSolution}; is_better = is_better)
-    mask = sortperm(solutions, lt = Metaheuristics.is_better, alg = Base.QuickSort)
-    sortperm(mask, alg = Base.QuickSort)
+    mask = sortperm(solutions, lt = is_better, alg = Base.QuickSort)
+    invperm(mask)
 end
 
 function rank_solutions(solutions::Array{<:xFgh_solution}; is_better = is_better)

@@ -37,12 +37,22 @@ struct Grid <: AbstractInitializer
 end
 
 function sample(method::Grid, bounds = zeros(0, 0))
-    v = range(0, 1, length = method.npartitions)
-    vals = Iterators.product((v for _ in 1:method.dim)...)
+    n, d = method.npartitions, method.dim
+    v = range(0, 1, length = n)
+    m = 1
+    for _ in 1:d
+        m = Base.checked_mul(m, n) # number of points: n^d
+    end
 
-    # fill values in the grid
-    _X = reshape([x for val in vals for x in val], method.dim, length(vals))
-    X = Array(_X')
+    # fill values in the grid (the first coordinate changes fastest)
+    X = Matrix{Float64}(undef, m, d)
+    @inbounds for row in 0:m - 1
+        q = row
+        for j in 1:d
+            q, r = divrem(q, n)
+            X[row + 1, j] = v[r + 1]
+        end
+    end
 
     isempty(bounds) && (return X)
     _scale_sample(X, bounds)

@@ -83,7 +83,8 @@ function sample(method::LatinHypercubeSampling, bounds = zeros(0, 0))
     # sample improving
     for i in 1:method.iterations
         XX = _lhs(method.N, method.dim)
-        sc = _score_lhs(XX)
+        # stop computing the score once it is below the best one (XX is rejected)
+        sc = _score_lhs(XX, score)
         sc < score && continue
         X = XX
         score = sc
@@ -94,12 +95,36 @@ end
 
 function _lhs(nsamples, dim)
     # initial sample
-    X = reshape([v for i in 1:dim for v in shuffle(1.0:nsamples)], nsamples, dim)
+    X = Matrix{Float64}(undef, nsamples, dim)
+    for j in 1:dim
+        col = view(X, :, j)
+        col .= 1:nsamples
+        shuffle!(col)
+    end
     # smooth and normalize sample
-    (X - rand(nsamples, dim)) / nsamples
+    R = rand(nsamples, dim)
+    @. X = (X - R) / nsamples
 end
 
-_score_lhs(M) = minimum(pairwise_distances(M))
+# Minimum Euclidean distance between rows of M. The loop stops early (returning a value
+# below `threshold`) once some distance is below `threshold`.
+function _score_lhs(M, threshold = -Inf)
+    n, d = size(M)
+    best = Inf
+    @inbounds for j in 1:n - 1, i in j + 1:n
+        s = 0.0
+        for k in 1:d
+            t = M[i, k] - M[j, k]
+            s += t * t
+        end
+        if s < best
+            best = s
+            sqrt(best) < threshold && return sqrt(best)
+        end
+    end
+    sqrt(best)
+end
+
 function _scale_sample(X, bounds)
     a = view(bounds, 1, :)'
     b = view(bounds, 2, :)'
