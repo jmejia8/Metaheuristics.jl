@@ -30,7 +30,8 @@ Parameters:
 - `p_cr` Crossover probability.
 - `η_m`  η for the mutation operator.
 - `p_m` Mutation probability (1/D for D-dimensional problem by default).
-- `n_samples` number of samples to approximate hypervolume in many-objective (M > 2).
+- `n_samples` number of Monte Carlo samples to approximate the hypervolume contributions
+  for four or more objectives (contributions are exact for two and three objectives).
 
 To use SMS_EMOA, the output from the objective function should be a 3-touple
 `(f::Vector, g::Vector, h::Vector)`, where `f` contains the objective functions,
@@ -89,8 +90,12 @@ function update_state!(
     kargs...,
 )
 
-    I = randperm(parameters.N)
-    J = randperm(parameters.N)
+    rng = options.rng
+    # p_m < 0 means 1/D; computed here so `parameters` is not modified
+    p_m = parameters.p_m < 0 ? 1.0 / getdim(problem) : parameters.p_m
+
+    I = randperm(rng, parameters.N)
+    J = randperm(rng, parameters.N)
 
     if options.parallel_evaluation
         Q = zeros(parameters.N, getdim(problem))
@@ -107,10 +112,11 @@ function update_state!(
             problem.search_space,
             parameters.η_cr,
             parameters.p_cr,
+            rng,
         )
 
         # mutation
-        polynomial_mutation!(c, problem.search_space, parameters.η_m, parameters.p_m)
+        polynomial_mutation!(c, problem.search_space, parameters.η_m, p_m, rng)
 
         # repair solutions if necesary
         reset_to_violated_bounds!(c, problem.search_space)
@@ -125,28 +131,32 @@ function update_state!(
 
         # Reduce: save offspring in population and reduce population according to
         # front contribution
-        update_population!(status.population, offspring, parameters.n_samples)
+        update_population!(status.population, offspring, parameters.n_samples, rng)
     end
 
     if !options.parallel_evaluation
         return
     end
     append!(status.population, create_solutions(Q, problem))
-    environmental_selection!(status.population, parameters)
+    environmental_selection!(status.population, parameters, rng)
 end
 
-function environmental_selection!(population, parameters::SMS_EMOA)
-    if length(population) <= parameters.N
-        return
-    end
+function environmental_selection!(
+    population,
+    parameters::SMS_EMOA,
+    rng::Random.AbstractRNG = default_rng_mh(),
+)
+    N = parameters.N
+    length(population) <= N && return
 
-    new_solutions = population[parameters.N + 1:end]
-    population = population[1:parameters.N]
+    offspring = population[N + 1:end]
+    # in place: the caller's population must be reduced to N solutions
+    resize!(population, N)
 
-    for (i, offspring) in enumerate(new_solutions)
+    for sol in offspring
         # Reduce: save offspring in population and reduce population according to
         # front contribution
-        update_population!(population, offspring, parameters.n_samples)
+        update_population!(population, sol, parameters.n_samples, rng)
     end
 end
 
@@ -159,12 +169,6 @@ function initialize!(
     args...;
     kargs...,
 )
-
-    D = getdim(problem)
-
-    if parameters.p_m < 0.0
-        parameters.p_m = 1.0 / D
-    end
 
     if options.iterations == 0
         options.iterations = 500
