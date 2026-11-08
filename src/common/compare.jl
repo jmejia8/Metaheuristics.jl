@@ -76,6 +76,10 @@ function compare(a::Vector, b::Vector)
     @assert k ==
         length(b) "Seems that objective function returns vectors of different sizes."
 
+    @inbounds _compare_unsafe(a, b, k)
+end
+
+@inline function _compare_unsafe(a, b, k)
     i = 1
     while i <= k && a[i] == b[i]
         i += 1

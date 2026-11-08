@@ -5,7 +5,9 @@ end
 
 function pairwise_distances(A::Matrix, dist = Euclidean(); diag_val = Inf)
     D = pairwise(dist, A, dims = 1)
-    D[Diagonal(ones(Bool, size(D, 1)))] .= diag_val
+    for i in 1:minimum(size(D))
+        D[i, i] = diag_val
+    end
 
     return D
 end

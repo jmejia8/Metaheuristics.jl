@@ -4,12 +4,22 @@ function reflected_back_to_bound!(x, bounds::BoxConstrainedSpace)
     for i in 1:getdim(bounds)
         l = bounds.lb[i]
         u = bounds.ub[i]
-        while !(l <= x[i] <= u)
-            x[i] = x[i] < l ? 2l - x[i] : 2u - x[i]
-        end
-
+        xi = x[i]
+        l <= xi <= u && continue
+        # one reflection (most common case)
+        y = xi < l ? 2l - xi : 2u - xi
+        x[i] = l <= y <= u ? y : _reflect_far(xi, l, u)
     end
     x
+end
+
+# closed form of repeated reflections (triangle wave of period 2(u - l))
+function _reflect_far(xi, l, u)
+    ρ = u - l
+    (isnan(xi) || iszero(ρ)) && return oftype(xi, l)
+    isinf(xi) && return oftype(xi, xi < l ? l : u)
+    t = mod(xi - l, 2ρ)
+    return clamp(t <= ρ ? l + t : l + (2ρ - t), l, u)
 end
 
 reflected_back_to_bound!(x, bounds::AbstractMatrix) = reflected_back_to_bound!(
