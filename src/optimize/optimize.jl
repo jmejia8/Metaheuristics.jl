@@ -38,10 +38,10 @@ julia> result = optimize(f, bounds)
 +============================+
 ```
 """
-function optimize(
-        f::Function, # objective function
-        search_space,
-        method::AbstractAlgorithm = ECA();
+Base.@nospecializeinfer function optimize(
+        @nospecialize(f::Function), # objective function
+        @nospecialize(search_space),
+        @nospecialize(method::AbstractAlgorithm) = ECA();
         logger::Function = (status) -> nothing,
     )
 

@@ -1,92 +1,70 @@
-using SnoopPrecompile
+using PrecompileTools: @setup_workload, @compile_workload
 
-@precompile_setup begin
-
-    @precompile_all_calls begin
-        # limit the resources for a faster pre compilation
-        options = Options(iterations = 4, f_calls_limit = 1000)
-        begin
-            local f(x) = sum(x.^2)
-            local bounds = [-1 -1 -1; 1 1 1.0]
-            for algo in [
-                    ABC(N = 10, options = options),
-                    CGSA(N = 10, options = options),
-                    DE(N = 10, options = options),
-                    ECA(N = 10, options = options),
-                    PSO(N = 10, options = options),
-                    SA(N = 10, options = options),
-                    WOA(N = 10, options = options),
-                ]
-                optimize(f, bounds, algo)
-            end
+@setup_workload begin
+    opts = Options(iterations = 4, f_calls_limit = 1000, seed = 1)
+    fso(x) = sum(abs2, x)
+    fco(x) = (sum(abs2, x), [x[1] - 0.5], [0.0])
+    fmo(x) = ([x[1], 1 - sqrt(abs(x[1])) + sum(x[2:end])], [0.0], [0.0])
+    fh(x) = (x, [sum(x.^2) - 1], [0.0])
+    bmat = [-1 -1 -1; 1 1 1.0]
+    bbox = boxconstraints(lb = -ones(3), ub = ones(3))
+    bm01 = boxconstraints(lb = zeros(3), ub = ones(3))
+    @compile_workload begin
+        for b in (bmat, bbox), mk in (ABC, CGSA, DE, ECA, PSO, SA, WOA, SHADE, CSO)
+            opts = Options(iterations = 4, f_calls_limit = 1000, seed = 1)
+            optimize(fso, b, mk(N = 10, options = opts))
         end
-
-        begin
-            local f, bounds, pf = Metaheuristics.TestProblems.MTP()
-            ccmo = CCMO(NSGA2(N = 100, p_m = 0.001), options = options)
-            optimize(f, bounds, ccmo)
+        for b in (bmat, bbox)
+            optimize(fso, b, RDEx(options = opts))
         end
-
-        begin
-            local g(x) = sum(abs.(x .- (length(x):-1:1.0)))
-            perm_size = 10
-            ga = GA(;
-                initializer = RandomPermutation(N = 100),
-                crossover = OrderCrossover(),
-                mutation = SlightMutation(),
-                options = options,
+        for b in (bmat, bbox), mk in (ECA, DE, εDE)
+            r = optimize(fco, b, mk(N = 10, options = opts))
+            sprint(show, MIME"text/plain"(), r)
+        end
+        r = optimize(fso, bbox, ECA(N = 10, options = opts))
+        sprint(show, MIME"text/plain"(), r)
+        optimize(fso, bm01, BRKGA(options = opts))
+        let (f, bounds, pf) = Metaheuristics.TestProblems.MTP()
+            optimize(f, bounds, CCMO(NSGA2(N = 100, p_m = 0.001), options = opts))
+        end
+        let g(x) = sum(abs.(x .- (length(x):-1:1.0)))
+            optimize(
+                g,
+                zeros(Int, 2, 10),
+                GA(;
+                    initializer = RandomPermutation(N = 100),
+                    crossover = OrderCrossover(),
+                    mutation = SlightMutation(),
+                    options = opts,
+                ),
             )
-            optimize(g, zeros(Int, 2, perm_size), ga)
         end
-
-        begin
-            local f, bounds, solutions = Metaheuristics.TestProblems.rastrigin()
-            result = optimize(f, bounds, MCCGA(options = options))
-            fvals(result)
-            positions(result)
-            minimizer(result)
-            minimum(result)
+        let (f, bounds, _) = Metaheuristics.TestProblems.rastrigin()
+            r = optimize(f, bounds, MCCGA(options = opts))
+            fvals(r)
+            positions(r)
+            minimizer(r)
+            minimum(r)
         end
-
-        begin
-            D = 2
-            local h(x) = (x, [sum(x.^2) - 1], [0.0])
-            bounds = [-1 -1; 1 1.0]
-            nobjectives = 2
-            npartitions = 100
-            weights = gen_ref_dirs(nobjectives, npartitions)
-            moead_de = MOEAD_DE(weights, options = Options(debug = false, iterations = 2))
-            status_moead = optimize(h, bounds, moead_de)
+        for b in ([-1 -1; 1 1.0], boxconstraints(lb = -ones(2), ub = ones(2)))
+            optimize(
+                fh,
+                b,
+                MOEAD_DE(gen_ref_dirs(2, 100), options = Options(iterations = 2)),
+            )
         end
-
-        begin
-            D = 2
-            local j(x) = (x, [sum(x.^2) - 1], [0.0])
-            bounds = [-1 -1; 1 1.0]
-            nsga2 = NSGA2(N = 100, p_cr = 0.85, options = options)
-            status = optimize(j, bounds, nsga2)
+        for b in ([-1 -1; 1 1.0], bm01), mk in (NSGA2, SMS_EMOA, SPEA2)
+            r = optimize(
+                b isa Matrix ? fh : fmo,
+                b,
+                mk(N = 100, p_cr = 0.85, options = opts),
+            )
+            fvals(r)
+            sprint(show, MIME"text/plain"(), r)
+            PerformanceIndicators.hypervolume(pareto_front(r), [2.0, 2.0])
         end
-
-        begin
-            local g, bounds, pf = Metaheuristics.TestProblems.get_problem(:DTLZ2)
-            nsga3 = NSGA3(p_cr = 0.9, options = options)
-            status = optimize(g, bounds, nsga3)
+        let (g, bounds, _) = Metaheuristics.TestProblems.get_problem(:DTLZ2)
+            optimize(g, bounds, NSGA3(p_cr = 0.9, options = opts))
         end
-
-        begin
-            local k(x) = (x, [sum(x.^2) - 1], [0.0])
-            bounds = [-1 -1; 1 1.0]
-            sms_emoa = SMS_EMOA(N = 100, p_cr = 0.85, options = options)
-            status = optimize(k, bounds, sms_emoa)
-        end
-
-        begin
-            local m(x) = (x, [sum(x.^2) - 1], [0.0])
-            bounds = [-1 -1; 1 1.0]
-            spea2 = SPEA2(N = 100, p_cr = 0.85, options = options)
-            status = optimize(m, bounds, spea2)
-            fvals(status)
-        end
-
     end
 end
