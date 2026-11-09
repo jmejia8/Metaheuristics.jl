@@ -90,93 +90,194 @@ function update_state!(
     kargs...,
 )
 
-    Q = reproduction(status, parameters, problem)
+    rng = options.rng
+    Q = reproduction(status, parameters, problem, rng)
 
     append!(status.population, create_solutions(Q, problem))
 
     # non-dominated sort, elitist removing via niching
-    environmental_selection!(status.population, parameters)
+    environmental_selection!(status.population, parameters, rng)
 end
 
-function environmental_selection!(population, parameters::NSGA3)
-    truncate_population_nsga3!(population, parameters.reference_points, parameters.N)
+function environmental_selection!(
+    population,
+    parameters::NSGA3,
+    rng::Random.AbstractRNG = default_rng_mh(),
+)
+    truncate_population_nsga3!(population, parameters.reference_points, parameters.N, rng)
 end
 
-function truncate_population_nsga3!(population, reference_points, N)
+function truncate_population_nsga3!(
+    population,
+    reference_points,
+    N,
+    rng::Random.AbstractRNG = default_rng_mh(),
+)
     fast_non_dominated_sort!(population)
+    length(population) <= N && return
 
-    k = 1
-    l = 1
-    while l <= N
-        k = population[l].rank
-        l += 1
+    # population is sorted by rank; the last front (rank k) contains the N-th solution
+    k = population[N].rank
+    n_keep = N
+    while n_keep < length(population) && population[n_keep + 1].rank == k
+        n_keep += 1
+    end
+    resize!(population, n_keep)
+
+    # first solution in the last front
+    l = N
+    while l > 1 && population[l - 1].rank == k
+        l -= 1
     end
 
-    let k = k
-        l = findlast(sol -> sol.rank == k, population)
-        deleteat!(population, l + 1:length(population))
-    end
-
-    l = findfirst(sol -> sol.rank == k, population)
-    niching!(population, reference_points, N, l)
+    niching!(population, reference_points, N, l, rng)
 end
 
-distance_point_to_rect(s, w) = @fastmath norm(s - (dot(w, s) / dot(w, w)) * w)
+# Associate each column of F (normalized objective vectors) to its closest reference
+# direction (perpendicular distance). `distance[i]` stores the squared distance. Solutions
+# in the last front (i ≥ l) are not counted in `nich_freq`.
+function associate!(nich, nich_freq, distance, F::AbstractMatrix, reference_points, l)
+    M, n = size(F)
+    H = length(reference_points)
 
-function associate!(nich, nich_freq, distance, F, reference_points, l)
-    N = length(F)
+    W = Matrix{Float64}(undef, M, H)
+    ww = Vector{Float64}(undef, H)
+    for j in 1:H
+        w = reference_points[j]
+        W[:, j] .= w
+        ww[j] = dot(w, w)
+    end
 
-    # find closest nich to corresponding solution
-    for i in 1:N
-        for j in 1:length(reference_points)
-            d = distance_point_to_rect(F[i], reference_points[j])
+    @inbounds for i in 1:n
+        best = distance[i]
+        best_j = nich[i]
+        for j in 1:H
+            # projection of F[:, i] onto direction W[:, j]
+            ws = 0.0
+            for m in 1:M
+                ws += W[m, j] * F[m, i]
+            end
+            c = ws / ww[j]
 
-            distance[i] < d && continue
+            d = 0.0
+            for m in 1:M
+                r = F[m, i] - c * W[m, j]
+                d += r * r
+            end
 
-            distance[i] = d
-            nich[i] = j
+            # ties: the last reference direction is kept
+            best < d && continue
+            best = d
+            best_j = j
         end
+        distance[i] = best
+        nich[i] = best_j
 
-        # not associate last  front
+        # not associate last front
         if i < l
-            nich_freq[nich[i]] += 1
+            nich_freq[best_j] += 1
         end
-
     end
 end
 
-function hyperplane_normalization(population)
-    M = length(fval(population[1]))
+# Return the ideal and nadir points (approximated via the hyperplane through the extreme
+# points) of the objective matrix F (M × n, one column per solution). All solutions are
+# used, regardless of feasibility. If the intercepts cannot be computed, the nadir point is
+# the worst point of the solutions in `first_front` (Deb and Jain, 2014).
+function hyperplane_normalization(F::AbstractMatrix, first_front = trues(size(F, 2)))
+    M, n = size(F)
 
-    ideal_point = ideal(population)
-    nadir_point = fill(Inf, length(ideal_point))
-
-    Fx = fvals(population) .- ideal_point'
-
-    # identify extreme points
-    extreme_points = zeros(Int, M)
-    w = LinearAlgebra.I + fill(1.0e-6, M, M)
-
-    for i in 1:M
-        extreme_points[i] = argmin(nadir(Fx' ./ w[i, :]))
+    ideal_point = Vector{Float64}(undef, M)
+    worst_point = Vector{Float64}(undef, M)
+    for m in 1:M
+        ideal_point[m] = minimum(view(F, m, :))
+        worst_point[m] = maximum(view(F, m, :))
     end
 
-    # check if intercepts can be obtained
-    S = Fx[extreme_points, :]
-    if LinearAlgebra.det(S) ≈ 0
-        # check if soluble matrix
-        nadir_point = nadir(population)
-    else
-        hyperplane = S \ ones(M)
-        intercepts = 1 ./ hyperplane # intercepts
-        nadir_point = ideal_point + intercepts
+    # identify extreme points via the achievement scalarizing function
+    extreme_points = zeros(Int, M)
+    asf = Vector{Float64}(undef, n)
+    for i in 1:M
+        for s in 1:n
+            v = -Inf
+            for m in 1:M
+                w = (m == i ? 1.0 : 0.0) + 1.0e-6
+                v = max(v, (F[m, s] - ideal_point[m]) / w)
+            end
+            asf[s] = v
+        end
+        extreme_points[i] = argmin(asf)
+    end
+
+    # intercepts of the hyperplane through the extreme points
+    S = Matrix{Float64}(undef, M, M)
+    for i in 1:M, m in 1:M
+        S[i, m] = F[m, extreme_points[i]] - ideal_point[m]
+    end
+
+    nadir_point = _nsga3_intercepts_nadir(S, ideal_point, worst_point)
+    if isnothing(nadir_point)
+        nadir_point = fill(-Inf, M)
+        for s in 1:n
+            first_front[s] || continue
+            for m in 1:M
+                nadir_point[m] = max(nadir_point[m], F[m, s])
+            end
+        end
+        # degenerate objectives in the first front: use the worst point instead
+        for m in 1:M
+            r = worst_point[m] - ideal_point[m]
+            if !(nadir_point[m] - ideal_point[m] > 1.0e-6 * r)
+                nadir_point[m] = worst_point[m]
+            end
+        end
     end
 
     ideal_point, nadir_point
 end
 
+# Return nothing when intercepts cannot be computed (singular or degenerate hyperplane).
+function _nsga3_intercepts_nadir(S, ideal_point, worst_point)
+    M = length(ideal_point)
+    LinearAlgebra.det(S) == 0 && return nothing
+    hyperplane = try
+        S \ ones(M)
+    catch e
+        e isa LinearAlgebra.SingularException && return nothing
+        e isa LinearAlgebra.LAPACKException && return nothing
+        rethrow()
+    end
+
+    all(isfinite, hyperplane) || return nothing
+    # the hyperplane must pass through the extreme points
+    for i in 1:M
+        r = 0.0
+        for m in 1:M
+            r += S[i, m] * hyperplane[m]
+        end
+        abs(r - 1.0) <= 1.0e-5 || return nothing
+    end
+
+    intercepts = 1 ./ hyperplane
+    for m in 1:M
+        a = intercepts[m]
+        # negative, non-finite or tiny (relative to the observed range) intercepts
+        (isfinite(a) && a > 1.0e-6 * (worst_point[m] - ideal_point[m])) || return nothing
+    end
+
+    return ideal_point + intercepts
+end
+
+# Return normalized objective vectors as columns of an M × n matrix.
 function normalize(population)
-    ideal_point, nadir_point = hyperplane_normalization(population)
+    F = Matrix{Float64}(undef, length(fval(population[1])), length(population))
+    for (s, sol) in enumerate(population)
+        F[:, s] .= fval(sol)
+    end
+
+    r1 = minimum(sol -> sol.rank, population)
+    first_front = [sol.rank == r1 for sol in population]
+    ideal_point, nadir_point = hyperplane_normalization(F, first_front)
 
     b = nadir_point - ideal_point
 
@@ -184,71 +285,97 @@ function normalize(population)
     mask = b .< eps()
     b[mask] .= eps()
 
-    return [(sol.f - ideal_point) ./ b for sol in population]
+    F .= (F .- ideal_point) ./ b
+    return F
 end
 
-# get_last_front(id, population) = findall(s -> s.rank == id, population)
-
-pick_random(itr, item) = rand(findall(i -> i == item, itr))
-find_item(itr, item) = findall(i -> i == item, itr)
-
-function niching!(population, reference_points, N, l)
-    if length(population) == N
-        return
-    end
+function niching!(
+    population,
+    reference_points,
+    N,
+    l,
+    rng::Random.AbstractRNG = default_rng_mh(),
+)
+    n = length(population)
+    n == N && return
 
     F = normalize(population)
-    k = l
+    H = length(reference_points)
 
-    # allocate memory
-    nich = zeros(Int, length(population))
-    nich_freq = zeros(Int, length(reference_points))
-    available_niches = ones(Bool, length(reference_points))
-    distance = fill(Inf, length(population))
+    nich = zeros(Int, n)
+    nich_freq = zeros(Int, H)
+    distance = fill(Inf, n)
 
     # associate to niches
     associate!(nich, nich_freq, distance, F, reference_points, l)
 
-    # keep last front
-    last_front_id = k:length(population) #get_last_front(population[end].rank, population)
-    last_front = population[last_front_id]
-    deleteat!(population, last_front_id)
+    # last front members grouped by niche (ascending index order within each niche)
+    remaining = zeros(Int, H)
+    for i in l:n
+        remaining[nich[i]] += 1
+    end
+    start = Vector{Int}(undef, H)
+    s = 1
+    for j in 1:H
+        start[j] = s
+        s += remaining[j]
+    end
+    members = Vector{Int}(undef, n - l + 1)
+    fill_pos = copy(start)
+    for i in l:n
+        j = nich[i]
+        members[fill_pos[j]] = i
+        fill_pos[j] += 1
+    end
 
-    # last front niches information
-    niches_last_front = nich[last_front_id]
-    distance_last_front = distance[last_front_id]
+    K = N - l + 1
+    selected = Vector{Int}(undef, K)
+    candidates = Int[]
+    sizehint!(candidates, H)
 
-    # save survivors
-    i = 1
-    while k <= N
-        mini = minimum(view(nich_freq, available_niches))
-        # nich to be assigned
-        j_hat = pick_random(nich_freq, mini)
+    for t in 1:K
+        # niches with the fewest associated survivors, among niches with last front members
+        mini = typemax(Int)
+        empty!(candidates)
+        for j in 1:H
+            remaining[j] > 0 || continue
+            fj = nich_freq[j]
+            if fj < mini
+                mini = fj
+                empty!(candidates)
+                push!(candidates, j)
+            elseif fj == mini
+                push!(candidates, j)
+            end
+        end
+        j_hat = candidates[rand(rng, 1:length(candidates))]
 
         # candidate solutions
-        I_j_hat = find_item(niches_last_front, j_hat)
-        if isempty(I_j_hat)
-            available_niches[j_hat] = false
-            continue
-        end
-
+        a = start[j_hat]
+        m = remaining[j_hat]
         if mini == 0
-            ds = view(distance_last_front, I_j_hat)
-            s = I_j_hat[argmin(ds)]
-            push!(population, last_front[s])
+            # closest solution to the reference direction
+            p = a
+            for q in (a + 1):(a + m - 1)
+                distance[members[q]] < distance[members[p]] && (p = q)
+            end
         else
-            s = rand(I_j_hat)
-            push!(population, last_front[s])
+            p = a + rand(rng, 1:m) - 1
         end
 
+        selected[t] = members[p]
+
+        # remove selected member keeping the order
+        for q in p:(a + m - 2)
+            members[q] = members[q + 1]
+        end
+        remaining[j_hat] -= 1
         nich_freq[j_hat] += 1
-        deleteat!(last_front, s)
-        deleteat!(niches_last_front, s)
-        deleteat!(distance_last_front, s)
-
-        k += 1
-
     end
+
+    survivors = population[selected]
+    resize!(population, l - 1)
+    append!(population, survivors)
 
     nothing
 end
@@ -262,12 +389,6 @@ function initialize!(
     args...;
     kargs...,
 )
-
-    D = getdim(problem)
-
-    if parameters.p_m < 0.0
-        parameters.p_m = 1.0 / D
-    end
 
     if options.iterations == 0
         options.iterations = 500
@@ -308,15 +429,28 @@ end
 ###########################################
 ## NSGA3 reproduction
 ###########################################
-function reproduction(status, parameters::NSGA3, problem)
+function reproduction(
+    status,
+    parameters::NSGA3,
+    problem,
+    rng::Random.AbstractRNG = default_rng_mh(),
+)
     @assert !isempty(status.population)
 
-    I = randperm(parameters.N)
-    Q = zeros(eltype(get_position(first(status.population))), parameters.N, getdim(problem))
-    for i in 1:parameters.N ÷ 2
+    population = status.population
+    N = parameters.N
+    D = getdim(problem)
+    # p_m < 0 means 1/D; computed here so `parameters` is not modified
+    p_m = parameters.p_m < 0 ? 1.0 / D : parameters.p_m
 
-        pa = status.population[I[2i - 1]]
-        pb = status.population[I[2i]]
+    # random mating: consecutive solutions in a random permutation are paired
+    n = length(population)
+    I = randperm(rng, n)
+    Q = zeros(eltype(get_position(first(population))), N, D)
+    for i in 1:cld(N, 2)
+        # for odd N, the last parent is paired with the first one in the permutation
+        pa = population[I[mod1(2i - 1, n)]]
+        pb = population[I[mod1(2i, n)]]
 
         c1, c2 = GA_reproduction(
             get_position(pa),
@@ -325,10 +459,11 @@ function reproduction(status, parameters::NSGA3, problem)
             η_cr = parameters.η_cr,
             p_cr = parameters.p_cr,
             η_m = parameters.η_m,
-            p_m = parameters.p_m,
+            p_m = p_m,
+            rng = rng,
         )
         Q[2i - 1, :] = c1
-        Q[2i, :] = c2
+        2i <= N && (Q[2i, :] = c2)
     end
 
     Q
