@@ -16,7 +16,7 @@ include("epsilonDE.jl")
 """
     DE(;
         N  = 0,
-        F  = 1.0,
+        F  = 0.7,
         CR = 0.5,
         strategy = :rand1,
         information = Information(),
